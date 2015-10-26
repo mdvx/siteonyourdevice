@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="style.css">
 </head>
  <body>
-  <div class="context headerRound"> Регистрация сайтов </div>
+  <div class="context headerRound"> Регистрация сайтов!! </div>
   <div class="registrationIndex">
 <?php
 include_once "fun.php";
