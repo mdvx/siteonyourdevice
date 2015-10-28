@@ -76,10 +76,11 @@ if ($_POST['sait']!=null)
 		{		
 		$arr = array ('name' => $arr['name'], 'secondName' => $arr['second_name'], 'login' => $arr['login'], 'password'=>  $arr['password'], 'sait' => $_POST['sait'], 'hosts' => array ('127.0.0.1', '127.0.0.2', '127.0.0.3')   );
 		$jsonData = json_encode($arr);
-		print ($jsonData);
+		
 		include_once "redis_connect.php";
 		$key = $arr['login'];
 		$redis -> set($key, $jsonData);
+		print_r ($jsonData);
 		}
 		catch (Exception $e) { die($e->getMessage()); }
 	}
