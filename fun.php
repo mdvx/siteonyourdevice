@@ -1,7 +1,7 @@
 ﻿<?
 function connect ()
   {
-$host="46.101.8.183";
+$host="localhost";
 $user="root";
 $password="fastogt";
 $db="registration_site";

@@ -1,6 +1,6 @@
 <? if (isset($_COOKIE['id']) & isset($_COOKIE['hash'])) 
 	{ 
-		mysql_connect("46.101.8.183", "root", "fastogt") or die("MySQL сервер недоступен!".mysql_error());
+		mysql_connect("localhost", "root", "fastogt") or die("MySQL сервер недоступен!".mysql_error());
 		mysql_select_db("registration_site") or die("Нет соединения с БД".mysql_error());
 		mysql_query("SET NAMES utf8");
 		$query = mysql_query("SELECT * FROM users WHERE id_users = '".$_COOKIE['id']."' LIMIT 1");
@@ -21,7 +21,7 @@
 	{
 	if (isset ($_POST['ok']) & $_POST['login']!=null & $_POST['pass']!=null)
 	{ 
-		mysql_connect("46.101.8.183", "root", "fastogt") or die("MySQL сервер недоступен!".mysql_error());
+		mysql_connect("localhost", "root", "fastogt") or die("MySQL сервер недоступен!".mysql_error());
 		mysql_select_db("registration_site") or die("Нет соединения с БД".mysql_error());
 		mysql_query("SET NAMES utf8");
 		$query = mysql_query("SELECT id_users, password FROM users WHERE login='".mysql_real_escape_string($_POST['login'])."' LIMIT 1");
