@@ -1,9 +1,9 @@
 ﻿<?
 function connect ()
   {
-$host="localhost";
+$host="46.101.8.183";
 $user="root";
-$password="";
+$password="fastogt";
 $db="registration_site";
 mysql_connect($host, $user, $password) or die("MySQL сервер недоступен!".mysql_error());
 mysql_select_db($db) or die("Нет соединения с БД".mysql_error());
