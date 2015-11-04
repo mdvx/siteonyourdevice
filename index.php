@@ -1,46 +1,47 @@
-<? if (isset($_COOKIE['id']) & isset($_COOKIE['hash'])) 
+<?php 
+if (isset($_COOKIE['id']) & isset($_COOKIE['hash'])) 
 	{ 
-		mysql_connect("localhost", "root", "fastogt") or die("MySQL сервер недоступен!".mysql_error());
-		mysql_select_db("registration_site") or die("Нет соединения с БД".mysql_error());
-		mysql_query("SET NAMES utf8");
-		$query = mysql_query("SELECT * FROM users WHERE id_users = '".$_COOKIE['id']."' LIMIT 1");
-		$userdata = mysql_fetch_array($query);
+		$connect = mysqli_connect("127.0.0.1", "root", "fastogt", "registration_site") or die("MySQL сервер недоступен!".mysql_error());
+		//mysql_query("SET NAMES utf8");
+		//ini_set("display_errors",1);
+		//error_reporting(E_ALL);
+		$query = mysqli_query($connect, "SELECT * FROM users WHERE id_users = '".$_COOKIE['id']."' LIMIT 1");
+		$userdata = mysqli_fetch_array($query);
 		if( ($userdata['hash'] !== $_COOKIE['hash']) or ($userdata['id_users'] !== $_COOKIE['id']) )
 			{
 				setcookie("id", "", time() - 3600*24*30*12);
 				setcookie("hash", "", time() - 3600*24*30*12);
 				?><script type="text/javascript">alert("Ошибка! Попробуйте авторизироваться еще раз.");</script>
-				<script type="text/javascript">location.href="index.php"</script><?
+				<script type="text/javascript">location.href="index.php"</script><?php
 			}
 		else    
 			{ 
-			?><script type="text/javascript">location.href="account.php"</script><?
+			?><script type="text/javascript">location.href="account.php"</script><?php
 			}
 	}
-	else
+else
 	{
-	if (isset ($_POST['ok']) & $_POST['login']!=null & $_POST['pass']!=null)
+	if (isset ($_POST['ok']) && $_POST['login']!=null && $_POST['pass']!=null)
 	{ 
-		mysql_connect("localhost", "root", "fastogt") or die("MySQL сервер недоступен!".mysql_error());
-		mysql_select_db("registration_site") or die("Нет соединения с БД".mysql_error());
-		mysql_query("SET NAMES utf8");
-		$query = mysql_query("SELECT id_users, password FROM users WHERE login='".mysql_real_escape_string($_POST['login'])."' LIMIT 1");
-		$data = mysql_fetch_assoc($query);
+		$connect = mysqli_connect("127.0.0.1", "root", "fastogt", "registration_site") or die("MySQL сервер недоступен!".mysql_error());
+		//mysql_query("SET NAMES utf8");
+		$query = mysqli_query($connect, "SELECT id_users, password FROM users WHERE login='".mysqli_real_escape_string($connect, $_POST['login'])."' LIMIT 1");
+		$data = mysqli_fetch_assoc($query);
 		if (!empty($data))
 			{
 				if( $data['password'] === md5(md5(trim($_POST['pass']))) )
 				{
 				$hash = md5(rand(1,100000));
-				$query = mysql_query("UPDATE users SET hash='".$hash."' WHERE id_users='".$data['id_users']."'");
+				$query = mysqli_query($connect,"UPDATE users SET hash='".$hash."' WHERE id_users='".$data['id_users']."'");
 				setcookie("id", $data['id_users'], time()+60*60*24*30);
 				setcookie("hash", $hash, time()+60*60*24*30);
-				?><script type="text/javascript">location.href="account.php"</script><? 
+				?><script type="text/javascript">location.href="account.php"</script><?php
 				}
-				else 	{ ?><script type="text/javascript">alert("Ошибка! Мы здесь.");</script><? }
-			} else { ?><script type="text/javascript">alert("Ошибка! Или здесь.");</script><?}
+				else 	{ ?><script type="text/javascript">alert("Ошибка! Мы здесь.");</script><?php }
+			} else { ?><script type="text/javascript">alert("Ошибка! Или здесь.");</script><?php }
 	}
 	else if (isset($_POST['ok']) & $_POST['login']==null & $_POST['pass']==null)
-	{?><script type="text/javascript">alert("Поля должны быть заполнены.");</script><?}
+	{?><script type="text/javascript">alert("Поля должны быть заполнены.");</script><?php  }
 	
 	}
 ?>
@@ -54,7 +55,7 @@
  <body>
   <div class="context headerRound"> Регистрация сайтов </div>
   <div class="index">
-<?
+<?php
 echo "<table border=0>
 	<form method=post action='index.php'>
 	<tr><td>Логин</td><td><input class='form' type=text name='login'></td></tr>
