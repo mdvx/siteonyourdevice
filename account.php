@@ -55,8 +55,8 @@ if ( isset($_POST['registration_data']) | isset($_POST['ok']) )
 echo " 
 <form method=post action='account.php'>
 <table border=0>
-<tr><td> Адрес сайта </td><td><input class='form' type=text placeholder='Адрес сайта' name='sait'></td></tr>
-<tr><td> Описание сайта </td><td><textarea class='form' rows=5  placeholder='Описание сайта' name='opisanieSait'></textarea></td></tr>
+<tr><td> Доменное имя сайта </td><td><input class='form' type=text name='sait'></td></tr>
+<tr><td> Описание сайта </td><td><textarea class='form' rows=5  name='opisanieSait'></textarea></td></tr>
 <tr><td> </td> <td><input type=hidden name='hidden' value='".$arr['id_users']."'></td></tr>
 <tr><td><input class='form submit' type=submit name='okregistr' value='Зарегистрировать'></td></tr>
 </table>
