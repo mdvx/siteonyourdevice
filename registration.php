@@ -3,7 +3,7 @@
 <head>
 <title>Тест</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style/style.css">
 </head>
  <body>
   <div class="context headerRound"> Регистрация сайтов </div>
@@ -22,7 +22,7 @@ echo " <table border=0>
 </form>  ";
 echo "<tr><td colspan=2><div class='link submit'><a href='index.php'>На главную</a> </div></td></tr></table>";
 
-include 'registration_user.php';
+include 'function/registration_user.php';
 
 //ini_set("display_errors",1);
 //error_reporting(E_ALL);

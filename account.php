@@ -15,7 +15,7 @@
 <head>
 <title>Тест</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style/style.css">
 
 </head>
  <body>
@@ -42,13 +42,13 @@
    
  <div class="context middle borderleft borderright">
 <?php
-include_once 'mysql_connect.php'; 
+include_once 'function/mysql_connect.php'; 
 
 $query = mysqli_query ($connect, "SELECT * FROM users where id_users='".$_COOKIE['id']."' LIMIT 1");
 $arr = mysqli_fetch_assoc($query);
 
 
-if ( isset($_POST['private_data']) ) { include_once 'personal_data.php'; } //данные о пользователе
+if ( isset($_POST['private_data']) ) { include_once 'function/personal_data.php'; } //данные о пользователе
 
 if ( isset($_POST['registration_data']) | isset($_POST['ok']) )
 {
@@ -65,34 +65,9 @@ echo "
 
 //регистрация сайта
 if (isset($_POST['okregistr'])) 
-{ 	include_once 'registration_site.php'; 
-
-/*if ($_POST['sait']!=null) 
-	{
-		//запись в базу редис
-		
-		$arr = array ('name' => $arr['name'], 'secondName' => $arr['second_name'], 'login' => $arr['login'], 'password'=>  $arr['password'], 'sait' => $_POST['sait'], 'hosts' => array ('127.0.0.1', '127.0.0.2', '127.0.0.3')   );
-		$jsonData = json_encode($arr);
-		//include 'redis_connect.php';
-		$redis = new Redis(); 
-		$redis->connect('127.0.0.1'); 
-		var_dump ($redis);
-		$key = $arr['login'];
-		$redis -> set($key, $jsonData);
-		echo "<br><br><br>";
-		echo "  ".$redis -> get($key)."  ";
-		ini_set('display_errors',1);
-		error_reporting(E_ALL);
-		echo "<br>".$jsonData."Мы в блоке try".$arr['login'];
-		//}
-		//catch (Exception $e) { die($e->getMessage()); }
-	}
-	*/
-
-
-}
+{ 	include_once 'function/registration_site.php'; }
 	
-if ( isset($_POST['registration_site']) ) { include_once 'output_site.php';} //вывод записанных сайтов 
+if ( isset($_POST['registration_site']) ) { include_once 'function/output_site.php';} //вывод записанных сайтов 
 ?>
 </div>
   

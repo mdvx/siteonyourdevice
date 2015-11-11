@@ -19,22 +19,40 @@ if (isset($_POST['registrationOk']))
 		//проверяем почту
 		if($_POST['email']!= filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ) { $err[] = "Ваш e-mail задан в неправильном формате";}
 		
-		//проверяем пользователя
+		//проверяем уникальность пользователя
 		$query = mysqli_query($connect, "SELECT * FROM users WHERE login='".clean($_POST['login'])."'");
 		$result = mysqli_num_rows($query);
 		
 		if ($result!=false) {$err[] = "Пользователь с таким логином уже существует";}
 		
+		//проверяем уникальность почтового ящика
+		$query = mysqli_query($connect, "SELECT * FROM users WHERE email='".filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)."'");
+		$result = mysqli_num_rows($query);
+		
+		if ($result!=false) {$err[] = "Пользователь с таким e-mail уже существует";}
+		
 		//нет ошибок
 		if ( count($err)==0 )
 		{
+			$activation=md5($_POST['email'].time()); // генерируем код активации
 			$pass = md5(md5(trim($_POST['pass'])));
 			$name=clean($_POST['name']); $secondName=clean($_POST['secondName']); $email=clean($_POST['email']); $login=clean($_POST['login']); 
         // Записываем в БД хеш
-		$query = mysqli_query($connect,"INSERT INTO users SET login='".$login."', password='".$pass."', name='".$name."', second_name='".$secondName."',
-		email='".$email."'");
-		?><script type="text/javascript">location.href="index.php";</script>
-		  <script type="text/javascript">alert("Авторизируйтесь пожалуйста");</script><?php		
+		$query = mysqli_query($connect,"INSERT INTO users 
+				 SET login='".$login."', password='".$pass."', name='".$name."', second_name='".$secondName."', email='".$email."', 
+				 activation='".$activation."', status=0");
+		//посылаем письмо
+		$base_url = 'http://46.101.8.183/';
+		$message = 'Здравствуйте! Для подтверждения регистрации перейдите пожалуйста по ссылке. '.$base_url.'verification_password.php?code='.$activation;
+
+		// На случай если какая-то строка письма длиннее 70 символов мы используем wordwrap()
+		$message = wordwrap($message, 70, "\r\n");
+
+		// Отправляем
+		mail($email, 'Подтверждение регистрации', $message);
+		
+		?><script type="text/javascript">alert("На почту отправлено письмо. Подтвердите пожалуйста регистрацию.");</script>
+		<script type="text/javascript">location.href="index.php";</script><?php		
 		}
 		else 
 		{
