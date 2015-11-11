@@ -12,10 +12,10 @@
 <?php
 echo " <table border=0>
 <form method=post action='registration.php'>
-<tr><td>Имя</td> <td><input class='form' type=text name='name'></td></tr>
-<tr><td>Фамилия</td> <td><input class='form' type=text name='secondName'></td></tr>
-<tr><td>E-mail</td> <td><input class='form' type=text name='email'></td></tr>
-<tr><td>Логин</td> <td><input class='form' type=text name='login'></td></tr>
+<tr><td>Имя</td> <td><input class='form' type=text name='name' value='".$_POST['name']."'></td></tr>
+<tr><td>Фамилия</td> <td><input class='form' type=text name='secondName' value='".$_POST['secondName']."'></td></tr>
+<tr><td>E-mail</td> <td><input class='form' type=text name='email' value='".$_POST['email']."'></td></tr>
+<tr><td>Логин</td> <td><input class='form' type=text name='login' value='".$_POST['login']."'></td></tr>
 <tr><td>Пароль</td> <td><input class='form' type=password name='pass'></td></tr>
 <tr><td>Повторите пароль</td> <td><input class='form' type=password name='pass2'></td></tr>
 <tr> <td colspan=2 align=center><input class='form submit' type=submit name='registrationOk' value='Зарегистрироваться'></td></tr>

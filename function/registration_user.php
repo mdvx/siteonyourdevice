@@ -56,6 +56,13 @@ if (isset($_POST['registrationOk']))
 		}
 		else 
 		{
+			echo "<form method=post action='registration.php'>
+			<input type=hidden name='name' value='".$_POST['name']."'>
+			<input type=hidden name='name' value='".$_POST['secondName']."'>
+			<input type=hidden name='name' value='".$_POST['email']."'>
+			<input type=hidden name='name' value='".$_POST['login']."'>
+			</form>
+			";
 			echo "<br><b>При регистрации произошли следующие ошибки:</b><br>";
 			foreach($err AS $error)
 			{ echo $error."<br>"; }
