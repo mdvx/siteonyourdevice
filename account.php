@@ -13,14 +13,16 @@
 <!DOCTYPE html > 
 <html lang="ru">
 <head>
-<title>Тест</title>
+<title>Личный кабинет</title>
+<link rel="icon" href="http://siteonyourdevice.com/favicon.png" type="image/png"/>
+<link rel="shortcut icon" href="http://siteonyourdevice.com/favicon.ico" type="image/x-icon"/>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="style/style.css">
 
 </head>
  <body>
 <div class="context header borderleft borderright">
- <div class="head"> <div class="left">Региcтрация сайта  </div></div>
+ <div class="head"> <div class="left">SITE ON YOUR DEVICE  </div></div>
  <div class="head">
  <?php
 	echo "
@@ -37,6 +39,7 @@
 	<form method=post action='account.php'><input type=submit class="button button1" name="private_data" value="Личные данные"></form>
 	<form method=post action='account.php'><input type=submit class="button button2" name="registration_data" value="Регистрация сайта"></form>
 	<form method=post action='account.php'><input type=submit class="button button3" name="registration_site" value="Зарегистрированные сайты"></form>
+	
 <div style="width:100%; height:0px; clear:both;"></div>
 </div>
    
@@ -63,11 +66,11 @@ echo "
 </form>";
 }
 
-//регистрация сайта
-if (isset($_POST['okregistr'])) 
-{ 	include_once 'function/registration_site.php'; }
-	
-if ( isset($_POST['registration_site']) ) { include_once 'function/output_site.php';} //вывод записанных сайтов 
+if (isset($_POST['deleteacc'])) { 	include_once 'function/delete_account.php'; }
+if (isset($_POST['okregistr'])) { 	include_once 'function/registration_site.php'; } //регистрация сайта
+if ( isset($_POST['registration_site']) ) { 	include_once 'function/output_site.php';} //вывод записанных сайтов 
+if (isset($_POST['redact_opisanie'])) { 	include_once 'function/redact_opisanie.php'; } //редактирование описания сайта
+if (isset($_POST['delete_site'])) { 	include_once 'function/delete_site.php'; } //удаление сайта
 ?>
 </div>
   

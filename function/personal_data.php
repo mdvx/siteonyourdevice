@@ -8,5 +8,17 @@ $query = mysqli_query($connect, "SELECT * FROM users where id_users='".$_COOKIE[
 				<tr><td width=30%>E-mail</td><td>".$arr["email"]."</td></tr>
 				<tr><td width=30%>Логин</td><td>".$arr["login"]."</td></tr>
 				</table>";
+	
+	echo " 
+	<fieldset style='position:absolute; bottom:5px; width:95%; border:none;';>
+	<legend>Удаление аккаунта</legend>
+	<form method=post action='account.php'>
+	<table border=0 width=50% align=center>
+	<tr><td> Вы действительно хотите удалить свой аккаунт? </td></tr>
+	<tr><td><input type=hidden name='hidden' value='".$arr['id_users']."'></td></tr>
+	<tr><td><input class='form submit' type=submit name='deleteacc' value='Да, я хочу удалить аккаунт'></td></tr>
+	</table>
+	</form>
+	</fieldset>";
 
 ?>

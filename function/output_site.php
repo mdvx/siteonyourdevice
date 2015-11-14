@@ -5,15 +5,18 @@
 	$num_results = mysqli_num_rows($W);
 			if ($num_results!=0)
 			{
-			echo "<table border=1 width=100%>
-				<tr><td width=30%>Адрес сайта</td>
-			    <td width=70%>Описание</td></tr>";
+			echo " <form method='post' action='account.php'>
+				<table border=1 rules='rows' width=100%>
+				<tr><td width=30%>Адрес сайта</td> <td width=70% colspan=2>Описание</td></tr>";
 			for ($n=0; $n<$num_results; $n++)
 				{
 				$arr = mysqli_fetch_array($W);
-				echo "<tr><td>".$arr["adds_site"]."</td>
-			    <td>".$arr["description"]."</td></tr>";
-				} echo "</table>";
+				echo "<tr><td>".$arr["adds_site"]."</td> 
+				<td><textarea name='opisanie' cols=50 rows = 3>".$arr["description"]."</textarea></td>
+				<td> <input type=hidden name ='hidden' value='".$arr["id_site"]."'> 
+						<input type=submit name='redact_opisanie' value='Сохранить описание'>
+						<input type=submit name='delete_site' value='Удалить сайт'></td> </tr>";
+				} echo "</table> </form>";
 				
 			}	
 

@@ -2,11 +2,13 @@
 <html lang="ru">
 <head>
 <title>Подтверждение пароля</title>
+<link rel="icon" href="http://siteonyourdevice.com/favicon.png" type="image/png"/>
+<link rel="shortcut icon" href="http://siteonyourdevice.com/favicon.ico" type="image/x-icon"/>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="style/style.css">
 </head>
  <body>
-  <div class="context headerRound"> Регистрация сайтов </div>
+  <div class="context headerRound"> SITE ON YOUR DEVICE </div>
   <div class="index">
 <?php
 
@@ -30,7 +32,7 @@ include_once 'function/mysql_connect.php';
 		else { echo "Ваш аккаунт уже активирован, нет необходимости активировать его снова."; }
 	}
 	else { echo "Неверный код активации."; }
- }
+ } else { echo "Вероятно, Вы попали сюда по ошибке.<a href='index.php'>Здесь</a> наша главная страница."; }
  
 function clean($value="")
 { $value = trim($value); $value=stripcslashes($value); $value=strip_tags($value); $value=htmlspecialchars($value); return $value; 

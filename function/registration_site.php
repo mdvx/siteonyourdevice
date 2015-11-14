@@ -1,6 +1,5 @@
 ﻿<?php
 
-//include 'mysql_connect.php';
 	$sait=clean($_POST['sait']); $opisanieSait=clean($_POST['opisanieSait']); 
 		if ($sait!=null)
 		{ 
@@ -17,9 +16,6 @@
 			include 'redis_connect.php';
 			$key = $arr['login'];
 			$redis -> hset ('users',$key, $jsonData);
-			//print_r($redis -> hgetall('users') );
-			//ini_set('display_errors',1);
-			//error_reporting(E_ALL);
 			}
 			else { echo "Сайт с таким же доменным именем уже был зарегистрирован.";}
 			
