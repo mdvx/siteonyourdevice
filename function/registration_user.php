@@ -3,8 +3,7 @@
 if (isset($_POST['registrationOk']))
 	{
 	include 'mysql_connect.php';
-		//ini_set("display_errors",1);
-		//error_reporting(E_ALL);
+		
 		$err = array();
 		if ( trim($_POST['pass']) !== trim($_POST['pass2'])) { $err[] = "Вы неверно ввели проверочный пароль";} 
 		if(empty($_POST['name']) ) { $err[] = "Вы не ввели Ваше Имя";}
@@ -17,7 +16,7 @@ if (isset($_POST['registrationOk']))
 		if(empty($_POST['pass']) ) { $err[] = "Вы не ввели пароль<br>";}
 			else if(strlen($_POST['pass']) < 5 or strlen($_POST['pass']) > 30) {$err[] = "Пароль должен быть не меньше 5-ти символов и не больше 30";}
 		//проверяем почту
-		if($_POST['email']!= filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ) { $err[] = "Ваш e-mail задан в неправильном формате";}
+		if($_POST['email']!= filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ) { $err[] = "Введенный e-mail задан в неправильном формате";}
 		
 		//проверяем уникальность пользователя
 		$query = mysqli_query($connect, "SELECT * FROM users WHERE login='".clean($_POST['login'])."'");
@@ -42,14 +41,17 @@ if (isset($_POST['registrationOk']))
 				 SET login='".$login."', password='".$pass."', name='".$name."', second_name='".$secondName."', email='".$email."', 
 				 activation='".$activation."', status=0");
 		//посылаем письмо
-		$base_url = 'http://46.101.8.183/';
-		$message = 'Здравствуйте! Для подтверждения регистрации перейдите пожалуйста по ссылке. '.$base_url.'verification_password.php?code='.$activation;
-
+		$base_url = 'http://siteonyourdevice.com/';
+		$subject="Подтверждение регистрации";//тема письма
+		$message = 'Здравствуйте! Вы зарегистрировались на сайте siteonyourdevice.com. Для подтверждения регистрации перейдите пожалуйста по ссылке. '.$base_url.'verification_password.php?code='.$activation;
+		$from = '=?utf-8?B?'.base64_encode("Администрация").'?=';
+		$header="From: ".$from." <donotreply@siteonyourdevice.com>";
+						
 		// На случай если какая-то строка письма длиннее 70 символов мы используем wordwrap()
 		$message = wordwrap($message, 70, "\r\n");
 
 		// Отправляем
-		mail($email, 'Подтверждение регистрации', $message);
+		mail($email, $subject, $message, $header);
 		
 		?><script type="text/javascript">alert("На почту отправлено письмо. Подтвердите пожалуйста регистрацию.");</script>
 		<script type="text/javascript">location.href="index.php";</script><?php		
