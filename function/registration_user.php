@@ -42,16 +42,20 @@ if (isset($_POST['registrationOk']))
 				 activation='".$activation."', status=0");
 		//посылаем письмо
 		$base_url = 'http://siteonyourdevice.com/';
-		$subject="Подтверждение регистрации";//тема письма
-		$message = 'Здравствуйте! Вы зарегистрировались на сайте siteonyourdevice.com. Для подтверждения регистрации перейдите пожалуйста по ссылке. '.$base_url.'verification_password.php?code='.$activation;
-		$from = '=?utf-8?B?'.base64_encode("Администрация").'?=';
-		$header="From: ".$from." <donotreply@siteonyourdevice.com>";
+		$subject='Подтверждение регистрации';//тема письма
+		$message = "Здравствуйте! Вы зарегистрировались на сайте siteonyourdevice.com. Для подтверждения регистрации перейдите пожалуйста по ссылке: ".$base_url.'verification_password.php?code='.$activation;
+				
+		$header='From: SiteOnYourDevice <donotreply@siteonyourdevice.com>'. "\r\n" .
+		'Reply-To: donotreply@siteonyourdevice.com' . "\r\n" .
+		'X-Mailer: PHP/' . phpversion();
+		$headers .= 'Content-type: text/plain; charset=\"KOI8-R\"';
+		$parameters = '-fdonotreply@siteonyourdevice.com';
 						
 		// На случай если какая-то строка письма длиннее 70 символов мы используем wordwrap()
 		$message = wordwrap($message, 70, "\r\n");
 
 		// Отправляем
-		mail($email, $subject, $message, $header);
+		mail($email, $subject, $message, $header, $parameters);
 		
 		?><script type="text/javascript">alert("На почту отправлено письмо. Подтвердите пожалуйста регистрацию.");</script>
 		<script type="text/javascript">location.href="index.php";</script><?php		

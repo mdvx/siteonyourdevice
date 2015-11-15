@@ -1,6 +1,7 @@
 ﻿<?php
 
  include_once 'mysql_connect.php';
+	
 	$W=mysqli_query($connect, "DELETE FROM users WHERE id_users='".$arr['id_users']."'");
 	$Q=mysqli_query($connect, "DELETE FROM users_site WHERE id_users='".$arr['id_users']."'");
 		if ($W==true && $Q==true)
@@ -11,5 +12,5 @@
 			setcookie("hash", "", time() - 3600*24*30*12);
 			}	
 		else { echo "Что то пошло не так";}
-
+	
 ?>

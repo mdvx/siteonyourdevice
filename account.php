@@ -66,11 +66,13 @@ echo "
 </form>";
 }
 
-if (isset($_POST['deleteacc'])) { 	include_once 'function/delete_account.php'; }
+if (isset($_POST['deleteacc'])) {  include_once 'function/confirm_delete_account.php'; 	} //подтвердить удаление аккаунта
+if (isset($_POST['delete'])) { 	include_once 'function/delete_account.php'; } //удаление аккаунта
 if (isset($_POST['okregistr'])) { 	include_once 'function/registration_site.php'; } //регистрация сайта
 if ( isset($_POST['registration_site']) ) { 	include_once 'function/output_site.php';} //вывод записанных сайтов 
 if (isset($_POST['redact_opisanie'])) { 	include_once 'function/redact_opisanie.php'; } //редактирование описания сайта
-if (isset($_POST['delete_site'])) { 	include_once 'function/delete_site.php'; } //удаление сайта
+if (isset($_POST['delete_site'])) { 	include_once 'function/confirm_delete_site.php'; } //подтверждение удаления сайта
+if (isset($_POST['deletewebsite'])) { 	include_once 'function/delete_site.php'; } //удаление сайта
 ?>
 </div>
   
