@@ -27,7 +27,7 @@ else
 	{
 		if ($data['status']==1)
 			{
-				if( $data['password'] === md5(md5(trim($_POST['pass']))) )
+				if( $data['password'] === md5($_POST['pass']) )
 				{
 				$hash = md5(rand(1,100000));
 				$query = mysqli_query($connect,"UPDATE users SET hash='".$hash."' WHERE id_users='".$data['id_users']."'");
