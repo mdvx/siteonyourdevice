@@ -34,7 +34,7 @@ if (isset($_POST['registrationOk']))
 		if ( count($err)==0 )
 		{
 			$activation=md5($_POST['email'].time()); // генерируем код активации
-			$pass = md5(md5(trim($_POST['pass'])));
+			$pass = md5($_POST['pass']);
 			$name=clean($_POST['name']); $secondName=clean($_POST['secondName']); $email=clean($_POST['email']); $login=clean($_POST['login']); 
         // Записываем в БД хеш
 		$query = mysqli_query($connect,"INSERT INTO users 
