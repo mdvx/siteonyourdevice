@@ -15,19 +15,17 @@
 			$q = mysqli_query($connect, "SELECT adds_site FROM users_site WHERE id_users='".$_POST['hidden']."'");
 			$num_results = mysqli_num_rows($q);
 			
-			$row = "";
 			$hostArray = [];
 			for ($a=0; $a<$num_results; $a++) 
 				{
 				$result = mysqli_fetch_row($q);
-				$result = implode (",",array_push($hostArray, $result) );
+				array_push($hostArray, implode($result) );
 				}
-			//$hostArray = join(",", $hostArray);
-			//$row = explode(',', $row);
-			var_dump($row);
+			//var_dump($hostArray);
+						
 			//запись в базу redis
 			$arr = array ('name' => $arr['name'], 'secondName' => $arr['second_name'], 'login' => $arr['login'], 'password'=>  $arr['password'], 
-			'hosts' => $row );
+			'hosts' => $hostArray );
 			$jsonData = json_encode($arr);
 			include 'redis_connect.php';
 			$key = $arr['login'];
