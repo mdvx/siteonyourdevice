@@ -4,7 +4,7 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 		<script>
 			//socket io client
-			var socket = io.connect('http://siteonyourdevice.com');
+			var socket = io.connect('http://siteonyourdevice.com:8080');
 
 			//on connetion, updates connection state and sends subscribe request
 			socket.on('connect', function(data){
