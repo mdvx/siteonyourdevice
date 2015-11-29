@@ -12,11 +12,6 @@
 				socket.emit('subscribe', {channel:'COMMANDS_OUT'});
 			});
 
-			//when reconnection is attempted, updates status 
-			socket.on('reconnecting', function(data){
-				setStatus('reconnecting');
-			});
-
 			//on new message adds a new message to display
 			socket.on('message', function (data) {
 				var msg = "";
@@ -28,11 +23,6 @@
 			addMessage(msg);
 			});
 
-			//updates status to the status div
-			function setStatus(msg) {
-				$('#status').html('Connection Status : ' + msg);
-			}
-
 			//adds message to messages div
 			function addMessage(msg) {
 				var str = '<div class="message">' + msg + '</div><hr>';
@@ -42,7 +32,6 @@
 		</script>
 	</head>
 	<body>
-		<div id="status"></div><br><br>
 		<div id="messages"></div>
 	</body>
 </html>

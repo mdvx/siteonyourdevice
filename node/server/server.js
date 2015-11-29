@@ -33,24 +33,11 @@ function handler (req, res) {
   });
 }
 
-/** 
- * set socket.io log level to warn
- *
- * uncomment below line to change debug level
- * 0-error, 1-warn, 2-info, 3-debug 
- *
- * For more options refer https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
- */
-//io.set('log level', 3);
-
 /**
  * socket io client, which listens for new websocket connection
  * and then handles various requests
  */
 io.sockets.on('connection', function (socket) {
-  
-  //on connect send a welcome message
-  socket.emit('message', { text : 'Welcome!' });
 
   //on subscription request joins specified room
   //later messages are broadcasted on the rooms
