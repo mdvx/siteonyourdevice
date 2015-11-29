@@ -4,12 +4,15 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 		<script>
 			//socket io client
-			var socket = io.connect('http://siteonyourdevice.com:8080');
+			var socket = io.connect('http://siteonyourdevice.com');
 
 			//on connetion, updates connection state and sends subscribe request
 			socket.on('connect', function(data){
-				setStatus('connected');
 				socket.emit('subscribe', {channel:'COMMANDS_OUT'});
+			});
+
+			//when reconnection is attempted, updates status 
+			socket.on('reconnecting', function(data){
 			});
 
 			//on new message adds a new message to display
