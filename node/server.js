@@ -1,8 +1,7 @@
 var app = require('http').createServer(handler)
-  , io = require('socket.io').listen(app)
-  , fs = require('fs')
-  , redis = require("redis")
-
+var io = require('socket.io').listen(app)
+var fs = require('fs')
+var redis = require("redis")
 
 app.listen(8080);
 
@@ -18,14 +17,14 @@ redisClient.on("error", function (err) {
 
 
 /**
- * http handler, currently just sends index.html on new connection
+ * http handler, currently just sends server_details.html on new connection
  */
 function handler (req, res) {
-  fs.readFile(__dirname + '/../www/index.html',
+  fs.readFile(__dirname + '/../server_details.html',
   function (err, data) {
     if (err) {
       res.writeHead(500);
-      return res.end('Error loading index.html' + __dirname);
+      return res.end('Error loading server_details.html' + __dirname);
     }
 
     res.writeHead(200);
