@@ -12,7 +12,7 @@ redis_sub.on("error", function (err) {
     console.log("error event - " + redis_sub.host + ":" + redis_sub.port + " - " + err);
 });
 
-redisClient2.on("error", function (err) {
+redis_pub.on("error", function (err) {
     console.log("error event2 - " + redis_pub.host + ":" + redis_pub.port + " - " + err);
 });
 
