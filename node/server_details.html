@@ -4,13 +4,18 @@
         <script src="http://siteonyourdevice.com:3000/socket.io/socket.io.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
         <script>
+            const CHANNEL_IN = 'COMMANDS_IN';
+            const CHANNEL_OUT = 'COMMANDS_OUT';
+            const NODE_PORT = 3000;
+            
             //socket io client
+            var io = require('socket.io');
             var socket = io.connect('http://siteonyourdevice.com:3000');
             var id = 11;
             
             //on connetion, updates connection state and sends subscribe request
             socket.on('connect', function(data){
-            socket.emit('subscribe', {channel:'COMMANDS_OUT'});
+                socket.emit('subscribe', {channel:CHANNEL_OUT});
             });
 
             //when reconnection is attempted, updates status 
@@ -19,28 +24,27 @@
 
             //on new message adds a new message to display
             socket.on('message', function (data) {
-            var msg = "";
-            if (data.channel) {
-            msg += 'Channel:' + data.channel + ', ' + data.text; 
-            } else {
-            msg = data.text;
-            }
-            addMessage(msg);
+                var msg = "";
+                if (data.channel) {
+                    msg += 'Channel:' + data.channel + ', ' + data.text; 
+                } else {
+                    msg = data.text;
+                }
+                addMessage(msg);
             });
 
             //adds message to messages div
             function addMessage(msg) {
-            var str = '<div class="message">' + msg + '</div><hr>';
-            console.log(str)
-            $('#messages').append(str)
+                var str = '<div class="message">' + msg + '</div><hr>';
+                console.log(str)
+                $('#messages').append(str)
             }
 
             var server_name;
             function init()
             {
-            server_name = getUrlParameter('site');
-
-            $('.server_name_label').html(server_name);
+                server_name = get_url_parameter('site');
+                $('.server_name_label').html(server_name);
             }
         </script>
 

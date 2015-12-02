@@ -1,32 +1,36 @@
+const CHANNEL_IN = 'COMMANDS_IN';
+const CHANNEL_OUT = 'COMMANDS_OUT';
+const NODE_PORT = 3000;
+
 var app = require('http').createServer(handler)
 var io = require('socket.io').listen(app)
 var fs = require('fs')
 var redis = require("redis")
-
-app.listen(3000);
-
-redis_sub = redis.createClient();
-redis_pub = redis.createClient();
-
-redis_sub.on("error", function (err) {
-    console.log("error event - " + redis_sub.host + ":" + redis_sub.port + " - " + err);
-});
-
-redis_pub.on("error", function (err) {
-    console.log("error event2 - " + redis_pub.host + ":" + redis_pub.port + " - " + err);
-});
 
 function handler (req, res) {
     fs.readFile('server_details.html',
     function (err, data) {
         if (err) {
             res.writeHead(500);
-            return res.end('Error loading server_details.html' + __dirname);
+            return res.end('Error loading server_details.html, folder' + __dirname);
         }
         res.writeHead(200);
         res.end(data);
     });
 }
+
+app.listen(NODE_PORT);
+
+var redis_sub = redis.createClient();
+var redis_pub = redis.createClient();
+
+redis_sub.on("error", function (err) {
+    console.log("redis_sub error" + err);
+});
+
+redis_pub.on("error", function (err) {
+    console.log("redis_pub error " + err);
+});
 
 io.sockets.on('connection', function (socket) {
     socket.on('subscribe', function (data) {
@@ -34,13 +38,13 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('publish', function (msg) {
-        redis_pub.publish('COMMANDS_IN', msg);
+        redis_pub.publish(CHANNEL_IN, msg);
     });
 
 });
 
 redis_sub.on('ready', function() {
-    redis_sub.subscribe('COMMANDS_OUT');
+    redis_sub.subscribe(CHANNEL_OUT);
 });
 
 redis_sub.on("message", function(channel, message){
