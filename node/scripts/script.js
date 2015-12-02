@@ -14,9 +14,9 @@ function getUrlParameter(sParam)
     }
 }
 
-function ping_server(name, socket)
+function ping_server(id, name, socket)
 {
-socket.emit('publish', name + " " + 11 + " ping");
-//	alert(name);
+    var msg = name + " " + id + " ping";
+    socket.emit('publish', msg);
 }
 

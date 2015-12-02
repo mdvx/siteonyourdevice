@@ -5,71 +5,45 @@ var redis = require("redis")
 
 app.listen(3000);
 
-/** 
- * Our redis client which subscribes to channels for updates
- */
-redisClient = redis.createClient();
-redisClient2 = redis.createClient();
+redis_sub = redis.createClient();
+redis_pub = redis.createClient();
 
-//look for connection errors and log
-redisClient.on("error", function (err) {
-    console.log("error event - " + redisClient.host + ":" + redisClient.port + " - " + err);
+redis_sub.on("error", function (err) {
+    console.log("error event - " + redis_sub.host + ":" + redis_sub.port + " - " + err);
 });
 
-//look for connection errors and log
 redisClient2.on("error", function (err) {
-    console.log("error event2 - " + redisClient.host + ":" + redisClient.port + " - " + err);
+    console.log("error event2 - " + redis_pub.host + ":" + redis_pub.port + " - " + err);
 });
 
-
-/**
- * http handler, currently just sends server_details.html on new connection
- */
 function handler (req, res) {
-fs.readFile('server_details.html',
-  function (err, data) {
-    if (err) {
-      res.writeHead(500);
-      return res.end('Error loading server_details.html' + __dirname);
-    }
-
-    res.writeHead(200);
-    res.end(data);
-  });
+    fs.readFile('server_details.html',
+    function (err, data) {
+        if (err) {
+            res.writeHead(500);
+            return res.end('Error loading server_details.html' + __dirname);
+        }
+        res.writeHead(200);
+        res.end(data);
+    });
 }
 
-/**
- * socket io client, which listens for new websocket connection
- * and then handles various requests
- */
 io.sockets.on('connection', function (socket) {
-  //on subscription request joins specified room
-  //later messages are broadcasted on the rooms
-  socket.on('subscribe', function (data) {
-    socket.join(data.channel);
-  });
+    socket.on('subscribe', function (data) {
+        socket.join(data.channel);
+    });
 
-  socket.on('publish', function (msg) {
-    console.log("publish:", msg);
-    redisClient2.publish('COMMANDS_IN', msg);
-  });
+    socket.on('publish', function (msg) {
+        redis_pub.publish('COMMANDS_IN', msg);
+    });
 
 });
 
-/**
- * subscribe to redis channel when client in ready
- */
-redisClient.on('ready', function() {
-  redisClient.subscribe('COMMANDS_OUT');
+redis_sub.on('ready', function() {
+    redis_sub.subscribe('COMMANDS_OUT');
 });
 
-/**
- * wait for messages from redis channel, on message
- * send updates on the rooms named after channels. 
- * 
- * This sends updates to users. 
- */
-redisClient.on("message", function(channel, message){
+redis_sub.on("message", function(channel, message){
     var resp = {'text': message, 'channel':channel}
     io.sockets.in(channel).emit('message', resp);
 });
