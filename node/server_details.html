@@ -11,7 +11,7 @@
             //socket io client
             //var io = require('socket.io');
             var socket = io.connect('http://siteonyourdevice.com:3000');
-            var id = 11;
+            var id_command = 11;
             
             //on connetion, updates connection state and sends subscribe request
             socket.on('connect', function(data){
@@ -34,7 +34,7 @@
                     return;
                 }
                 
-                if(id !== msgObj.id){
+                if(id_command !== msgObj.id){
                     return;
                 }
                 
@@ -59,7 +59,7 @@
     </head>
     <body onload = "init()">
         <div class="server_name_label"></div>
-        <button onclick="ping_server(id, server_name, socket)">Ping</button>
+        <button onclick="ping_server(id_command, server_name, socket)">Ping</button>
         <div id="messages"></div>
     </body>
 </html>

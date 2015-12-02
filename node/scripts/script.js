@@ -88,7 +88,7 @@ function parse_command_out(msg)
 
 function ping_server(id, name, socket)
 {
-    var msg = name + " " + id.toString(); + " " + COMMANDS.PING;
+    var msg = name + " " + id.toString() + " " + COMMANDS.PING;
     socket.emit('publish', msg);
 }
 
