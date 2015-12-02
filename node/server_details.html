@@ -1,11 +1,11 @@
 <html>
 	<head>
-		<script src="/socket.io/socket.io.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 		<script src="scripts/script.js" type="text/javascript"></script>
+		<script src="http://siteonyourdevice.com:3000/socket.io/socket.io.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 		<script>
 			//socket io client
-			var socket = io.connect('http://siteonyourdevice.com:8080');
+			var socket = io.connect('http://siteonyourdevice.com:3000');
 
 			//on connetion, updates connection state and sends subscribe request
 			socket.on('connect', function(data){

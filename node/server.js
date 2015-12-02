@@ -3,7 +3,7 @@ var io = require('socket.io').listen(app)
 var fs = require('fs')
 var redis = require("redis")
 
-app.listen(8080);
+app.listen(3000);
 
 /** 
  * Our redis client which subscribes to channels for updates
@@ -20,7 +20,7 @@ redisClient.on("error", function (err) {
  * http handler, currently just sends server_details.html on new connection
  */
 function handler (req, res) {
-  fs.readFile(__dirname + '/../server_details.html',
+fs.readFile('server_details.html',
   function (err, data) {
     if (err) {
       res.writeHead(500);
@@ -37,7 +37,6 @@ function handler (req, res) {
  * and then handles various requests
  */
 io.sockets.on('connection', function (socket) {
-
   //on subscription request joins specified room
   //later messages are broadcasted on the rooms
   socket.on('subscribe', function (data) {
