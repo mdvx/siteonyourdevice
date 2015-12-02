@@ -9,10 +9,16 @@ app.listen(3000);
  * Our redis client which subscribes to channels for updates
  */
 redisClient = redis.createClient();
+redisClient2 = redis.createClient();
 
 //look for connection errors and log
 redisClient.on("error", function (err) {
     console.log("error event - " + redisClient.host + ":" + redisClient.port + " - " + err);
+});
+
+//look for connection errors and log
+redisClient2.on("error", function (err) {
+    console.log("error event2 - " + redisClient.host + ":" + redisClient.port + " - " + err);
 });
 
 
@@ -42,6 +48,12 @@ io.sockets.on('connection', function (socket) {
   socket.on('subscribe', function (data) {
     socket.join(data.channel);
   });
+
+  socket.on('publish', function (msg) {
+    console.log("publish:", msg);
+    redisClient2.publish('COMMANDS_IN', msg);
+  });
+
 });
 
 /**
