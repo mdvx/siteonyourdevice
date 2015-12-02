@@ -9,7 +9,7 @@
             const NODE_PORT = 3000;
             
             //socket io client
-            var io = require('socket.io');
+            //var io = require('socket.io');
             var socket = io.connect('http://siteonyourdevice.com:3000');
             var id = 11;
             
@@ -24,12 +24,20 @@
 
             //on new message adds a new message to display
             socket.on('message', function (data) {
-                var msg = "";
-                if (data.channel) {
-                    msg += 'Channel:' + data.channel + ', ' + data.text; 
-                } else {
-                    msg = data.text;
+                if (data.channel !== CHANNEL_OUT) {
+                    return; 
                 }
+                
+                var msg = data.text;
+                var msgObj = parse_command_out(msg);
+                if(msgObj == undefined){
+                    return;
+                }
+                
+                if(id !== msgObj.id){
+                    return;
+                }
+                
                 addMessage(msg);
             });
 
