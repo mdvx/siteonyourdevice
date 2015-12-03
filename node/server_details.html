@@ -51,7 +51,10 @@
                     handle_onconnection_changed(is_ok);
                 }
                 else if(is_info_command(msgObj)){
-                
+		    if(is_ok){
+		        var system_info = JSON.parse(msgObj.args);
+			$('#cpu_label').html(system_info.cpu);
+		    }                
                 }
                 else if(is_shutdown_command(msgObj)){
                 
