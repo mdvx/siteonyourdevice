@@ -59,13 +59,13 @@
                     }
                     
                     if(stateObj.status == CONNECTED_STATUS.CONNECTED){
-                        $('.status_label').html(SERVER_STATUS.ONLINE);
+                        $('#status_label').html(SERVER_STATUS.ONLINE);
                         $('#ping_button').prop('disabled', false);
                         $('#info_button').prop('disabled', false);
                         $('#shutdown_button').prop('disabled', false);
                     }
                     else{
-                        $('.status_label').html(SERVER_STATUS.OFFLINE);
+                        $('#status_label').html(SERVER_STATUS.OFFLINE);
                         $('#ping_button').prop('disabled', true);
                         $('#info_button').prop('disabled', true); 
                         $('#shutdown_button').prop('disabled', true);
@@ -81,9 +81,9 @@
                 if(server_name_local !== undefined){
                     server_name = server_name_local;
                 }
-                $('.server_name_label').html(server_name === undefined ? SERVER_DEFAULT_LABEL : server_name);
-                $('.status_label').html(SERVER_STATUS.OFFLINE);
-                $('.cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
+                $('#server_name_label').html(server_name === undefined ? SERVER_DEFAULT_LABEL : server_name);
+                $('#status_label').html(SERVER_STATUS.OFFLINE);
+                $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
             }
         </script>
 
@@ -91,9 +91,9 @@
     <body onload = "init()">
         <form>
         <fieldset>
-            <legend class="server_name_label"></legend>
-            Status: <label class="status_label"></label><br>
-            Cpu: <label class="cpu_label"></label>
+            <legend id="server_name_label"></legend>
+            Status: <label id="status_label"></label><br>
+            Cpu: <label id="cpu_label"></label>
         </fieldset>
         </form>
         <button id="ping_button" disabled onclick="ping_server(id_command, server_name, socket)">Ping</button>
