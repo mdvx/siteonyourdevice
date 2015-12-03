@@ -27,6 +27,7 @@
                     $('#status_label').html(SERVER_STATUS.OFFLINE);
                     $('#info_button').prop('disabled', true); 
                     $('#shutdown_button').prop('disabled', true);
+                    $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
                 }
             }
             
@@ -51,10 +52,13 @@
                     handle_onconnection_changed(is_ok);
                 }
                 else if(is_info_command(msgObj)){
-		    if(is_ok){
-		        var system_info = JSON.parse(msgObj.args);
-			$('#cpu_label').html(system_info.cpu);
-		    }                
+                    if(is_ok){
+                        var system_info = JSON.parse(msgObj.args);
+                        $('#cpu_label').html(system_info.cpu);
+                    }
+                    else{
+                        $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
+                    }
                 }
                 else if(is_shutdown_command(msgObj)){
                 
