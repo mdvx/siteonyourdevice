@@ -95,7 +95,7 @@
                 var server_name_local = get_url_parameter('site');
                 if(server_name_local !== undefined){
                     server_name = server_name_local;
-                    ping_server(server_name, id_command, socket)
+                    ping_server(id_command, server_name, socket)
                 }
                 $('#server_name_label').html(server_name === undefined ? SERVER_DEFAULT_LABEL : server_name);
                 $('#status_label').html(SERVER_STATUS.OFFLINE);
