@@ -19,6 +19,7 @@
             //on connetion, updates connection state and sends subscribe request
             socket.on('connect', function(data){
                 socket.emit('subscribe', {channel:CHANNEL_OUT});
+                socket.emit('subscribe', {channel:CHANNEL_CLIENTS_STATE});
             });
 
             //when reconnection is attempted, updates status 
@@ -51,7 +52,7 @@
                     
                     }
                 }
-                else if(data.channel === CLIENTS_STATE){
+                else if(data.channel === CHANNEL_CLIENTS_STATE){
                     var stateObj = parse_state_msg(msg);
                     if(stateObj == undefined){
                         return;
