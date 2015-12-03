@@ -58,7 +58,11 @@
                         return;
                     }
                     
-                    if(stateObj.status == CONNECTED_STATUS.CONNECTED){
+                    if(stateObj.host !== server_name){
+                        return;
+                    }
+                    
+                    if(stateObj.status === CONNECTED_STATUS.CONNECTED){
                         $('#status_label').html(SERVER_STATUS.ONLINE);
                         $('#ping_button').prop('disabled', false);
                         $('#info_button').prop('disabled', false);
