@@ -16,6 +16,48 @@
             
             var server_name = undefined;
             
+            function handle_onconnection_changed(is_connected)
+            {
+                if(is_connected){
+                    $('#status_label').html(SERVER_STATUS.ONLINE);
+                    $('#info_button').prop('disabled', false);
+                    $('#shutdown_button').prop('disabled', false);
+                }
+                else{
+                    $('#status_label').html(SERVER_STATUS.OFFLINE);
+                    $('#info_button').prop('disabled', true); 
+                    $('#shutdown_button').prop('disabled', true);
+                }
+            }
+            
+            function handle_state_changed(stateObj)
+            {
+                if(stateObj.host !== server_name){
+                    return;
+                }
+                
+                handle_onconnection_changed(stateObj.status === CONNECTED_STATUS.CONNECTED);
+            }
+            
+            function handle_command_received(msgObj)
+            {
+                if(id_command !== msgObj.id){
+                    return;
+                }
+                
+                var is_ok = is_succsess_command(msgObj);
+                
+                if(is_ping_command(msgObj)){
+                    handle_onconnection_changed(is_ok);
+                }
+                else if(is_info_command(msgObj)){
+                
+                }
+                else if(is_shutdown_command(msgObj)){
+                
+                }
+            }
+            
             //on connetion, updates connection state and sends subscribe request
             socket.on('connect', function(data){
                 socket.emit('subscribe', {channel:CHANNEL_OUT});
@@ -36,21 +78,7 @@
                         return;
                     }
                     
-                    if(id_command !== msgObj.id){
-                        return;
-                    }
-                    
-                    var is_ok = is_succsess_command(msgObj);
-                    
-                    if(is_ping_command(msgObj)){
-                        
-                    }
-                    else if(is_info_command(msgObj)){
-                    
-                    }
-                    else if(is_shutdown_command(msgObj)){
-                    
-                    }
+                    handle_command_received(msgObj);
                 }
                 else if(data.channel === CHANNEL_CLIENTS_STATE){
                     var stateObj = parse_state_msg(msg);
@@ -58,25 +86,8 @@
                         return;
                     }
                     
-                    if(stateObj.host !== server_name){
-                        return;
-                    }
-                    
-                    if(stateObj.status === CONNECTED_STATUS.CONNECTED){
-                        $('#status_label').html(SERVER_STATUS.ONLINE);
-                        $('#ping_button').prop('disabled', false);
-                        $('#info_button').prop('disabled', false);
-                        $('#shutdown_button').prop('disabled', false);
-                    }
-                    else{
-                        $('#status_label').html(SERVER_STATUS.OFFLINE);
-                        $('#ping_button').prop('disabled', true);
-                        $('#info_button').prop('disabled', true); 
-                        $('#shutdown_button').prop('disabled', true);
-                    }
+                    handle_state_changed(stateObj);
                 }
-                
-               
             });
 
             function init()
@@ -84,6 +95,7 @@
                 var server_name_local = get_url_parameter('site');
                 if(server_name_local !== undefined){
                     server_name = server_name_local;
+                    ping_server(server_name, id_command, socket)
                 }
                 $('#server_name_label').html(server_name === undefined ? SERVER_DEFAULT_LABEL : server_name);
                 $('#status_label').html(SERVER_STATUS.OFFLINE);
@@ -100,7 +112,6 @@
             Cpu: <label id="cpu_label"></label>
         </fieldset>
         </form>
-        <button id="ping_button" disabled onclick="ping_server(id_command, server_name, socket)">Ping</button>
         <button id="info_button" disabled onclick="server_info(id_command, server_name, socket)">Info</button>
         <button id="shutdown_button" disabled onclick="shutdown_server(id_command, server_name, socket)">Shutdown</button>
     </body>
