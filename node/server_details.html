@@ -1,12 +1,10 @@
 <html>
     <head>
+        <link rel="stylesheet" href="style/style.css">
         <script src="scripts/script.js" type="text/javascript"></script>
         <script src="http://siteonyourdevice.com:3000/socket.io/socket.io.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
         <script>
-            const CHANNEL_IN = 'COMMANDS_IN';
-            const CHANNEL_OUT = 'COMMANDS_OUT';
-            const NODE_PORT = 3000;
             
             //socket io client
             //var io = require('socket.io');
@@ -38,28 +36,52 @@
                     return;
                 }
                 
-                addMessage(msg);
+                var is_ok = is_succsess_command(msgObj);
+                
+                if(is_ping_command(msgObj)){
+                    if(is_ok){
+                        $('.status_label').html(SERVER_STATUS.ONLINE);
+                    }
+                    else{
+                        $('.status_label').html(SERVER_STATUS.OFFLINE);
+                    }
+                }
+                else if(is_info_command(msgObj)){
+                
+                }
+                else if(is_shutdown_command(msgObj)){
+                
+                }
             });
 
-            //adds message to messages div
-            function addMessage(msg) {
-                var str = '<div class="message">' + msg + '</div><hr>';
-                console.log(str)
-                $('#messages').append(str)
-            }
-
-            var server_name;
+            var user_id = get_url_parameter('id');
+            var user_cookie_hash = get_url_parameter('hash');
+            
+            var server_name = undefined;
+            
             function init()
             {
-                server_name = get_url_parameter('site');
-                $('.server_name_label').html(server_name);
+                var server_name_local = get_url_parameter('site');
+                if(server_name_local !== undefined){
+                    server_name = server_name_local;
+                }
+                $('.server_name_label').html(server_name === undefined ? SERVER_DEFAULT_LABEL : server_name);
+                $('.status_label').html(SERVER_STATUS.OFFLINE);
+                $('.cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
             }
         </script>
 
     </head>
     <body onload = "init()">
-        <div class="server_name_label"></div>
+        <form>
+        <fieldset>
+            <legend class="server_name_label"></legend>
+            Status: <label class="status_label"></label><br>
+            Cpu: <label class="cpu_label"></label>
+        </fieldset>
+        </form>
         <button onclick="ping_server(id_command, server_name, socket)">Ping</button>
-        <div id="messages"></div>
+        <button onclick="server_info(id_command, server_name, socket)">Info</button>
+        <button onclick="shutdown_server(id_command, server_name, socket)">Shutdown</button>
     </body>
 </html>

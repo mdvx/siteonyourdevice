@@ -1,3 +1,9 @@
+// global constant
+const CHANNEL_IN = 'COMMANDS_IN';
+const CHANNEL_OUT = 'COMMANDS_OUT';
+const NODE_PORT = 3000;
+
+//get url field
 function get_url_parameter(sParam) 
 {
     var sPageURL = decodeURIComponent(window.location.search.substring(1)),
@@ -14,20 +20,30 @@ function get_url_parameter(sParam)
     }
 }
 
-var STATUS = { // 4.1
+var STATUS = { 
     OK : 1,
     FAIL : 0
 };
 
 var COMMANDS = {
-    PING : "ping"
+    PING : "ping",
+    INFO : "info",
+    SHUTDOWN : "disconnect"
 }
-
+// is_commands
 function is_ping_command(msgObj)
 {
     return msgObj.command === COMMANDS.PING;    
 }
-
+function is_info_command(msgObj)
+{
+    return msgObj.command === COMMANDS.INFO;    
+}
+function is_shutdown_command(msgObj)
+{
+    return msgObj.command === COMMANDS.SHUTDOWN;    
+}
+// status off command
 function is_failed_command(msgObj)
 {
     return msgObj.status === STATUS.FAIL;    
@@ -37,7 +53,7 @@ function is_succsess_command(msgObj)
 {
     return msgObj.status === STATUS.OK;    
 }
-
+// parse string to msgObj
 function parse_command_out(msg)
 {
     var msg_length = msg.length;
@@ -86,9 +102,41 @@ function parse_command_out(msg)
     return undefined;
 }
 
+// server functions
 function ping_server(id, name, socket)
 {
+    if(name === undefined){
+        return;
+    }
+    
     var msg = name + " " + id.toString() + " " + COMMANDS.PING;
     socket.emit('publish', msg);
 }
 
+function shutdown_server(id, name, socket)
+{
+    if(name === undefined){
+        return;
+    }
+    
+    var msg = name + " " + id.toString() + " " + COMMANDS.SHUTDOWN;
+    socket.emit('publish', msg);
+}
+
+function server_info(id, name, socket)
+{
+    if(name === undefined){
+        return;
+    }
+    
+    var msg = name + " " + id.toString() + " " + COMMANDS.INFO;
+    socket.emit('publish', msg);
+}
+
+//// server_details constant
+const SERVER_DEFAULT_LABEL = "Unknown";
+const SERVER_CPU_DEFAULT_LABEL = "Unknown"
+var SERVER_STATUS = { 
+    ONLINE : "online",
+    OFFLINE : "offline"
+};
