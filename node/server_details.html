@@ -9,7 +9,12 @@
             //socket io client
             //var io = require('socket.io');
             var socket = io.connect('http://siteonyourdevice.com:3000');
+            
             var id_command = 11;
+            var user_id = get_url_parameter('id');
+            var user_cookie_hash = get_url_parameter('hash');
+            
+            var server_name = undefined;
             
             //on connetion, updates connection state and sends subscribe request
             socket.on('connect', function(data){
@@ -22,43 +27,53 @@
 
             //on new message adds a new message to display
             socket.on('message', function (data) {
-                if (data.channel !== CHANNEL_OUT) {
-                    return; 
-                }
-                
                 var msg = data.text;
-                var msgObj = parse_command_out(msg);
-                if(msgObj == undefined){
-                    return;
+                
+                if (data.channel === CHANNEL_OUT) {
+                    var msgObj = parse_command_out(msg);
+                    if(msgObj == undefined){
+                        return;
+                    }
+                    
+                    if(id_command !== msgObj.id){
+                        return;
+                    }
+                    
+                    var is_ok = is_succsess_command(msgObj);
+                    
+                    if(is_ping_command(msgObj)){
+                        
+                    }
+                    else if(is_info_command(msgObj)){
+                    
+                    }
+                    else if(is_shutdown_command(msgObj)){
+                    
+                    }
                 }
-                
-                if(id_command !== msgObj.id){
-                    return;
-                }
-                
-                var is_ok = is_succsess_command(msgObj);
-                
-                if(is_ping_command(msgObj)){
-                    if(is_ok){
+                else if(data.channel === CLIENTS_STATE){
+                    var stateObj = parse_state_msg(msg);
+                    if(stateObj == undefined){
+                        return;
+                    }
+                    
+                    if(stateObj.status == CONNECTED_STATUS.CONNECTED){
                         $('.status_label').html(SERVER_STATUS.ONLINE);
+                        $('.ping_button').disabled = false;
+                        $('.info_button').disabled = false; 
+                        $('.shutdown_button').disabled = false;
                     }
                     else{
                         $('.status_label').html(SERVER_STATUS.OFFLINE);
+                        $('.ping_button').disabled = true;
+                        $('.info_button').disabled = true; 
+                        $('.shutdown_button').disabled = true;
                     }
                 }
-                else if(is_info_command(msgObj)){
                 
-                }
-                else if(is_shutdown_command(msgObj)){
-                
-                }
+               
             });
 
-            var user_id = get_url_parameter('id');
-            var user_cookie_hash = get_url_parameter('hash');
-            
-            var server_name = undefined;
-            
             function init()
             {
                 var server_name_local = get_url_parameter('site');
@@ -80,8 +95,8 @@
             Cpu: <label class="cpu_label"></label>
         </fieldset>
         </form>
-        <button onclick="ping_server(id_command, server_name, socket)">Ping</button>
-        <button onclick="server_info(id_command, server_name, socket)">Info</button>
-        <button onclick="shutdown_server(id_command, server_name, socket)">Shutdown</button>
+        <button class="ping_button" value="disable" onclick="ping_server(id_command, server_name, socket)">Ping</button>
+        <button class="info_button" value="disable" onclick="server_info(id_command, server_name, socket)">Info</button>
+        <button class="shutdown_button" value="disable" onclick="shutdown_server(id_command, server_name, socket)">Shutdown</button>
     </body>
 </html>

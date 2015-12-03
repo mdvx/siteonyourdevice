@@ -1,5 +1,6 @@
 const CHANNEL_IN = 'COMMANDS_IN';
 const CHANNEL_OUT = 'COMMANDS_OUT';
+const CHANNEL_CLIENTS_STATE = 'CLIENTS_STATE';
 const NODE_PORT = 3000;
 
 var app = require('http').createServer(handler)
@@ -44,7 +45,7 @@ io.sockets.on('connection', function (socket) {
 });
 
 redis_sub.on('ready', function() {
-    redis_sub.subscribe(CHANNEL_OUT);
+    redis_sub.subscribe(CHANNEL_OUT, CHANNEL_CLIENTS_STATE);
 });
 
 redis_sub.on("message", function(channel, message){

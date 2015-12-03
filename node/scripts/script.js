@@ -1,6 +1,7 @@
 // global constant
 const CHANNEL_IN = 'COMMANDS_IN';
 const CHANNEL_OUT = 'COMMANDS_OUT';
+const CHANNEL_CLIENTS_STATE = 'CLIENTS_STATE';
 const NODE_PORT = 3000;
 
 //get url field
@@ -25,11 +26,30 @@ var STATUS = {
     FAIL : 0
 };
 
+var CONNECTED_STATUS = { 
+    CONNECTED : 1,
+    DISCONNECTED : 0
+};
+
 var COMMANDS = {
     PING : "ping",
     INFO : "info",
     SHUTDOWN : "disconnect"
 }
+
+// state parse
+function parse_state_msg(msg)
+{
+    var msg_length = msg.length;
+    var pos = 0;
+    var msg_host_state = msg.split(" ");
+    if(msg_host_state.length === 2){
+        return {host : msg_host_state[0], status : msg_host_state[1] == "connected" ? CONNECTED_STATUS.CONNECTED : CONNECTED_STATUS.DISCONNECTED }
+    }
+    
+    return undefined;
+}
+
 // is_commands
 function is_ping_command(msgObj)
 {
@@ -54,6 +74,7 @@ function is_succsess_command(msgObj)
     return msgObj.status === STATUS.OK;    
 }
 // parse string to msgObj
+
 function parse_command_out(msg)
 {
     var msg_length = msg.length;
