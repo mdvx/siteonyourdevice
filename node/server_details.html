@@ -5,6 +5,7 @@
         <script src="http://siteonyourdevice.com:3000/socket.io/socket.io.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
         <script>
+            const GB = (1024*1024*1024)
             
             //socket io client
             //var io = require('socket.io');
@@ -27,7 +28,10 @@
                     $('#status_label').html(SERVER_STATUS.OFFLINE);
                     $('#info_button').prop('disabled', true); 
                     $('#shutdown_button').prop('disabled', true);
+                    
+                    $('#os_label').html(SERVER_OS_DEFAULT_LABEL);
                     $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
+                    $('#ram_label').html(SERVER_RAM_DEFAULT_LABEL);
                 }
             }
             
@@ -54,10 +58,16 @@
                 else if(is_info_command(msgObj)){
                     if(is_ok){
                         var system_info = JSON.parse(msgObj.args);
+                        $('#os_label').html(system_info.os);
                         $('#cpu_label').html(system_info.cpu);
+                        var ram_total_gb = system_info.ram_total/GB;
+                        var ram_total_fr = system_info.ram_free/GB;
+                        $('#ram_label').html(ram_total_gb.toFixed(2) + " GB (" + ram_total_fr.toFixed(2) + " GB free)");
                     }
                     else{
+                        $('#os_label').html(SERVER_OS_DEFAULT_LABEL);
                         $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
+                        $('#ram_label').html(SERVER_RAM_DEFAULT_LABEL);
                     }
                 }
                 else if(is_shutdown_command(msgObj)){
@@ -106,7 +116,9 @@
                 }
                 $('#server_name_label').html(server_name === undefined ? SERVER_DEFAULT_LABEL : server_name);
                 $('#status_label').html(SERVER_STATUS.OFFLINE);
+                $('#os_label').html(SERVER_OS_DEFAULT_LABEL);
                 $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
+                $('#ram_label').html(SERVER_RAM_DEFAULT_LABEL);
             }
         </script>
 
@@ -116,7 +128,9 @@
         <fieldset>
             <legend id="server_name_label"></legend>
             Status: <label id="status_label"></label><br>
-            Cpu: <label id="cpu_label"></label>
+            Os: <label id="os_label"></label>
+            Processor: <label id="cpu_label"></label>
+            Installed memory(RAM): <label id="ram_label"></label>
         </fieldset>
         </form>
         <button id="info_button" disabled onclick="server_info(id_command, server_name, socket)">Info</button>

@@ -157,6 +157,8 @@ function server_info(id, name, socket)
 //// server_details constant
 const SERVER_DEFAULT_LABEL = "Unknown";
 const SERVER_CPU_DEFAULT_LABEL = "Unknown"
+const SERVER_OS_DEFAULT_LABEL = "Unknown"
+const SERVER_RAM_DEFAULT_LABEL = "Unknown"
 var SERVER_STATUS = { 
     ONLINE : "online",
     OFFLINE : "offline"
