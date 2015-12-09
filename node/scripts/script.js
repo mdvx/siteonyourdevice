@@ -5,9 +5,9 @@ const CHANNEL_CLIENTS_STATE = 'CLIENTS_STATE';
 const NODE_PORT = 3000;
 
 //get url field
-function get_url_parameter(sParam) 
+function get_url_parameter_url(url, sParam) 
 {
-    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+    var sPageURL = decodeURIComponent(url),
         sURLVariables = sPageURL.split('&'),
         sParameterName,
         i;
@@ -19,6 +19,11 @@ function get_url_parameter(sParam)
             return sParameterName[1] === undefined ? true : sParameterName[1];
         }
     }
+}
+
+function get_url_parameter(sParam) 
+{
+    return get_url_parameter_url(window.location.search.substring(1));
 }
 
 var STATUS = { 
@@ -130,7 +135,7 @@ function ping_server(id, name, socket)
         return;
     }
     
-    var msg = name + " " + id.toString() + " " + COMMANDS.PING;
+    var msg = name + " " + id + " " + COMMANDS.PING;
     socket.emit('publish', msg);
 }
 
@@ -140,7 +145,7 @@ function shutdown_server(id, name, socket)
         return;
     }
     
-    var msg = name + " " + id.toString() + " " + COMMANDS.SHUTDOWN;
+    var msg = name + " " + id + " " + COMMANDS.SHUTDOWN;
     socket.emit('publish', msg);
 }
 
@@ -150,7 +155,7 @@ function server_info(id, name, socket)
         return;
     }
     
-    var msg = name + " " + id.toString() + " " + COMMANDS.INFO;
+    var msg = name + " " + id + " " + COMMANDS.INFO;
     socket.emit('publish', msg);
 }
 

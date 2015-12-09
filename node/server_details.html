@@ -11,7 +11,6 @@
             //var io = require('socket.io');
             var socket = io.connect('http://siteonyourdevice.com:3000');
             
-            var id_command = 11;
             var user_id = get_url_parameter('id');
             var user_cookie_hash = get_url_parameter('hash');
             
@@ -46,7 +45,7 @@
             
             function handle_command_received(msgObj)
             {
-                if(id_command !== msgObj.id){
+                if(user_id !== msgObj.id){
                     return;
                 }
                 
@@ -112,7 +111,7 @@
                 var server_name_local = get_url_parameter('site');
                 if(server_name_local !== undefined){
                     server_name = server_name_local;
-                    ping_server(id_command, server_name, socket)
+                    ping_server(user_id, server_name, socket)
                 }
                 $('#server_name_label').html(server_name === undefined ? SERVER_DEFAULT_LABEL : server_name);
                 $('#status_label').html(SERVER_STATUS.OFFLINE);
@@ -133,7 +132,7 @@
             Installed memory(RAM): <label id="ram_label"></label>
         </fieldset>
         </form>
-        <button id="info_button" disabled onclick="server_info(id_command, server_name, socket)">Info</button>
-        <button id="shutdown_button" disabled onclick="shutdown_server(id_command, server_name, socket)">Shutdown</button>
+        <button id="info_button" disabled onclick="server_info(user_id, server_name, socket)">Info</button>
+        <button id="shutdown_button" disabled onclick="shutdown_server(user_id, server_name, socket)">Shutdown</button>
     </body>
 </html>

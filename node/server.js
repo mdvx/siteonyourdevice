@@ -15,6 +15,19 @@ function handler (req, res) {
             res.writeHead(500);
             return res.end('Error loading server_details.html, folder' + __dirname);
         }
+        
+        var user_id = get_url_parameter(req.url, 'id');
+        var user_cookie_hash = get_url_parameter(req.url, 'hash');
+        console.log(user_id);
+        console.log(req.user_cookie_hash);
+
+        console.log('req cookie');
+        var req_cookie = req.headers.cookie;
+        var req_user_id = get_url_parameter_url(req_cookie, 'id');
+        var req_user_cookie_hash = get_url_parameter_url(req_cookie, 'hash');
+        console.log(req_user_id);
+        console.log(req_user_cookie_hash);
+        
         res.writeHead(200);
         res.end(data);
     });

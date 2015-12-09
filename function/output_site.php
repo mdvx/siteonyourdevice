@@ -18,8 +18,9 @@
 				<td> <input type=hidden name ='hidden' value='".$arr["id_site"]."'> 
 						<input type=submit name='redact_opisanie' value='Сохранить описание'>					
 						<input type=submit name='delete_site' value='Удалить сайт'> </form>
-				<a href='http://siteonyourdevice.com/node/server_details.html?site=".$arr["adds_site"]."&id=".$_COOKIE['id']."&hash=".$_COOKIE['hash']."'>Состояние сервера</a> </td> </tr>
-				";
+				<a href='http://siteonyourdevice.com/node/server_details.html?site=".$arr["adds_site"]."&id=".$_COOKIE['id']."&hash=".$_COOKIE['hash']."'>Server status</a> </td> </tr>
+				<a href='http://proxy.siteonyourdevice.com/".$arr["adds_site"]"'>Direct link</a> </td> </tr>
+                ";
 				} echo "</table>";
 			}	
 
