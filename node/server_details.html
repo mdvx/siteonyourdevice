@@ -20,11 +20,13 @@
             {
                 if(is_connected){
                     $('#status_label').html(SERVER_STATUS.ONLINE);
+                    $('#status_img').attr("src", SERVER_STATUS_IMG.ONLINE);
                     $('#info_button').prop('disabled', false);
                     $('#shutdown_button').prop('disabled', false);
                 }
                 else{
                     $('#status_label').html(SERVER_STATUS.OFFLINE);
+                    $('#status_img').attr("src", SERVER_STATUS_IMG.OFFLINE);
                     $('#info_button').prop('disabled', true); 
                     $('#shutdown_button').prop('disabled', true);
                     
@@ -115,10 +117,12 @@
                 }
                 $('#server_name_label').html(server_name === undefined ? SERVER_DEFAULT_LABEL : server_name);
                 $('#status_label').html(SERVER_STATUS.OFFLINE);
+                $('#status_img').attr("src", SERVER_STATUS_IMG.OFFLINE);
                 $('#os_label').html(SERVER_OS_DEFAULT_LABEL);
                 $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
                 $('#ram_label').html(SERVER_RAM_DEFAULT_LABEL);
             }
+            
         </script>
 
     </head>
@@ -126,7 +130,7 @@
         <form>
         <fieldset>
             <legend id="server_name_label"></legend>
-            Status: <label id="status_label"></label><br>
+            Status: <img id="status_img" src="images/offline.png"/> <label id="status_label"></label><br>
             Os: <label id="os_label"></label><br>
             Processor: <label id="cpu_label"></label><br>
             Installed memory(RAM): <label id="ram_label"></label>

@@ -169,3 +169,8 @@ var SERVER_STATUS = {
     ONLINE : "online",
     OFFLINE : "offline"
 };
+
+var SERVER_STATUS_IMG = { 
+    ONLINE : "images/online.png",
+    OFFLINE : "images/offline.png"
+};
