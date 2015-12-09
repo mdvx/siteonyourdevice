@@ -3,10 +3,39 @@ const CHANNEL_OUT = 'COMMANDS_OUT';
 const CHANNEL_CLIENTS_STATE = 'CLIENTS_STATE';
 const NODE_PORT = 3000;
 
+//get url field
+function get_url_parameter_url(url, sParam) 
+{
+    var sPageURL = decodeURIComponent(url),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+}
+
+function parseCookies (request) {
+    var list = {},
+        rc = request.headers.cookie;
+
+    rc && rc.split(';').forEach(function( cookie ) {
+        var parts = cookie.split('=');
+        list[parts.shift().trim()] = decodeURI(parts.join('='));
+    });
+
+    return list;
+}
+
 var app = require('http').createServer(handler)
 var io = require('socket.io').listen(app)
 var fs = require('fs')
-var redis = require("redis")
+var redis = require('redis')
 
 function handler (req, res) {
     fs.readFile('server_details.html',
@@ -16,20 +45,21 @@ function handler (req, res) {
             return res.end('Error loading server_details.html, folder' + __dirname);
         }
         
-        var user_id = get_url_parameter(req.url, 'id');
-        var user_cookie_hash = get_url_parameter(req.url, 'hash');
-        console.log(user_id);
-        console.log(req.user_cookie_hash);
-
-        console.log('req cookie');
-        var req_cookie = req.headers.cookie;
-        var req_user_id = get_url_parameter_url(req_cookie, 'id');
-        var req_user_cookie_hash = get_url_parameter_url(req_cookie, 'hash');
-        console.log(req_user_id);
-        console.log(req_user_cookie_hash);
+        var user_id = get_url_parameter_url(req.url, 'id');
+        var user_cookie_hash = get_url_parameter_url(req.url, 'hash');
         
-        res.writeHead(200);
-        res.end(data);
+	var cookies = parseCookies(req); 
+        var req_user_id = cookies['id'];
+        var req_user_cookie_hash = cookies['hash'];
+        if(req_user_id === user_id && req_user_cookie_hash === user_cookie_hash){
+	    res.writeHead(200);
+            res.end(data);
+	}
+	else{
+	    res.writeHead(403);
+            return res.end('Access Denied');
+
+	}        
     });
 }
 
