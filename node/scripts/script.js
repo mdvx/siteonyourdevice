@@ -23,7 +23,7 @@ function get_url_parameter_url(url, sParam)
 
 function get_url_parameter(sParam) 
 {
-    return get_url_parameter_url(window.location.search.substring(1));
+    return get_url_parameter_url(window.location.search.substring(1), sParam);
 }
 
 var STATUS = { 
@@ -95,7 +95,8 @@ function parse_command_out(msg)
         var c = msg[i];
         if(c === ' '){
             if(pos === 0){
-                id = parseInt(data, 10);
+                //id = parseInt(data, 10);
+		id = data;
             }
             else if(pos === 1){
                 if(data === "ok"){
