@@ -1,0 +1,18 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
+PROJECT(fasto_remote_server CXX)
+STRING(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWERCASE)
+
+ADD_DEFINITIONS(-DCONFIG_FILE_PATH="/etc/${PROJECT_NAME_LOWERCASE}.conf")
+ADD_DEFINITIONS(-DPROJECT_NAME_SERVER_TITLE="${PROJECT_NAME}")
+ADD_DEFINITIONS(-DPROJECT_NAME_SERVER="${PROJECT_NAME_LOWERCASE}")
+
+INCLUDE_DIRECTORIES(../third-party/redis/deps)
+
+ADD_EXECUTABLE(${PROJECT_NAME}
+                main.cpp
+                http_server_host.h http_server_host.cpp
+                inner_tcp_server.h inner_tcp_server.cpp
+                redis_helpers.h redis_helpers.cpp
+                server_commands.h
+)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_CORE_LIBRARY} hiredis)

@@ -1,0 +1,3 @@
+IDR_STATE_OFFLINE RCDATA "@RESOURCES_DIR@/images/64x64/status_offline.png"
+IDR_STATE_ONLINE RCDATA "@RESOURCES_DIR@/images/64x64/status_online.png"
+IDR_STATE_AUTH RCDATA "@RESOURCES_DIR@/images/64x64/status_auth.png"
