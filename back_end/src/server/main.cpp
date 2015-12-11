@@ -40,7 +40,7 @@ namespace
 
     configuration_t config;
 
-    int ini_handler(void* user, const char* section, const char* name, const char* value)
+    int ini_handler_fasto(void* user, const char* section, const char* name, const char* value)
     {
         configuration_t* pconfig = (configuration_t*)user;
 
@@ -173,7 +173,7 @@ void sync_config()
     config.redis_config_.channel_out_ = CHANNEL_COMMANDS_OUT_NAME;
     config.redis_config_.channel_clients_state_ = CHANNEL_CLIENTS_STATE_NAME;
     //try to parse settings file
-    if (ini_parse(config_path, ini_handler, &config) < 0) {
+    if (ini_parse(config_path, ini_handler_fasto, &config) < 0) {
         DEBUG_MSG_FORMAT<128>(common::logging::L_INFO, "Can't load config '%s', use default settings.", config_path);
     }
 

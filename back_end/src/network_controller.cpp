@@ -33,7 +33,7 @@ namespace fasto
     {
         namespace
         {
-            int ini_handler(void* user, const char* section, const char* name, const char* value)
+            int ini_handler_fasto(void* user, const char* section, const char* name, const char* value)
             {
                 configuration_t* pconfig = (configuration_t*)user;
 
@@ -339,7 +339,7 @@ namespace fasto
             config.is_private_site_ = USER_SPECIFIC_DEFAULT_PRIVATE_SITE;
 
             //try to parse settings file
-            if (ini_parse(path, ini_handler, &config) < 0) {
+            if (ini_parse(path, ini_handler_fasto, &config) < 0) {
                 DEBUG_MSG_FORMAT<128>(common::logging::L_INFO, "Can't load config '%s', use default settings.", path);
             }
 
