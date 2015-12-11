@@ -2,6 +2,8 @@ module.exports = function(app, passport) {
 
 // normal routes ===============================================================
 
+    app.use(express.static('public'));
+
     // show the home page (will also have our login links)
     app.get('/', function(req, res) {
         res.render('index.ejs');
