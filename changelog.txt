@@ -1,0 +1,7 @@
+0.0.1 /
+[Alexandr Topilski]
+- http2 support
+- basic authentication
+- console clients for(Windows, MacOSX, Linux, FreeBSD)
+- GUI clients for(Windows, MacOSX, Linux, FreeBSD)
+- shutdown, Info, Ping commands
