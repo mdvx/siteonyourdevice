@@ -1,0 +1,55 @@
+matrix:
+    include:
+        - os: linux
+          compiler: gcc
+          env:
+        - os: osx
+          compiler: clang
+          env:
+language: cpp
+#os:
+#  - linux
+#  - osx
+#compiler:
+  #- gcc
+  #- clang
+#env:
+
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
+
+install:
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get -qq update; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CC" == "gcc" ]; then sudo apt-get -qq install gcc-4.7; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CC" == "gcc" ]; then export CC="gcc-4.7"; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" == "g++" ]; then sudo apt-get -qq install g++-4.7; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" == "g++" ]; then export CXX="g++-4.7"; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install rpm; fi
+  
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew ls | grep -wq cmake || brew install cmake; fi
+before_script:
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then wget --no-check-certificate http://www.cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz -O cmake.tar.gz; fi
+  #- if [ "$TRAVIS_OS_NAME" = "osx" ]; then wget http://www.cmake.org/files/v3.3/cmake-3.3.2-Darwin-x86_64.tar.gz -O cmake.tar.gz; fi
+  #- tar -xzf cmake.tar.gz -C $HOME
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then tar -xzf cmake.tar.gz -C $HOME; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export PATH=$HOME/cmake-3.3.2-Linux-x86_64/bin:$PATH; fi
+  #- if [ "$TRAVIS_OS_NAME" = "osx" ]; then export PATH=$HOME/cmake-3.3.2-Darwin-x86_64/CMake.app/Contents/bin:$PATH; fi
+  #- if [ "$TRAVIS_OS_NAME" = "osx" ]; then CMAKE_ARGS="-DCMAKE_PREFIX_PATH=/usr/local/opt/qt5"; fi
+
+  - which cmake
+  - cmake --version
+script:
+  - git submodule update --init --recursive
+  - cd build
+  - sh ./rebuild.sh /dev/null /dev/null
+  
+after_success:
+  - sh ./clean.sh
+
+notifications:
+  recipients:
+    - atopilski@fastogt.com
+  email:
+    on_success: always
+    on_failure: always
