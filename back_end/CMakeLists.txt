@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
 ###################### Branding ##########################
 
-SET(BRANDING_PROJECT_NAME "FastoRemote" CACHE STRING "Branding for ${BRANDING_PROJECT_NAME}") #default
+SET(BRANDING_PROJECT_NAME "SiteOnYourDevice" CACHE STRING "Branding for ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_VERSION "0.0.2.7" CACHE STRING "Branding version for ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_BUILD_TYPE_VERSION "beta" CACHE STRING "Build version type for ${BRANDING_PROJECT_NAME}") #default
     #posible variables: alfa, beta, rc, release
