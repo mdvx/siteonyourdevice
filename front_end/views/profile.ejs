@@ -87,6 +87,7 @@
         <div class="col-sm-6">
             <!-- Add site FORM -->
             <table>
+            <% if (user.domains.length > 0) { %>
                 <tr>
                     <th>Name</th>
                 </tr>
@@ -96,6 +97,8 @@
                     <td><%= user.domains[i].name %></td>
                 </tr>    
                 <% } %>
+            <% } %>
+                
             </table>
             <form action="/add_site" method="post">                
                 <div class="form-group">
