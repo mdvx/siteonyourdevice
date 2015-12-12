@@ -1,4 +1,4 @@
-module.exports = function(app, passport) {
+module.exports = function(app, passport, redis) {
 
 // normal routes ===============================================================
 
