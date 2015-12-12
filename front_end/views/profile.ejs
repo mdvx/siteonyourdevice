@@ -87,7 +87,6 @@
         <div class="col-sm-6">
             <!-- Add site FORM -->
             <% if (user.domains.length > 0) { %>
-                <div class="container">
                     <h2>Registered domains:</h2>
                     <table class="table">
                     <thead>
@@ -95,6 +94,7 @@
                         <th>#</th>
                         <th>Name</th>
                         <th>Date created</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -103,12 +103,21 @@
                             <td><%= i %></td>
                             <td><%= user.domains[i].name %></td>
                             <td><%= user.domains[i].created_date %></td>
-                            <td><button type="submit" class="btn btn-critical btn-lg">Remove</button></td>
+                            <td>                            
+                            <form action="/remove_domain" method="post">
+                                <button type="submit" class="btn btn-danger btn-xs">Remove</button>
+                            </form>
+                            <div>
+                                <button type="button" class="btn btn-info btn-xs">Details</button>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-primary btn-xs" onClick="window.open('http://proxy.siteonyourdevice.com/<%= user.domains[i].name %>');">Hot link</button>
+                            </div>
+                            </td>
                         </tr>    
                         <% } %>
                     </tbody>              
                     </table>
-                </div>
             <% } %> 
             
             <form action="/add_domain" method="post">                
@@ -116,7 +125,7 @@
                     <label>Domain name:</label>
                     <input type="text" class="form-control" name="domain_name">
                 </div>
-                <button type="submit" class="btn btn-warning btn-lg">Add new domain</button>
+                <button type="submit" class="btn btn-warning btn-md">Add new domain</button>
             </form>
         </div>
     </div>
