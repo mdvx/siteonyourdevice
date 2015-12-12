@@ -15,6 +15,15 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
 
+var redis_client = redis.createClient();
+redis_client.on("error", function (err) {
+    console.log("redis_client error" + err);
+});
+
+redis_client.on("error", function (err) {
+    console.log("redis_client error " + err);
+});
+
 var configDB = require('./config/database.js');
 
 // configuration ===============================================================
@@ -38,7 +47,7 @@ app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 
 // routes ======================================================================
-require('./app/routes.js')(app, passport, redis); // load our routes and pass in our app and fully configured passport
+require('./app/routes.js')(app, passport, redis_client); // load our routes and pass in our app and fully configured passport
 
 // launch ======================================================================
 app.listen(port);
