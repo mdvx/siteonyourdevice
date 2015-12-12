@@ -7,6 +7,19 @@ module.exports = function(app, passport) {
         res.render('index.ejs');
     });
 
+    // ADD DOMAIN 
+    app.post('/add_domain', function(req, res) {
+        var user = req.user;
+        var new_domain = req.body.domain_name;        
+        user.domains.push({name : new_domain});
+        user.save(function(err) {
+            if (err)
+                res.send(err);
+            
+            res.redirect('/profile');
+        });
+    });
+    
     // PROFILE SECTION =========================
     app.get('/profile', isLoggedIn, function(req, res) {
         res.render('profile.ejs', {
