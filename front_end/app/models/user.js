@@ -27,7 +27,10 @@ var userSchema = mongoose.Schema({
         email        : String,
         name         : String
     }
-
+    
+    domains         : [{
+                        name : String
+                      }]
 });
 
 // generating a hash
