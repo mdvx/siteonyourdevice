@@ -87,7 +87,7 @@
         <div class="col-sm-6">
             <!-- Add site FORM -->
             <form action="/remove_domain" method="post">
-            <table>
+            <table border="1">
             <% if (user.domains.length > 0) { %>
                 <tr>
                     <th>Name</th>
@@ -98,7 +98,7 @@
                 <tr>
                     <td><%= user.domains[i].name %></td>
                     <td><%= user.domains[i].created_date %></td>
-                    <td><button type="submit" class="btn btn-warning btn-lg">Remove</button></td>
+                    <td><button type="submit" class="btn">Remove</button></td>
                 </tr>    
                 <% } %>
             <% } %>               
