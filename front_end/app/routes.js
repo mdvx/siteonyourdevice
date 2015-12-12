@@ -1,3 +1,6 @@
+// load up the user model
+var User       = require('../app/models/user');
+
 module.exports = function(app, passport, redis) {
 
 // normal routes ===============================================================
@@ -12,9 +15,26 @@ module.exports = function(app, passport, redis) {
         var user = req.user;
         var new_domain = req.body.domain_name;
         
-        user.domains.push({name : new_domain, created_date : Date() });
-        user.save(function(err) {
-            res.redirect('/profile');
+        User.findOne({'domains.name': new_domain}, function(err, fuser) {
+            if (err){
+                req.flash('statusProfileMessage', err);
+                res.redirect('/profile');
+                return;
+            }
+            
+            if(fuser){
+                req.flash('statusProfileMessage', 'This site is already exist!');
+                res.redirect('/profile');
+                return;
+            }
+            
+            user.domains.push({name : new_domain, created_date : Date() });
+            user.save(function(err) {
+                if(err){
+                    req.flash('statusProfileMessage', err);
+                }
+                res.redirect('/profile');
+            });
         });
     });
     
@@ -25,6 +45,9 @@ module.exports = function(app, passport, redis) {
         
         user.domains.pull({_id : remove_domain_id });
         user.save(function(err) {
+            if(err){
+                req.flash('statusProfileMessage', err);
+            }
             res.redirect('/profile');
         });
     });
@@ -32,7 +55,8 @@ module.exports = function(app, passport, redis) {
     // PROFILE SECTION =========================
     app.get('/profile', isLoggedIn, function(req, res) {
         res.render('profile.ejs', {
-            user : req.user
+            user : req.user,
+            message: req.flash('statusProfileMessage')
         });
     });
 
