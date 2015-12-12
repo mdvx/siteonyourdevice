@@ -9,6 +9,7 @@ module.exports = function(app, passport) {
 
     // ADD DOMAIN 
     app.post('/add_domain', function(req, res) {
+        var redis_client = redis.createClient();
         var user = req.user;
         var new_domain = req.body.domain_name;        
         user.domains.push({name : new_domain, created_date : Date() });
@@ -19,6 +20,7 @@ module.exports = function(app, passport) {
     
     // REMOVE DOMAIN 
     app.post('/remove_domain', function(req, res) {
+        var redis_client = redis.createClient();
         var user = req.user;
         var remove_domain_id = req.body.domain_id;        
         user.domains.pull({_id : remove_domain_id });
