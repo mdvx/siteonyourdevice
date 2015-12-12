@@ -10,9 +10,10 @@ module.exports = function(app, passport, redis) {
     // ADD DOMAIN 
     app.post('/add_domain', function(req, res) {
         var user = req.user;
-        var new_domain = req.body.domain_name;        
+        var new_domain = req.body.domain_name;
+        
         user.domains.push({name : new_domain, created_date : Date() });
-        user.save(function(err) {            
+        user.save(function(err) {
             res.redirect('/profile');
         });
     });
@@ -20,9 +21,10 @@ module.exports = function(app, passport, redis) {
     // REMOVE DOMAIN 
     app.post('/remove_domain', function(req, res) {
         var user = req.user;
-        var remove_domain_id = req.body.domain_id;        
+        var remove_domain_id = req.body.domain_id;   
+        
         user.domains.pull({_id : remove_domain_id });
-        user.save(function(err) {            
+        user.save(function(err) {
             res.redirect('/profile');
         });
     });
@@ -171,6 +173,7 @@ module.exports = function(app, passport, redis) {
         var user            = req.user;
         user.local.email    = undefined;
         user.local.password = undefined;
+        
         user.save(function(err) {
             res.redirect('/profile');
         });
@@ -180,6 +183,7 @@ module.exports = function(app, passport, redis) {
     app.get('/unlink/facebook', isLoggedIn, function(req, res) {
         var user            = req.user;
         user.facebook.token = undefined;
+        
         user.save(function(err) {
             res.redirect('/profile');
         });
@@ -189,6 +193,7 @@ module.exports = function(app, passport, redis) {
     app.get('/unlink/twitter', isLoggedIn, function(req, res) {
         var user           = req.user;
         user.twitter.token = undefined;
+        
         user.save(function(err) {
             res.redirect('/profile');
         });
@@ -198,12 +203,11 @@ module.exports = function(app, passport, redis) {
     app.get('/unlink/google', isLoggedIn, function(req, res) {
         var user          = req.user;
         user.google.token = undefined;
+        
         user.save(function(err) {
             res.redirect('/profile');
         });
     });
-
-
 };
 
 // route middleware to ensure user is logged in

@@ -16,6 +16,10 @@
         <a href="/logout" class="btn btn-default btn-sm">Logout</a>
     </div>
     
+    <% if (message.length > 0) { %>
+        <div class="alert alert-danger"><%= message %></div>
+    <% } %>
+    
     <div class="row">
     
         <!-- LOCAL INFORMATION -->
@@ -100,7 +104,7 @@
                     <tbody>
                         <% for (var i = 0; i < user.domains.length; i++) { %>
                         <tr>
-                            <td><%= i %></td>
+                            <td><%= i + 1 %></td>
                             <td><%= user.domains[i].name %></td>
                             <td><%= user.domains[i].created_date %></td>
                             <td>                            
