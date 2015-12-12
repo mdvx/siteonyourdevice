@@ -21,7 +21,7 @@
         <!-- LOCAL INFORMATION -->
         <div class="col-sm-6">
             <div class="well">
-                <h3><span class="fa fa-user"></span> Siteonyourdeivece</h3>
+                <h3><span class="fa fa-user"></span> Siteonyourdevice</h3>
                 <% if (user.local.email) { %>
                     <p>
                         <strong>id</strong>: <%= user._id %><br>
@@ -102,7 +102,7 @@
             </table>
             <form action="/add_site" method="post">                
                 <div class="form-group">
-                    <label>Domain name</label>
+                    <label>Domain name:</label>
                     <input type="text" class="form-control" name="site_name">
                 </div>
                 <button type="submit" class="btn btn-warning btn-lg">Add new domain</button>
