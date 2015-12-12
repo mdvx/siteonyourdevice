@@ -11,12 +11,9 @@ module.exports = function(app, passport) {
     app.post('/add_domain', function(req, res) {
         var user = req.user;
         var new_domain = req.body.domain_name;        
-        user.domains.push({name : new_domain});
-        user.save(function(err) {
-            if (err)
-                res.send(err);
-            
-            res.redirect('/profile');
+        user.domains.push({name : new_domain, created_date : Date() });
+        user.save(function(err) {            
+            res.render('profile.ejs', { message: err });
         });
     });
     

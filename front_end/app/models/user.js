@@ -29,7 +29,8 @@ var userSchema = mongoose.Schema({
     },
     
     domains         : [{
-                        name : String
+                        name : String,
+                        created_date : Date
                       }]
 });
 

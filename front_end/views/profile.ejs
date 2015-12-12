@@ -15,7 +15,11 @@
         <h1><span class="fa fa-anchor"></span> Profile Page</h1>
         <a href="/logout" class="btn btn-default btn-sm">Logout</a>
     </div>
-
+    
+    <% if (message.length > 0) { %>
+        <div class="alert alert-danger"><%= message %></div>
+    <% } %>
+    
     <div class="row">
     
         <!-- LOCAL INFORMATION -->
@@ -90,11 +94,13 @@
             <% if (user.domains.length > 0) { %>
                 <tr>
                     <th>Name</th>
+                    <th>Created</th>
                 </tr>
 
                 <% for (var i = 0; i < user.domains.length; i++) { %>
                 <tr>
                     <td><%= user.domains[i].name %></td>
+                    <td><%= user.domains[i].created_date %></td>
                 </tr>    
                 <% } %>
             <% } %>
