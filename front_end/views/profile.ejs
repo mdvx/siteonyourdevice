@@ -86,24 +86,30 @@
         
         <div class="col-sm-6">
             <!-- Add site FORM -->
-            <form action="/remove_domain" method="post">
-            <table border="1">
             <% if (user.domains.length > 0) { %>
-                <tr>
-                    <th>Name</th>
-                    <th>Created</th>
-                </tr>
-
-                <% for (var i = 0; i < user.domains.length; i++) { %>
-                <tr>
-                    <td><%= user.domains[i].name %></td>
-                    <td><%= user.domains[i].created_date %></td>
-                    <td><button type="submit" class="btn">Remove</button></td>
-                </tr>    
-                <% } %>
-            <% } %>               
-            </table>
-            </form>
+                <div class="container">
+                    <h2>Registered domains:</h2>
+                    <table class="table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Date created</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <% for (var i = 0; i < user.domains.length; i++) { %>
+                        <tr>
+                            <td><%= i %></td>
+                            <td><%= user.domains[i].name %></td>
+                            <td><%= user.domains[i].created_date %></td>
+                            <td><button type="submit" class="btn btn-critical btn-lg">Remove</button></td>
+                        </tr>    
+                        <% } %>
+                    </tbody>              
+                    </table>
+                </div>
+            <% } %> 
             
             <form action="/add_domain" method="post">                
                 <div class="form-group">
