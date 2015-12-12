@@ -105,7 +105,7 @@
                             <td><%= user.domains[i].created_date %></td>
                             <td>                            
                             <form action="/remove_domain" method="post">
-                                <input type="hidden" class="form-control" name="domain_name" value="<%= user.domains[i].name %>">
+                                <input type="hidden" class="form-control" name="domain_id" value="<%= user.domains[i]._id %>">
                                 <button type="submit" class="btn btn-danger btn-xs">Remove</button>
                             </form>
                             <div>

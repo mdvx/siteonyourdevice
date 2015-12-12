@@ -21,8 +21,9 @@ module.exports = function(app, passport) {
     app.post('/remove_domain', function(req, res) {
         console.log(req.body);
         var user = req.user;
-        var remove_domain = req.body.domain_name;        
-        user.domains.pull({name : remove_domain });
+        console.log(user);
+        var remove_domain_id = req.body.domain_id;        
+        user.domains.pull({_id : remove_domain_id });
         user.save(function(err) {            
             res.redirect('/profile');
         });
