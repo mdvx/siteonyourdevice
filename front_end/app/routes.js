@@ -19,9 +19,10 @@ module.exports = function(app, passport) {
     
     // REMOVE DOMAIN 
     app.post('/remove_domain', function(req, res) {
+        console.log(req.body);
         var user = req.user;
-        var new_domain = req.body.domain_name;        
-        user.domains.pull({name : new_domain });
+        var remove_domain = req.body.domain_name;        
+        user.domains.pull({name : remove_domain });
         user.save(function(err) {            
             res.redirect('/profile');
         });

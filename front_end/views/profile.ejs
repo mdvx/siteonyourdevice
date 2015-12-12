@@ -105,13 +105,14 @@
                             <td><%= user.domains[i].created_date %></td>
                             <td>                            
                             <form action="/remove_domain" method="post">
+                                <input type="hidden" class="form-control" name="domain_name" value="<%= user.domains[i].name %>">
                                 <button type="submit" class="btn btn-danger btn-xs">Remove</button>
                             </form>
                             <div>
-                                <button type="button" class="btn btn-info btn-xs">Details</button>
+                                <button type="button" class="btn btn-primary btn-xs" onClick="window.open('http://proxy.siteonyourdevice.com/<%= user.domains[i].name %>');">Hot link</button>
                             </div>
                             <div>
-                                <button type="button" class="btn btn-primary btn-xs" onClick="window.open('http://proxy.siteonyourdevice.com/<%= user.domains[i].name %>');">Hot link</button>
+                                <button type="button" class="btn btn-info btn-xs">Details</button>
                             </div>
                             </td>
                         </tr>    
