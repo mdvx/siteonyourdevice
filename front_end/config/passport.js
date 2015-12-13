@@ -85,9 +85,16 @@ module.exports = function(passport) {
         passReqToCallback : true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
     },
     function(req, email, password, done) {
-        if (email)
-            email = email.toLowerCase(); // Use lower-case e-mails to avoid case-sensitive e-mail matching
+        if (!email){
+            return done(null, false, req.flash('loginMessage', 'Invalid input.' ));
+        }
+            
+        email = email.toLowerCase(); // Use lower-case e-mails to avoid case-sensitive e-mail matching
 
+        if(!validateEmail(email)){
+            return done(null, false, req.flash('loginMessage', 'Invalid email ' + email + '.' ));
+        }
+        
         // asynchronous
         process.nextTick(function() {
             // if the user is not already logged in:
