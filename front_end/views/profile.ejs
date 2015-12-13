@@ -116,7 +116,10 @@
                                 <a href="http://proxy.siteonyourdevice.com/<%= user.domains[i].name %>" class="btn btn-primary btn-xs">Hot link</a>
                             </div>
                             <div>
-                                <button type="button" class="btn btn-info btn-xs">Details</button>
+                                <form action="/server_details" method="post">
+                                    <input type="hidden" class="form-control" name="domain_name" value="<%= user.domains[i].name %>">
+                                    <button type="submit" class="btn btn-info btn-xs">Details</button>
+                                </form>
                             </div>
                             </td>
                         </tr>    

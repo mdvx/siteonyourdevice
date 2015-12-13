@@ -15,6 +15,14 @@ module.exports = function(app, passport, redis) {
         res.render('index.ejs');
     });
 
+    app.post('/server_details', function(req, res) {
+        var domain_name = req.body.domain_name;
+        res.render('server_details.ejs', {
+            user : req.user,
+            server_name: domain_name
+        });
+    });
+    
     // ADD DOMAIN 
     app.post('/add_domain', function(req, res) {
         var user = req.user;
