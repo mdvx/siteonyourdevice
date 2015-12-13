@@ -40,7 +40,7 @@
             
             function handle_state_changed(stateObj)
             {
-                if(stateObj.host !== <%- domain_name %>){
+                if(stateObj.host !== '<%- domain_name %>'){
                     return;
                 }
                 
@@ -112,7 +112,7 @@
 
             function init()
             {
-                ping_server('<%- user._id %>', <%- domain_name %>, socket);
+                ping_server('<%- user._id %>', '<%- domain_name %>', socket);
                 $('#status_label').html(SERVER_STATUS.OFFLINE);
                 $('#status_img').attr("src", SERVER_STATUS_IMG.OFFLINE);
                 $('#os_label').html(SERVER_OS_DEFAULT_LABEL);
@@ -133,8 +133,8 @@
                     Processor: <label id="cpu_label"></label><br>
                     Installed memory(RAM): <label id="ram_label"></label>
                 </div>
-                <button id="info_button" disabled onclick="server_info('<%- user._id %>', <%- domain_name %>, socket)">Info</button>
-                <button id="shutdown_button" disabled onclick="shutdown_server('<%- user._id %>', <%- domain_name %>, socket)">Shutdown</button>
+                <button id="info_button" disabled onclick="server_info('<%- user._id %>', '<%- domain_name %>', socket)">Info</button>
+                <button id="shutdown_button" disabled onclick="shutdown_server('<%- user._id %>', '<%- domain_name %>', socket)">Shutdown</button>
             </div>
         </div>
     </body>

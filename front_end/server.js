@@ -51,6 +51,18 @@ redis_client.on("error", function (err) {
 var http = require('http');
 var io = require('socket.io');
 var server = http.createServer(app);
+var listener = io.listen(server);
+
+listener.on('connection', function (socket) {
+    console.log('Connection to socket.io established');
+    socket.on('subscribe', function (data) {
+        socket.join(data.channel);
+    });
+
+    socket.on('publish', function (msg) {
+        redis_pub.publish(CHANNEL_IN, msg);
+    });
+});
 
 var redis_sub = redis.createClient();
 var redis_pub = redis.createClient();
@@ -61,19 +73,6 @@ redis_sub.on("error", function (err) {
 
 redis_pub.on("error", function (err) {
     console.log("redis_pub error " + err);
-});
-
-var listener = io.listen(server);
-
-listener.on('connection', function (socket) {
-  console.log('Connection to client established');
-  socket.on('subscribe', function (data) {
-        socket.join(data.channel);
-    });
-
-    socket.on('publish', function (msg) {
-        redis_pub.publish(CHANNEL_IN, msg);
-    });
 });
 
 redis_sub.on('ready', function() {
@@ -112,4 +111,5 @@ require('./app/routes.js')(app, passport, redis_client); // load our routes and 
 
 // launch ======================================================================
 app.listen(port);
+console.log('Http server ready for requests');
 server.listen(NODE_PORT);
