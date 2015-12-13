@@ -16,10 +16,11 @@ module.exports = function(app, passport, redis) {
     });
 
     app.post('/server_details', function(req, res) {
-        var domain_name = req.body.domain_name;
+        var domain_n = req.body.domain_name;
+        console.log(domain_n);
         res.render('server_details.ejs', {
             user : req.user,
-            domain_name: domain_name
+            domain_name: domain_n
         });
     });
     

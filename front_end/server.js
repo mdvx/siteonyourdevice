@@ -22,49 +22,6 @@ function get_url_parameter_url(url, sParam)
     }
 }
 
-function parseCookies (request) {
-    var list = {},
-        rc = request.headers.cookie;
-
-    rc && rc.split(';').forEach(function( cookie ) {
-        var parts = cookie.split('=');
-        list[parts.shift().trim()] = decodeURI(parts.join('='));
-    });
-
-    return list;
-}
-
-var app_r = require('http').createServer(handler);
-var io = require('socket.io').listen(app_r);
-
-function handler (req, res) {
-    fs.readFile('server_details.ejs',
-    function (err, data) {
-        if (err) {
-            res.writeHead(500);
-            return res.end('Error loading server_details.html, folder' + __dirname);
-        }
-        
-        var user_id = get_url_parameter_url(req.url, 'id');
-        var user_cookie_hash = get_url_parameter_url(req.url, 'hash');
-        
-	var cookies = parseCookies(req); 
-        var req_user_id = cookies['id'];
-        var req_user_cookie_hash = cookies['hash'];
-        if(req_user_id === user_id && req_user_cookie_hash === user_cookie_hash){
-	    res.writeHead(200);
-        res.end(data);
-	}
-	else{
-	    res.writeHead(403);
-            return res.end('Access Denied');
-
-	}        
-    });
-}
-
-app_r.listen(NODE_PORT);
-
 // set up ======================================================================
 // get all the tools we need
 var express  = require('express');
@@ -90,6 +47,24 @@ redis_client.on("error", function (err) {
 });
 
 // app_r
+
+var http = require('http');
+var io = require('socket.io');
+var server = http.createServer(app);
+var listener = io.listen(server);
+
+listener.on('connection', function (socket) {
+  console.log('Connection to client established');
+  socket.on('newsresponse', function (data) {
+    console.log(data);
+  });
+ 
+  socket.on('disconnect',function(){
+    console.log('Server has disconnected');
+  }); 
+});
+
+server.listen(NODE_PORT);
 
 var redis_sub = redis.createClient();
 var redis_pub = redis.createClient();

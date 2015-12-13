@@ -9,6 +9,7 @@
         </style>
         
         <script src="scripts/script.js" type="text/javascript"></script>
+        <script src="/socket.io/socket.io.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
         <script>
             const GB = (1024*1024*1024)
@@ -16,7 +17,7 @@
             //socket io client
             //var io = require('socket.io');
             var socket = io.connect('http://siteonyourdevice.com:3000');
-                                   
+            
             function handle_onconnection_changed(is_connected)
             {
                 if(is_connected){
@@ -39,7 +40,7 @@
             
             function handle_state_changed(stateObj)
             {
-                if(stateObj.host !== domain_name){
+                if(stateObj.host !== <%- domain_name %>){
                     return;
                 }
                 
@@ -111,10 +112,7 @@
 
             function init()
             {
-                if(domain_name !== undefined){
-                    ping_server(user_id, domain_name, socket)
-                }
-                $('#server_name_label').html(domain_name === undefined ? SERVER_DEFAULT_LABEL : domain_name);
+                ping_server(user_id, <%- domain_name %>, socket);
                 $('#status_label').html(SERVER_STATUS.OFFLINE);
                 $('#status_img').attr("src", SERVER_STATUS_IMG.OFFLINE);
                 $('#os_label').html(SERVER_OS_DEFAULT_LABEL);
@@ -129,14 +127,14 @@
         <div class="container">
             <div class="page-header text-left">
                 <div class="well">
-                    <legend id="server_name_label"></legend>
+                    <legend id="server_name_label"><%- domain_name %></legend>
                     Status: <img id="status_img" src="images/offline.png"/> <label id="status_label"></label><br>
                     Os: <label id="os_label"></label><br>
                     Processor: <label id="cpu_label"></label><br>
                     Installed memory(RAM): <label id="ram_label"></label>
                 </div>
-                <button id="info_button" disabled onclick="server_info(user_id, domain_name, socket)">Info</button>
-                <button id="shutdown_button" disabled onclick="shutdown_server(user_id, domain_name, socket)">Shutdown</button>
+                <button id="info_button" disabled onclick="server_info(user_id, <%- domain_name %>, socket)">Info</button>
+                <button id="shutdown_button" disabled onclick="shutdown_server(user_id, <%- domain_name %>, socket)">Shutdown</button>
             </div>
         </div>
     </body>
