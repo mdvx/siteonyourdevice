@@ -77,7 +77,7 @@ namespace fasto
             virtual void handleInnerResponceCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[]) = 0; //called when argv not NULL and argc > 0, only approve responce
             virtual void handleInnerApproveCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[]) = 0; //called when argv not NULL and argc > 0
 
-            common::atomic_ullong_t id_;
+            common::atomic_size_t id_;
             std::vector<RequestCallback> subscribed_requests_;
         };
     }

@@ -47,7 +47,7 @@ namespace fasto
         InnerServerCommandSeqParser::InnerServerCommandSeqParser()
             : id_()
         {
-
+            next_id();
         }
 
         InnerServerCommandSeqParser::~InnerServerCommandSeqParser()
@@ -57,9 +57,10 @@ namespace fasto
 
         cmd_id_type InnerServerCommandSeqParser::next_id()
         {
-            auto new_id = id_++;
-            std::string new_id_str = common::convertToString(new_id);
-            std::string hex = common::HexEncode(new_id_str, true);
+            size_t next_id = id_++;
+            char bytes[sizeof(size_t)];
+            betoh_memcpy(&bytes, &next_id, sizeof(bytes));
+            std::string hex = common::HexEncode(&bytes, sizeof(bytes), true);
             return hex;
         }
 
