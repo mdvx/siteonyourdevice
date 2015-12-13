@@ -10,6 +10,11 @@ var User       = require('../app/models/user');
 // load the auth variables
 var configAuth = require('./auth'); // use this one for testing
 
+function validateEmail(email) {
+    var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
+
 module.exports = function(passport) {
 
     // =========================================================================
@@ -40,9 +45,16 @@ module.exports = function(passport) {
         passReqToCallback : true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
     },
     function(req, email, password, done) {
-        if (email)
-            email = email.toLowerCase(); // Use lower-case e-mails to avoid case-sensitive e-mail matching
+        if (!email){
+            return done(null, false, req.flash('loginMessage', 'Invalid input.' ));
+        }
+            
+        email = email.toLowerCase(); // Use lower-case e-mails to avoid case-sensitive e-mail matching
 
+        if(!validateEmail(email)){
+            return done(null, false, req.flash('loginMessage', 'Invalid email ' + email + '.' ));
+        }
+        
         // asynchronous
         process.nextTick(function() {
             User.findOne({ 'local.email' :  email }, function(err, user) {
