@@ -16,16 +16,18 @@ module.exports = function(app, passport, redis) {
     });
 
     app.post('/server_details', function(req, res) {
-        var domain_n = req.body.domain_name;
+        var user = req.user;        
+        var domain_name = req.body.domain_name;
+        
         res.render('server_details.ejs', {
-            user : req.user,
-            domain_name: domain_n
+            user : user,
+            domain_name: domain_name
         });
     });
     
     // ADD DOMAIN 
     app.post('/add_domain', function(req, res) {
-        var user = req.user;
+        var user = req.user;        
         var new_domain = req.body.domain_name;
         
         if(!checkIsValidDomain(new_domain)){
@@ -68,7 +70,7 @@ module.exports = function(app, passport, redis) {
     
     // REMOVE DOMAIN 
     app.post('/remove_domain', function(req, res) {
-        var user = req.user;
+        var user = req.user;        
         var remove_domain_id = req.body.domain_id;   
         
         user.domains.pull({_id : remove_domain_id });
