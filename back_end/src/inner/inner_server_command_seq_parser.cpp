@@ -57,7 +57,7 @@ namespace fasto
 
         cmd_id_type InnerServerCommandSeqParser::next_id()
         {
-            unsigned long long new_id = id_++;
+            auto new_id = id_++;
             std::string new_id_str = common::convertToString(new_id);
             std::string hex = common::HexEncode(new_id_str, true);
             return hex;
