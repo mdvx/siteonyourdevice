@@ -159,7 +159,7 @@ namespace fasto
 
             const int first_line_x2 = first_line_x  + label_width + control_padding;
             hwndDomainTextBox_ = CreateWindow(TEXT("EDIT"), TEXT(""),
-                                              WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP,
+                                              WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_AUTOHSCROLL,
                                               first_line_x2, first_line_y,
                                               text_box_width, textbox_control_height,
                                               hwnd_, (HMENU)ID_DOMAIN_TEXTBOX,
@@ -195,11 +195,12 @@ namespace fasto
 
             const int second_line_x2 = first_line_x  + label_width + control_padding;
             hwndLoginTextBox_ = CreateWindow(TEXT("EDIT"), TEXT(""),
-                                              WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP,
+                                              WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_AUTOHSCROLL,
                                               second_line_x2, second_line_y,
                                               text_box_width, textbox_control_height,
                                               hwnd_, (HMENU)ID_LOGIN_TEXTBOX,
                                               hInstance, NULL);
+            SendMessage(hwndLoginTextBox_, EM_SETLIMITTEXT, login_max_length, 0);
             //
 
             // 3rd

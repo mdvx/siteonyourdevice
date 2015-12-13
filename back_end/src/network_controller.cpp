@@ -232,10 +232,6 @@ namespace fasto
 
         common::Error NetworkController::connect()
         {
-            if(server_){
-                return server_->innerConnect();
-            }
-
             configuration_t config = config_;
 
             const common::net::hostAndPort hs(config.domain_, config.port_);
@@ -249,6 +245,10 @@ namespace fasto
                 if(handler){
                     handler_->registerHttpCallback(handurl.first, handler);
                 }
+            }
+
+            if(server_){
+                return server_->innerConnect();
             }
 
             server_ = new Http2InnerServer(hs, handler_, config_);

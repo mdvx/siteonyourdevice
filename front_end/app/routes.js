@@ -45,7 +45,14 @@ module.exports = function(app, passport, redis) {
                     req.flash('statusProfileMessage', err);
                 }
                 else{
-                    
+                    var redis_hosts = []; // Create a new empty array.
+                    for (var i = 0; i < user.domains.length; i++) {
+                        redis_hosts[i] = user.domains[i].name;
+                    }
+                    var needed_val = { name : user.local.email, password : user.local.password, hosts : redis_hosts};
+                    var needed_val_str = JSON.stringify(needed_val);
+                    console.log('needed_val_str:' + needed_val_str);
+                    redis.hset("users", user.local.email, needed_val_str);
                 }
                 res.redirect('/profile');
             });
@@ -63,7 +70,14 @@ module.exports = function(app, passport, redis) {
                 req.flash('statusProfileMessage', err);
             }
             else{
-                    
+                var redis_hosts = []; // Create a new empty array.
+                for (var i = 0; i < user.domains.length; i++) {
+                    redis_hosts[i] = user.domains[i].name;
+                }
+                var needed_val = { name : user.local.email, password : user.local.password, hosts : redis_hosts};
+                var needed_val_str = JSON.stringify(needed_val);
+                console.log('needed_val_str:' + needed_val_str);
+                redis.hset("users", user.local.email, needed_val_str);   
             }
             res.redirect('/profile');
         });

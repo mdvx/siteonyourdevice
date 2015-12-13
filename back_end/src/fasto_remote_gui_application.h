@@ -45,6 +45,7 @@ namespace fasto
             {
                 height = 240,
                 width = 320,
+                login_max_length = 32,
                 domain_max_length = 32,
                 port_max_length = 6
             };
