@@ -47,7 +47,6 @@ namespace fasto
         InnerServerCommandSeqParser::InnerServerCommandSeqParser()
             : id_()
         {
-            next_id();
         }
 
         InnerServerCommandSeqParser::~InnerServerCommandSeqParser()
