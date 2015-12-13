@@ -8,16 +8,18 @@ namespace fasto
 {
     namespace fastoremote
     {
+        typedef uint64_t cmd_id_type;
+
         class RequestCallback
         {
         public:
-            typedef std::function<void(uint64_t request_id, int argc, char *argv[])> callback_t;
-            RequestCallback(uint64_t request_id, callback_t cb);
-            uint64_t request_id() const;
+            typedef std::function<void(cmd_id_type request_id, int argc, char *argv[])> callback_t;
+            RequestCallback(cmd_id_type request_id, callback_t cb);
+            cmd_id_type request_id() const;
             void execute(int argc, char *argv[]);
 
         private:
-            uint64_t request_id_;
+            cmd_id_type request_id_;
             callback_t cb_;
         };
 
@@ -50,7 +52,7 @@ namespace fasto
             void handleInnerDataReceived(InnerClient *connection, char *buff, uint32_t buff_len);
 
             template<typename... Args>
-            std::string make_responce(uint64_t id, const char* cmd_fmt, Args... args)
+            std::string make_responce(cmd_id_type id, const char* cmd_fmt, Args... args)
             {
                 char buff[MAX_COMMAND_SIZE] = {0};
                 int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, RESPONCE_COMMAND, id, args...);
@@ -59,7 +61,7 @@ namespace fasto
             }
 
             template<typename... Args>
-            std::string make_approve_responce(uint64_t id, const char* cmd_fmt, Args... args)
+            std::string make_approve_responce(cmd_id_type id, const char* cmd_fmt, Args... args)
             {
                 char buff[MAX_COMMAND_SIZE] = {0};
                 int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, APPROVE_COMMAND, id, args...);
@@ -68,9 +70,9 @@ namespace fasto
             }
 
         private:
-            void processRequest(uint64_t request_id, int argc, char *argv[]);
+            void processRequest(cmd_id_type request_id, int argc, char *argv[]);
 
-            uint64_t next_id();
+            cmd_id_type next_id();
             virtual void handleInnerRequestCommand(InnerClient *connection, uint64_t id, int argc, char *argv[]) = 0; //called when argv not NULL and argc > 0 , only responce
             virtual void handleInnerResponceCommand(InnerClient *connection, uint64_t id, int argc, char *argv[]) = 0; //called when argv not NULL and argc > 0, only approve responce
             virtual void handleInnerApproveCommand(InnerClient *connection, uint64_t id, int argc, char *argv[]) = 0; //called when argv not NULL and argc > 0

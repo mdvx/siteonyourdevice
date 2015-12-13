@@ -81,7 +81,7 @@ redis_sub.on('ready', function() {
 
 redis_sub.on("message", function(channel, message){
     var resp = {'text': message, 'channel':channel}
-    io.sockets.in(channel).emit('message', resp);
+    listener.in(channel).emit('message', resp);
 });
 
 var configDB = require('./config/database.js');

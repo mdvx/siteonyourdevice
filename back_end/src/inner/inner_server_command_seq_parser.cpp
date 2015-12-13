@@ -13,13 +13,13 @@ namespace fasto
 {
     namespace fastoremote
     {
-        RequestCallback::RequestCallback(uint64_t request_id, callback_t cb)
+        RequestCallback::RequestCallback(cmd_id_type request_id, callback_t cb)
             : request_id_(request_id), cb_(cb)
         {
 
         }
 
-        uint64_t RequestCallback::request_id() const
+        cmd_id_type RequestCallback::request_id() const
         {
             return request_id_;
         }
@@ -55,7 +55,7 @@ namespace fasto
 
         }
 
-        uint64_t InnerServerCommandSeqParser::next_id()
+        cmd_id_type InnerServerCommandSeqParser::next_id()
         {
             return id_++;
         }
@@ -73,7 +73,7 @@ namespace fasto
             }
         }
 
-        void InnerServerCommandSeqParser::processRequest(uint64_t request_id, int argc, char *argv[])
+        void InnerServerCommandSeqParser::processRequest(cmd_id_type request_id, int argc, char *argv[])
         {
             subscribed_requests_.erase(std::remove_if(subscribed_requests_.begin(), subscribed_requests_.end(),
                                                       std::bind(&exec_reqest, std::placeholders::_1, request_id, argc, argv)),
