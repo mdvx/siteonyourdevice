@@ -1,5 +1,10 @@
 // load up the user model
-var User       = require('../app/models/user');
+var User = require('../app/models/user');
+
+function checkIsValidDomain(domain) { 
+    var re = new RegExp(/^((?:(?:(?:\w[\.\-\+]?)*)\w)+)((?:(?:(?:\w[\.\-\+]?){0,62})\w)+)\.(\w{2,6})$/); 
+    return domain.match(re);
+} 
 
 module.exports = function(app, passport, redis) {
 
@@ -15,6 +20,12 @@ module.exports = function(app, passport, redis) {
         var user = req.user;
         var new_domain = req.body.domain_name;
         
+        if(!checkIsValidDomain(new_domain)){
+            req.flash('statusProfileMessage', new_domain + ' not valid domain name.');
+            res.redirect('/profile');
+            return;
+        }
+        
         User.findOne({'domains.name': new_domain}, function(err, fuser) {
             if (err){
                 req.flash('statusProfileMessage', err);
@@ -23,7 +34,7 @@ module.exports = function(app, passport, redis) {
             }
             
             if(fuser){
-                req.flash('statusProfileMessage', 'This site is already exist!');
+                req.flash('statusProfileMessage', 'Sorry, ' + new_domain + ' isn’t available.');
                 res.redirect('/profile');
                 return;
             }
@@ -32,6 +43,9 @@ module.exports = function(app, passport, redis) {
             user.save(function(err) {
                 if(err){
                     req.flash('statusProfileMessage', err);
+                }
+                else{
+                    
                 }
                 res.redirect('/profile');
             });
@@ -47,6 +61,9 @@ module.exports = function(app, passport, redis) {
         user.save(function(err) {
             if(err){
                 req.flash('statusProfileMessage', err);
+            }
+            else{
+                    
             }
             res.redirect('/profile');
         });

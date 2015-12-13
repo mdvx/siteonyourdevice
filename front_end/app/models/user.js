@@ -46,5 +46,10 @@ userSchema.methods.validPassword = function(password) {
     return hash === this.local.password;
 };
 
+// checking if password is valid
+userSchema.methods.isReadOnlyMode = function() {
+    return !this.local.email;
+};
+
 // create the model for users and expose it to our app
 module.exports = mongoose.model('User', userSchema);

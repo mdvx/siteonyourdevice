@@ -32,7 +32,7 @@
                         <strong>email</strong>: <%= user.local.email %><br>
                         <strong>password</strong>: <%= user.local.password %>
                     </p>                    
-                    <a href="/unlink/local" class="btn btn-default">Unlink</a>
+                    <a href="/unlink/local" class="btn btn-default disabled">Unlink</a>
                 <% } else { %>
                     <a href="/connect/local" class="btn btn-default">Connect Local</a>
                 <% } %>
@@ -89,6 +89,9 @@
         </div>
         
         <div class="col-sm-6">
+        <% if (user.isReadOnlyMode()) { %>
+            <div class="alert alert-danger">Read only mode</div>
+        <% } else { %>
             <!-- Add site FORM -->
             <% if (user.domains.length > 0) { %>
                     <h2>Registered domains:</h2>
@@ -113,7 +116,7 @@
                                 <button type="submit" class="btn btn-danger btn-xs">Remove</button>
                             </form>
                             <div>
-                                <button type="button" class="btn btn-primary btn-xs" onClick="window.open('http://proxy.siteonyourdevice.com/<%= user.domains[i].name %>');">Hot link</button>
+                                <a href="http://proxy.siteonyourdevice.com/<%= user.domains[i].name %>" class="btn btn-primary btn-xs">Hot link</a>
                             </div>
                             <div>
                                 <button type="button" class="btn btn-info btn-xs">Details</button>
@@ -132,6 +135,7 @@
                 </div>
                 <button type="submit" class="btn btn-warning btn-md">Add new domain</button>
             </form>
+        <% } %>
         </div>
     </div>
 
