@@ -86,13 +86,13 @@ module.exports = function(passport) {
     },
     function(req, email, password, done) {
         if (!email){
-            return done(null, false, req.flash('loginMessage', 'Invalid input.' ));
+            return done(null, false, req.flash('signupMessage', 'Invalid input.' ));
         }
             
         email = email.toLowerCase(); // Use lower-case e-mails to avoid case-sensitive e-mail matching
 
         if(!validateEmail(email)){
-            return done(null, false, req.flash('loginMessage', 'Invalid email ' + email + '.' ));
+            return done(null, false, req.flash('signupMessage', 'Invalid email ' + email + '.' ));
         }
         
         // asynchronous
