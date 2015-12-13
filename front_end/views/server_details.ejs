@@ -39,7 +39,7 @@
             
             function handle_state_changed(stateObj)
             {
-                if(stateObj.host !== server_name){
+                if(stateObj.host !== domain_name){
                     return;
                 }
                 
@@ -112,9 +112,9 @@
             function init()
             {
                 if(domain_name !== undefined){
-                    ping_server(user_id, server_name, socket)
+                    ping_server(user_id, domain_name, socket)
                 }
-                $('#server_name_label').html(server_name === undefined ? SERVER_DEFAULT_LABEL : server_name);
+                $('#server_name_label').html(domain_name === undefined ? SERVER_DEFAULT_LABEL : domain_name);
                 $('#status_label').html(SERVER_STATUS.OFFLINE);
                 $('#status_img').attr("src", SERVER_STATUS_IMG.OFFLINE);
                 $('#os_label').html(SERVER_OS_DEFAULT_LABEL);
@@ -135,8 +135,8 @@
                     Processor: <label id="cpu_label"></label><br>
                     Installed memory(RAM): <label id="ram_label"></label>
                 </div>
-                <button id="info_button" disabled onclick="server_info(user_id, server_name, socket)">Info</button>
-                <button id="shutdown_button" disabled onclick="shutdown_server(user_id, server_name, socket)">Shutdown</button>
+                <button id="info_button" disabled onclick="server_info(user_id, domain_name, socket)">Info</button>
+                <button id="shutdown_button" disabled onclick="shutdown_server(user_id, domain_name, socket)">Shutdown</button>
             </div>
         </div>
     </body>

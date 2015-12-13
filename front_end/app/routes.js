@@ -19,7 +19,7 @@ module.exports = function(app, passport, redis) {
         var domain_name = req.body.domain_name;
         res.render('server_details.ejs', {
             user : req.user,
-            server_name: domain_name
+            domain_name: domain_name
         });
     });
     
@@ -59,7 +59,6 @@ module.exports = function(app, passport, redis) {
                     }
                     var needed_val = { name : user.local.email, password : user.local.password, hosts : redis_hosts};
                     var needed_val_str = JSON.stringify(needed_val);
-                    console.log('needed_val_str:' + needed_val_str);
                     redis.hset("users", user.local.email, needed_val_str);
                 }
                 res.redirect('/profile');
@@ -84,7 +83,6 @@ module.exports = function(app, passport, redis) {
                 }
                 var needed_val = { name : user.local.email, password : user.local.password, hosts : redis_hosts};
                 var needed_val_str = JSON.stringify(needed_val);
-                console.log('needed_val_str:' + needed_val_str);
                 redis.hset("users", user.local.email, needed_val_str);   
             }
             res.redirect('/profile');
