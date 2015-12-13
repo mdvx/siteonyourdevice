@@ -22,9 +22,9 @@
 #define MAX_COMMAND_SIZE 256
 #define IS_EQUAL_COMMAND(BUF, CMD) BUF && memcmp(BUF, CMD, sizeof(CMD) - 1) == 0
 
-#define GENERATE_FMT(CMD, CMD_FMT) "%" PRIu64 " " "%" PRIu64 " " CMD " " CMD_FMT END_OF_COMMAND
-#define GENEATATE_SUCCESS_FMT(CMD, CMD_FMT) "%" PRIu64 " " "%" PRIu64 " " SUCCESS_COMMAND " " CMD " " CMD_FMT END_OF_COMMAND
-#define GENEATATE_FAIL_FMT(CMD, CMD_FMT) "%" PRIu64 " " "%" PRIu64 " " FAIL_COMMAND " " CMD " " CMD_FMT END_OF_COMMAND
+#define GENERATE_FMT(CMD, CMD_FMT) "%" PRIu64 " %s " CMD " " CMD_FMT END_OF_COMMAND
+#define GENEATATE_SUCCESS_FMT(CMD, CMD_FMT) "%" PRIu64 " %s " SUCCESS_COMMAND " " CMD " " CMD_FMT END_OF_COMMAND
+#define GENEATATE_FAIL_FMT(CMD, CMD_FMT) "%" PRIu64 " %s " FAIL_COMMAND " " CMD " " CMD_FMT END_OF_COMMAND
 
 #define REQUEST_COMMAND 0
 #define RESPONCE_COMMAND 1
@@ -45,13 +45,13 @@
 #define SERVER_PLEASE_SYSTEM_INFO_COMMAND "plz_system_info"
 
 //request
-//[uint64_t](&1 == 0) [uint64_t]seq [std::string]command args ...
+//[uint64_t](0) [hex_string]seq [std::string]command args ...
 
 //responce
-//[uint64_t](&1 == 1) [uint64_t]seq [OK|FAIL] [std::string]command args ...
+//[uint64_t](1) [hex_string]seq [OK|FAIL] [std::string]command args ...
 
 //approve
-//[uint64_t](&1 == 1) [uint64_t]seq [OK|FAIL] [std::string]command args ...
+//[uint64_t](2) [hex_string]seq [OK|FAIL] [std::string]command args ...
 
 namespace fasto
 {

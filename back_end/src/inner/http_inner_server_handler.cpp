@@ -58,7 +58,7 @@ namespace fasto
             innerDisConnect(server);
         }
 
-        void Http2InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, uint64_t id, int argc, char *argv[])
+        void Http2InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[])
         {
             ssize_t nwrite = 0;
             char* command = argv[0];
@@ -132,7 +132,7 @@ namespace fasto
             }
         }
 
-        void Http2InnerServerHandler::handleInnerResponceCommand(InnerClient *connection, uint64_t id, int argc, char *argv[])
+        void Http2InnerServerHandler::handleInnerResponceCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[])
         {
             ssize_t nwrite = 0;
             char* state_command = argv[0];
@@ -168,7 +168,7 @@ namespace fasto
             }
         }
 
-        void Http2InnerServerHandler::handleInnerApproveCommand(InnerClient *connection, uint64_t id, int argc, char *argv[])
+        void Http2InnerServerHandler::handleInnerApproveCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[])
         {
             char* command = argv[0];
 

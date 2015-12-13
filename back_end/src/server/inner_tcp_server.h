@@ -35,9 +35,9 @@ namespace fasto
             void setStorageConfig(const redis_sub_configuration_t &config);
 
         private:
-            virtual void handleInnerRequestCommand(InnerClient *connection, uint64_t id, int argc, char *argv[]);
-            virtual void handleInnerResponceCommand(InnerClient *connection, uint64_t id, int argc, char *argv[]);
-            virtual void handleInnerApproveCommand(InnerClient *connection, uint64_t id, int argc, char *argv[]);
+            virtual void handleInnerRequestCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[]);
+            virtual void handleInnerResponceCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[]);
+            virtual void handleInnerApproveCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[]);
 
             HttpServerHandlerHost* const parent_;
 

@@ -270,10 +270,10 @@ namespace fasto
 
             }
 
-            void processSubscribed(uint64_t request_id, int argc, char *argv[])
+            void processSubscribed(cmd_id_type request_id, int argc, char *argv[])
             {
                 sds join = sdsempty();
-                join = sdscatfmt(join, "%U ", request_id);
+                join = sdscatfmt(join, "%s ", request_id.c_str());
                 for (int i = 0; i < argc; ++i) {
                     join = sdscat(join, argv[i]);
                     if (i != argc - 1) {
@@ -327,19 +327,22 @@ namespace fasto
                     return;
                 }
 
-                char *star_cmd = NULL;
-                uint64_t id = strtoull(star_seq + 1, &star_cmd, 10);
-                if (*star_cmd != ' ') {
+                const char* id_ptr = strchr(star_seq + 1, ' ');
+                if (!id_ptr) {
                     const std::string resp = common::MemSPrintf("PROBLEM EXTRACTING ID: %s", space + 1);
                     DEBUG_MSG(common::logging::L_WARNING, resp);
                     publish_command_out(resp);
                     return;
                 }
 
+                size_t len_seq = id_ptr - (star_seq + 1);
+                cmd_id_type id = std::string(star_seq + 1, len_seq);
+                const char *cmd = id_ptr;
+
                 InnerTcpClient* fclient = parent_->parent_->findInnerConnectionByHost(msg);
                 if(!fclient){
                     int argc;
-                    sds *argv = sdssplitargs(star_cmd, &argc);
+                    sds *argv = sdssplitargs(cmd, &argc);
                     char* command = argv[0];
 
                     const std::string resp = common::MemSPrintf(SERVER_COMMANDS_OUT_FAIL_2US(CAUSE_NOT_CONNECTED), id, command);
@@ -352,7 +355,7 @@ namespace fasto
                 common::ErrnoError err = fclient->write(buff, len, nwrite);
                 if(err && err->isError()){
                     int argc;
-                    sds *argv = sdssplitargs(star_cmd, &argc);
+                    sds *argv = sdssplitargs(cmd, &argc);
                     char* command = argv[0];
 
                     const std::string resp = common::MemSPrintf(SERVER_COMMANDS_OUT_FAIL_2US(CAUSE_NOT_HANDLED), id, command);
@@ -447,7 +450,7 @@ namespace fasto
             redis_subscribe_command_in_thread_->start();
         }
 
-        void InnerServerHandlerHost::handleInnerRequestCommand(InnerClient *connection, uint64_t id, int argc, char *argv[])
+        void InnerServerHandlerHost::handleInnerRequestCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[])
         {
             char* command = argv[0];
 
@@ -461,7 +464,7 @@ namespace fasto
             }
         }
 
-        void InnerServerHandlerHost::handleInnerResponceCommand(InnerClient *connection, uint64_t id, int argc, char *argv[])
+        void InnerServerHandlerHost::handleInnerResponceCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[])
         {
             ssize_t nwrite = 0;
             char* state_command = argv[0];
@@ -569,7 +572,7 @@ namespace fasto
             delete connection;
         }
 
-        void InnerServerHandlerHost::handleInnerApproveCommand(InnerClient *connection, uint64_t id, int argc, char *argv[])
+        void InnerServerHandlerHost::handleInnerApproveCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[])
         {
 
         }

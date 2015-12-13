@@ -57,12 +57,15 @@ namespace fasto
 
         cmd_id_type InnerServerCommandSeqParser::next_id()
         {
-            return id_++;
+            unsigned long long new_id = id_++;
+            std::string new_id_str = common::convertToString(new_id);
+            std::string hex = common::HexEncode(new_id_str, true);
+            return hex;
         }
 
         namespace
         {
-            bool exec_reqest(RequestCallback req, uint64_t request_id, int argc, char *argv[])
+            bool exec_reqest(RequestCallback req, cmd_id_type request_id, int argc, char *argv[])
             {
                 if(request_id == req.request_id()){
                     req.execute(argc, argv);
@@ -109,9 +112,8 @@ namespace fasto
                 return;
             }
 
-            char *star_cmd = NULL;
-            uint64_t id = strtoull(star_seq + 1, &star_cmd, 10);
-            if (*star_cmd != ' ') {
+            const char* id_ptr = strchr(star_seq + 1, ' ');
+            if (!id_ptr) {
                 DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "PROBLEM EXTRACTING ID: %s", buff);
                 connection->write(make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff), nwrite);
                 connection->close();
@@ -119,19 +121,22 @@ namespace fasto
                 return;
             }
 
-            const char *cmd = star_cmd + 1;
+            size_t len_seq = id_ptr - (star_seq + 1);
+            cmd_id_type id = std::string(star_seq + 1, len_seq);
+            const char *cmd = id_ptr;
+
             int argc;
             sds *argv = sdssplitargs(cmd, &argc);
             processRequest(id, argc, argv);
             if (argv == NULL) {
                 DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "PROBLEM PARSING INNER COMMAND: %s", buff);
-                connection->write(make_responce(seq, STATE_COMMAND_RESP_FAIL_1S, buff), nwrite);
+                connection->write(make_responce(id, STATE_COMMAND_RESP_FAIL_1S, buff), nwrite);
                 connection->close();
                 delete connection;
                 return;
             }
 
-            DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_INFO, "HANDLE INNER COMMAND client[%s] seq:% " PRIu64 ", id:% " PRIu64 ", cmd: %s",
+            DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_INFO, "HANDLE INNER COMMAND client[%s] seq:% " PRIu64 ", id:%s, cmd: %s",
                                                    connection->formatedName(), seq, id, cmd);
             if(seq == REQUEST_COMMAND){
                 handleInnerRequestCommand(connection, id, argc, argv);

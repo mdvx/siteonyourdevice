@@ -8,7 +8,7 @@ namespace fasto
 {
     namespace fastoremote
     {
-        typedef uint64_t cmd_id_type;
+        typedef std::string cmd_id_type;
 
         class RequestCallback
         {
@@ -73,9 +73,9 @@ namespace fasto
             void processRequest(cmd_id_type request_id, int argc, char *argv[]);
 
             cmd_id_type next_id();
-            virtual void handleInnerRequestCommand(InnerClient *connection, uint64_t id, int argc, char *argv[]) = 0; //called when argv not NULL and argc > 0 , only responce
-            virtual void handleInnerResponceCommand(InnerClient *connection, uint64_t id, int argc, char *argv[]) = 0; //called when argv not NULL and argc > 0, only approve responce
-            virtual void handleInnerApproveCommand(InnerClient *connection, uint64_t id, int argc, char *argv[]) = 0; //called when argv not NULL and argc > 0
+            virtual void handleInnerRequestCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[]) = 0; //called when argv not NULL and argc > 0 , only responce
+            virtual void handleInnerResponceCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[]) = 0; //called when argv not NULL and argc > 0, only approve responce
+            virtual void handleInnerApproveCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[]) = 0; //called when argv not NULL and argc > 0
 
             common::atomic_ullong_t id_;
             std::vector<RequestCallback> subscribed_requests_;
