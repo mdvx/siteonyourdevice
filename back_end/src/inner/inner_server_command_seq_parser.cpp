@@ -136,8 +136,8 @@ namespace fasto
                 return;
             }
 
-            DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_INFO, "HANDLE INNER COMMAND client[%s] seq:% " PRIu64 ", id:%s, cmd: %s",
-                                                   connection->formatedName(), seq, id, cmd);
+            DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_INFO, "HANDLE INNER COMMAND client[%s] seq:% " PRIu64 ", id:%s, cmd: %s (%s)",
+                                                   connection->formatedName(), seq, id, cmd, buff);
             if(seq == REQUEST_COMMAND){
                 handleInnerRequestCommand(connection, id, argc, argv);
             }
