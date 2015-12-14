@@ -24,5 +24,5 @@ version = 0.0.1$patch
             --gui/siteonyourdevice-$version-x86_64.dmg
             --gui/siteonyourdevice-$version-x86_64.zip
         --freebsd
-            --console/siteonyourdevice-$version-x86_64.zip
-            --gui/siteonyourdevice-$version-x86_64.zip
+            --console/siteonyourdevice-$version-x86_64.tar.gz
+            --gui/siteonyourdevice-$version-x86_64.tar.gz
