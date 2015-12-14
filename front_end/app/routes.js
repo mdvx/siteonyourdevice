@@ -6,7 +6,7 @@ function checkIsValidDomain(domain) {
     return domain.match(re);
 } 
 
-module.exports = function(app, passport, redis, io) {
+module.exports = function(app, passport, redis) {
 
 // normal routes ===============================================================
 
