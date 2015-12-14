@@ -1,7 +1,9 @@
 # siteonyourdevice
 
 download directory
-versio - 0.0.1
+build_type can be: -beta8/rc2 if release empty
+version = 0.0.1$patch
+
 --public
     --downloads
         --windows
