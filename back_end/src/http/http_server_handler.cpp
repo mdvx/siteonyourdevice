@@ -13,7 +13,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         IHttpAuthObserver::IHttpAuthObserver()
         {
@@ -40,7 +40,7 @@ namespace fasto
 
         }
 
-        void HttpServerHandler::closed(fasto::fastoremote::TcpClient* client)
+        void HttpServerHandler::closed(TcpClient* client)
         {
 
         }

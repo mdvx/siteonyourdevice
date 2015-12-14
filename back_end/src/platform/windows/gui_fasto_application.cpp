@@ -52,7 +52,7 @@ namespace
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         Win32MainWindow::Win32MainWindow(NetworkController *controller)
             : GuiNetworkEventHandler(controller), hwnd_(NULL),

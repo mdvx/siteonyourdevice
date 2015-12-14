@@ -4,7 +4,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         class Win32MainWindow
                 : public GuiNetworkEventHandler

@@ -14,7 +14,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         HttpClient::HttpClient(TcpServer *server, const common::net::socket_info& info)
             : TcpClient(server, info), isAuth_(false)

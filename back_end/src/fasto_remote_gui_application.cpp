@@ -2,7 +2,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         GuiNetworkEventHandler::GuiNetworkEventHandler(NetworkController *controller)
             : NetworkEventHandler(controller)

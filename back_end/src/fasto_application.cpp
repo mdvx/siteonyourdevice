@@ -24,17 +24,18 @@ namespace fasto
     {
         IFastoApplicationImpl* createImpl(int argc, char *argv[])
         {
+            using namespace siteonyourdevice;
 #if defined(BUILD_CONSOLE)
-            return new fastoremote::FastoRemoteApplication(argc, argv);
+            return new FastoRemoteApplication(argc, argv);
 #else
     #if defined(OS_WIN)
-            return new fastoremote::WinGuiFastoRemoteApplication(argc, argv);
+            return new WinGuiFastoRemoteApplication(argc, argv);
     #elif defined(OS_MACOSX)
-            return new fastoremote::MacOSXGuiFastoRemoteApplication(argc, argv);
+            return new MacOSXGuiFastoRemoteApplication(argc, argv);
     #elif defined(OS_ANDROID)
-            return new fastoremote::FastoRemoteApplication(argc, argv);
+            return new FastoRemoteApplication(argc, argv);
     #else
-            return new fastoremote::GtkGuiFastoRemoteApplication(argc, argv);
+            return new GtkGuiFastoRemoteApplication(argc, argv);
     #endif
 #endif
         }

@@ -4,7 +4,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         struct UserAuthInfo
         {
@@ -43,5 +43,5 @@ namespace fasto
 
 namespace common
 {
-    std::string convertToString(const fasto::fastoremote::UserAuthInfo& uinfo);
+    std::string convertToString(const fasto::siteonyourdevice::UserAuthInfo& uinfo);
 }

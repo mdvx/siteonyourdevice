@@ -7,7 +7,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         class Http2Client;
 
@@ -28,10 +28,10 @@ namespace fasto
 
             HttpServerHandler(IHttpAuthObserver * observer);
             virtual void preLooped(TcpServer* server);
-            virtual void accepted(fasto::fastoremote::TcpClient* client);
+            virtual void accepted(TcpClient* client);
             virtual void moved(TcpClient* client);
-            virtual void closed(fasto::fastoremote::TcpClient* client);
-            virtual void dataReceived(fasto::fastoremote::TcpClient* client);
+            virtual void closed(TcpClient* client);
+            virtual void dataReceived(TcpClient* client);
             virtual void postLooped(TcpServer* server);
             virtual ~HttpServerHandler();
 

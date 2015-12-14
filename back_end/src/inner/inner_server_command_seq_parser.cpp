@@ -11,7 +11,7 @@ extern "C" {
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         RequestCallback::RequestCallback(cmd_id_type request_id, callback_t cb)
             : request_id_(request_id), cb_(cb)
@@ -136,8 +136,8 @@ namespace fasto
                 return;
             }
 
-            DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_INFO, "HANDLE INNER COMMAND client[%s] seq:% " PRIu64 ", id:%s, cmd: %s (%s)",
-                                                   connection->formatedName(), seq, id, cmd, buff);
+            DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_INFO, "HANDLE INNER COMMAND client[%s] seq:% " PRIu64 ", id:%s, cmd: %s",
+                                                   connection->formatedName(), seq, id, cmd);
             if(seq == REQUEST_COMMAND){
                 handleInnerRequestCommand(connection, id, argc, argv);
             }

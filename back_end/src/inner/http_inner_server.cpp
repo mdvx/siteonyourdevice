@@ -4,7 +4,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         RelayClient::RelayClient(TcpServer* server, const common::net::socket_info& info)
             : Http2Client(server, info)

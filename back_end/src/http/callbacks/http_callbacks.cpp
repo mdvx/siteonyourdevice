@@ -5,28 +5,28 @@
 
 namespace common
 {
-    std::string convertToString(fasto::fastoremote::HCTypes t)
+    std::string convertToString(fasto::siteonyourdevice::HCTypes t)
     {
-        return fasto::fastoremote::HCallbackTypes[t];
+        return fasto::siteonyourdevice::HCallbackTypes[t];
     }
 
     template<>
-    fasto::fastoremote::HCTypes convertFromString(const std::string& text)
+    fasto::siteonyourdevice::HCTypes convertFromString(const std::string& text)
     {
-        for (uint32_t i = 0; i < SIZEOFMASS(fasto::fastoremote::HCallbackTypes); ++i){
-            if (text == fasto::fastoremote::HCallbackTypes[i]){
-                return static_cast<fasto::fastoremote::HCTypes>(i);
+        for (uint32_t i = 0; i < SIZEOFMASS(fasto::siteonyourdevice::HCallbackTypes); ++i){
+            if (text == fasto::siteonyourdevice::HCallbackTypes[i]){
+                return static_cast<fasto::siteonyourdevice::HCTypes>(i);
             }
         }
 
         NOTREACHED();
-        return fasto::fastoremote::file_system;
+        return fasto::siteonyourdevice::file_system;
     }
 }
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         IHttpCallback::IHttpCallback(HCTypes type)
             : type_(type)

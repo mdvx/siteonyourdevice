@@ -6,7 +6,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         typedef std::string cmd_id_type;
 
