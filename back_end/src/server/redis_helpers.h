@@ -6,7 +6,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         struct redis_configuration_t
         {
