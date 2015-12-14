@@ -178,9 +178,11 @@ namespace fasto
             handler_->setAuthChecker(authChecker_);
 
             bool daemon_mode = false;
-
+#ifdef OS_MACOSX
+            std::string config_path = PROJECT_NAME ".app/Contents/Resources/" CONFIG_FILE_NAME;
+#else
             std::string config_path = CONFIG_FILE_NAME;
-
+#endif
             for (int i = 0; i < argc; i++) {
                 if (strcmp(argv[i], "-c") == 0) {
                     config_path = argv[++i];
@@ -327,7 +329,12 @@ namespace fasto
 
         void NetworkController::readConfig()
         {
+        #ifdef OS_MACOSX
+            const std::string spath = fApp->appDir() + config_path_;
+            const char* path = spath.c_str();
+        #else
             const char* path = config_path_.c_str();
+        #endif
 
             configuration_t config;
             //default settings
@@ -340,7 +347,7 @@ namespace fasto
 
             //try to parse settings file
             if (ini_parse(path, ini_handler_fasto, &config) < 0) {
-                DEBUG_MSG_FORMAT<128>(common::logging::L_INFO, "Can't load config '%s', use default settings.", path);
+                DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Can't load config '%s', use default settings.", path);
             }
 
             config_ = config;
