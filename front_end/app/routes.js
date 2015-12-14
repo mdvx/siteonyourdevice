@@ -6,13 +6,15 @@ function checkIsValidDomain(domain) {
     return domain.match(re);
 } 
 
-module.exports = function(app, passport, redis) {
+module.exports = function(app, passport, redis, settings_config) {
 
 // normal routes ===============================================================
 
     // show the home page (will also have our login links)
     app.get('/', function(req, res) {
-        res.render('index.ejs');
+        res.render('index.ejs', {
+        version : settings_config.client_version,
+        type : settings_config.client_version_type});
     });
 
     app.post('/server_details', function(req, res) {
