@@ -13,7 +13,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         HttpInnerServerHandlerHost::HttpInnerServerHandlerHost(HttpServerHandlerHost *parent)
             : Http2ServerHandler(NULL), parent_(parent)

@@ -35,7 +35,7 @@ namespace
 
     struct configuration_t
     {
-        fasto::fastoremote::redis_sub_configuration_t redis_config_;
+        fasto::siteonyourdevice::redis_sub_configuration_t redis_config_;
     };
 
     configuration_t config;
@@ -71,8 +71,8 @@ namespace
     }
 }
 
-fasto::fastoremote::HttpServerHost* server = NULL;
-fasto::fastoremote::HttpServerHandlerHost* handler = NULL;
+fasto::siteonyourdevice::HttpServerHost* server = NULL;
+fasto::siteonyourdevice::HttpServerHandlerHost* handler = NULL;
 
 void signal_handler(int sig);
 void sync_config();
@@ -80,7 +80,7 @@ void app_logger_hadler(common::logging::LEVEL_LOG level, const std::string& mess
 
 int main(int argc, char *argv[])
 {
-    using namespace fasto::fastoremote;
+    using namespace fasto::siteonyourdevice;
 
     int opt;
     bool daemon_mode = false;

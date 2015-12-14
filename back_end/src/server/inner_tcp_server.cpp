@@ -20,7 +20,7 @@ extern "C" {
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         RelayServer::RelayServer(InnerServerHandlerHost *handler, InnerTcpClient *parent, const common::net::hostAndPort& host, client_t client)
             : ServerSocketTcp(host), stop_(false), client_(client), relayThread_(), parent_(parent), handler_(handler)
@@ -409,7 +409,7 @@ namespace fasto
             client->write(make_request(SERVER_WHO_ARE_YOU_COMMAND_REQ), nwrite);
         }
 
-        void InnerServerHandlerHost::closed(fasto::fastoremote::TcpClient* client)
+        void InnerServerHandlerHost::closed(TcpClient* client)
         {
             bool isOk = parent_->unRegisterInnerConnectionByHost(client);
             if(isOk){

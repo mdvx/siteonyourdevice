@@ -6,7 +6,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         class GtkMainWindow
                 : public GuiNetworkEventHandler

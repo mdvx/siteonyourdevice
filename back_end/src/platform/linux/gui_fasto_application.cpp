@@ -54,7 +54,7 @@ namespace
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         class GtkMainWindow::EventHandler
         {

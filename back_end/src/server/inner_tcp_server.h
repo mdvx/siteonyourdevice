@@ -10,7 +10,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         typedef UserAuthInfo HostInfo;
 

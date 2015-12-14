@@ -6,7 +6,7 @@ SET(BRANDING_PROJECT_VERSION "0.0.2.8" CACHE STRING "Branding version for ${BRAN
 SET(BRANDING_PROJECT_BUILD_TYPE_VERSION "rc" CACHE STRING "Build version type for ${BRANDING_PROJECT_NAME}") #default
     #posible variables: alfa, beta, rc, release
 
-SET(BRANDING_PROJECT_DOMAIN "https://www.siteonyourdevice.com" CACHE STRING "Branding domain url for ${BRANDING_PROJECT_NAME}") #default
+SET(BRANDING_PROJECT_DOMAIN "http://www.siteonyourdevice.com" CACHE STRING "Branding domain url for ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_COMPANYNAME "FastoGT" CACHE STRING "Company name for ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_COMPANYNAME_DOMAIN "http://www.fastogt.com" CACHE STRING "Internet domain name company for ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_MAINTAINER_MAIL "atopilski@fastogt.com" CACHE STRING "Internet mail address mainteiner of ${BRANDING_PROJECT_NAME}") #default
@@ -17,7 +17,7 @@ SET(BRANDING_PROJECT_GITHUB_ISSUES "https://www.github.com/fastogt/siteonyourdev
 
 SET(BRANDING_PROJECT_HOMEPAGE_LINK "http://www.siteonyourdevice.com" CACHE STRING "Home page link for ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_FACEBOOK_LINK "https://www.facebook.com/profile.php?id=100010049712549" CACHE STRING "Facebook link for ${BRANDING_PROJECT_NAME}") #default
-SET(BRANDING_PROJECT_TWITTER_LINK "https://www.twitter.com/SiteOnYourDevice" CACHE STRING "Twitter link for ${BRANDING_PROJECT_NAME}") #default
+SET(BRANDING_PROJECT_TWITTER_LINK "https://www.twitter.com/SiteOnDevice" CACHE STRING "Twitter link for ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_GITHUB_LINK "https://www.github.com/fastogt/siteonyourdevice" CACHE STRING "Github link for ${BRANDING_PROJECT_NAME}") #default
 
 SET(BRANDING_PROJECT_BREF_DESCRIPTION "Cross-platform open source http server."

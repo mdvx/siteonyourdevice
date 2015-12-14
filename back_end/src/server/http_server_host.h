@@ -9,7 +9,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         class HttpServerHandlerHost;
 
@@ -21,9 +21,9 @@ namespace fasto
             typedef HttpClient client_t;
 
             HttpInnerServerHandlerHost(HttpServerHandlerHost * parent);
-            virtual void accepted(fasto::fastoremote::TcpClient* client);
-            virtual void closed(fasto::fastoremote::TcpClient* client);
-            virtual void dataReceived(fasto::fastoremote::TcpClient* client);
+            virtual void accepted(TcpClient* client);
+            virtual void closed(TcpClient* client);
+            virtual void dataReceived(TcpClient* client);
 
             virtual ~HttpInnerServerHandlerHost();
 
