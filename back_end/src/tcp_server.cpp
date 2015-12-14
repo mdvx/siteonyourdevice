@@ -45,7 +45,7 @@ namespace
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         struct fasto_cs_sync
         {

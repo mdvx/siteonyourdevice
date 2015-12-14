@@ -35,7 +35,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         class GuiNetworkEventHandler
                 : public NetworkEventHandler

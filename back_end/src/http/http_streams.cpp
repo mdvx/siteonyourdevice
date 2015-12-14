@@ -4,7 +4,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         common::http2::frame_type IStream::type() const
         {

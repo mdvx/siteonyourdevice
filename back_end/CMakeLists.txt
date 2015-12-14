@@ -3,22 +3,22 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
 
 SET(BRANDING_PROJECT_NAME "SiteOnYourDevice" CACHE STRING "Branding for ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_VERSION "0.0.2.8" CACHE STRING "Branding version for ${BRANDING_PROJECT_NAME}") #default
-SET(BRANDING_PROJECT_BUILD_TYPE_VERSION "beta" CACHE STRING "Build version type for ${BRANDING_PROJECT_NAME}") #default
+SET(BRANDING_PROJECT_BUILD_TYPE_VERSION "rc" CACHE STRING "Build version type for ${BRANDING_PROJECT_NAME}") #default
     #posible variables: alfa, beta, rc, release
 
-SET(BRANDING_PROJECT_DOMAIN "https://www.siteonyourdevice.com" CACHE STRING "Branding domain url for ${BRANDING_PROJECT_NAME}") #default
+SET(BRANDING_PROJECT_DOMAIN "http://www.siteonyourdevice.com" CACHE STRING "Branding domain url for ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_COMPANYNAME "FastoGT" CACHE STRING "Company name for ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_COMPANYNAME_DOMAIN "http://www.fastogt.com" CACHE STRING "Internet domain name company for ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_MAINTAINER_MAIL "atopilski@fastogt.com" CACHE STRING "Internet mail address mainteiner of ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_MAINTAINER_NAME "Alexandr Topilski" CACHE STRING "Name of mainteiner for ${BRANDING_PROJECT_NAME}") #default
 
-SET(BRANDING_PROJECT_GITHUB_FORK "https://www.github.com/fastogt/fastoremote" CACHE STRING "Branding fork url for ${BRANDING_PROJECT_NAME}") #default
-SET(BRANDING_PROJECT_GITHUB_ISSUES "https://www.github.com/fastogt/fastoremote/issues" CACHE STRING "Branding issues url for ${BRANDING_PROJECT_NAME}") #default
+SET(BRANDING_PROJECT_GITHUB_FORK "https://www.github.com/fastogt/siteonyourdevice" CACHE STRING "Branding fork url for ${BRANDING_PROJECT_NAME}") #default
+SET(BRANDING_PROJECT_GITHUB_ISSUES "https://www.github.com/fastogt/siteonyourdevice/issues" CACHE STRING "Branding issues url for ${BRANDING_PROJECT_NAME}") #default
 
 SET(BRANDING_PROJECT_HOMEPAGE_LINK "http://www.siteonyourdevice.com" CACHE STRING "Home page link for ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_FACEBOOK_LINK "https://www.facebook.com/profile.php?id=100010049712549" CACHE STRING "Facebook link for ${BRANDING_PROJECT_NAME}") #default
-SET(BRANDING_PROJECT_TWITTER_LINK "https://www.twitter.com/FastoRemote" CACHE STRING "Twitter link for ${BRANDING_PROJECT_NAME}") #default
-SET(BRANDING_PROJECT_GITHUB_LINK "https://www.github.com/fastogt/fastoremote" CACHE STRING "Github link for ${BRANDING_PROJECT_NAME}") #default
+SET(BRANDING_PROJECT_TWITTER_LINK "https://www.twitter.com/SiteOnDevice" CACHE STRING "Twitter link for ${BRANDING_PROJECT_NAME}") #default
+SET(BRANDING_PROJECT_GITHUB_LINK "https://www.github.com/fastogt/siteonyourdevice" CACHE STRING "Github link for ${BRANDING_PROJECT_NAME}") #default
 
 SET(BRANDING_PROJECT_BREF_DESCRIPTION "Cross-platform open source http server."
     CACHE STRING "Bref description for ${BRANDING_PROJECT_NAME}")
@@ -221,8 +221,8 @@ ADD_SUBDIRECTORY(src)
 #cpack
 
 IF(CPACK_SUPPORT)
-    SET(CPACK_PACKAGE_DESCRIPTION "Shell-centric cross-platform Redis and Memchached management tool.")
-    SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME_TITLE} cross-platform Redis and Memchached management tool.")
+    SET(CPACK_PACKAGE_DESCRIPTION "Remote control any computer/mobile/device over the internet.")
+    SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME_TITLE} lightweight and fast Web Server for remote access.")
     #CPACK_DEBIAN_PACKAGE_DESCRIPTION CPACK_RPM_PACKAGE_SUMMARY
     SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/LICENSE")#CPACK_RPM_PACKAGE_DESCRIPTION
     SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
@@ -275,7 +275,7 @@ IF(CPACK_SUPPORT)
             SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\${PROJECT_DOMAIN}")
             SET(SIDEBAR_IMAGE ${CMAKE_SOURCE_DIR}/install/${PROJECT_NAME_LOWERCASE}/windows\\\\database.bmp)
             SET(CPACK_NSIS_INSTALLER_MUI_ICON_CODE "!define MUI_WELCOMEFINISHPAGE_BITMAP \\\"${SIDEBAR_IMAGE}\\\"")
-            SET(CPACK_NSIS_CONTACT "me@my-personal-home-page.com")
+            SET(CPACK_NSIS_CONTACT "atopilski@fastogt.com")
             SET(CPACK_NSIS_MUI_FINISHPAGE_RUN "..\\\\${PROJECT_NAME}.exe")
         ENDIF(CPACK_GENERATOR STREQUAL "NSIS")
     ELSEIF(OS_MACOSX)
@@ -307,7 +307,7 @@ IF(CPACK_SUPPORT)
             SET(CPACK_RPM_PACKAGE_AUTOREQPROV "no")
             SET(CPACK_RPM_PACKAGE_REQUIRES "libc.so.6 >= 2.12, libstdc++.so.6 >= 6.0.13")
             SET(CPACK_RPM_PACKAGE_RELEASE 1)
-            SET(CPACK_RPM_PACKAGE_GROUP "Development/Libraries/${PROJECT_COMPANYNAME}")
+            SET(CPACK_RPM_PACKAGE_GROUP "Applications/Internet/${PROJECT_COMPANYNAME}")
             SET(CPACK_RPM_PACKAGE_ARCHITECTURE ${ARCH_TEXT_PACKAGE})
             SET(CPACK_RPM_PACKAGE_VERSION ${PROJECT_VERSION_SHORT})
             SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/postinst")
@@ -322,7 +322,7 @@ IF(CPACK_SUPPORT)
             #SET(CPACK_DEBIAN_PACKAGE_DEBUG ON)
             SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.12), libstdc++6 (>= 4.4.7)")
             SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
-            SET(CPACK_DEBIAN_PACKAGE_SECTION "database")#input our section
+            SET(CPACK_DEBIAN_PACKAGE_SECTION "internet")#input our section
             SET(CPACK_DEBIAN_PACKAGE_RECOMMENDS "Unknown")
             SET(CPACK_DEBIAN_PACKAGE_SUGGESTS "Unknown")
             SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${ARCH_TEXT_PACKAGE})#i386

@@ -26,8 +26,8 @@
 @end
 
 @interface  AppDelegate()
-@property (nonatomic, assign) fasto::fastoremote::MacMainWindow *cxx_window_;
-@property (nonatomic, assign) fasto::fastoremote::NetworkController *cxx_controller_;
+@property (nonatomic, assign) fasto::siteonyourdevice::MacMainWindow *cxx_window_;
+@property (nonatomic, assign) fasto::siteonyourdevice::NetworkController *cxx_controller_;
 @end
 
 @implementation AppDelegate
@@ -36,11 +36,12 @@
 
 - (id)initWithCxxWindow: (void*) cxxWindow cxxController : (void*)controller
 {    
+    using namespace fasto::siteonyourdevice;
     if ( self = [super init] ) {
-        cxx_window_ = (fasto::fastoremote::MacMainWindow *)cxxWindow;
-        cxx_controller_ = (fasto::fastoremote::NetworkController *)controller;
+        cxx_window_ = (MacMainWindow *)cxxWindow;
+        cxx_controller_ = (NetworkController *)controller;
         // create a reference rect
-        NSRect contentSize = NSMakeRect(0.0f, 0.0f, fasto::fastoremote::MacMainWindow::width, fasto::fastoremote::MacMainWindow::height);
+        NSRect contentSize = NSMakeRect(0.0f, 0.0f, MacMainWindow::width, MacMainWindow::height);
         
         // allocate window
         window = [[NSWindow alloc] initWithContentRect:contentSize styleMask:NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask backing:NSBackingStoreBuffered defer:YES];
@@ -52,10 +53,10 @@
         const int padding = 10;
         const int left_padding = padding;
         const int buttom_padding = padding;
-        const int top_padding = fasto::fastoremote::MacMainWindow::height - padding - control_heigth;
+        const int top_padding = MacMainWindow::height - padding - control_heigth;
 
-        const int center_widget_width = fasto::fastoremote::MacMainWindow::width / 2;
-        const int center_widget_height = fasto::fastoremote::MacMainWindow::height / 2;
+        const int center_widget_width = MacMainWindow::width / 2;
+        const int center_widget_height = MacMainWindow::height / 2;
         
         NSRect domainFrameLabel = NSMakeRect(left_padding, top_padding, width_control, control_heigth);
         domainLabel_ = [[NSTextField alloc] initWithFrame:domainFrameLabel];
@@ -138,7 +139,9 @@
     [mainMenu release];
     [appleMenu release];
     
-    fasto::fastoremote::configuration_t config = cxx_controller_->config();
+    using namespace fasto::siteonyourdevice;
+
+    configuration_t config = cxx_controller_->config();
     
     [domainLabel_ setStringValue:@ DOMAIN_LABEL];
     [domainLabel_ setBezeled:NO];
@@ -225,7 +228,9 @@
 
 - (IBAction) connectAction : (id) sender;
 {
-    fasto::fastoremote::configuration_t config = cxx_controller_->config();
+    using namespace fasto::siteonyourdevice;
+
+    configuration_t config = cxx_controller_->config();
     NSString *domain = [domainTextBox_ stringValue];
     config.domain_ = [domain UTF8String];
     int port = [portTextBox_ intValue];
@@ -275,7 +280,7 @@
 
 - (void) handleNetworkEvent: (void*) revent
 {
-     using namespace fasto::fastoremote;
+     using namespace fasto::siteonyourdevice;
      NetworkEvent* event = reinterpret_cast<NetworkEvent*>(revent);
      if(event->eventType() == InnerClientConnectedEvent::EventType){
          [connetButton_ setTitle:@ DISCONNECT_LABEL];

@@ -8,7 +8,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         class HttpClient
                 : public TcpClient

@@ -18,7 +18,7 @@ namespace common
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         class Http2InnerServerHandler;
         class Http2InnerServer;

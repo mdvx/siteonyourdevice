@@ -13,7 +13,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         HttpFileSystemCallback::HttpFileSystemCallback()
             : IHttpCallback(file_system)

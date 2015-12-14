@@ -8,7 +8,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         class Http2InnerServerHandler
                 : public InnerServerCommandSeqParser, public Http2ServerHandler
@@ -20,7 +20,7 @@ namespace fasto
             virtual void preLooped(TcpServer* server);
             virtual void accepted(TcpClient* client);
             virtual void closed(TcpClient* client);
-            virtual void dataReceived(fasto::fastoremote::TcpClient* client);
+            virtual void dataReceived(TcpClient* client);
             virtual void postLooped(TcpServer* server);
 
             void setAuthInfo(const UserAuthInfo& authInfo);

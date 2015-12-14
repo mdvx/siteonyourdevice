@@ -4,10 +4,10 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         HttpServer::HttpServer(const common::net::hostAndPort& host, TcpServerObserver* observer)
-            : fastoremote::TcpServer(host, observer), info_()
+            : TcpServer(host, observer), info_()
         {
 
         }

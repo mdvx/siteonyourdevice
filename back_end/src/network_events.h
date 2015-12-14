@@ -6,7 +6,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         typedef common::event_traits<NetworkEventTypes> NetworkEventTraits;
         typedef NetworkEventTraits::event_t NetworkEvent;

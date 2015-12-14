@@ -4,7 +4,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         class HttpClient;
 
@@ -37,5 +37,5 @@ namespace fasto
 
 namespace common
 {
-    std::string convertToString(fasto::fastoremote::HCTypes t);
+    std::string convertToString(fasto::siteonyourdevice::HCTypes t);
 }

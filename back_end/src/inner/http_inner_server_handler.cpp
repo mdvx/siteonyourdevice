@@ -19,7 +19,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     { 
         Http2InnerServerHandler::Http2InnerServerHandler(const common::net::hostAndPort &host)
             : Http2ServerHandler(NULL), innerConnection_(NULL), authInfo_(), host_(host)

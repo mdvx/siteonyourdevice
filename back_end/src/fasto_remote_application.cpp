@@ -18,21 +18,22 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         NetworkEventHandler* createHandlerImpl(NetworkController * controler)
         {
+            using namespace siteonyourdevice;
             #if defined(BUILD_CONSOLE)
-                return new fastoremote::NetworkEventHandler(controler);
+                return new NetworkEventHandler(controler);
             #else
             #if defined(OS_WIN)
-                return new fastoremote::Win32MainWindow(controler);
+                return new Win32MainWindow(controler);
             #elif defined(OS_MACOSX)
-                return new fastoremote::MacMainWindow(controler);
+                return new MacMainWindow(controler);
             #elif defined(OS_ANDROID)
-                return new fastoremote::NetworkEventHandler(controler);
+                return new NetworkEventHandler(controler);
             #else
-                return new fastoremote::GtkMainWindow(controler);
+                return new GtkMainWindow(controler);
             #endif
             #endif
         }

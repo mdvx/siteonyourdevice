@@ -5,7 +5,7 @@
 
 namespace fasto
 {
-    namespace fastoremote
+    namespace siteonyourdevice
     {
         class FastoRemoteApplication
                 : public IFastoApplicationImpl
