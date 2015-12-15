@@ -93,27 +93,27 @@ namespace fasto
             gtk_window_set_position(GTK_WINDOW(window_), GTK_WIN_POS_CENTER);
             gtk_window_set_title (GTK_WINDOW(window_), PROJECT_NAME_TITLE);
             gtk_window_set_default_size(GTK_WINDOW(window_), height, width);
-            gtk_container_set_border_width(GTK_CONTAINER(window_), 5);
+            gtk_container_set_border_width(GTK_CONTAINER(window_), 10);
 
             GtkWidget *vbox = gtk_vbox_new(TRUE, 1);
-            gtk_container_add(GTK_CONTAINER(window_), vbox);
 
             // domain and port
             GtkWidget *dpbox = gtk_hbox_new(TRUE, 1);
+
             GtkWidget *dhdbox = gtk_hbox_new(TRUE, 1);
             GtkWidget *domain_label  = gtk_label_new(DOMAIN_LABEL);
-            gtk_container_add(GTK_CONTAINER(dpbox), domain_label);
+            gtk_box_pack_start(GTK_BOX(dhdbox), domain_label, FALSE, FALSE, 0);
             domain_text_ = gtk_entry_new();
             gtk_entry_set_max_length(GTK_ENTRY(domain_text_), domain_max_length);
-            gtk_container_add(GTK_CONTAINER(dhdbox), domain_text_);
+            gtk_box_pack_start(GTK_BOX(dhdbox), domain_text_, FALSE, FALSE, 0);
             gtk_container_add(GTK_CONTAINER(dpbox), dhdbox);
 
             GtkWidget *pdbox = gtk_hbox_new(TRUE, 1);
             GtkWidget *port_label = gtk_label_new(PORT_LABEL);
-            gtk_container_add(GTK_CONTAINER(pdbox), port_label);
+            gtk_box_pack_start(GTK_BOX(pdbox), port_label, FALSE, FALSE, 0);
             port_text_ = gtk_entry_new();
             gtk_entry_set_max_length(GTK_ENTRY(port_text_), port_max_length);
-            gtk_container_add(GTK_CONTAINER(pdbox), port_text_);
+            gtk_box_pack_start(GTK_BOX(pdbox), port_text_, FALSE, FALSE, 0);
             gtk_container_add(GTK_CONTAINER(dpbox), pdbox);
 
             gtk_container_add(GTK_CONTAINER(vbox), dpbox);
@@ -121,20 +121,22 @@ namespace fasto
 
             // login and password
             GtkWidget *lpbox = gtk_hbox_new(TRUE, 1);
+
             GtkWidget *lhdbox = gtk_hbox_new(TRUE, 1);
             GtkWidget *login_label  = gtk_label_new(LOGIN_LABEL);
-            gtk_container_add(GTK_CONTAINER(lhdbox), login_label);
+            gtk_box_pack_start(GTK_BOX(lhdbox), login_label, FALSE, FALSE, 0);
             login_text_ = gtk_entry_new();
-            gtk_container_add(GTK_CONTAINER(lhdbox), login_text_);
+            gtk_entry_set_max_length(GTK_ENTRY(login_text_), login_max_length);
+            gtk_box_pack_start(GTK_BOX(lhdbox), login_text_, FALSE, FALSE, 0);
             gtk_container_add(GTK_CONTAINER(lpbox), lhdbox);
 
             GtkWidget *pasdbox = gtk_hbox_new(TRUE, 1);
             GtkWidget *password_label = gtk_label_new(PASSWORD_LABEL);
-            gtk_container_add(GTK_CONTAINER(pasdbox), password_label);
+            gtk_box_pack_start(GTK_BOX(pasdbox), password_label, FALSE, FALSE, 0);
             password_text_ = gtk_entry_new();
             gtk_entry_set_visibility (GTK_ENTRY(password_text_), FALSE);
             gtk_entry_set_invisible_char(GTK_ENTRY(password_text_), 9679);
-            gtk_container_add(GTK_CONTAINER(pasdbox), password_text_);
+            gtk_box_pack_start(GTK_BOX(pasdbox), password_text_, FALSE, FALSE, 0);
             gtk_container_add(GTK_CONTAINER(lpbox), pasdbox);
 
             gtk_container_add(GTK_CONTAINER(vbox), lpbox);
@@ -144,16 +146,16 @@ namespace fasto
             GtkWidget *cbox = gtk_hbox_new(TRUE, 1);
             GtkWidget *cpbox = gtk_hbox_new(TRUE, 1);
             GtkWidget *content_path_label  = gtk_label_new(CONTENT_PATH_LABEL);
-            gtk_container_add(GTK_CONTAINER(cpbox), content_path_label);
+            gtk_box_pack_start(GTK_BOX(cpbox), content_path_label, FALSE, FALSE, 0);
             content_path_text_ = gtk_entry_new();
-            gtk_container_add(GTK_CONTAINER(cpbox), content_path_text_);
+            gtk_box_pack_start(GTK_BOX(cpbox), content_path_text_, FALSE, FALSE, 0);
             gtk_container_add(GTK_CONTAINER(cbox), cpbox);
 
             gtk_container_add(GTK_CONTAINER(vbox), cbox);
             //
 
             is_private_site_ = gtk_check_button_new_with_label(PRIVATE_SITE_LABEL);
-            gtk_container_add(GTK_CONTAINER(vbox), is_private_site_);
+            gtk_box_pack_start(GTK_BOX(vbox), is_private_site_, FALSE, FALSE, 0);
 
             GtkWidget * menu = gtk_menu_new();
             GtkWidget * menuAbout = gtk_image_menu_item_new_with_mnemonic("About");
@@ -172,8 +174,10 @@ namespace fasto
             gtk_widget_show_all(menu);
 
             connect_button_ = gtk_button_new_with_label(CONNECT_LABEL);
-            gtk_container_add(GTK_CONTAINER(vbox), connect_button_);
+            gtk_box_pack_start(GTK_BOX(vbox), connect_button_, FALSE, FALSE, 0);
             connect_signal_id = g_signal_connect(G_OBJECT(connect_button_), "clicked", G_CALLBACK(EventHandler::click_connect_callback), evhandler_);
+
+            gtk_container_add(GTK_CONTAINER(window_), vbox);
 
             g_signal_connect(G_OBJECT(window_), "destroy", G_CALLBACK(destroy), NULL);
             g_signal_connect(G_OBJECT(window_), "delete_event", G_CALLBACK(delete_event), trayIcon);
