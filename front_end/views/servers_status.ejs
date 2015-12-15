@@ -14,17 +14,19 @@
         <script>
             var socket = io.connect('http://siteonyourdevice.com:3000');
             
-            function handle_onconnection_changed(is_connected)
+            function handle_onconnection_changed(host, is_connected)
             {
                 if(is_connected){
+                    $('#status_img' + host).attr("src", SERVER_STATUS_IMG.ONLINE);
                 }
                 else{
+                    $('#status_img' + host).attr("src", SERVER_STATUS_IMG.OFFLINE);
                 }
             }
             
             function handle_state_changed(stateObj)
             {                
-                handle_onconnection_changed(stateObj.status === CONNECTED_STATUS.CONNECTED);
+                handle_onconnection_changed(stateObj.host, stateObj.status === CONNECTED_STATUS.CONNECTED);
             }
             
             //on connetion, updates connection state and sends subscribe request
@@ -70,7 +72,7 @@
                         <% for (var i = 0; i < domains.length; i++) { %>
                         <tr>
                             <td><%= i + 1 %></td>
-                            <td><img id="status_img" src="images/offline.png"/> <%= domains[i].name %></td>
+                            <td><img id="status_img<%= domains[i].name %>" src="images/offline.png"/> <%= domains[i].name %></td>
                             <td><%= domains[i].created_date %></td>
                         </tr>    
                         <% } %>
