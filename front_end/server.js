@@ -53,7 +53,6 @@ var server = http.createServer(app);
 var listener = io.listen(server);
 
 listener.on('connection', function (socket) {
-    console.log('Connection to socket.io established');
     socket.on('subscribe', function (data) {
         socket.join(data.channel);
     });

@@ -28,9 +28,20 @@ module.exports = function(app, passport, redis, settings_config) {
     });
     
     app.get('/servers_status', function(req, res){
-        res.render('servers_status.ejs', {
-            domains: [{ name : 'fastoredis.com', created_date : Date()}]
-        });
+        User.find({"domains": { $exists: true, $ne: [] }} , function(err, all_users) 
+        {
+            var domains = [];
+            for (var i = 0; i < all_users.length; i++) {
+                var user_domains = all_users[i].domains;
+                for(var j = 0; j < user_domains.length; ++j){
+                    domains.push({name : user_domains[j].name, created_date : user_domains[j].created_date} );
+                }
+            }
+
+            res.render('servers_status.ejs', {
+                domains: domains
+            });  
+        } ); 
     });
     
     // ADD DOMAIN 

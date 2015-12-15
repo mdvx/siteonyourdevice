@@ -70,7 +70,7 @@
                         <% for (var i = 0; i < domains.length; i++) { %>
                         <tr>
                             <td><%= i + 1 %></td>
-                            <td><%= domains[i].name %></td>
+                            <td><img id="status_img" src="images/offline.png"/> <%= domains[i].name %></td>
                             <td><%= domains[i].created_date %></td>
                         </tr>    
                         <% } %>
