@@ -283,10 +283,10 @@
      using namespace fasto::siteonyourdevice;
      NetworkEvent* event = reinterpret_cast<NetworkEvent*>(revent);
      if(event->eventType() == InnerClientConnectedEvent::EventType){
-         [connetButton_ setTitle:@ DISCONNECT_LABEL];
-         [connetButton_ setAction:@selector(disConnectAction:)];
      }
      else if(event->eventType() == InnerClientAutorizedEvent::EventType){
+         [connetButton_ setTitle:@ DISCONNECT_LABEL];
+         [connetButton_ setAction:@selector(disConnectAction:)];
      }
      else if(event->eventType() == InnerClientDisconnectedEvent::EventType){
          [connetButton_ setTitle:@ CONNECT_LABEL];
