@@ -29,7 +29,7 @@ module.exports = function(app, passport, redis, settings_config) {
     
     app.get('/servers_status', function(req, res){
         res.render('servers_status.ejs', {
-            domains: [name : 'fastoredis.com', created_date : Date()]
+            domains: [{ name : 'fastoredis.com', created_date : Date()}]
         });
     });
     
