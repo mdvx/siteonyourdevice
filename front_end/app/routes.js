@@ -27,6 +27,12 @@ module.exports = function(app, passport, redis, settings_config) {
         });
     });
     
+    app.get('/servers_status', function(req, res){
+        res.render('servers_status.ejs', {
+            domains: [name : 'fastoredis.com', created_date : Date()]
+        });
+    });
+    
     // ADD DOMAIN 
     app.post('/add_domain', function(req, res) {
         var user = req.user;        
