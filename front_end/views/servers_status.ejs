@@ -16,11 +16,12 @@
             
             function handle_onconnection_changed(host, is_connected)
             {
+                var id_control = '#status_img' + host.replace('.', '_');
                 if(is_connected){
-                    $('#status_img' + host).attr("src", SERVER_STATUS_IMG.ONLINE);
+                    $(id_control).attr("src", SERVER_STATUS_IMG.ONLINE);
                 }
                 else{
-                    $('#status_img' + host).attr("src", SERVER_STATUS_IMG.OFFLINE);
+                    $(id_control).attr("src", SERVER_STATUS_IMG.OFFLINE);
                 }
             }
             
@@ -72,7 +73,7 @@
                         <% for (var i = 0; i < domains.length; i++) { %>
                         <tr>
                             <td><%= i + 1 %></td>
-                            <td><img id="status_img<%= domains[i].name %>" src="images/offline.png"/> <%= domains[i].name %></td>
+                            <td><img id="status_img<%= domains[i].name.replace('.', '_') %>" src="images/offline.png"/> <%= domains[i].name %></td>
                             <td><%= domains[i].created_date %></td>
                         </tr>    
                         <% } %>
