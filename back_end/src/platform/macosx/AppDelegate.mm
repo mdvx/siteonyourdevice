@@ -224,6 +224,7 @@
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
+    cxx_window_->onExit();
 }
 
 - (IBAction) connectAction : (id) sender;

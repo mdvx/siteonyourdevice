@@ -42,6 +42,11 @@ namespace fasto
             delete impl_;
         }
 
+        void MacMainWindow::onExit()
+        {
+            fApp->exit(EXIT_SUCCESS);
+        }
+
         int MacMainWindow::showImpl()
         {
             return EXIT_SUCCESS;
@@ -64,10 +69,15 @@ namespace fasto
 
         }
 
+        void MacOSXGuiFastoRemoteApplication::exit(int result)
+        {
+            FastoRemoteGuiApplication::exit(result);
+            FastoRemoteGuiApplication::exec();
+            FastoRemoteGuiApplication::postExec();
+        }
+
         int MacOSXGuiFastoRemoteApplication::exec()
         {
-            id pool = [[NSAutoreleasePool alloc] init];
-
             // make sure the application singleton has been instantiated
             NSApplication * application = [NSApplication sharedApplication];
 
@@ -75,7 +85,7 @@ namespace fasto
             CHECK(macw);
 
             // instantiate our application delegate
-            id applicationDelegate = [[[AppDelegate alloc] initWithCxxWindow: macw cxxController : controller_] autorelease];
+            id applicationDelegate = [[AppDelegate alloc] initWithCxxWindow: macw cxxController : controller_];
             macw->impl_->setDelegate(applicationDelegate);
 
             // assign our delegate to the NSApplication
@@ -84,8 +94,6 @@ namespace fasto
             // call the run method of our application
             [application run];
 
-            // drain the autorelease pool
-            [pool drain];
             FastoRemoteGuiApplication::exit(EXIT_SUCCESS);
             return FastoRemoteGuiApplication::exec();
         }

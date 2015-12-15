@@ -69,10 +69,6 @@ namespace fasto
         public:
             FastoRemoteGuiApplication(int argc, char *argv[]);
             ~FastoRemoteGuiApplication();
-
-        private:
-            using FastoRemoteApplication::preExec;
-            using FastoRemoteApplication::postExec;
         };
     }
 }

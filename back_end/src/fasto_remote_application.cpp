@@ -45,8 +45,7 @@ namespace fasto
 
         FastoRemoteApplication::~FastoRemoteApplication()
         {
-            delete controller_;            
-            delete network_handler_;
+
         }
 
         int FastoRemoteApplication::preExec()
@@ -63,6 +62,8 @@ namespace fasto
 
         int FastoRemoteApplication::postExec()
         {
+            delete controller_;
+            delete network_handler_;
             return EXIT_SUCCESS;
         }
 

@@ -12,7 +12,9 @@ namespace fasto
         public:
             MacOSXGuiFastoRemoteApplication(int argc, char *argv[]);
             ~MacOSXGuiFastoRemoteApplication();
+
             virtual int exec();
+            virtual void exit(int result);
         };
 
         class MacMainWindow
@@ -25,6 +27,7 @@ namespace fasto
 
             using GuiNetworkEventHandler::onConnectClicked; //with config
             using GuiNetworkEventHandler::onDisconnectClicked;
+            void onExit();
 
         protected:
             virtual void handleEvent(NetworkEvent* event);
