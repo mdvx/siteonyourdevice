@@ -22,14 +22,14 @@ Our client(Web Server) has next features:
 
 Compare with standard internet domains:
 
-Advantages:
-1) Free domain address which proxies over siteonyourdevice.com site.
-2) Free hosting because you use your device.
-3) Work on all devices.
-4) Remote control access to device.
-5) Direct access to web server if server is placed on visible network.
+**Advantages:**<br />
+  1) Free domain address which proxies over siteonyourdevice.com site.<br />
+  2) Free hosting because you use your device.<br />
+  3) Work on all devices.<br />
+  4) Remote control access to device.<br />
+  5) Direct access to web server if server is placed on visible network.
 
-Disadvantages:
-1) It is not direct domain (proxies over siteonyourdevice.com).
-2) Young solution.
-3) Support only clear html/js page
+**Disadvantages:**<br />
+  1) It is not direct domain (proxies over siteonyourdevice.com).<br />
+  2) Young solution.<br />
+  3) Support only clear html/js page
