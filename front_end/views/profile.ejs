@@ -13,17 +13,18 @@
 
     <div class="page-header text-left">
         <div class="well">
-            <h1><span class="fa fa-user"></span> Siteonyourdevice  <a href="/logout" class="btn btn-warning btn-md pull-right">Logout</a></h1>      
+            <h1><span class="fa fa-user"></span> Siteonyourdevice <a href="/logout" class="btn btn-warning btn-md pull-right">Logout</a></h1>        
             <% if (!user.isReadOnlyMode()) { %>
                 <p>
                     <strong>id</strong>: <%= user._id %><br>
                     <strong>email</strong>: <%= user.local.email %><br>
                     <!-- <strong>password</strong>: <%= user.local.password %> -->
-                </p>                    
+                </p>
                 <a href="/unlink/local" class="btn btn-default disabled">Unlink</a>
             <% } else { %>
                 <a href="/connect/local" class="btn btn-default">Connect Local</a>
             <% } %>
+                <a href="/" class="btn btn-warning btn-md pull-right"><span class="glyphicon glyphicon-home"></span> Go Home</a>                
         </div>
     </div>
     
