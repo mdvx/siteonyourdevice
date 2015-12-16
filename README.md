@@ -5,11 +5,11 @@ About SiteOnYourDevice
 Site on your device - solution which connects your device with internet.
 Remote control any computer/mobile/device over the internet.
 
-How to use:
-1) You register new account.
-2) Register domain which you want.
-3) Download our client(lightweight and fast Web Server).
-4) Install and start client, specify path which web content you want share with internet.
+**How to use:**<br />
+1) You register new account.<br />
+2) Register domain which you want.<br />
+3) Download our client(lightweight and fast Web Server).<br />
+4) Install and start client, specify path which web content you want share with internet.<br />
 5) Tell your friends about your own web site.
 
 Our client(Web Server) has next features:
