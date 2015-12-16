@@ -72,54 +72,54 @@
 	
 	<!-- download -->
 	<div class="well" id="download"> 
-			<h4>Download client. Current version: <%- version %></h4>
+			<h4>Download client. Current version: <%= version %></h4>
 		<div class="panel-group" id="accordion">
     
 		<div class="panel panel-default">
 			<div class="panel-heading">
-			<h4 class="panel-title"> <img src="http://siteonyourdevice.com/images/win.png" width="35" height="35"> <a data-toggle="collapse" data-parent="#accordion" href="#windows">Windows client</a> </h4>
+			<h4 class="panel-title"> <img src="http://siteonyourdevice.com/images/windows.png"> <a data-toggle="collapse" data-parent="#accordion" href="#windows">Windows client</a> </h4>
 			</div>
 		<div id="windows" class="panel-collapse collapse">
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/windows/gui/siteonyourdevice-<%- version %><%- type %>x86_64.zip">Windows (gui .zip)</a></div>
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/windows/gui/siteonyourdevice-<%- version %><%- type %>x86_64.exe">Windows (gui .exe)</a></div>
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/windows/console/siteonyourdevice-<%- version %><%- type %>x86_64.zip">Windows (console .zip)</a></div>
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/windows/console/siteonyourdevice-<%- version %><%- type %>x86_64.exe">Windows (console .exe)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/windows/gui/siteonyourdevice-<%= version %><%= type %>x86_64.zip">Windows (gui .zip)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/windows/gui/siteonyourdevice-<%= version %><%= type %>x86_64.exe">Windows (gui .exe)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/windows/console/siteonyourdevice-<%= version %><%= type %>x86_64.zip">Windows (console .zip)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/windows/console/siteonyourdevice-<%= version %><%= type %>x86_64.exe">Windows (console .exe)</a></div>
 		</div>
 		</div>
 		
 		<div class="panel panel-default">
 			<div class="panel-heading">
-			<h4 class="panel-title"> <img src="http://siteonyourdevice.com/images/mac.png" width="35" height="35"> <a data-toggle="collapse" data-parent="#accordion" href="#macos">Mac OS client</a> </h4>
+			<h4 class="panel-title"> <img src="http://siteonyourdevice.com/images/macosx.png"> <a data-toggle="collapse" data-parent="#accordion" href="#macos">Mac OS client</a> </h4>
 			</div>
 		<div id="macos" class="panel-collapse collapse">
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/macosx/gui/siteonyourdevice-<%- version %><%- type %>x86_64.zip">Mac OS (gui .zip)</a></div>
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/macosx/gui/siteonyourdevice-<%- version %><%- type %>x86_64.dmg">Mac OS (gui .dmg)</a></div>
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/macosx/console/siteonyourdevice-<%- version %><%- type %>x86_64.zip">Mac OS (console .zip)</a></div>
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/macosx/console/siteonyourdevice-<%- version %><%- type %>x86_64.dmg">Mac OS (console .dmg)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/macosx/gui/siteonyourdevice-<%= version %><%= type %>-x86_64.zip">Mac OS (gui .zip)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/macosx/gui/siteonyourdevice-<%= version %><%= type %>-x86_64.dmg">Mac OS (gui .dmg)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/macosx/console/siteonyourdevice-<%= version %><%= type %>-x86_64.zip">Mac OS (console .zip)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/macosx/console/siteonyourdevice-<%= version %><%= type %>-x86_64.dmg">Mac OS (console .dmg)</a></div>
 		</div>
 		</div>
 		
 		<div class="panel panel-default">
 			<div class="panel-heading">
-			<h4 class="panel-title"> <img src="http://siteonyourdevice.com/images/lin.png" width="35" height="35"> <a data-toggle="collapse" data-parent="#accordion" href="#linux">Linux client</a> </h4>
+			<h4 class="panel-title"> <img src="http://siteonyourdevice.com/images/linux.png"> <a data-toggle="collapse" data-parent="#accordion" href="#linux">Linux client</a> </h4>
 			</div>
 		<div id="linux" class="panel-collapse collapse">
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/linux/gui/siteonyourdevice-<%- version %><%- type %>x86_64.deb">Linux (gui .deb)</a></div>
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/linux/gui/siteonyourdevice-<%- version %><%- type %>x86_64.rpm">Linux (gui .rpm)</a></div>
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/linux/gui/siteonyourdevice-<%- version %><%- type %>x86_64.tar.gz">Linux (gui .tar.gz)</a></div>
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/linux/console/siteonyourdevice-<%- version %><%- type %>x86_64.deb">Linux (console .deb)</a></div>
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/linux/console/siteonyourdevice-<%- version %><%- type %>x86_64.rpm">Linux (console .rpm)</a></div>
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/linux/console/siteonyourdevice-<%- version %><%- type %>x86_64.tar.gz">Linux (console .tar.gz)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/linux/gui/siteonyourdevice-<%= version %><%= type %>-x86_64.deb">Linux (gui .deb)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/linux/gui/siteonyourdevice-<%= version %><%= type %>-x86_64.rpm">Linux (gui .rpm)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/linux/gui/siteonyourdevice-<%= version %><%= type %>-x86_64.tar.gz">Linux (gui .tar.gz)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/linux/console/siteonyourdevice-<%= version %><%= type %>-x86_64.deb">Linux (console .deb)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/linux/console/siteonyourdevice-<%= version %><%= type %>-x86_64.rpm">Linux (console .rpm)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/linux/console/siteonyourdevice-<%= version %><%= type %>-x86_64.tar.gz">Linux (console .tar.gz)</a></div>
 		</div>
 		</div>
 		
 		<div class="panel panel-default">
 			<div class="panel-heading">
-			<h4 class="panel-title"> <img src="http://siteonyourdevice.com/images/bsd.png" width="35" height="35"> <a data-toggle="collapse" data-parent="#accordion" href="#freebsd">Freebsd client</a> </h4>
+			<h4 class="panel-title"> <img src="http://siteonyourdevice.com/images/freebsd.png"> <a data-toggle="collapse" data-parent="#accordion" href="#freebsd">Freebsd client</a> </h4>
 			</div>
 		<div id="freebsd" class="panel-collapse collapse">
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/freebsd/gui/siteonyourdevice-<%- version %><%- type %>x86_64.tar.gz">Freebsd (gui .tar.gz)</a></div>
-			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/freebsd/console/siteonyourdevice-<%- version %><%- type %>x86_64.tar.gz">Freebsd (console .tar.gz)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/freebsd/gui/siteonyourdevice-<%= version %><%= type %>-x86_64.tar.gz">Freebsd (gui .tar.gz)</a></div>
+			<div class="panel-body"><a href="http://siteonyourdevice.com/downloads/freebsd/console/siteonyourdevice-<%= version %><%= type %>-x86_64.tar.gz">Freebsd (console .tar.gz)</a></div>
 		</div>
 		</div>	 
 	</div>  
