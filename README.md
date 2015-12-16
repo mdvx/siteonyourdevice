@@ -12,7 +12,7 @@ Remote control any computer/mobile/device over the internet.
 4) Install and start client, specify path which web content you want share with internet.<br />
 5) Tell your friends about your own web site.
 
-Our client(Web Server) has next features:
+**Our client(Web Server) has next features:**
 - Http 1.1 protocol.
 - Http 2 protocol.
 - Basic & digest authentication for secure access.
