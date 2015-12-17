@@ -82,9 +82,7 @@ namespace fasto
             common::net::socket_info info() const;
             int fd() const;
 
-            virtual common::ErrnoError write(const std::string& data, ssize_t& nwrite) WARN_UNUSED_RESULT;
             virtual common::ErrnoError write(const char *data, uint16_t size, ssize_t &nwrite) WARN_UNUSED_RESULT;
-            virtual common::ErrnoError write(const common::buffer_type& data, ssize_t &nwrite) WARN_UNUSED_RESULT;
             virtual common::ErrnoError read(char* outData, uint16_t maxSize, ssize_t &nread) WARN_UNUSED_RESULT;
 
             void close();

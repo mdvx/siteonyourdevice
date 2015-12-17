@@ -49,6 +49,10 @@ namespace fasto
                     pconfig->is_private_site_ = atoi(value);
                     return 1;
                 }
+                else if(MATCH("http_server", "external_host")){
+                    pconfig->external_host_ = common::convertFromString<common::net::hostAndPort>(value);
+                    return 1;
+                }
                 else if(strcmp(section, "http_handlers_utls") == 0){
                     pconfig->handlers_urls_.push_back(std::make_pair(name, value));
                     return 1;
@@ -309,6 +313,7 @@ namespace fasto
             configSave.writeFormated("password=%s\n", config_.password_);
             configSave.writeFormated("content_path=%s\n", config_.content_path_);
             configSave.writeFormated("private_site=%u\n", config_.is_private_site_);
+            configSave.writeFormated("external_host=%u\n", common::convertToString(config_.external_host_));
             configSave.write("[http_handlers_utls]\n");
             configSave.close();
         }

@@ -94,7 +94,8 @@ namespace fasto
             char *end = strstr(buff, END_OF_COMMAND);
             if (!end) {
                 DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN SEQUENCE: %s", buff);
-                connection->write(make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff), nwrite);
+                const std::string resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
+                connection->write(resp.c_str(), resp.size(), nwrite);
                 connection->close();
                 delete connection;
                 return;
@@ -106,7 +107,8 @@ namespace fasto
             uint64_t seq = strtoull(buff, &star_seq, 10);
             if (*star_seq != ' ') {
                 DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "PROBLEM EXTRACTING SEQUENCE: %s", buff);
-                connection->write(make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff), nwrite);
+                const std::string resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
+                connection->write(resp.c_str(), resp.size(), nwrite);
                 connection->close();
                 delete connection;
                 return;
@@ -115,7 +117,8 @@ namespace fasto
             const char* id_ptr = strchr(star_seq + 1, ' ');
             if (!id_ptr) {
                 DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "PROBLEM EXTRACTING ID: %s", buff);
-                connection->write(make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff), nwrite);
+                const std::string resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
+                connection->write(resp.c_str(), resp.size(), nwrite);
                 connection->close();
                 delete connection;
                 return;
@@ -130,7 +133,8 @@ namespace fasto
             processRequest(id, argc, argv);
             if (argv == NULL) {
                 DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "PROBLEM PARSING INNER COMMAND: %s", buff);
-                connection->write(make_responce(id, STATE_COMMAND_RESP_FAIL_1S, buff), nwrite);
+                const std::string resp = make_responce(id, STATE_COMMAND_RESP_FAIL_1S, buff);
+                connection->write(resp.c_str(), resp.size(), nwrite);
                 connection->close();
                 delete connection;
                 return;

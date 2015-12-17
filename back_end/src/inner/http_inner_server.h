@@ -8,12 +8,34 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
+        class ProxyRelayClient;
+
         class RelayClient
                 : public Http2Client
         {
         public:
-            RelayClient(TcpServer* server, const common::net::socket_info& info);
+            RelayClient(TcpServer* server, const common::net::socket_info& info, const common::net::hostAndPort& externalHost);
             const char* className() const;
+
+            common::net::hostAndPort externalHost() const;
+
+            ProxyRelayClient *eclient() const;
+            void setEclient(ProxyRelayClient* client);
+
+        private:
+            const common::net::hostAndPort external_host_;
+            ProxyRelayClient * eclient_;
+        };
+
+        class ProxyRelayClient
+                : public TcpClient
+        {
+        public:
+            ProxyRelayClient(TcpServer* server, const common::net::socket_info& info, RelayClient * relay);
+            RelayClient * relay() const;
+
+        private:
+            RelayClient * const relay_;
         };
 
         class Http2InnerServer

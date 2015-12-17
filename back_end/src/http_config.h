@@ -1,7 +1,6 @@
 #pragma once
 
-#include <vector>
-#include <string>
+#include "common/net/types.h"
 
 namespace fasto
 {
@@ -15,6 +14,8 @@ namespace fasto
             std::string login_;
             std::string password_;
             bool is_private_site_;
+
+            common::net::hostAndPort external_host_;
 
             typedef std::pair<std::string, std::string>  handlers_urls_t;
             std::vector<handlers_urls_t> handlers_urls_;

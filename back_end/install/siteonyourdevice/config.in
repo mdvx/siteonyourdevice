@@ -5,4 +5,5 @@ content_path=content
 login=@USER_SPECIFIC_DEFAULT_LOGIN@
 password=@USER_SPECIFIC_DEFAULT_PASSWORD@
 private_site=@USER_SPECIFIC_DEFAULT_PRIVATE_SITE@
+external_host=
 [http_handlers_utls]
