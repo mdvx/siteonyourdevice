@@ -2,7 +2,7 @@
 
 #include <gtk/gtkstyle.h>
 
-#include "fasto_remote_gui_application.h"
+#include "application/fasto_remote_gui_application.h"
 
 namespace fasto
 {

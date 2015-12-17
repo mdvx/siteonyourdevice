@@ -10,8 +10,6 @@
 #include "server/http_server_host.h"
 #include "server_commands.h"
 
-#include "infos.h"
-
 #define BUF_SIZE 4096
 
 extern "C" {

@@ -5,7 +5,8 @@
 #include "common/thread/thread.h"
 
 #include "server/inner_tcp_server.h"
-#include "server/redis_helpers.h"
+
+#include "http/http_server_handler.h"
 
 namespace fasto
 {

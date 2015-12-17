@@ -1,15 +1,12 @@
 #include <signal.h>
 #include <syslog.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include <string.h>
 
 #include "inih/ini.h"
 
 #include "common/logger.h"
 #include "common/utils.h"
 
-#include "infos.h"
 #include "http_server_host.h"
 #include "server_config.h"
 
