@@ -1,4 +1,5 @@
 SET(HEADERS_GLOBAL
+    event_loop.h
     tcp_server.h
     globals.h
     infos.h
@@ -8,6 +9,7 @@ SET(HEADERS_GLOBAL
     http_config.h
 )
 SET(SOURCES_GLOBAL
+    event_loop.cpp
     tcp_server.cpp
     infos.cpp
     network_events.cpp

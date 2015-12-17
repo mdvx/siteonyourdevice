@@ -3,22 +3,18 @@
 #include "common/patterns/crtp_pattern.h"
 #include "common/net/socket_tcp.h"
 
+#include "event_loop.h"
+
 namespace fasto
 {
     namespace siteonyourdevice
     {
         class TcpServerObserver;
-
-        struct fasto_cs_sync;
-        struct fasto_s_sync;
-        struct fasto_s_async;
-
         class TcpClient;
 
         class TcpServer
-                : common::IMetaClassInfo
+                : public EvLoopObserver, common::IMetaClassInfo
         {
-            struct event_impl;
         public:
             TcpServer(const common::net::hostAndPort& host, TcpServerObserver* observer = NULL);
             virtual ~TcpServer();
@@ -44,7 +40,6 @@ namespace fasto
             const char* className() const;
             std::string formatedName() const;
 
-            typedef std::function<void()> function_type;
             void execInServerThread(function_type func);
 
         public:
@@ -54,16 +49,22 @@ namespace fasto
             virtual TcpClient * createClient(const common::net::socket_info& info);
 
         private:
+            static void read_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
+            static void accept_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
+
+            virtual void preLooped(EvLoop* loop);
+            virtual void stoped(EvLoop* loop);
+            virtual void postLooped(EvLoop* loop);
+
             common::ErrnoError accept(common::net::socket_info& info) WARN_UNUSED_RESULT;
 
             common::net::ServerSocketTcp sock_;
             uint32_t total_clients_;
 
             TcpServerObserver* const observer_;
-            event_impl *const impl_;
+            EvLoop impl_;
 
             fasto_s_sync * accept_io_;
-            fasto_s_async * async_stop_;
 
             std::string name_;
             const common::id_counter<TcpServer> id_;
