@@ -48,6 +48,13 @@ namespace fasto
             if(client == innerConnection_){
                 EVENT_BUS()->postEvent(new InnerClientDisconnectedEvent(this));
                 innerConnection_ = NULL;
+                return;
+            }
+
+            ProxyRelayClient * prclient = dynamic_cast<ProxyRelayClient*>(client); //proxyrelay connection
+            if(prclient){
+                RelayClient * rclient = prclient->relay();
+                rclient->setEclient(NULL);
             }
         }
 
@@ -344,7 +351,7 @@ namespace fasto
                 }
             }
             else{
-                ProxyRelayClient * prclient = dynamic_cast<ProxyRelayClient*>(client); //proyrelay connection
+                ProxyRelayClient * prclient = dynamic_cast<ProxyRelayClient*>(client); //proxyrelay connection
                 if(prclient){
                     char buff[BUF_SIZE] = {0};
                     ssize_t nread = 0;
