@@ -1,7 +1,5 @@
 #include "inner/http_inner_server.h"
 
-#include "inner/http_inner_server_handler.h"
-
 namespace fasto
 {
     namespace siteonyourdevice
@@ -17,20 +15,10 @@ namespace fasto
             return "RelayClient";
         }
 
-        Http2InnerServer::Http2InnerServer(const common::net::hostAndPort& host, Http2InnerServerHandler * handler, const configuration_t& config)
-            : Http2Server(host, handler), handler_(handler), config_(config)
+        Http2InnerServer::Http2InnerServer(const common::net::hostAndPort& host, TcpServerObserver * observer, const configuration_t& config)
+            : Http2Server(host, observer), config_(config)
         {
 
-        }
-
-        common::Error Http2InnerServer::innerConnect()
-        {
-            return handler_->innerConnect(this);
-        }
-
-        common::Error Http2InnerServer::innerDisConnect()
-        {
-            return handler_->innerDisConnect(this);
         }
 
         TcpClient * Http2InnerServer::createClient(const common::net::socket_info &info)

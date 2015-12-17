@@ -2,15 +2,13 @@
 
 #include "common/third-party/json-c/json-c/json.h"
 
-#include "common/net/net.h"
 #include "common/thread/event_bus.h"
 #include "common/logger.h"
-
-#include "common/system_info/cpu.h"
+#include "common/net/net.h"
 #include "common/system_info/system_info.h"
 
-#include "client_commands.h"
 #include "network_events.h"
+#include "client_commands.h"
 
 #include "inner/http_inner_server.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "network_controller.h"
-#include "fasto_application.h"
+#include "application/fasto_application.h"
 
 namespace fasto
 {

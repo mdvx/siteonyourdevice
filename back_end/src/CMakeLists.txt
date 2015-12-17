@@ -3,8 +3,6 @@ SET(HEADERS_GLOBAL
     globals.h
     infos.h
     server/server_config.h
-    fasto_application.h
-    fasto_remote_application.h
     network_events.h
     network_controller.h
     http_config.h
@@ -12,10 +10,17 @@ SET(HEADERS_GLOBAL
 SET(SOURCES_GLOBAL
     tcp_server.cpp
     infos.cpp
-    fasto_application.cpp
-    fasto_remote_application.cpp
     network_events.cpp
     network_controller.cpp
+)
+
+SET(HEADERS_APPLICATION
+    application/fasto_application.h
+    application/fasto_remote_application.h
+)
+SET(SOURCES_APPLICATION
+    application/fasto_application.cpp
+    application/fasto_remote_application.cpp
 )
 
 SET(HEADERS_COMMANDS
@@ -65,10 +70,12 @@ SET(SOURCES_SDS
 )
 
 IF(NOT BUILD_CONSOLE)
-    SET(PLATFORM_HDRS ${PLATFORM_HDRS} fasto_remote_gui_application.h)
-    SET(PLATFORM_SRCS ${PLATFORM_SRCS} fasto_remote_gui_application.cpp)
-    SET(PLATFORM_APP_HDRS ${PLATFORM_APP_HDRS} fasto_remote_gui_application.h)
-    SET(PLATFORM_APP_SRCS ${PLATFORM_APP_SRCS} fasto_remote_gui_application.cpp)
+    SET(HEADERS_APPLICATION ${HEADERS_APPLICATION}
+        application/fasto_remote_gui_application.h
+    )
+    SET(SOURCES_APPLICATION ${SOURCES_APPLICATION}
+        application/fasto_remote_gui_application.cpp
+    )
     SET_DESKTOP_TARGET()
     ADD_DEFINITIONS(-DLOG_TO_FILE)
 ENDIF(NOT BUILD_CONSOLE)
@@ -89,11 +96,11 @@ ELSEIF(OS_MACOSX)
     IF(NOT BUILD_CONSOLE)
         FIND_LIBRARY(COCOA_LIBRARY Cocoa)
 
-        SET(PLATFORM_APP_HDRS ${PLATFORM_APP_HDRS} platform/macosx/AppDelegate.h
+        SET(PLATFORM_HDRS ${PLATFORM_HDRS} platform/macosx/AppDelegate.h
             platform/macosx/gui_fasto_application.h)
-        SET(PLATFORM_APP_SRCS ${PLATFORM_APP_SRCS} platform/macosx/AppDelegate.mm
+        SET(PLATFORM_SRCS ${PLATFORM_SRCS} platform/macosx/AppDelegate.mm
             platform/macosx/gui_fasto_application.mm)
-        SET(PLATFORM_APP_LIBRARIES ${PLATFORM_APP_LIBRARIES} ${COCOA_LIBRARY})
+        SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES} ${COCOA_LIBRARY})
     ENDIF(NOT BUILD_CONSOLE)
 ELSEIF(OS_LINUX OR OS_FREEBSD)
     IF(OS_LINUX)
@@ -126,8 +133,8 @@ ADD_SUBDIRECTORY(third-party/redis)
 SET(INCLUDE_DIRS ${INCLUDE_DIRS} ${CMAKE_CURRENT_LIST_DIR} third-party/libev/src third-party/ini third-party/sds)
 INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
-SET(HEADERS ${HEADERS} ${HEADERS_GLOBAL} ${HEADERS_HTTP} ${HEADERS_INNER} ${HEADERS_HTTP_CALLBACKS} ${HEADERS_COMMANDS})
-SET(SOURCES ${SOURCES} ${SOURCES_GLOBAL} ${SOURCES_HTTP} ${SOURCES_INNER} ${SOURCES_HTTP_CALLBACKS} ${SOURCES_COMMANDS})
+SET(HEADERS ${HEADERS} ${HEADERS_GLOBAL} ${HEADERS_APPLICATION} ${HEADERS_HTTP} ${HEADERS_INNER} ${HEADERS_HTTP_CALLBACKS} ${HEADERS_COMMANDS})
+SET(SOURCES ${SOURCES} ${SOURCES_GLOBAL} ${SOURCES_APPLICATION} ${SOURCES_HTTP} ${SOURCES_INNER} ${SOURCES_HTTP_CALLBACKS} ${SOURCES_COMMANDS})
 
 SOURCE_GROUP("Header Files" FILES ${HEADERS})
 SOURCE_GROUP("Source Files" FILES ${SOURCES})
@@ -139,8 +146,8 @@ SET(ALL_LIBS ${ALL_LIBS} libev common inih ${PLATFORM_LIBRARIES})
 
 SET(OBJECT_LIBS ${OBJECT_LIBS})
 
-SET(EXE_SOURCES client_commands.h main.cpp ${PLATFORM_APP_HDRS} ${PLATFORM_APP_SRCS} ${RESOURCE_APP} ${ICON_FILE} ${RESOURCE_OS})
-SET(PROJECT_EXE_LIBRARIES ${PROJECT_CORE_LIBRARY} ${PLATFORM_APP_LIBRARIES})
+SET(EXE_SOURCES client_commands.h main.cpp ${RESOURCE_APP} ${ICON_FILE} ${RESOURCE_OS})
+SET(PROJECT_EXE_LIBRARIES ${PROJECT_CORE_LIBRARY})
 
 IF(MINGW OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
     ADD_APP_LIBRARY_OBJECT(${PROJECT_CORE_LIBRARY} "${ALL_SOURCES}" "${ALL_LIBS}" "${OBJECT_LIBS}")

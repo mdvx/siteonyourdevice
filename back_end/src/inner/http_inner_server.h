@@ -8,8 +8,6 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class Http2InnerServerHandler;
-
         class RelayClient
                 : public Http2Client
         {
@@ -22,10 +20,7 @@ namespace fasto
                 : public Http2Server
         {
         public:
-            Http2InnerServer(const common::net::hostAndPort& host, Http2InnerServerHandler * handler, const configuration_t& config);
-
-            common::Error innerConnect();
-            common::Error innerDisConnect();
+            Http2InnerServer(const common::net::hostAndPort& host, TcpServerObserver * observer, const configuration_t& config);
 
             RelayClient* createRelayClient(const common::net::socket_info &info);
 
@@ -33,7 +28,6 @@ namespace fasto
             virtual TcpClient * createClient(const common::net::socket_info &info);
 
         private:
-            Http2InnerServerHandler * handler_;
             const configuration_t& config_;
         };
     }

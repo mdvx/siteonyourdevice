@@ -2,30 +2,16 @@
 
 #include "inih/ini.h"
 
-#include "common/logger.h"
 #include "common/file_system.h"
-#include "common/thread/thread_manager.h"
-#include "common/net/net.h"
 #include "common/thread/event_bus.h"
-#include "common/utils.h"
+#include "common/logger.h"
 
-#include "fasto_application.h"
+#include "application/fasto_application.h"
 
 #include "server/server_config.h"
 
 #include "inner/http_inner_server.h"
 #include "inner/http_inner_server_handler.h"
-
-/*
-    [http_server]
-    domain=fatoredis.com
-    port=8080
-    content_path=content
-    login=atopilski
-    password=1234
-    private_site=0
-    [http_handlers_utls]
-*/
 
 namespace fasto
 {
@@ -250,7 +236,7 @@ namespace fasto
             }
 
             if(server_){
-                return server_->innerConnect();
+                return handler_->innerConnect(server_);
             }
 
             server_ = new Http2InnerServer(hs, handler_, config_);
@@ -286,7 +272,7 @@ namespace fasto
                 return common::Error();
             }
 
-            common::Error err = server_->innerDisConnect();
+            common::Error err = handler_->innerDisConnect(server_);
             if(err && err->isError()){
                 return err;
             }
