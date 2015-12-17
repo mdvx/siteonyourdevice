@@ -28,6 +28,7 @@ namespace fasto
             void registerClient(const common::net::socket_info& info);
             void registerClient(TcpClient * client);
             void unregisterClient(TcpClient * client);
+            virtual void closeClient(TcpClient *client);
 
             common::net::hostAndPort host() const;
 
@@ -42,9 +43,6 @@ namespace fasto
 
             void execInServerThread(function_type func);
 
-        public:
-            void closeClient(TcpClient *client);
-
         protected:
             virtual TcpClient * createClient(const common::net::socket_info& info);
 
@@ -52,9 +50,9 @@ namespace fasto
             static void read_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
             static void accept_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
 
-            virtual void preLooped(EvLoop* loop);
-            virtual void stoped(EvLoop* loop);
-            virtual void postLooped(EvLoop* loop);
+            virtual void preLooped(LibEvLoop* loop);
+            virtual void stoped(LibEvLoop* loop);
+            virtual void postLooped(LibEvLoop* loop);
 
             common::ErrnoError accept(common::net::socket_info& info) WARN_UNUSED_RESULT;
 
@@ -62,7 +60,7 @@ namespace fasto
             uint32_t total_clients_;
 
             TcpServerObserver* const observer_;
-            EvLoop impl_;
+            LibEvLoop impl_;
 
             fasto_s_sync * accept_io_;
 
@@ -97,7 +95,7 @@ namespace fasto
 
         private:
             TcpServer* server_;
-            fasto_cs_sync * read_io_;
+            fasto_c_sync * read_io_;
             common::net::SocketHolder sock_;
             std::string name_;
             const common::id_counter<TcpClient> id_;

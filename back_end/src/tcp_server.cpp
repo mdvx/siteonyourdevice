@@ -39,11 +39,11 @@ namespace fasto
     {
         // client
         TcpClient::TcpClient(TcpServer *server, const common::net::socket_info &info)
-            : server_(server), read_io_((struct fasto_cs_sync*)calloc(1, sizeof(struct fasto_cs_sync))),
+            : server_(server), read_io_((struct fasto_c_sync*)calloc(1, sizeof(struct fasto_c_sync))),
               sock_(info), name_(), id_()
         {
             read_io_->client_ = this;
-            read_io_->server_ = server;
+            //read_io_->server_ = server;
         }
 
         common::net::socket_info TcpClient::info() const
@@ -125,7 +125,7 @@ namespace fasto
             accept_io_ = NULL;
         }
 
-        void TcpServer::preLooped(EvLoop* loop)
+        void TcpServer::preLooped(LibEvLoop* loop)
         {
             int fd = sock_.fd();
             ev_io_init_fasto(accept_io_, accept_cb, fd, EV_READ);
@@ -135,12 +135,12 @@ namespace fasto
             }
         }
 
-        void TcpServer::stoped(EvLoop* loop)
+        void TcpServer::stoped(LibEvLoop* loop)
         {
             loop->stop_io(accept_io_);
         }
 
-        void TcpServer::postLooped(EvLoop* loop)
+        void TcpServer::postLooped(LibEvLoop* loop)
         {
             if(observer_){
                 observer_->postLooped(this);
@@ -189,7 +189,6 @@ namespace fasto
             }
 
             client->server_ = NULL;
-            client->read_io_->server_ = NULL;
             DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Successfully unregister client[%s], from server[%s], %d client(s) connected.",
                                   client->formatedName(), formatedName(), id(), --total_clients_);
         }
@@ -267,10 +266,11 @@ namespace fasto
 
         void TcpServer::read_cb(struct ev_loop* loop, struct ev_io* watcher, int revents)
         {
-            fasto_cs_sync* ioserver = reinterpret_cast<fasto_cs_sync *>(watcher);
+            fasto_c_sync* ioserver = reinterpret_cast<fasto_c_sync *>(watcher);
 
             TcpClient* pclient = reinterpret_cast<TcpClient *>(ioserver->client_);
-            TcpServer* pserver = reinterpret_cast<TcpServer *>(ioserver->server_);
+            TcpServer* pserver = pclient->server();
+            CHECK(pserver);
 
             if(EV_ERROR & revents){
                 return;
@@ -285,13 +285,13 @@ namespace fasto
         {
             fasto_s_sync* ioserver = reinterpret_cast<fasto_s_sync *>(watcher);
             TcpServer* pserver = reinterpret_cast<TcpServer *>(ioserver->server_);
-            DCHECK(pserver);
+            CHECK(pserver);
 
             if(EV_ERROR & revents){
                 return;
             }
 
-            DCHECK(watcher->fd == pserver->sock_.fd());
+            CHECK(watcher->fd == pserver->sock_.fd());
 
             common::net::socket_info sinfo;
             common::ErrnoError er = pserver->accept(sinfo);
