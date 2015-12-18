@@ -243,28 +243,38 @@ namespace fasto
                 return handler_->innerConnect(server_);
             }
 
-            server_ = new Http2InnerServer(hs, handler_, config_);
-            server_->setHttpServerInfo(HttpServerInfo(PROJECT_NAME_TITLE, PROJECT_DOMAIN, config.content_path_));
-            const std::string contentPath = config.content_path_;
-            bool res = common::file_system::change_directory(contentPath);
-            DCHECK(res);
-            server_->setName("local_http_server");
+            const common::net::hostAndPort externalHost = config_.external_host_;
+            handler_->setConfig(config_);
 
-            common::ErrnoError err = server_->bind();
-            if(err && err->isError()){
-                delete server_;
-                server_ = NULL;
-                return err;
+            if(externalHost.isValid()){
+                Http2InnerServer* h2s = new Http2InnerServer(hs, handler_, config_);
+                server_ = h2s;
+                const std::string contentPath = config.content_path_;
+                h2s->setHttpServerInfo(HttpServerInfo(PROJECT_NAME_TITLE, PROJECT_DOMAIN, contentPath));
+                bool res = common::file_system::change_directory(contentPath);
+                DCHECK(res);
+                server_->setName("local_http_server");
+
+                common::ErrnoError err = h2s->bind();
+                if(err && err->isError()){
+                    delete server_;
+                    server_ = NULL;
+                    return err;
+                }
+
+                err = h2s->listen(5);
+                if(err && err->isError()){
+                    delete server_;
+                    server_ = NULL;
+                    return err;
+                }
+            }
+            else{
+                ProxyInnerServer* proxy_server = new ProxyInnerServer(handler_, config_);
+                server_ = proxy_server;
             }
 
-            err = server_->listen(5);
-            if(err && err->isError()){
-                delete server_;
-                server_ = NULL;
-                return err;
-            }
-
-            http_thread_ = THREAD_MANAGER()->createThread(&Http2Server::exec, server_);
+            http_thread_ = THREAD_MANAGER()->createThread(&ITcpLoop::exec, server_);
             http_thread_->start();
 
             return common::Error();

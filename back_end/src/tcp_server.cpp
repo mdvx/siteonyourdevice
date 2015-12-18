@@ -39,78 +39,34 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        // server
-        TcpServer::TcpServer(const common::net::hostAndPort& host, TcpServerObserver* observer)
-            : sock_(host), total_clients_(0), observer_(observer), loop_(new LibEvLoop),
-              accept_io_((struct ev_io*)calloc(1, sizeof(struct ev_io))), id_()
+        ITcpLoop::ITcpLoop(ITcpLoopObserver* observer)
+            : observer_(observer), loop_(new LibEvLoop), total_clients_(0), id_()
         {
             loop_->setObserver(this);
-            accept_io_->data = this;
         }
 
-        TcpServer::~TcpServer()
+        ITcpLoop::~ITcpLoop()
         {
             delete loop_;
-
-            free(accept_io_);
-            accept_io_ = NULL;
         }
 
-        void TcpServer::preLooped(LibEvLoop* loop)
-        {
-            int fd = sock_.fd();
-            ev_io_init(accept_io_, accept_cb, fd, EV_READ);
-            loop->start_io(accept_io_);
-            if(observer_){
-                observer_->preLooped(this);
-            }
-        }
-
-        void TcpServer::stoped(LibEvLoop* loop)
-        {
-            loop->stop_io(accept_io_);
-        }
-
-        void TcpServer::postLooped(LibEvLoop* loop)
-        {
-            if(observer_){
-                observer_->postLooped(this);
-            }
-        }
-
-        common::ErrnoError TcpServer::bind()
-        {
-            return sock_.bind();
-        }
-
-        common::ErrnoError TcpServer::listen(int backlog)
-        {
-            return sock_.listen(backlog);
-        }
-
-        int TcpServer::exec()
+        int ITcpLoop::exec()
         {
             return loop_->exec();
         }
 
-        void TcpServer::stop()
+        void ITcpLoop::stop()
         {
-            close();
             loop_->stop();
         }
 
-        common::net::hostAndPort TcpServer::host() const
-        {
-            return sock_.host();
-        }
-
-        void TcpServer::registerClient(const common::net::socket_info &info)
+        void ITcpLoop::registerClient(const common::net::socket_info &info)
         {
             TcpClient* client = createClient(info);
             registerClient(client);
         }
 
-        void TcpServer::unregisterClient(TcpClient * client)
+        void ITcpLoop::unregisterClient(TcpClient * client)
         {
             CHECK(client->server() == this);
             loop_->stop_io(client->read_io_);
@@ -124,7 +80,7 @@ namespace fasto
                                   client->formatedName(), formatedName(), id(), --total_clients_);
         }
 
-        void TcpServer::registerClient(TcpClient * client)
+        void ITcpLoop::registerClient(TcpClient * client)
         {
             CHECK(client->server() == this);
             // Initialize and start watcher to read client requests
@@ -138,12 +94,7 @@ namespace fasto
                                   client->formatedName(), formatedName(), id(), ++total_clients_);
         }
 
-        TcpClient * TcpServer::createClient(const common::net::socket_info& info)
-        {
-            return new TcpClient(this, info);
-        }
-
-        void TcpServer::closeClient(TcpClient *client)
+        void ITcpLoop::closeClient(TcpClient *client)
         {
             CHECK(client->server() == this);
             loop_->stop_io(client->read_io_);
@@ -155,50 +106,40 @@ namespace fasto
                                   client->formatedName(), formatedName(), --total_clients_);
         }
 
-        void TcpServer::execInServerThread(function_type func)
-        {
-            loop_->execInLoopThread(func);
-        }
-
-        void TcpServer::setName(const std::string& name)
-        {
-            name_ = name;
-        }
-
-        std::string TcpServer::name() const
-        {
-            return name_;
-        }
-
-        common::id_counter<TcpServer>::type_t TcpServer::id() const
+        common::id_counter<ITcpLoop>::type_t ITcpLoop::id() const
         {
             return id_.id();
         }
 
-        const char* TcpServer::className() const
+        void ITcpLoop::execInLoopThread(async_loop_exec_function_type func)
         {
-            return "TcpServer";
+            loop_->execInLoopThread(func);
         }
 
-        std::string TcpServer::formatedName() const
+        void ITcpLoop::setName(const std::string& name)
+        {
+            name_ = name;
+        }
+
+        std::string ITcpLoop::name() const
+        {
+            return name_;
+        }
+
+        std::string ITcpLoop::formatedName() const
         {
             return common::MemSPrintf("[%s][%s(%" PRIu32 ")]", name(), className(), id());
         }
 
-        void TcpServer::close()
+        TcpClient * ITcpLoop::createClient(const common::net::socket_info& info)
         {
-            sock_.close();
+            return new TcpClient(this, info);
         }
 
-        common::ErrnoError TcpServer::accept(common::net::socket_info& info)
-        {
-            return sock_.accept(info);
-        }
-
-        void TcpServer::read_cb(struct ev_loop* loop, struct ev_io* watcher, int revents)
+        void ITcpLoop::read_cb(struct ev_loop* loop, struct ev_io* watcher, int revents)
         {
             TcpClient* pclient = reinterpret_cast<TcpClient *>(watcher->data);
-            TcpServer* pserver = pclient->server();
+            ITcpLoop* pserver = pclient->server();
             LibEvLoop* evloop = reinterpret_cast<LibEvLoop *>(ev_userdata(loop));
             CHECK(pserver && pserver->loop_ == evloop);
 
@@ -209,6 +150,83 @@ namespace fasto
             if(pserver->observer_){
                 pserver->observer_->dataReceived(pclient);
             }
+        }
+
+        void ITcpLoop::preLooped(LibEvLoop* loop)
+        {
+            if(observer_){
+                observer_->preLooped(this);
+            }
+        }
+
+        void ITcpLoop::stoped(LibEvLoop* loop)
+        {
+
+        }
+
+        void ITcpLoop::postLooped(LibEvLoop* loop)
+        {
+            if(observer_){
+                observer_->postLooped(this);
+            }
+        }
+
+        // server
+        TcpServer::TcpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer)
+            : ITcpLoop(observer), sock_(host), accept_io_((struct ev_io*)calloc(1, sizeof(struct ev_io)))
+        {
+            accept_io_->data = this;
+        }
+
+        TcpServer::~TcpServer()
+        {
+            free(accept_io_);
+            accept_io_ = NULL;
+        }
+
+        void TcpServer::preLooped(LibEvLoop* loop)
+        {
+            int fd = sock_.fd();
+            ev_io_init(accept_io_, accept_cb, fd, EV_READ);
+            loop->start_io(accept_io_);
+            ITcpLoop::preLooped(loop);
+        }
+
+        void TcpServer::stoped(LibEvLoop* loop)
+        {
+            loop->stop_io(accept_io_);
+            ITcpLoop::stoped(loop);
+        }
+
+        common::ErrnoError TcpServer::bind()
+        {
+            return sock_.bind();
+        }
+
+        common::ErrnoError TcpServer::listen(int backlog)
+        {
+            return sock_.listen(backlog);
+        }
+
+        void TcpServer::stop()
+        {
+            sock_.close();
+            ITcpLoop::stop();
+        }
+
+        const char* TcpServer::className() const
+        {
+            return "TcpServer";
+        }
+
+        common::net::hostAndPort TcpServer::host() const
+        {
+            return sock_.host();
+        }
+
+        common::ErrnoError TcpServer::accept(common::net::socket_info& info)
+        {
+            return sock_.accept(info);
         }
 
         void TcpServer::accept_cb(struct ev_loop* loop, struct ev_io* watcher, int revents)
@@ -234,7 +252,7 @@ namespace fasto
             pserver->registerClient(pclient);
         }
 
-        TcpServerObserver::~TcpServerObserver()
+        ITcpLoopObserver::~ITcpLoopObserver()
         {
 
         }

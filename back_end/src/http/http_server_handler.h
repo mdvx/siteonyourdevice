@@ -20,7 +20,7 @@ namespace fasto
         };
 
         class HttpServerHandler
-                : public TcpServerObserver
+                : public ITcpLoopObserver
         {
         public:
             typedef common::shared_ptr<IHttpCallback> http_callback_t;

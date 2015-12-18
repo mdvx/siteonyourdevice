@@ -6,7 +6,7 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        HttpServer::HttpServer(const common::net::hostAndPort& host, TcpServerObserver* observer)
+        HttpServer::HttpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer)
             : TcpServer(host, observer), info_()
         {
 
@@ -37,7 +37,7 @@ namespace fasto
             return "HttpServer";
         }
 
-        Http2Server::Http2Server(const common::net::hostAndPort& host, TcpServerObserver *observer)
+        Http2Server::Http2Server(const common::net::hostAndPort& host, ITcpLoopObserver *observer)
             : HttpServer(host, observer)
         {
 

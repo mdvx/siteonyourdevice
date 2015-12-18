@@ -16,7 +16,7 @@ namespace fasto
             struct fasto_async_cb
             {
                 ev_async async_;
-                function_type func_;
+                async_loop_exec_function_type func_;
             };
 
             void async_exec_cb(struct ev_loop* loop, struct ev_async* watcher, int revents)
@@ -66,7 +66,7 @@ namespace fasto
             ev_io_stop(loop_, io);
         }
 
-        void LibEvLoop::execInLoopThread(function_type async_cb)
+        void LibEvLoop::execInLoopThread(async_loop_exec_function_type async_cb)
         {
             if(exec_id_ == common::thread::PlatformThread::currentId()){
                 async_cb();

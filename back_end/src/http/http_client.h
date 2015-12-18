@@ -14,7 +14,7 @@ namespace fasto
                 : public TcpClient
         {
         public:
-            HttpClient(TcpServer* server, const common::net::socket_info& info);
+            HttpClient(ITcpLoop* server, const common::net::socket_info& info);
 
             virtual common::ErrnoError send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive);
             virtual common::ErrnoError send_file_by_fd(common::http::http_protocols protocol, int fdesc, off_t size);
@@ -38,7 +38,7 @@ namespace fasto
             typedef StreamSPtr stream_t;
             typedef std::vector<stream_t> streams_t;
 
-            Http2Client(TcpServer* server, const common::net::socket_info& info);
+            Http2Client(ITcpLoop* server, const common::net::socket_info& info);
 
             virtual common::ErrnoError send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive);
             virtual common::ErrnoError send_file_by_fd(common::http::http_protocols protocol, int fdesc, off_t size);

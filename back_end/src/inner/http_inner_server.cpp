@@ -4,7 +4,7 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        RelayClient::RelayClient(TcpServer* server, const common::net::socket_info& info, const common::net::hostAndPort& externalHost)
+        RelayClient::RelayClient(ITcpLoop *server, const common::net::socket_info& info, const common::net::hostAndPort& externalHost)
             : Http2Client(server, info), external_host_(externalHost), eclient_(NULL)
         {
 
@@ -30,7 +30,7 @@ namespace fasto
             return "RelayClient";
         }
 
-        ProxyRelayClient::ProxyRelayClient(TcpServer* server, const common::net::socket_info& info, RelayClient * relay)
+        ProxyRelayClient::ProxyRelayClient(ITcpLoop *server, const common::net::socket_info& info, RelayClient * relay)
             : TcpClient(server, info), relay_(relay)
         {
 
@@ -41,22 +41,31 @@ namespace fasto
             return relay_;
         }
 
-        Http2InnerServer::Http2InnerServer(const common::net::hostAndPort& host, TcpServerObserver * observer, const configuration_t& config)
+        ProxyInnerServer::ProxyInnerServer(ITcpLoopObserver* observer, const configuration_t &config)
+            : ITcpLoop(observer), config_(config)
+        {
+
+        }
+
+        const char* ProxyInnerServer::className() const
+        {
+            return "ProxyInnerServer";
+        }
+
+        Http2InnerServer::Http2InnerServer(const common::net::hostAndPort& host, ITcpLoopObserver * observer, const configuration_t& config)
             : Http2Server(host, observer), config_(config)
         {
 
         }
 
+        const char* Http2InnerServer::className() const
+        {
+            return "Http2InnerServer";
+        }
+
         TcpClient * Http2InnerServer::createClient(const common::net::socket_info &info)
         {
             Http2Client *cl = new Http2Client(this, info);
-            cl->setIsAuthenticated(!config_.is_private_site_);
-            return cl;
-        }
-
-        RelayClient* Http2InnerServer::createRelayClient(const common::net::socket_info &info)
-        {
-            RelayClient *cl = new RelayClient(this, info, config_.external_host_);
             cl->setIsAuthenticated(!config_.is_private_site_);
             return cl;
         }

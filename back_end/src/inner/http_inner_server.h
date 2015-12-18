@@ -15,7 +15,7 @@ namespace fasto
                 : public Http2Client
         {
         public:
-            RelayClient(TcpServer* server, const common::net::socket_info& info, const common::net::hostAndPort& externalHost);
+            RelayClient(ITcpLoop* server, const common::net::socket_info& info, const common::net::hostAndPort& externalHost);
             const char* className() const;
 
             common::net::hostAndPort externalHost() const;
@@ -32,20 +32,32 @@ namespace fasto
                 : public TcpClient
         {
         public:
-            ProxyRelayClient(TcpServer* server, const common::net::socket_info& info, RelayClient * relay);
+            ProxyRelayClient(ITcpLoop* server, const common::net::socket_info& info, RelayClient * relay);
             RelayClient * relay() const;
 
         private:
             RelayClient * const relay_;
         };
 
+        class ProxyInnerServer
+                : public ITcpLoop
+        {
+        public:
+            ProxyInnerServer(ITcpLoopObserver* observer, const configuration_t& config);
+
+            virtual const char* className() const;
+
+        private:
+            const configuration_t& config_;
+        };
+
         class Http2InnerServer
                 : public Http2Server
         {
         public:
-            Http2InnerServer(const common::net::hostAndPort& host, TcpServerObserver * observer, const configuration_t& config);
+            Http2InnerServer(const common::net::hostAndPort& host, ITcpLoopObserver * observer, const configuration_t& config);
 
-            RelayClient* createRelayClient(const common::net::socket_info &info);
+            virtual const char* className() const;
 
         protected:
             virtual TcpClient * createClient(const common::net::socket_info &info);

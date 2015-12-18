@@ -4,6 +4,7 @@
 
 #include "inner/inner_server_command_seq_parser.h"
 
+#include "http_config.h"
 #include "infos.h"
 
 namespace fasto
@@ -17,17 +18,19 @@ namespace fasto
             Http2InnerServerHandler(const common::net::hostAndPort& host);
             ~Http2InnerServerHandler();
 
-            virtual void preLooped(TcpServer* server);
+            virtual void preLooped(ITcpLoop* server);
             virtual void accepted(TcpClient* client);
             virtual void closed(TcpClient* client);
             virtual void dataReceived(TcpClient* client);
-            virtual void postLooped(TcpServer* server);
+            virtual void postLooped(ITcpLoop* server);
 
             void setAuthInfo(const UserAuthInfo& authInfo);
             const UserAuthInfo& authInfo() const;
 
-            common::Error innerConnect(TcpServer *server);
-            common::Error innerDisConnect(TcpServer *server);
+            common::Error innerConnect(ITcpLoop *server);
+            common::Error innerDisConnect(ITcpLoop *server);
+
+            void setConfig(const configuration_t& config);
 
         private:
             virtual void handleInnerRequestCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[]);
@@ -36,7 +39,9 @@ namespace fasto
 
             InnerClient* innerConnection_;
             UserAuthInfo authInfo_;
+
             const common::net::hostAndPort host_;
+            configuration_t config_;
         };
     }
 }

@@ -33,7 +33,7 @@ namespace fasto
             return cb_(request_id_, argc, argv);
         }
 
-        InnerClient::InnerClient(TcpServer *server, const common::net::socket_info& info)
+        InnerClient::InnerClient(ITcpLoop *server, const common::net::socket_info& info)
             : TcpClient(server, info)
         {
 

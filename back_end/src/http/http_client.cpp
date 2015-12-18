@@ -16,7 +16,7 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        HttpClient::HttpClient(TcpServer *server, const common::net::socket_info& info)
+        HttpClient::HttpClient(ITcpLoop *server, const common::net::socket_info& info)
             : TcpClient(server, info), isAuth_(false)
         {
 
@@ -126,7 +126,7 @@ namespace fasto
             return err;
         }
 
-        Http2Client::Http2Client(TcpServer *server, const common::net::socket_info& info)
+        Http2Client::Http2Client(ITcpLoop *server, const common::net::socket_info& info)
             : HttpClient(server, info), streams_()
         {
 

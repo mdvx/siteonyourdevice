@@ -27,7 +27,7 @@ namespace fasto
                 : public TcpClient
         {
         public:
-            InnerClient(TcpServer *server, const common::net::socket_info& info);
+            InnerClient(ITcpLoop *server, const common::net::socket_info& info);
             const char* className() const;
         };
 

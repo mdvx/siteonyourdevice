@@ -20,7 +20,7 @@ namespace fasto
     namespace siteonyourdevice
     { 
         Http2InnerServerHandler::Http2InnerServerHandler(const common::net::hostAndPort &host)
-            : Http2ServerHandler(NULL), innerConnection_(NULL), authInfo_(), host_(host)
+            : Http2ServerHandler(NULL), innerConnection_(NULL), authInfo_(), host_(host), config_()
         {
 
         }
@@ -31,7 +31,7 @@ namespace fasto
             innerConnection_ = NULL;
         }
 
-        void Http2InnerServerHandler::preLooped(TcpServer* server)
+        void Http2InnerServerHandler::preLooped(ITcpLoop *server)
         {
             innerConnect(server);
         }
@@ -58,7 +58,7 @@ namespace fasto
             }
         }
 
-        void Http2InnerServerHandler::postLooped(TcpServer* server)
+        void Http2InnerServerHandler::postLooped(ITcpLoop *server)
         {
             innerDisConnect(server);
         }
@@ -106,11 +106,12 @@ namespace fasto
                             return;
                         }
 
-                        Http2InnerServer* hserver = dynamic_cast<Http2InnerServer*>(connection->server());
-                        CHECK(hserver);
+                        ITcpLoop* server = connection->server();
+                        CHECK(server);
 
-                        RelayClient * relayConnection = hserver->createRelayClient(rinfo);
-                        hserver->registerClient(relayConnection);
+                        RelayClient *relayConnection = new RelayClient(server, rinfo, config_.external_host_);
+                        relayConnection->setIsAuthenticated(!config_.is_private_site_);
+                        server->registerClient(relayConnection);
                     }
                 }
                 else{
@@ -241,7 +242,7 @@ namespace fasto
             return authInfo_;
         }
 
-        common::Error Http2InnerServerHandler::innerConnect(TcpServer* server)
+        common::Error Http2InnerServerHandler::innerConnect(ITcpLoop *server)
         {
             if(innerConnection_){
                 return common::Error();
@@ -261,11 +262,16 @@ namespace fasto
                 server->registerClient(connection);
             };
 
-            server->execInServerThread(cb);
+            server->execInLoopThread(cb);
             return common::Error();
         }
 
-        common::Error Http2InnerServerHandler::innerDisConnect(TcpServer *server)
+        void Http2InnerServerHandler::setConfig(const configuration_t& config)
+        {
+            config_ = config;
+        }
+
+        common::Error Http2InnerServerHandler::innerDisConnect(ITcpLoop *server)
         {
             if(!innerConnection_){
                 return common::Error();
@@ -278,7 +284,7 @@ namespace fasto
                 delete connection;
             };
 
-            server->execInServerThread(cb);
+            server->execInLoopThread(cb);
             return common::Error();
         }
 
@@ -330,7 +336,7 @@ namespace fasto
                             return;
                         }
 
-                        TcpServer* server = rclient->server();
+                        ITcpLoop* server = rclient->server();
                         eclient = new ProxyRelayClient(server, client_info, rclient);
                         server->registerClient(eclient);
                         rclient->setEclient(eclient);

@@ -21,7 +21,7 @@ namespace fasto
     namespace siteonyourdevice
     {
         class Http2InnerServerHandler;
-        class Http2InnerServer;
+        class ITcpLoop;
 
         class NetworkController;
 
@@ -62,7 +62,7 @@ namespace fasto
             void saveConfig();
 
             Http2InnerServerHandler * handler_;
-            Http2InnerServer * server_;
+            ITcpLoop * server_;
             std::shared_ptr<common::thread::Thread<int> > http_thread_; //http thread handle
 
             std::string config_path_;

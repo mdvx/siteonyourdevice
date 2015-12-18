@@ -12,7 +12,7 @@ namespace fasto
                 : public TcpServer
         {
         public:
-            HttpServer(const common::net::hostAndPort& host, TcpServerObserver *observer);
+            HttpServer(const common::net::hostAndPort& host, ITcpLoopObserver *observer);
             ~HttpServer();
 
             void setHttpServerInfo(const HttpServerInfo& info);
@@ -31,7 +31,7 @@ namespace fasto
                 : public HttpServer
         {
         public:
-            Http2Server(const common::net::hostAndPort& host, TcpServerObserver *observer);
+            Http2Server(const common::net::hostAndPort& host, ITcpLoopObserver *observer);
 
             virtual const char* className() const;
 

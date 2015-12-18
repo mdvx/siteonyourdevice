@@ -10,7 +10,7 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        typedef std::function<void()> function_type;
+        typedef std::function<void()> async_loop_exec_function_type;
 
         class EvLoopObserver
         {
@@ -33,7 +33,7 @@ namespace fasto
             void start_io(ev_io *io);
             void stop_io(ev_io *io);
 
-            void execInLoopThread(function_type async_cb);
+            void execInLoopThread(async_loop_exec_function_type async_cb);
 
             int exec();
             void stop();
