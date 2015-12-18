@@ -1,5 +1,7 @@
 #include "event_loop.h"
 
+#include <stdlib.h>
+
 namespace fasto
 {
     namespace siteonyourdevice
