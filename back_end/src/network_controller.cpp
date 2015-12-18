@@ -381,7 +381,7 @@ namespace fasto
             config.login_ = USER_SPECIFIC_DEFAULT_LOGIN;
             config.password_ = USER_SPECIFIC_DEFAULT_PASSWORD;
             config.is_private_site_ = USER_SPECIFIC_DEFAULT_PRIVATE_SITE;
-            config.external_host_ = common::net::hostAndPort();
+            config.external_host_ = common::net::hostAndPort("localhost", 80);
             config.server_type_ = FASTO_SERVER;
 
             //try to parse settings file

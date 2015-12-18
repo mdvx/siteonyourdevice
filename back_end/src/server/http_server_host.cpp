@@ -6,6 +6,8 @@
 #include "common/thread/thread_manager.h"
 #include "common/logger.h"
 
+#include "http/http_client.h"
+
 #define BUF_SIZE 4096
 
 namespace fasto
@@ -91,7 +93,7 @@ namespace fasto
             common::buffer_type res = common::convertToBytes(chrequest);
 
             innerConnection->addClient(parent_->innerHandler(), hclient, res);
-            TcpServer *server = hclient->server();
+            ITcpLoop *server = hclient->server();
             server->unregisterClient(hclient);
         }
 

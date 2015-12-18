@@ -26,7 +26,6 @@ namespace
         gtk_menu_popup(GTK_MENU(user_data), NULL, NULL, gtk_status_icon_position_menu, status_icon, button, activate_time);
     }
 
-
     void destroy(GtkWidget *window, gpointer user_data)
     {
         gtk_main_quit();
@@ -65,6 +64,34 @@ namespace fasto
 
             }
 
+            static void click_external_domain_change_callback(GtkToggleButton *button, gpointer callback_data)
+            {
+                EventHandler* handler = static_cast<EventHandler*>(callback_data);
+                GtkMainWindow * parent = handler->parent_;
+
+                parent->setExternalChekboxState(gtk_toggle_button_get_active(button));
+            }
+
+            static void click_browse_content_callback(GtkButton *button, gpointer callback_data)
+            {
+                EventHandler* handler = static_cast<EventHandler*>(callback_data);
+                GtkMainWindow * parent = handler->parent_;
+
+                GtkWidget * chose_content_path  = gtk_file_chooser_dialog_new("Select content folder", GTK_WINDOW(parent->window_),
+                                                                                        GTK_FILE_CHOOSER_ACTION_OPEN,
+                                                                                        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                                                                        GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                                                                        NULL);
+                gtk_file_chooser_set_action(GTK_FILE_CHOOSER(chose_content_path), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
+
+                if (gtk_dialog_run (GTK_DIALOG (chose_content_path)) == GTK_RESPONSE_ACCEPT){
+                    char *filepath = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER (chose_content_path));
+                    gtk_entry_set_text(GTK_ENTRY(parent->content_path_text_), filepath);
+                    g_free(filepath);
+                }
+                gtk_widget_destroy(chose_content_path);
+            }
+
             static void click_connect_callback(GtkButton *button, gpointer callback_data)
             {
                 EventHandler* handler = static_cast<EventHandler*>(callback_data);
@@ -83,7 +110,8 @@ namespace fasto
 
         GtkMainWindow::GtkMainWindow(NetworkController *controller)
             : GuiNetworkEventHandler(controller), connect_button_(NULL),
-              domain_text_(NULL), port_text_(NULL), login_text_(NULL), password_text_(NULL), content_path_text_(NULL)
+              domain_text_(NULL), port_text_(NULL), login_text_(NULL), password_text_(NULL), content_path_text_(NULL),
+              browse_content_button_(NULL), external_host_(NULL), external_port_(NULL)
         {
 
             evhandler_ = new EventHandler(this);
@@ -150,9 +178,24 @@ namespace fasto
             content_path_text_ = gtk_entry_new();
             gtk_box_pack_start(GTK_BOX(cpbox), content_path_text_, FALSE, FALSE, 0);
             gtk_container_add(GTK_CONTAINER(cbox), cpbox);
+            browse_content_button_ = gtk_button_new_with_label(BROWSE_LABEL);
+            gtk_box_pack_start(GTK_BOX(cbox), browse_content_button_, FALSE, FALSE, 0);
+            g_signal_connect(G_OBJECT(browse_content_button_), "clicked", G_CALLBACK(EventHandler::click_browse_content_callback), evhandler_);
 
             gtk_container_add(GTK_CONTAINER(vbox), cbox);
             //
+
+            GtkWidget *exbox = gtk_hbox_new(TRUE, 1);
+            is_external_domain_ = gtk_check_button_new_with_label(EXTERNAL_SITE_LABEL);
+            gtk_box_pack_start(GTK_BOX(exbox), is_external_domain_, FALSE, FALSE, 0);
+            g_signal_connect(G_OBJECT(is_external_domain_), "clicked",  G_CALLBACK(EventHandler::click_external_domain_change_callback), evhandler_);
+
+            external_host_ = gtk_entry_new();
+            gtk_box_pack_start(GTK_BOX(exbox), external_host_, FALSE, FALSE, 0);
+            external_port_ = gtk_entry_new();
+            gtk_box_pack_start(GTK_BOX(exbox), external_port_, FALSE, FALSE, 0);
+            gtk_entry_set_max_length(GTK_ENTRY(external_port_), port_max_length);
+            gtk_container_add(GTK_CONTAINER(vbox), exbox);
 
             is_private_site_ = gtk_check_button_new_with_label(PRIVATE_SITE_LABEL);
             gtk_box_pack_start(GTK_BOX(vbox), is_private_site_, FALSE, FALSE, 0);
@@ -222,6 +265,13 @@ namespace fasto
             gtk_entry_set_text(GTK_ENTRY(password_text_), cur_config.password_.c_str());
             gtk_entry_set_text(GTK_ENTRY(content_path_text_), cur_config.content_path_.c_str());
             gtk_toggle_button_set_state(GTK_TOGGLE_BUTTON(is_private_site_), cur_config.is_private_site_);
+            gtk_toggle_button_set_state(GTK_TOGGLE_BUTTON(is_external_domain_), cur_config.server_type_ ==  EXTERNAL_SERVER);
+
+            const std::string ex_host = cur_config.external_host_.host_;
+            gtk_entry_set_text(GTK_ENTRY(external_host_), ex_host.c_str());
+            const std::string exportstr = common::convertToString(cur_config.external_host_.port_);
+            gtk_entry_set_text(GTK_ENTRY(external_port_), exportstr.c_str());
+
             gtk_widget_show_all(window_);
             return EXIT_SUCCESS;
         }
@@ -237,7 +287,21 @@ namespace fasto
             old_config.password_ = gtk_entry_get_text(GTK_ENTRY(password_text_));
             old_config.content_path_ = gtk_entry_get_text(GTK_ENTRY(content_path_text_));
             old_config.is_private_site_ = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(is_private_site_));
+            old_config.server_type_ = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(is_external_domain_)) ? EXTERNAL_SERVER : FASTO_SERVER;
+            const std::string exhoststr = gtk_entry_get_text(GTK_ENTRY(external_host_));
+            const uint16_t ex_port = common::convertFromString<uint16_t>(gtk_entry_get_text(GTK_ENTRY(external_port_)));
+            old_config.external_host_ = common::net::hostAndPort(exhoststr, ex_port);
             GuiNetworkEventHandler::onConnectClicked(old_config);
+        }
+
+        void GtkMainWindow::setExternalChekboxState(bool is_active)
+        {
+            gtk_widget_set_sensitive(browse_content_button_, !is_active);
+            gtk_widget_set_sensitive(content_path_text_, !is_active);
+            gtk_widget_set_sensitive(port_text_, !is_active);
+
+            gtk_widget_set_sensitive(external_host_, is_active);
+            gtk_widget_set_sensitive(external_port_, is_active);
         }
 
         GtkGuiFastoRemoteApplication::GtkGuiFastoRemoteApplication(int argc, char *argv[])

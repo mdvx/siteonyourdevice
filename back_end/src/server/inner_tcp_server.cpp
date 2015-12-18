@@ -235,7 +235,9 @@ namespace fasto
                 }
             }
 
-            TcpServer* server = rrclient->server();
+            TcpServer* server = dynamic_cast<TcpServer*>(rrclient->server());
+            CHECK(server);
+
             common::net::hostAndPort hs = server->host();
             std::shared_ptr<RelayServer> tmp(new RelayServer(handler, this, hs, rrclient));
             tmp->addRequest(request);
@@ -386,7 +388,7 @@ namespace fasto
             delete handler_;
         }
 
-        void InnerServerHandlerHost::preLooped(TcpServer* server)
+        void InnerServerHandlerHost::preLooped(ITcpLoop* server)
         {
 
         }
@@ -396,7 +398,7 @@ namespace fasto
 
         }
 
-        void InnerServerHandlerHost::postLooped(TcpServer* server)
+        void InnerServerHandlerHost::postLooped(ITcpLoop *server)
         {
 
         }
@@ -586,7 +588,7 @@ namespace fasto
 
         }
 
-        InnerTcpServer::InnerTcpServer(const common::net::hostAndPort& host, TcpServerObserver* observer)
+        InnerTcpServer::InnerTcpServer(const common::net::hostAndPort& host, ITcpLoopObserver *observer)
             : TcpServer(host, observer)
         {
 

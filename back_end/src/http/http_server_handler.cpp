@@ -25,7 +25,7 @@ namespace fasto
 
         }
 
-        void HttpServerHandler::preLooped(TcpServer* server)
+        void HttpServerHandler::preLooped(ITcpLoop *server)
         {
 
         }
@@ -63,7 +63,7 @@ namespace fasto
             processReceived(hclient, buff, nread);
         }
 
-        void HttpServerHandler::postLooped(TcpServer* server)
+        void HttpServerHandler::postLooped(ITcpLoop *server)
         {
 
         }

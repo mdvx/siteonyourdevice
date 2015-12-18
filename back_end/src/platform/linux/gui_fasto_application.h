@@ -19,16 +19,26 @@ namespace fasto
             void handleEvent(NetworkEvent* event);
             void onConnectClicked();
 
+            void setExternalChekboxState(bool is_active);
+
         private:
             virtual int showImpl();
 
             GtkWidget * window_;
             GtkWidget * connect_button_;
+
             GtkWidget * domain_text_;
             GtkWidget * port_text_;
+
             GtkWidget * login_text_;
             GtkWidget * password_text_;
             GtkWidget * content_path_text_;
+            GtkWidget * browse_content_button_;
+
+            GtkWidget * is_external_domain_;
+            GtkWidget * external_host_;
+            GtkWidget * external_port_;
+
             GtkWidget * is_private_site_;
 
             class EventHandler;

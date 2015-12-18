@@ -27,12 +27,12 @@ namespace fasto
             typedef std::map<std::string, http_callback_t> http_callbacks_t;
 
             HttpServerHandler(IHttpAuthObserver * observer);
-            virtual void preLooped(TcpServer* server);
+            virtual void preLooped(ITcpLoop* server);
             virtual void accepted(TcpClient* client);
             virtual void moved(TcpClient* client);
             virtual void closed(TcpClient* client);
             virtual void dataReceived(TcpClient* client);
-            virtual void postLooped(TcpServer* server);
+            virtual void postLooped(ITcpLoop* server);
             virtual ~HttpServerHandler();
 
             void registerHttpCallback(const std::string& url, http_callback_t callback);

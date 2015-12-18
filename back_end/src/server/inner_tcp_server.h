@@ -6,6 +6,8 @@
 
 #include "server/redis_helpers.h"
 
+#include "tcp_server.h"
+
 #include "infos.h"
 
 namespace fasto
@@ -17,19 +19,19 @@ namespace fasto
         class HttpServerHandlerHost;
 
         class InnerServerHandlerHost
-                : public InnerServerCommandSeqParser, public TcpServerObserver
+                : public InnerServerCommandSeqParser, public ITcpLoopObserver
         {
         public:
             InnerServerHandlerHost(HttpServerHandlerHost * parent);
 
-            virtual void preLooped(TcpServer* server);
+            virtual void preLooped(ITcpLoop* server);
 
             virtual void accepted(TcpClient* client);
             virtual void moved(TcpClient* client);
             virtual void closed(TcpClient* client);
 
             virtual void dataReceived(TcpClient* client);
-            virtual void postLooped(TcpServer* server);
+            virtual void postLooped(ITcpLoop* server);
             virtual ~InnerServerHandlerHost();
 
             void setStorageConfig(const redis_sub_configuration_t &config);
@@ -74,7 +76,7 @@ namespace fasto
                 : public TcpServer
         {
         public:
-            InnerTcpServer(const common::net::hostAndPort& host, TcpServerObserver* observer);
+            InnerTcpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer);
 
             virtual const char* className() const;
 
