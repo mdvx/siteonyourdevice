@@ -37,7 +37,7 @@ namespace fasto
             void setName(const std::string& name);
             std::string name() const;
 
-            common::id_counter<TcpClient>::type_t id() const;
+            common::id_counter<TcpServer>::type_t id() const;
             const char* className() const;
             std::string formatedName() const;
 
@@ -60,45 +60,12 @@ namespace fasto
             uint32_t total_clients_;
 
             TcpServerObserver* const observer_;
-            LibEvLoop impl_;
+            LibEvLoop* const loop_;
 
-            fasto_s_sync * accept_io_;
+            ev_io * accept_io_;
 
             std::string name_;
             const common::id_counter<TcpServer> id_;
-        };
-
-        class TcpClient
-                : common::IMetaClassInfo
-        {
-        public:
-            friend class TcpServer;
-            TcpClient(TcpServer* server, const common::net::socket_info& info);
-            virtual ~TcpClient();
-
-            TcpServer* server() const;
-
-            common::net::socket_info info() const;
-            int fd() const;
-
-            virtual common::ErrnoError write(const char *data, uint16_t size, ssize_t &nwrite) WARN_UNUSED_RESULT;
-            virtual common::ErrnoError read(char* outData, uint16_t maxSize, ssize_t &nread) WARN_UNUSED_RESULT;
-
-            void close();
-
-            void setName(const std::string& name);
-            std::string name() const;
-
-            common::id_counter<TcpClient>::type_t id() const;
-            virtual const char *className() const;
-            std::string formatedName() const;
-
-        private:
-            TcpServer* server_;
-            fasto_c_sync * read_io_;
-            common::net::SocketHolder sock_;
-            std::string name_;
-            const common::id_counter<TcpClient> id_;
         };
 
         class TcpServerObserver

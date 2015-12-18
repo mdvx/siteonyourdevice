@@ -4,6 +4,8 @@
 
 #include "common/logger.h"
 
+#include "tcp_client.h"
+
 namespace
 {
 #ifdef OS_WIN
@@ -37,90 +39,19 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        // client
-        TcpClient::TcpClient(TcpServer *server, const common::net::socket_info &info)
-            : server_(server), read_io_((struct fasto_c_sync*)calloc(1, sizeof(struct fasto_c_sync))),
-              sock_(info), name_(), id_()
-        {
-            read_io_->client_ = this;
-            //read_io_->server_ = server;
-        }
-
-        common::net::socket_info TcpClient::info() const
-        {
-            return sock_.info();
-        }
-
-        int TcpClient::fd() const
-        {
-            return sock_.fd();
-        }
-
-        common::ErrnoError TcpClient::write(const char* data, uint16_t size, ssize_t &nwrite)
-        {
-            return sock_.write(data, size, nwrite);
-        }
-
-        common::ErrnoError TcpClient::read(char* outData, uint16_t maxSize, ssize_t &nread)
-        {
-            return sock_.read(outData, maxSize, nread);
-        }
-
-        TcpClient::~TcpClient()
-        {
-            free(read_io_);
-            read_io_ = NULL;
-        }
-
-        TcpServer* TcpClient::server() const
-        {
-            return server_;
-        }
-
-        void TcpClient::close()
-        {
-            if(server_){
-                server_->closeClient(this);
-            }
-            sock_.close();
-        }
-
-        void TcpClient::setName(const std::string& name)
-        {
-            name_ = name;
-        }
-
-        std::string TcpClient::name() const
-        {
-            return name_;
-        }
-
-        common::id_counter<TcpClient>::type_t TcpClient::id() const
-        {
-            return id_.id();
-        }
-
-        const char* TcpClient::className() const
-        {
-            return "TcpClient";
-        }
-
-        std::string TcpClient::formatedName() const
-        {
-            return common::MemSPrintf("[%s][%s(%" PRIu32 ")]", name(), className(), id());
-        }
-
         // server
         TcpServer::TcpServer(const common::net::hostAndPort& host, TcpServerObserver* observer)
-            : sock_(host), total_clients_(0), observer_(observer), impl_(),
-              accept_io_((struct fasto_s_sync*)calloc(1, sizeof(struct fasto_s_sync))), id_()
+            : sock_(host), total_clients_(0), observer_(observer), loop_(new LibEvLoop),
+              accept_io_((struct ev_io*)calloc(1, sizeof(struct ev_io))), id_()
         {
-            impl_.setObserver(this);
-            accept_io_->server_ = this;
+            loop_->setObserver(this);
+            accept_io_->data = this;
         }
 
         TcpServer::~TcpServer()
         {
+            delete loop_;
+
             free(accept_io_);
             accept_io_ = NULL;
         }
@@ -128,7 +59,7 @@ namespace fasto
         void TcpServer::preLooped(LibEvLoop* loop)
         {
             int fd = sock_.fd();
-            ev_io_init_fasto(accept_io_, accept_cb, fd, EV_READ);
+            ev_io_init(accept_io_, accept_cb, fd, EV_READ);
             loop->start_io(accept_io_);
             if(observer_){
                 observer_->preLooped(this);
@@ -159,13 +90,13 @@ namespace fasto
 
         int TcpServer::exec()
         {
-            return impl_.exec();
+            return loop_->exec();
         }
 
         void TcpServer::stop()
         {
             close();
-            impl_.stop();
+            loop_->stop();
         }
 
         common::net::hostAndPort TcpServer::host() const
@@ -181,8 +112,8 @@ namespace fasto
 
         void TcpServer::unregisterClient(TcpClient * client)
         {
-            DCHECK(client->server() == this);
-            impl_.stop_io(client->read_io_);
+            CHECK(client->server() == this);
+            loop_->stop_io(client->read_io_);
 
             if(observer_){
                 observer_->moved(client);
@@ -195,10 +126,10 @@ namespace fasto
 
         void TcpServer::registerClient(TcpClient * client)
         {
-            DCHECK(client->server() == this);
+            CHECK(client->server() == this);
             // Initialize and start watcher to read client requests
-            ev_io_init_fasto(client->read_io_, read_cb, client->fd(), EV_READ);
-            impl_.start_io(client->read_io_);
+            ev_io_init(client->read_io_, read_cb, client->fd(), EV_READ);
+            loop_->start_io(client->read_io_);
 
             if(observer_){
                 observer_->accepted(client);
@@ -214,8 +145,8 @@ namespace fasto
 
         void TcpServer::closeClient(TcpClient *client)
         {
-            DCHECK(client->server() == this);
-            impl_.stop_io(client->read_io_);
+            CHECK(client->server() == this);
+            loop_->stop_io(client->read_io_);
 
             if(observer_){
                 observer_->closed(client);
@@ -226,7 +157,7 @@ namespace fasto
 
         void TcpServer::execInServerThread(function_type func)
         {
-            impl_.execInLoopThread(func);
+            loop_->execInLoopThread(func);
         }
 
         void TcpServer::setName(const std::string& name)
@@ -266,11 +197,10 @@ namespace fasto
 
         void TcpServer::read_cb(struct ev_loop* loop, struct ev_io* watcher, int revents)
         {
-            fasto_c_sync* ioserver = reinterpret_cast<fasto_c_sync *>(watcher);
-
-            TcpClient* pclient = reinterpret_cast<TcpClient *>(ioserver->client_);
+            TcpClient* pclient = reinterpret_cast<TcpClient *>(watcher->data);
             TcpServer* pserver = pclient->server();
-            CHECK(pserver);
+            LibEvLoop* evloop = reinterpret_cast<LibEvLoop *>(ev_userdata(loop));
+            CHECK(pserver && pserver->loop_ == evloop);
 
             if(EV_ERROR & revents){
                 return;
@@ -283,9 +213,9 @@ namespace fasto
 
         void TcpServer::accept_cb(struct ev_loop* loop, struct ev_io* watcher, int revents)
         {
-            fasto_s_sync* ioserver = reinterpret_cast<fasto_s_sync *>(watcher);
-            TcpServer* pserver = reinterpret_cast<TcpServer *>(ioserver->server_);
-            CHECK(pserver);
+            TcpServer* pserver = reinterpret_cast<TcpServer *>(watcher->data);
+            LibEvLoop* evloop = reinterpret_cast<LibEvLoop *>(ev_userdata(loop));
+            CHECK(pserver && pserver->loop_ == evloop);
 
             if(EV_ERROR & revents){
                 return;

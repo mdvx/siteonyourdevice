@@ -3,6 +3,7 @@
 #include "http_config.h"
 
 #include "http/http_server.h"
+#include "http/http_client.h"
 
 namespace fasto
 {
