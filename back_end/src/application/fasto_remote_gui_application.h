@@ -11,6 +11,7 @@
 #define CONTENT_PATH_LABEL "Content path:"
 #define BROWSE_LABEL "..."
 #define PRIVATE_SITE_LABEL "Private site:"
+#define EXTERNAL_SITE_LABEL "External host:"
 
 #if defined(PROJECT_BUILD_TYPE_VERSION) && defined(PROJECT_BUILD_RELEASE)
     #define ABOUT_TITLE "<h3>" PROJECT_NAME_TITLE " " PROJECT_VERSION "<br/>Revision:" PROJECT_GIT_VERSION "</h3>"

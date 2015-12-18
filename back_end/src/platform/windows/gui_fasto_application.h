@@ -19,6 +19,7 @@ namespace fasto
 
         private:
             virtual int showImpl();
+            void setExternalChekboxState(LRESULT status);
 
             static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
             virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -44,6 +45,10 @@ namespace fasto
             HWND hwndContentPathStatic_;
             HWND hwndContentPathTextBox_;
             HWND hwndBrowseButton_;
+
+            HWND hwndExternalServerCheckbox_;
+            HWND hwndExternalHostTextBox_;
+            HWND hwndExternalPortTextBox_;
 
             HWND hwndIsPrivateSiteCheckbox_;
 

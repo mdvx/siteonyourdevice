@@ -20,10 +20,13 @@
 #define ID_PASSWORD_TEXTBOX 2011
 #define ID_BROWSE_BUTTON 2012
 #define ID_PRIVATE_SITE_CHECKBOX 2013
-#define ID_CONNECT_BUTTON 2014
+#define ID_EXTERNAL_SITE_CHECKBOX 2014
+#define ID_EXTERNAL_SITE_HOST_TEXTBOX 2015
+#define ID_EXTERNAL_SITE_PORT_TEXTBOX 2016
+#define ID_CONNECT_BUTTON 2017
 
-#define IDR_STATE_OFFLINE 2014
-#define IDR_STATE_ONLINE 2015
+#define IDR_STATE_OFFLINE 2018
+#define IDR_STATE_ONLINE 2019
 
 #define ID_APPICON 101
 
@@ -60,7 +63,9 @@ namespace fasto
             hwndLoginStatic_(NULL), hwndLoginTextBox_(NULL),
             hwndPasswordStatic_(NULL), hwndPasswordTextBox_(NULL),
             hwndContentPathStatic_(NULL), hwndContentPathTextBox_(NULL),
-            hwndBrowseButton_(NULL), hwndIsPrivateSiteCheckbox_(NULL),
+            hwndBrowseButton_(NULL),
+            hwndExternalServerCheckbox_(NULL), hwndExternalHostTextBox_(NULL), hwndExternalPortTextBox_(NULL),
+            hwndIsPrivateSiteCheckbox_(NULL),
             hwndConnectButton_(NULL), isMessageBoxShown_(false)
         {
             const HINSTANCE hInstance = GetModuleHandle(NULL);
@@ -79,7 +84,7 @@ namespace fasto
             wclx.hbrBackground  = (HBRUSH)( COLOR_BTNFACE + 1 );
             wclx.lpszMenuName   = NULL;
             wclx.lpszClassName  = PROJECT_NAME_TITLE;
-            RegisterClassEx( &wclx );
+            RegisterClassEx(&wclx);
         }
 
         Win32MainWindow::~Win32MainWindow()
@@ -114,9 +119,37 @@ namespace fasto
             SetWindowText(hwndPasswordTextBox_, cur_config.password_.c_str());
             SetWindowText(hwndContentPathTextBox_, cur_config.content_path_.c_str());
 
+            setExternalChekboxState(cur_config.server_type_ == EXTERNAL_SERVER ? BST_CHECKED : BST_UNCHECKED);
             SendMessage(hwndIsPrivateSiteCheckbox_, BM_SETCHECK, cur_config.is_private_site_ ? BST_CHECKED : BST_UNCHECKED, 0);
+            const std::string ex_host = cur_config.external_host_.host_;
+            SetWindowText(hwndExternalHostTextBox_, ex_host.c_str());
+            const std::string ex_portstr = common::convertToString(cur_config.external_host_.port_);
+            SetWindowText(hwndExternalPortTextBox_, ex_portstr.c_str());
+
 
             return EXIT_SUCCESS;
+        }
+
+        void Win32MainWindow::setExternalChekboxState(LRESULT status)
+        {
+            if(status == BST_CHECKED){
+                SendMessage(hwndExternalServerCheckbox_, BM_SETCHECK, BST_CHECKED, 0);
+                EnableWindow(hwndBrowseButton_, FALSE);
+                EnableWindow(hwndContentPathTextBox_, FALSE);
+                EnableWindow(hwndPortTextBox_, FALSE);
+
+                EnableWindow(hwndExternalHostTextBox_, TRUE);
+                EnableWindow(hwndExternalPortTextBox_, TRUE);
+            }
+            else if(status == BST_UNCHECKED){
+                SendMessage(hwndExternalServerCheckbox_, BM_SETCHECK, BST_UNCHECKED, 0);
+                EnableWindow(hwndBrowseButton_, TRUE);
+                EnableWindow(hwndContentPathTextBox_, TRUE);
+                EnableWindow(hwndPortTextBox_, TRUE);
+
+                EnableWindow(hwndExternalHostTextBox_, FALSE);
+                EnableWindow(hwndExternalPortTextBox_, FALSE);
+            }
         }
 
         LRESULT Win32MainWindow::OnCreate()
@@ -140,10 +173,13 @@ namespace fasto
             const int foth_line_y = third_line_y + control_padding + textbox_control_height;
 
             const int fifth_line_x = foth_line_x;
-            const int fifth_line_y = foth_line_y + (control_padding + textbox_control_height) * 2;
+            const int fifth_line_y = foth_line_y + (control_padding + textbox_control_height);
 
             const int six_line_x = fifth_line_x;
             const int six_line_y = fifth_line_y + control_padding + textbox_control_height;
+
+            const int seven_line_x = six_line_x;
+            const int seven_line_y = six_line_y + control_padding + textbox_control_height;
 
             const int label_width = (width - padding * 2)/4;
             const int text_box_width = (width - padding * 2) * 2 / 5;
@@ -244,9 +280,34 @@ namespace fasto
                                               hwnd_, (HMENU) ID_BROWSE_BUTTON,
                                               hInstance, NULL);
 
-            hwndIsPrivateSiteCheckbox_ = CreateWindow(TEXT("BUTTON"), TEXT(PRIVATE_SITE_LABEL),
+            // external
+            hwndExternalServerCheckbox_ = CreateWindow(TEXT("BUTTON"), TEXT(EXTERNAL_SITE_LABEL),
                                               WS_VISIBLE | WS_CHILD | BS_CHECKBOX | WS_TABSTOP,
                                               fifth_line_x, fifth_line_y,
+                                              label_width + 40, control_height,
+                                              hwnd_, (HMENU) ID_EXTERNAL_SITE_CHECKBOX,
+                                              hInstance, NULL);
+
+            const int fifth_line_x2 = fifth_line_x + label_width + 40 + control_padding;
+            hwndExternalHostTextBox_ = CreateWindow(TEXT("EDIT"), TEXT(""),
+                                              WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP,
+                                              fifth_line_x2, fifth_line_y,
+                                              text_box_width, textbox_control_height,
+                                              hwnd_, (HMENU)ID_EXTERNAL_SITE_HOST_TEXTBOX,
+                                              hInstance, NULL);
+
+            const int fifth_line_x3 = fifth_line_x2 + text_box_width + control_padding;
+            hwndExternalPortTextBox_ = CreateWindow(TEXT("EDIT"), TEXT(""),
+                                                    WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP,
+                                                    fifth_line_x3, fifth_line_y,
+                                                    40, textbox_control_height,
+                                                    hwnd_, (HMENU)ID_EXTERNAL_SITE_PORT_TEXTBOX,
+                                                    hInstance, NULL);
+
+            //
+            hwndIsPrivateSiteCheckbox_ = CreateWindow(TEXT("BUTTON"), TEXT(PRIVATE_SITE_LABEL),
+                                              WS_VISIBLE | WS_CHILD | BS_CHECKBOX | WS_TABSTOP,
+                                              six_line_x, six_line_y,
                                               width - padding * 2, control_height,
                                               hwnd_, (HMENU) ID_PRIVATE_SITE_CHECKBOX,
                                               hInstance, NULL);
@@ -255,7 +316,7 @@ namespace fasto
 
             hwndConnectButton_ = CreateWindow(TEXT("BUTTON"), TEXT(CONNECT_LABEL),
                                               WS_VISIBLE | WS_CHILD | BS_TEXT | WS_TABSTOP,
-                                              six_line_x, six_line_y,
+                                              seven_line_x, seven_line_y,
                                               width - padding * 2, control_height,
                                               hwnd_, (HMENU) ID_CONNECT_BUTTON,
                                               hInstance, NULL);
@@ -268,6 +329,10 @@ namespace fasto
             ::DestroyWindow(hwndConnectButton_);
 
             ::DestroyWindow(hwndIsPrivateSiteCheckbox_);
+
+            ::DestroyWindow(hwndExternalServerCheckbox_);
+            ::DestroyWindow(hwndExternalHostTextBox_);
+            ::DestroyWindow(hwndExternalServerCheckbox_);
 
             ::DestroyWindow(hwndContentPathStatic_);
             ::DestroyWindow(hwndContentPathTextBox_);
@@ -364,6 +429,17 @@ namespace fasto
                             }
                             else if(res == BST_UNCHECKED){
                                 SendMessage(hwndIsPrivateSiteCheckbox_, BM_SETCHECK, BST_CHECKED, 0);
+                            }
+                            return 0;
+                        }
+                        case ID_EXTERNAL_SITE_CHECKBOX:
+                        {
+                            LRESULT res = SendMessage(hwndExternalServerCheckbox_, BM_GETCHECK, 0, 0);
+                            if(res == BST_CHECKED){
+                                setExternalChekboxState(BST_UNCHECKED);
+                            }
+                            else if(res == BST_UNCHECKED){
+                                setExternalChekboxState(BST_CHECKED);
                             }
                             return 0;
                         }
@@ -477,8 +553,19 @@ namespace fasto
             GetWindowText(hwndContentPathTextBox_, lbl, sizeof(lbl));
             old_config.content_path_ = lbl;
 
-            LRESULT res = SendMessage(hwndIsPrivateSiteCheckbox_, BM_GETCHECK, 0, 0);
+            LRESULT res = SendMessage(hwndExternalServerCheckbox_, BM_GETCHECK, 0, 0);
+            old_config.server_type_ = res == BST_CHECKED ? EXTERNAL_SERVER : FASTO_SERVER;
+
+            res = SendMessage(hwndIsPrivateSiteCheckbox_, BM_GETCHECK, 0, 0);
             old_config.is_private_site_ = res == BST_CHECKED;
+
+            GetWindowText(hwndExternalHostTextBox_, lbl, sizeof(lbl));
+            std::string ex_host = lbl;
+
+            GetWindowText(hwndExternalPortTextBox_, lbl, sizeof(lbl));
+            uint16_t ex_port = common::convertFromString<uint16_t>(lbl);
+
+            old_config.external_host_ = common::net::hostAndPort(ex_host, ex_port);
 
             GuiNetworkEventHandler::onConnectClicked(old_config);
         }

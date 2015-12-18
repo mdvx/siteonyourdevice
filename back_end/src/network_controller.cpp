@@ -53,6 +53,10 @@ namespace fasto
                     pconfig->external_host_ = common::convertFromString<common::net::hostAndPort>(value);
                     return 1;
                 }
+                else if(MATCH("http_server", "server_type")){
+                    pconfig->server_type_ = (http_server_type)atoi(value);
+                    return 1;
+                }
                 else if(strcmp(section, "http_handlers_utls") == 0){
                     pconfig->handlers_urls_.push_back(std::make_pair(name, value));
                     return 1;
@@ -239,14 +243,42 @@ namespace fasto
                 }
             }
 
+            const http_server_type server_type = config_.server_type_;
+            const common::net::hostAndPort externalHost = config_.external_host_;
+
             if(server_){
-                return handler_->innerConnect(server_);
+                if(server_type == FASTO_SERVER){
+                    Http2InnerServer* h2server = dynamic_cast<Http2InnerServer*>(server_);
+                    if(h2server){
+                        return handler_->innerConnect(server_);
+                    }
+                    else{
+                        server_->stop();
+                        http_thread_->joinAndGet();
+                        delete server_;
+                        server_ = NULL;
+                    }
+                }
+                else if(server_type == EXTERNAL_SERVER && externalHost.isValid()) {
+                    ProxyInnerServer* prserver = dynamic_cast<ProxyInnerServer*>(server_);
+                    if(prserver){
+                       return handler_->innerConnect(server_);
+                    }
+                    else{
+                        server_->stop();
+                        http_thread_->joinAndGet();
+                        delete server_;
+                        server_ = NULL;
+                    }
+                }
+                else{
+                    return common::make_error_value("Invalid https server settings!", common::Value::E_ERROR, common::logging::L_ERR);
+                }
             }
 
-            const common::net::hostAndPort externalHost = config_.external_host_;
             handler_->setConfig(config_);
 
-            if(externalHost.isValid()){
+            if(server_type == FASTO_SERVER){
                 Http2InnerServer* h2s = new Http2InnerServer(hs, handler_, config_);
                 server_ = h2s;
                 const std::string contentPath = config.content_path_;
@@ -269,9 +301,12 @@ namespace fasto
                     return err;
                 }
             }
-            else{
+            else if(server_type == EXTERNAL_SERVER && externalHost.isValid()) {
                 ProxyInnerServer* proxy_server = new ProxyInnerServer(handler_, config_);
                 server_ = proxy_server;
+            }
+            else{
+                return common::make_error_value("Invalid https server settings!", common::Value::E_ERROR, common::logging::L_ERR);
             }
 
             http_thread_ = THREAD_MANAGER()->createThread(&ITcpLoop::exec, server_);
@@ -323,7 +358,8 @@ namespace fasto
             configSave.writeFormated("password=%s\n", config_.password_);
             configSave.writeFormated("content_path=%s\n", config_.content_path_);
             configSave.writeFormated("private_site=%u\n", config_.is_private_site_);
-            configSave.writeFormated("external_host=%u\n", common::convertToString(config_.external_host_));
+            configSave.writeFormated("external_host=%s\n", common::convertToString(config_.external_host_));
+            configSave.writeFormated("server_type=%u\n", config_.server_type_);
             configSave.write("[http_handlers_utls]\n");
             configSave.close();
         }
@@ -345,6 +381,8 @@ namespace fasto
             config.login_ = USER_SPECIFIC_DEFAULT_LOGIN;
             config.password_ = USER_SPECIFIC_DEFAULT_PASSWORD;
             config.is_private_site_ = USER_SPECIFIC_DEFAULT_PRIVATE_SITE;
+            config.external_host_ = common::net::hostAndPort();
+            config.server_type_ = FASTO_SERVER;
 
             //try to parse settings file
             if (ini_parse(path, ini_handler_fasto, &config) < 0) {
