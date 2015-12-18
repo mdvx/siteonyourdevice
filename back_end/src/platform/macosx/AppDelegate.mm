@@ -105,7 +105,23 @@
 
         const int top_padding_5 = top_padding_4 - control_heigth * 2;
 
-        NSRect privateFrame = NSMakeRect(left_padding, top_padding_5, width_control + 35, control_heigth);
+        NSRect exFrame = NSMakeRect(left_padding, top_padding_5, width_control + 35, control_heigth);
+        isExternalSiteCheckBox_ = [[NSButton alloc] initWithFrame: exFrame];
+
+        const int left_padding_x2 = left_padding + width_control + 35 + padding;
+
+        NSRect extHostFrame = NSMakeRect(left_padding_x2, top_padding_5,
+                                            width_control, text_control_heigth);
+        externalHostTextBox_ = [[NSTextField alloc] initWithFrame:extHostFrame];
+
+        const int left_padding_x3 = left_padding_x2 + width_control + padding;
+        NSRect extPortFrame = NSMakeRect(left_padding_x3, top_padding_5,
+                                            width_control, text_control_heigth);
+        externalPortTextBox_ = [[NSTextField alloc] initWithFrame:extPortFrame];
+
+        const int top_padding_6 = top_padding_5 - control_heigth * 2;
+
+        NSRect privateFrame = NSMakeRect(left_padding, top_padding_6, width_control + 35, control_heigth);
         isPrivateSiteCheckBox_ = [[NSButton alloc] initWithFrame: privateFrame];
 
         NSRect frame = NSMakeRect(center_widget_width - (left_padding + width_control/2), buttom_padding, width_control + 35, control_heigth);
@@ -208,9 +224,26 @@
     [selectPathButton_ setAction:@selector(selectContentPathAction:)];
     [window.contentView addSubview:selectPathButton_];
 
+    [isExternalSiteCheckBox_ setButtonType:NSSwitchButton];
+    [isExternalSiteCheckBox_ setTitle:@ EXTERNAL_SITE_LABEL];
+    [isExternalSiteCheckBox_ setState:config.server_type_ == EXTERNAL_SERVER ? NSOnState : NSOffState];
+    [isExternalSiteCheckBox_ setAction:@selector(externalSiteChangeAction:)];
+    [window.contentView addSubview:isExternalSiteCheckBox_];
+
+    NSString *ex_domain = [NSString stringWithCString:config.external_host_.host_.c_str()
+                                                encoding:[NSString defaultCStringEncoding]];
+    [externalHostTextBox_ setStringValue: ex_domain];
+    [window.contentView addSubview:externalHostTextBox_];
+
+    const uint16 ex_port = config.external_host_.port_;
+    [externalPortTextBox_ setIntValue: ex_port];
+    [externalPortTextBox_ setFormatter: formatter];
+    [window.contentView addSubview:externalPortTextBox_];
+
     [isPrivateSiteCheckBox_ setButtonType:NSSwitchButton];
     [isPrivateSiteCheckBox_ setTitle:@ PRIVATE_SITE_LABEL];
     [isPrivateSiteCheckBox_ setState:config.is_private_site_ ? NSOnState : NSOffState];
+    [self externalSiteChangeAction: nil];
     [window.contentView addSubview:isPrivateSiteCheckBox_];
 
     //[view setWantsLayer:YES];
@@ -244,6 +277,12 @@
     config.content_path_ = [contentPath UTF8String];
 
     config.is_private_site_ = [isPrivateSiteCheckBox_ state] == NSOnState;
+    config.server_type_ = [isExternalSiteCheckBox_ state] == NSOnState ? EXTERNAL_SERVER : FASTO_SERVER;
+
+    NSString *ex_domain = [externalHostTextBox_ stringValue];
+    const std::string ex_domain_str = [ex_domain UTF8String];
+    int ex_port = [portTextBox_ intValue];
+    config.external_host_ = common::net::hostAndPort(ex_domain_str, ex_port);
 
     cxx_window_->onConnectClicked(config);
 }
@@ -251,6 +290,27 @@
 - (IBAction) disConnectAction : (id) sender
 {
     cxx_window_->onDisconnectClicked();
+}
+
+- (IBAction) externalSiteChangeAction : (id) sender
+{
+    bool isOn = [isExternalSiteCheckBox_ state] == NSOnState;
+    if(isOn){
+        [selectPathButton_ setEnabled:NO];
+        [portTextBox_ setEnabled:NO];
+        [contentPathTextBox_ setEnabled:NO];
+
+        [externalHostTextBox_ setEnabled:YES];
+        [externalPortTextBox_ setEnabled:YES];
+    }
+    else{
+        [selectPathButton_ setEnabled:YES];
+        [portTextBox_ setEnabled:YES];
+        [contentPathTextBox_ setEnabled:YES];
+
+        [externalHostTextBox_ setEnabled:NO];
+        [externalPortTextBox_ setEnabled:NO];
+    }
 }
 
 - (IBAction) selectContentPathAction : (id) sender

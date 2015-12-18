@@ -21,6 +21,10 @@
     
     NSButton* selectPathButton_;
 
+    NSTextField *externalHostTextBox_;
+    NSTextField *externalPortTextBox_;
+    NSButton* isExternalSiteCheckBox_;
+
     NSButton* isPrivateSiteCheckBox_;
     NSButton* connetButton_;
 }
@@ -34,6 +38,7 @@
 - (IBAction) connectAction : (id) sender;
 - (IBAction) disConnectAction : (id) sender;
 - (IBAction) selectContentPathAction : (id) sender;
+- (IBAction) externalSiteChangeAction : (id) sender;
 
 - (void) handleNetworkEvent: (void*) event;
 
