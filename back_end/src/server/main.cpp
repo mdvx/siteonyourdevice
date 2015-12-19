@@ -113,11 +113,13 @@ int main(int argc, char *argv[])
 	}
 
     handler = new HttpServerHandlerHost;
+    HttpServerInfo hinfo(PROJECT_NAME_SERVER_TITLE, PROJECT_DOMAIN, HOST_PATH);
+    handler->httpHandler()->setHttpServerInfo(hinfo);
 
     sync_config();
 
     common::net::hostAndPort hs(INNER_HOST_NAME, HOST_PORT);
-    server = new HttpServerHost(hs, g_inner_host, HttpServerInfo(PROJECT_NAME_SERVER_TITLE, PROJECT_DOMAIN, HOST_PATH), handler);
+    server = new HttpServerHost(hs, g_inner_host, hinfo, handler);
 
     common::Error err = server->bind();
     int return_code = EXIT_FAILURE;

@@ -52,7 +52,7 @@ namespace fasto
 
             if(result.second && result.second->isError()){
                 const std::string error_text = result.second->description();
-                hclient->send_error(http::HP_1_1, result.first, NULL, error_text.c_str(), false);
+                hclient->send_error(http::HP_1_1, result.first, NULL, error_text.c_str(), false, info());
                 hclient->close();
                 delete hclient;
                 return;
@@ -80,7 +80,7 @@ namespace fasto
 
             if(!innerConnection){
                 DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING, "not found host %s, request str:\n%s", hpath, convertToString(hrequest));
-                hclient->send_error(protocol, http::HS_NOT_FOUND, NULL, "Not registered host.", false);
+                hclient->send_error(protocol, http::HS_NOT_FOUND, NULL, "Not registered host.", false, info());
                 hclient->close();
                 delete hclient;
                 return;
@@ -183,7 +183,6 @@ namespace fasto
             : httpServer_(NULL), innerServer_(NULL)
         {
             httpServer_ = new Http2Server(httpHost, handler->httpHandler());
-            httpServer_->setHttpServerInfo(info);
 
             const std::string contentPath = info.contentPath_;
             bool res = common::file_system::change_directory(contentPath);
