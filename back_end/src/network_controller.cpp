@@ -230,9 +230,6 @@ namespace fasto
         {
             configuration_t config = config_;
 
-            const common::net::hostAndPort hs(config.domain_, config.port_);
-            const UserAuthInfo auth(config.login_, config.password_, hs);
-            handler_->setAuthInfo(auth);
             handler_->clearHttpCallback();
 
             for(int i = 0; i < config.handlers_urls_.size(); ++i){
@@ -245,6 +242,7 @@ namespace fasto
 
             const http_server_type server_type = config_.server_type_;
             const common::net::hostAndPort externalHost = config_.external_host_;
+            handler_->setConfig(config);
 
             if(server_){
                 if(server_type == FASTO_SERVER){
@@ -276,10 +274,8 @@ namespace fasto
                 }
             }
 
-            handler_->setConfig(config_);
-
-            if(server_type == FASTO_SERVER){
-                Http2InnerServer* h2s = new Http2InnerServer(hs, handler_, config_);
+            if(server_type == FASTO_SERVER){                
+                Http2InnerServer* h2s = new Http2InnerServer(handler_, config_);
                 server_ = h2s;
                 const std::string contentPath = config.content_path_;
                 h2s->setHttpServerInfo(HttpServerInfo(PROJECT_NAME_TITLE, PROJECT_DOMAIN, contentPath));
@@ -304,6 +300,7 @@ namespace fasto
             else if(server_type == EXTERNAL_SERVER && externalHost.isValid()) {
                 ProxyInnerServer* proxy_server = new ProxyInnerServer(handler_, config_);
                 server_ = proxy_server;
+                server_->setName("proxy_http_server");
             }
             else{
                 return common::make_error_value("Invalid https server settings!", common::Value::E_ERROR, common::logging::L_ERR);

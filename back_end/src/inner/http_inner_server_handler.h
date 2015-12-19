@@ -24,8 +24,7 @@ namespace fasto
             virtual void dataReceived(TcpClient* client);
             virtual void postLooped(ITcpLoop* server);
 
-            void setAuthInfo(const UserAuthInfo& authInfo);
-            const UserAuthInfo& authInfo() const;
+            UserAuthInfo authInfo() const;
 
             common::Error innerConnect(ITcpLoop *server);
             common::Error innerDisConnect(ITcpLoop *server);
@@ -38,7 +37,6 @@ namespace fasto
             virtual void handleInnerApproveCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[]);
 
             InnerClient* innerConnection_;
-            UserAuthInfo authInfo_;
 
             const common::net::hostAndPort host_;
             configuration_t config_;

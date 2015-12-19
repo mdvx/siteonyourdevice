@@ -52,8 +52,8 @@ namespace fasto
             return "ProxyInnerServer";
         }
 
-        Http2InnerServer::Http2InnerServer(const common::net::hostAndPort& host, ITcpLoopObserver * observer, const configuration_t& config)
-            : Http2Server(host, observer), config_(config)
+        Http2InnerServer::Http2InnerServer(ITcpLoopObserver * observer, const configuration_t& config)
+            : Http2Server(common::net::hostAndPort(config.domain_, config.port_), observer), config_(config)
         {
 
         }

@@ -20,7 +20,7 @@ namespace fasto
     namespace siteonyourdevice
     { 
         Http2InnerServerHandler::Http2InnerServerHandler(const common::net::hostAndPort &host)
-            : Http2ServerHandler(NULL), innerConnection_(NULL), authInfo_(), host_(host), config_()
+            : Http2ServerHandler(NULL), innerConnection_(NULL), host_(host), config_()
         {
 
         }
@@ -39,7 +39,7 @@ namespace fasto
         void Http2InnerServerHandler::accepted(TcpClient* client)
         {
             if(client == innerConnection_){
-                EVENT_BUS()->postEvent(new InnerClientConnectedEvent(this, authInfo_));
+                EVENT_BUS()->postEvent(new InnerClientConnectedEvent(this, authInfo()));
             }
         }
 
@@ -76,7 +76,7 @@ namespace fasto
                 }
             }
             else if(IS_EQUAL_COMMAND(command, SERVER_WHO_ARE_YOU_COMMAND)){
-                const std::string authStr = common::convertToString(authInfo_);
+                const std::string authStr = common::convertToString(authInfo());
                 const std::string iAm = make_responce(id, CLIENT_WHO_ARE_YOU_COMMAND_RESP_SUCCSESS_1S, authStr);
                 common::Error err = connection->write(iAm.c_str(), iAm.size(), nwrite);
                 if(err && err->isError()){
@@ -232,14 +232,10 @@ namespace fasto
             }
         }
 
-        void Http2InnerServerHandler::setAuthInfo(const UserAuthInfo& authInfo)
+        UserAuthInfo Http2InnerServerHandler::authInfo() const
         {
-            authInfo_ = authInfo;
-        }
-
-        const UserAuthInfo& Http2InnerServerHandler::authInfo() const
-        {
-            return authInfo_;
+            const common::net::hostAndPort hs(config_.domain_, config_.port_);
+            return UserAuthInfo(config_.login_, config_.password_, hs);
         }
 
         common::Error Http2InnerServerHandler::innerConnect(ITcpLoop *server)

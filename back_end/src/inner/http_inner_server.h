@@ -55,7 +55,7 @@ namespace fasto
                 : public Http2Server
         {
         public:
-            Http2InnerServer(const common::net::hostAndPort& host, ITcpLoopObserver * observer, const configuration_t& config);
+            Http2InnerServer(ITcpLoopObserver * observer, const configuration_t& config);
 
             virtual const char* className() const;
 
