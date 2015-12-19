@@ -21,7 +21,7 @@ namespace fasto
 
         }
 
-        bool HttpFileSystemCallback::handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request)
+        bool HttpFileSystemCallback::handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info)
         {
             std::string requeststr = common::convertToString(request);
             DEBUG_MSG_FORMAT<1024>(common::logging::L_INFO, "handleRequest:\n%s", requeststr);
@@ -44,23 +44,23 @@ namespace fasto
     #endif
                 struct stat sb;
                 if (stat(file_path.c_str(), &sb ) < 0){
-                    hclient->send_error(protocol, HS_NOT_FOUND, extra_header, "File not found.", isKeepAlive);
+                    hclient->send_error(protocol, HS_NOT_FOUND, extra_header, "File not found.", isKeepAlive, info);
                     return true;
                 }
 
                 if (S_ISDIR(sb.st_mode)){
-                    hclient->send_error(protocol, HS_BAD_REQUEST, extra_header, "Bad filename.", isKeepAlive);
+                    hclient->send_error(protocol, HS_BAD_REQUEST, extra_header, "Bad filename.", isKeepAlive, info);
                     return true;
                 }
 
                 int file = open(file_path.c_str(), open_flags);
                 if(file == INVALID_DESCRIPTOR) {  /* open the file for reading */
-                    hclient->send_error(protocol, HS_FORBIDDEN, NULL, "File is protected.", isKeepAlive);
+                    hclient->send_error(protocol, HS_FORBIDDEN, NULL, "File is protected.", isKeepAlive, info);
                     return true;
                 }
 
                 const std::string mime = path.mime();
-                hclient->send_headers(protocol, HS_OK, NULL, mime.c_str(), &sb.st_size, &sb.st_mtime, isKeepAlive);
+                hclient->send_headers(protocol, HS_OK, NULL, mime.c_str(), &sb.st_size, &sb.st_mtime, isKeepAlive, info);
                 if(request.method_ == http_method::HM_GET){
                     hclient->send_file_by_fd(protocol, file, sb.st_size);
                 }
@@ -70,7 +70,7 @@ namespace fasto
             else{
                 http_request::header_t contentTypeField = request.findHeaderByKey("Content-Type", false);
                 if(!contentTypeField.isValid()){
-                    hclient->send_error(protocol, HS_NOT_ALLOWED, NULL, "Unsupported request.", isKeepAlive);
+                    hclient->send_error(protocol, HS_NOT_ALLOWED, NULL, "Unsupported request.", isKeepAlive, info);
                     return true;
                 }
 
@@ -85,7 +85,7 @@ namespace fasto
                     return true;
                 }
                 else{
-                    hclient->send_error(protocol, HS_NOT_ALLOWED, NULL, "Unsupported content type.", isKeepAlive);
+                    hclient->send_error(protocol, HS_NOT_ALLOWED, NULL, "Unsupported content type.", isKeepAlive, info);
                     return true;
                 }
             }

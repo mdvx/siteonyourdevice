@@ -89,6 +89,16 @@ namespace fasto
             authChecker_ = observer;
         }
 
+        void HttpServerHandler::setHttpServerInfo(const HttpServerInfo& info)
+        {
+            info_ = info;
+        }
+
+        const HttpServerInfo& HttpServerHandler::info() const
+        {
+            return info_;
+        }
+
         bool HttpServerHandler::tryToHandleAsRegisteredCallback(HttpClient* hclient, const std::string& uri, const common::http::http_request& request)
         {
             http_callbacks_t::const_iterator it = httpCallbacks_.find(uri);
@@ -102,7 +112,7 @@ namespace fasto
                 return false;
             }
 
-            return callback->handleRequest(hclient, NULL, request);
+            return callback->handleRequest(hclient, NULL, request, info());
         }
 
         bool HttpServerHandler::tryAuthenticateIfNeeded(HttpClient* hclient, const char* extra_header, const common::http::http_request& request)
@@ -138,11 +148,11 @@ namespace fasto
                     }
                 }
 
-                hclient->send_error(http::HP_1_1, http::HS_UNAUTHORIZED, "WWW-Authenticate: " AUTH_BASIC_METHOD " realm=User or password incorrect, try again", NULL, true);
+                hclient->send_error(http::HP_1_1, http::HS_UNAUTHORIZED, "WWW-Authenticate: " AUTH_BASIC_METHOD " realm=User or password incorrect, try again", NULL, true, info());
                 return true;
             }
 
-            hclient->send_error(http::HP_1_1, http::HS_UNAUTHORIZED, "WWW-Authenticate: " AUTH_BASIC_METHOD " realm=Private page please authenticate", NULL, true);
+            hclient->send_error(http::HP_1_1, http::HS_UNAUTHORIZED, "WWW-Authenticate: " AUTH_BASIC_METHOD " realm=Private page please authenticate", NULL, true, info());
             return true;
         }
 
@@ -155,7 +165,7 @@ namespace fasto
 
             if(result.second && result.second->isError()){
                 const std::string error_text = result.second->description();
-                hclient->send_error(http::HP_1_1, result.first, NULL, error_text.c_str(), false);
+                hclient->send_error(http::HP_1_1, result.first, NULL, error_text.c_str(), false, info());
                 hclient->close();
                 delete hclient;
                 return;
@@ -183,7 +193,7 @@ namespace fasto
                 goto cleanup;
             }
 
-            if(fshandler_->handleRequest(hclient, NULL, hrequest)){
+            if(fshandler_->handleRequest(hclient, NULL, hrequest, info())){
                 goto cleanup;
             }
 
@@ -251,7 +261,7 @@ namespace fasto
                 std::pair<common::http::http_status, common::Error> result = common::http2::parse_http_request(*head, request);
                 if(result.second && result.second->isError()){
                     const std::string error_text = result.second->description();
-                    h2client->send_error(http::HP_2_0, result.first, NULL, error_text.c_str(), false);
+                    h2client->send_error(http::HP_2_0, result.first, NULL, error_text.c_str(), false, info());
                     h2client->close();
                     delete h2client;
                     return;

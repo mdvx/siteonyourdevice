@@ -4,25 +4,10 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        RelayClient::RelayClient(ITcpLoop *server, const common::net::socket_info& info, const common::net::hostAndPort& externalHost)
-            : Http2Client(server, info), external_host_(externalHost), eclient_(NULL)
+        RelayClient::RelayClient(ITcpLoop *server, const common::net::socket_info& info)
+            : Http2Client(server, info)
         {
 
-        }
-
-        common::net::hostAndPort RelayClient::externalHost() const
-        {
-            return external_host_;
-        }
-
-        ProxyRelayClient *RelayClient::eclient() const
-        {
-            return eclient_;
-        }
-
-        void RelayClient::setEclient(ProxyRelayClient *client)
-        {
-            eclient_ = client;
         }
 
         const char* RelayClient::className() const
@@ -30,13 +15,39 @@ namespace fasto
             return "RelayClient";
         }
 
-        ProxyRelayClient::ProxyRelayClient(ITcpLoop *server, const common::net::socket_info& info, RelayClient * relay)
+        RelayClientEx::RelayClientEx(ITcpLoop* server, const common::net::socket_info& info, const common::net::hostAndPort& externalHost)
+            : RelayClient(server, info), external_host_(externalHost), eclient_(NULL)
+        {
+
+        }
+
+        common::net::hostAndPort RelayClientEx::externalHost() const
+        {
+            return external_host_;
+        }
+
+        ProxyRelayClient *RelayClientEx::eclient() const
+        {
+            return eclient_;
+        }
+
+        void RelayClientEx::setEclient(ProxyRelayClient *client)
+        {
+            eclient_ = client;
+        }
+
+        const char* RelayClientEx::className() const
+        {
+            return "RelayClientEx";
+        }
+
+        ProxyRelayClient::ProxyRelayClient(ITcpLoop *server, const common::net::socket_info& info, RelayClientEx *relay)
             : TcpClient(server, info), relay_(relay)
         {
 
         }
 
-        RelayClient * ProxyRelayClient::relay() const
+        RelayClientEx *ProxyRelayClient::relay() const
         {
             return relay_;
         }

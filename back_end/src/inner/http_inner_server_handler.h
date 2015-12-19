@@ -5,17 +5,20 @@
 #include "inner/inner_server_command_seq_parser.h"
 
 #include "http_config.h"
-#include "infos.h"
 
 namespace fasto
 {
     namespace siteonyourdevice
     {
+        class RelayClient;
+        class RelayClientEx;
+        class ProxyRelayClient;
+
         class Http2InnerServerHandler
                 : public InnerServerCommandSeqParser, public Http2ServerHandler
         {
         public:
-            Http2InnerServerHandler(const common::net::hostAndPort& host);
+            Http2InnerServerHandler(const common::net::hostAndPort& innerHost);
             ~Http2InnerServerHandler();
 
             virtual void preLooped(ITcpLoop* server);
@@ -36,9 +39,14 @@ namespace fasto
             virtual void handleInnerResponceCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[]);
             virtual void handleInnerApproveCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[]);
 
+            void innerDataReceived(InnerClient *iclient);
+            void relayDataReceived(RelayClient *rclient);
+            void relayExDataReceived(RelayClientEx *rclient);
+            void proxyDataReceived(ProxyRelayClient * prclient);
+
             InnerClient* innerConnection_;
 
-            const common::net::hostAndPort host_;
+            const common::net::hostAndPort innerHost_;
             configuration_t config_;
         };
     }

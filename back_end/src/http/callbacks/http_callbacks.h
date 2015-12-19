@@ -2,6 +2,8 @@
 
 #include "common/http/http.h"
 
+#include "infos.h"
+
 namespace fasto
 {
     namespace siteonyourdevice
@@ -21,7 +23,7 @@ namespace fasto
         public:
             ~IHttpCallback();
             HCTypes type() const;
-            virtual bool handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request) = 0;
+            virtual bool handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info) = 0;
 
             static common::shared_ptr<IHttpCallback> createHttpCallback(HCTypes type);
             static common::shared_ptr<IHttpCallback> createHttpCallback(const std::string& name);

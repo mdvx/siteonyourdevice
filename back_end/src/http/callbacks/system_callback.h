@@ -11,7 +11,7 @@ namespace fasto
         {
         public:
             HttpSystemCallback();
-            virtual bool handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request);
+            virtual bool handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info);
         };
     }
 }

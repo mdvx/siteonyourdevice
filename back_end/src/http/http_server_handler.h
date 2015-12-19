@@ -5,6 +5,8 @@
 #include "tcp_server.h"
 #include "http/callbacks/http_callbacks.h"
 
+#include "infos.h"
+
 namespace fasto
 {
     namespace siteonyourdevice
@@ -41,6 +43,9 @@ namespace fasto
 
             void setAuthChecker(IHttpAuthObserver *observer);
 
+            void setHttpServerInfo(const HttpServerInfo& info);
+            const HttpServerInfo& info() const;
+
         protected:
             virtual void processReceived(HttpClient *hclient, const char* request, uint32_t req_len);
             void handleRequest(HttpClient *hclient, const common::http::http_request& hrequest, bool notClose);
@@ -52,6 +57,8 @@ namespace fasto
             http_callbacks_t httpCallbacks_;
             const common::shared_ptr<IHttpCallback> fshandler_;
             IHttpAuthObserver * authChecker_;
+
+            HttpServerInfo info_;
         };
 
         class Http2ServerHandler

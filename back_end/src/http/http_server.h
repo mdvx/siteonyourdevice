@@ -15,16 +15,10 @@ namespace fasto
             HttpServer(const common::net::hostAndPort& host, ITcpLoopObserver *observer);
             ~HttpServer();
 
-            void setHttpServerInfo(const HttpServerInfo& info);
-            const HttpServerInfo& info() const;
-
             virtual const char* className() const;
 
         protected:
             virtual TcpClient * createClient(const common::net::socket_info &info);
-
-        private:
-            HttpServerInfo info_;
         };
 
         class Http2Server

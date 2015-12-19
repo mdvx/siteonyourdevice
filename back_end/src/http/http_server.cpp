@@ -7,7 +7,7 @@ namespace fasto
     namespace siteonyourdevice
     {
         HttpServer::HttpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer)
-            : TcpServer(host, observer), info_()
+            : TcpServer(host, observer)
         {
 
         }
@@ -20,16 +20,6 @@ namespace fasto
         TcpClient *HttpServer::createClient(const common::net::socket_info& info)
         {
             return new HttpClient(this, info);
-        }
-
-        void HttpServer::setHttpServerInfo(const HttpServerInfo& info)
-        {
-            info_ = info;
-        }
-
-        const HttpServerInfo& HttpServer::info() const
-        {
-            return info_;
         }
 
         const char* HttpServer::className() const

@@ -8,8 +8,6 @@
 #include "common/logger.h"
 #include "common/file_system.h"
 
-#include "http_server.h"
-
 #define RFC1123FMT "%a, %d %b %Y %H:%M:%S GMT"
 
 namespace fasto
@@ -37,13 +35,10 @@ namespace fasto
             return isAuth_;
         }
 
-        common::ErrnoError HttpClient::send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive)
+        common::ErrnoError HttpClient::send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive, const HttpServerInfo& info)
         {
             CHECK(protocol <= common::http::HP_1_1);
-            const HttpServer* serv = dynamic_cast<const HttpServer*>(server());
-            CHECK(serv);
             const std::string title = common::convertToString(status);
-            const HttpServerInfo info = serv->info();
 
             char err_data[1024] = {0};
             off_t err_len = common::SPrintf(err_data, "\
@@ -59,7 +54,7 @@ namespace fasto
                     <address><a href=\"%s\">%s</a></address>\n\
                     </body>\n\
                     </html>\n", status, title, status, title, text, info.serverUrl_, info.serverName_);
-            send_headers(protocol, status, extra_header, "text/html", &err_len, NULL, is_keep_alive);
+            send_headers(protocol, status, extra_header, "text/html", &err_len, NULL, is_keep_alive, info);
 
             ssize_t nwrite = 0;
             common::ErrnoError err = write(err_data, err_len, nwrite);
@@ -73,13 +68,10 @@ namespace fasto
             return common::net::send_file_to_fd(fd(), fdesc, 0, size);
         }
 
-        common::ErrnoError HttpClient::send_headers(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* mime_type, off_t* length, time_t* mod, bool is_keep_alive)
+        common::ErrnoError HttpClient::send_headers(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* mime_type, off_t* length, time_t* mod, bool is_keep_alive, const HttpServerInfo& info)
         {
             CHECK(protocol <= common::http::HP_1_1);
-            const HttpServer* serv = dynamic_cast<const HttpServer*>(server());
-            CHECK(serv);
             const std::string title = common::convertToString(status);
-            const HttpServerInfo info = serv->info();
 
             time_t now = time(NULL);
             char timebuf[100];
@@ -143,15 +135,11 @@ namespace fasto
             return main_stream.get();
         }
 
-        common::ErrnoError Http2Client::send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive)
+        common::ErrnoError Http2Client::send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive, const HttpServerInfo& info)
         {
             using namespace common;
             if(is_http2() && protocol == http::HP_2_0){
-                const HttpServer* serv = dynamic_cast<const HttpServer*>(server());
-                CHECK(serv);
                 const std::string title = common::convertToString(status);
-                const HttpServerInfo info = serv->info();
-
                 char err_data[1024] = {0};
                 off_t err_len = common::SPrintf(err_data, "\
                         <!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n\
@@ -166,7 +154,7 @@ namespace fasto
                         <address><a href=\"%s\">%s</a></address>\n\
                         </body>\n\
                         </html>\n", status, title, status, title, text, info.serverUrl_, info.serverName_);
-                common::ErrnoError err = send_headers(protocol, status, extra_header, "text/html", &err_len, NULL, is_keep_alive);
+                common::ErrnoError err = send_headers(protocol, status, extra_header, "text/html", &err_len, NULL, is_keep_alive, info);
                 if(err && err->isError()){
                     return err;
                 }
@@ -181,7 +169,7 @@ namespace fasto
                 return header_stream->sendFrame(fdata);
             }
 
-            return HttpClient::send_error(protocol, status, extra_header, text, is_keep_alive);
+            return HttpClient::send_error(protocol, status, extra_header, text, is_keep_alive, info);
         }
 
         namespace
@@ -243,15 +231,11 @@ namespace fasto
             return HttpClient::send_file_by_fd(protocol, fdesc, size);
         }
 
-        common::ErrnoError Http2Client::send_headers(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* mime_type, off_t* length, time_t* mod, bool is_keep_alive)
+        common::ErrnoError Http2Client::send_headers(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* mime_type, off_t* length, time_t* mod, bool is_keep_alive, const HttpServerInfo& info)
         {
             using namespace common;
 
             if(is_http2() && protocol == http::HP_2_0){
-                const HttpServer* serv = dynamic_cast<const HttpServer*>(server());
-                CHECK(serv);
-                const HttpServerInfo info = serv->info();
-
                 StreamSPtr header_stream = findStreamByType(http2::HTTP2_HEADERS);
                 if(!header_stream){
                     return DEBUG_MSG_PERROR("findStreamByType", EAGAIN);
@@ -313,7 +297,7 @@ namespace fasto
                 return header_stream->sendFrame(fhdr);
             }
 
-            return HttpClient::send_headers(protocol, status, extra_header, mime_type, length, mod, is_keep_alive);
+            return HttpClient::send_headers(protocol, status, extra_header, mime_type, length, mod, is_keep_alive, info);
         }
 
         StreamSPtr Http2Client::findStreamByStreamID(uint32_t stream_id) const

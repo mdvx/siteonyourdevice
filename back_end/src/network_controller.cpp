@@ -274,11 +274,13 @@ namespace fasto
                 }
             }
 
+            const std::string contentPath = config.content_path_;
+            HttpServerInfo hinf(PROJECT_NAME_TITLE, PROJECT_DOMAIN, contentPath);
+            handler_->setHttpServerInfo(hinf);
+
             if(server_type == FASTO_SERVER){                
                 Http2InnerServer* h2s = new Http2InnerServer(handler_, config_);
                 server_ = h2s;
-                const std::string contentPath = config.content_path_;
-                h2s->setHttpServerInfo(HttpServerInfo(PROJECT_NAME_TITLE, PROJECT_DOMAIN, contentPath));
                 bool res = common::file_system::change_directory(contentPath);
                 DCHECK(res);
                 server_->setName("local_http_server");

@@ -34,7 +34,7 @@ namespace fasto
         }
 
         LibEvLoop::LibEvLoop()
-            : observer_(NULL), loop_(ev_loop_new(0)), exec_id_(),
+            : loop_(ev_loop_new(0)), observer_(NULL), exec_id_(),
               async_stop_((struct ev_async*)calloc(1, sizeof(struct ev_async)))
         {
             ev_async_init(async_stop_, stop_cb);

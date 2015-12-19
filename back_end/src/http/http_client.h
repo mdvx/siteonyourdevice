@@ -6,6 +6,8 @@
 
 #include "http/http_streams.h"
 
+#include "infos.h"
+
 namespace fasto
 {
     namespace siteonyourdevice
@@ -16,9 +18,9 @@ namespace fasto
         public:
             HttpClient(ITcpLoop* server, const common::net::socket_info& info);
 
-            virtual common::ErrnoError send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive);
+            virtual common::ErrnoError send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive, const HttpServerInfo& info);
             virtual common::ErrnoError send_file_by_fd(common::http::http_protocols protocol, int fdesc, off_t size);
-            virtual common::ErrnoError send_headers(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* mime_type, off_t* length, time_t* mod, bool is_keep_alive);
+            virtual common::ErrnoError send_headers(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* mime_type, off_t* length, time_t* mod, bool is_keep_alive, const HttpServerInfo& info);
 
             virtual const char* className() const;
 
@@ -40,9 +42,9 @@ namespace fasto
 
             Http2Client(ITcpLoop* server, const common::net::socket_info& info);
 
-            virtual common::ErrnoError send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive);
+            virtual common::ErrnoError send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive, const HttpServerInfo& info);
             virtual common::ErrnoError send_file_by_fd(common::http::http_protocols protocol, int fdesc, off_t size);
-            virtual common::ErrnoError send_headers(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* mime_type, off_t* length, time_t* mod, bool is_keep_alive);
+            virtual common::ErrnoError send_headers(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* mime_type, off_t* length, time_t* mod, bool is_keep_alive, const HttpServerInfo& info);
 
             void processFrames(const common::http2::frames_t& frames);
 

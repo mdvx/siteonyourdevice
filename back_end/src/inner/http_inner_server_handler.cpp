@@ -19,8 +19,8 @@ namespace fasto
 {
     namespace siteonyourdevice
     { 
-        Http2InnerServerHandler::Http2InnerServerHandler(const common::net::hostAndPort &host)
-            : Http2ServerHandler(NULL), innerConnection_(NULL), host_(host), config_()
+        Http2InnerServerHandler::Http2InnerServerHandler(const common::net::hostAndPort &innerHost)
+            : Http2ServerHandler(NULL), innerConnection_(NULL), innerHost_(innerHost), config_()
         {
 
         }
@@ -53,7 +53,7 @@ namespace fasto
 
             ProxyRelayClient * prclient = dynamic_cast<ProxyRelayClient*>(client); //proxyrelay connection
             if(prclient){
-                RelayClient * rclient = prclient->relay();
+                RelayClientEx * rclient = prclient->relay();
                 rclient->setEclient(NULL);
             }
         }
@@ -109,7 +109,13 @@ namespace fasto
                         ITcpLoop* server = connection->server();
                         CHECK(server);
 
-                        RelayClient *relayConnection = new RelayClient(server, rinfo, config_.external_host_);
+                        RelayClient *relayConnection = NULL;
+                        if(config_.server_type_ == EXTERNAL_SERVER){
+                            relayConnection = new RelayClientEx(server, rinfo, config_.external_host_);
+                        }
+                        else{
+                            relayConnection = new RelayClient(server, rinfo);
+                        }
                         relayConnection->setIsAuthenticated(!config_.is_private_site_);
                         server->registerClient(relayConnection);
                     }
@@ -245,7 +251,7 @@ namespace fasto
             }
 
             common::net::socket_info client_info;
-            common::ErrnoError err = common::net::connect(host_, common::net::ST_SOCK_STREAM, 0, client_info);
+            common::ErrnoError err = common::net::connect(innerHost_, common::net::ST_SOCK_STREAM, 0, client_info);
             if(err && err->isError()){
                 return err;
             }
@@ -284,97 +290,133 @@ namespace fasto
             return common::Error();
         }
 
+        void Http2InnerServerHandler::innerDataReceived(InnerClient* iclient)
+        {
+            char buff[MAX_COMMAND_SIZE] = {0};
+            ssize_t nread = 0;
+            common::ErrnoError err = iclient->read(buff, MAX_COMMAND_SIZE, nread);
+            if((err && err->isError()) || nread == 0){
+                iclient->close();
+                delete iclient;
+                return;
+            }
+
+            handleInnerDataReceived(iclient, buff, nread);
+        }
+
+        void Http2InnerServerHandler::relayDataReceived(RelayClient * rclient)
+        {
+            char buff[BUF_SIZE] = {0};
+            ssize_t nread = 0;
+            common::ErrnoError err = rclient->read(buff, BUF_SIZE, nread);
+            if((err && err->isError()) || nread == 0){
+                rclient->close();
+                delete rclient;
+                return;
+            }
+
+            Http2ServerHandler::processReceived(rclient, buff, nread);
+        }
+
+        void Http2InnerServerHandler::relayExDataReceived(RelayClientEx *rclient)
+        {
+            char buff[BUF_SIZE] = {0};
+            ssize_t nread = 0;
+            common::ErrnoError err = rclient->read(buff, BUF_SIZE, nread);
+            if((err && err->isError()) || nread == 0){
+                rclient->close();
+                delete rclient;
+                return;
+            }
+
+            const common::net::hostAndPort externalHost = rclient->externalHost();
+
+            common::net::socket_info client_info;
+            common::http::http_protocols protocol = common::http::HP_1_1;
+            if(common::http2::is_preface_data(buff, nread)){
+                protocol = common::http::HP_2_0;
+            }
+            else if(common::http2::is_frame_header_data(buff, nread)){
+                protocol = common::http::HP_2_0;
+            }
+
+            if(externalHost.isValid()){
+                ProxyRelayClient* eclient = rclient->eclient();
+                if(!eclient){
+                    common::Error err = common::net::connect(externalHost, common::net::ST_SOCK_STREAM, 0, client_info);
+                    if(err && err->isError()){
+                        const std::string error_text = err->description();
+                        rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL, error_text.c_str(), false, info());
+                        return;
+                    }
+
+                    ITcpLoop* server = rclient->server();
+                    eclient = new ProxyRelayClient(server, client_info, rclient);
+                    server->registerClient(eclient);
+                    rclient->setEclient(eclient);
+                }
+
+                CHECK(eclient);
+
+                ssize_t nwrite = 0;
+                err = eclient->write(buff, nread, nwrite);
+                if(err && err->isError()){
+                    const std::string error_text = err->description();
+                    rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL, error_text.c_str(), false, info());
+                    return;
+                }
+            }
+            else{
+                rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL, "Invalid external host!", false, info());
+            }
+        }
+
+        void Http2InnerServerHandler::proxyDataReceived(ProxyRelayClient * prclient)
+        {
+            char buff[BUF_SIZE] = {0};
+            ssize_t nread = 0;
+            common::ErrnoError err = prclient->read(buff, BUF_SIZE, nread);
+            if((err && err->isError()) || nread == 0){
+                prclient->close();
+                delete prclient;
+                return;
+            }
+
+            RelayClient * rclient = prclient->relay();
+            ssize_t nwrite = 0;
+            err = rclient->TcpClient::write(buff, nread, nwrite);
+            if(err && err->isError()){
+
+            }
+            return;
+        }
+
         void Http2InnerServerHandler::dataReceived(TcpClient* client)
         {
             if(client == innerConnection_){
-                char buff[MAX_COMMAND_SIZE] = {0};
-                ssize_t nread = 0;
-                common::ErrnoError err = client->read(buff, MAX_COMMAND_SIZE, nread);
-                if((err && err->isError()) || nread == 0){
-                    client->close();
-                    delete client;
-                    return;
-                }
+                innerDataReceived(innerConnection_);
+                return;
+            }
 
-                handleInnerDataReceived(innerConnection_, buff, nread);
+            RelayClientEx * rexclient = dynamic_cast<RelayClientEx*>(client); //relay external connection
+            if(rexclient){
+                relayExDataReceived(rexclient);
                 return;
             }
 
             RelayClient * rclient = dynamic_cast<RelayClient*>(client); //relay connection
             if(rclient){
-                char buff[BUF_SIZE] = {0};
-                ssize_t nread = 0;
-                common::ErrnoError err = client->read(buff, BUF_SIZE, nread);
-                if((err && err->isError()) || nread == 0){
-                    rclient->close();
-                    delete rclient;
-                    return;
-                }
-
-                const common::net::hostAndPort externalHost = rclient->externalHost();
-
-                if(externalHost.isValid()){
-                    common::net::socket_info client_info;
-                    common::http::http_protocols protocol = common::http::HP_1_1;
-                    if(common::http2::is_preface_data(buff, nread)){
-                        protocol = common::http::HP_2_0;
-                    }
-                    else if(common::http2::is_frame_header_data(buff, nread)){
-                        protocol = common::http::HP_2_0;
-                    }
-
-                    ProxyRelayClient* eclient = rclient->eclient();
-                    if(!eclient){
-                        common::Error err = common::net::connect(externalHost, common::net::ST_SOCK_STREAM, 0, client_info);
-                        if(err && err->isError()){
-                            const std::string error_text = err->description();
-                            rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL, error_text.c_str(), false);
-                            return;
-                        }
-
-                        ITcpLoop* server = rclient->server();
-                        eclient = new ProxyRelayClient(server, client_info, rclient);
-                        server->registerClient(eclient);
-                        rclient->setEclient(eclient);
-                    }
-
-                    CHECK(eclient);
-
-                    ssize_t nwrite = 0;
-                    err = eclient->write(buff, nread, nwrite);
-                    if(err && err->isError()){
-                        const std::string error_text = err->description();
-                        rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL, error_text.c_str(), false);
-                        return;
-                    }
-                }
-                else { //reley our web server
-                    Http2ServerHandler::processReceived(rclient, buff, nread);
-                }
+                relayDataReceived(rclient);
+                return;
             }
-            else{
-                ProxyRelayClient * prclient = dynamic_cast<ProxyRelayClient*>(client); //proxyrelay connection
-                if(prclient){
-                    char buff[BUF_SIZE] = {0};
-                    ssize_t nread = 0;
-                    common::ErrnoError err = prclient->read(buff, BUF_SIZE, nread);
-                    if((err && err->isError()) || nread == 0){
-                        prclient->close();
-                        delete prclient;
-                        return;
-                    }
 
-                    RelayClient * rclient = prclient->relay();
-                    ssize_t nwrite = 0;
-                    err = rclient->TcpClient::write(buff, nread, nwrite);
-                    if(err && err->isError()){
-
-                    }
-                    return;
-                }
-
-                Http2ServerHandler::dataReceived(client); //direct connection
+            ProxyRelayClient * prclient = dynamic_cast<ProxyRelayClient*>(client); //proxyrelay connection
+            if(prclient){
+                proxyDataReceived(prclient);
+                return;
             }
+
+            Http2ServerHandler::dataReceived(client); //direct connection
         }
     }
 }

@@ -15,7 +15,7 @@ namespace fasto
 
         }
 
-        bool HttpSystemCallback::handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request)
+        bool HttpSystemCallback::handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info)
         {
             using namespace common::http;
             common::uri::Upath path = request.path_;
