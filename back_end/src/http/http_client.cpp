@@ -35,7 +35,7 @@ namespace fasto
             return isAuth_;
         }
 
-        common::ErrnoError HttpClient::send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive, const HttpServerInfo& info)
+        common::Error HttpClient::send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive, const HttpServerInfo& info)
         {
             CHECK(protocol <= common::http::HP_1_1);
             const std::string title = common::convertToString(status);
@@ -57,18 +57,18 @@ namespace fasto
             send_headers(protocol, status, extra_header, "text/html", &err_len, NULL, is_keep_alive, info);
 
             ssize_t nwrite = 0;
-            common::ErrnoError err = write(err_data, err_len, nwrite);
+            common::Error err = write(err_data, err_len, nwrite);
             DCHECK(!err);
             return err;
         }
 
-        common::ErrnoError HttpClient::send_file_by_fd(common::http::http_protocols protocol, int fdesc, off_t size)
+        common::Error HttpClient::send_file_by_fd(common::http::http_protocols protocol, int fdesc, off_t size)
         {
             CHECK(protocol <= common::http::HP_1_1);
             return common::net::send_file_to_fd(fd(), fdesc, 0, size);
         }
 
-        common::ErrnoError HttpClient::send_headers(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* mime_type, off_t* length, time_t* mod, bool is_keep_alive, const HttpServerInfo& info)
+        common::Error HttpClient::send_headers(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* mime_type, off_t* length, time_t* mod, bool is_keep_alive, const HttpServerInfo& info)
         {
             CHECK(protocol <= common::http::HP_1_1);
             const std::string title = common::convertToString(status);
@@ -113,7 +113,7 @@ namespace fasto
 
             DCHECK(strlen(header_data) == cur_pos);
             ssize_t nwrite = 0;
-            common::ErrnoError err = write(header_data, cur_pos, nwrite);
+            common::Error err = write(header_data, cur_pos, nwrite);
             DCHECK(!err);
             return err;
         }
@@ -135,7 +135,7 @@ namespace fasto
             return main_stream.get();
         }
 
-        common::ErrnoError Http2Client::send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive, const HttpServerInfo& info)
+        common::Error Http2Client::send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive, const HttpServerInfo& info)
         {
             using namespace common;
             if(is_http2() && protocol == http::HP_2_0){
@@ -154,7 +154,7 @@ namespace fasto
                         <address><a href=\"%s\">%s</a></address>\n\
                         </body>\n\
                         </html>\n", status, title, status, title, text, info.serverUrl_, info.serverName_);
-                common::ErrnoError err = send_headers(protocol, status, extra_header, "text/html", &err_len, NULL, is_keep_alive, info);
+                common::Error err = send_headers(protocol, status, extra_header, "text/html", &err_len, NULL, is_keep_alive, info);
                 if(err && err->isError()){
                     return err;
                 }
@@ -180,7 +180,7 @@ namespace fasto
                 uint32_t all_size;
             };
 
-            common::ErrnoError send_data_frame(const char* buff, uint32_t buff_len, void *user_data, uint32_t *processed)
+            common::Error send_data_frame(const char* buff, uint32_t buff_len, void *user_data, uint32_t *processed)
             {
                 using namespace common;
                 send_data_helper *helper = (send_data_helper *)user_data;
@@ -193,7 +193,7 @@ namespace fasto
 
                 http2::frame_hdr hdr = http2::frame_data::create_frame_header(flags, header_stream->sid(), buff_len);
                 http2::frame_data fdata(hdr, buff);
-                common::ErrnoError err = header_stream->sendFrame(fdata);
+                common::Error err = header_stream->sendFrame(fdata);
                 if(err && err->isError()){
                     return err;
                 }
@@ -201,11 +201,11 @@ namespace fasto
                 *processed = buff_len;
                 helper->all_size -= buff_len;
 
-                return common::ErrnoError();
+                return common::Error();
             }
         }
 
-        common::ErrnoError Http2Client::send_file_by_fd(common::http::http_protocols protocol, int fdesc, off_t size)
+        common::Error Http2Client::send_file_by_fd(common::http::http_protocols protocol, int fdesc, off_t size)
         {
             using namespace common;
 
@@ -219,19 +219,19 @@ namespace fasto
                 help.header_stream = header_stream;
                 help.all_size = size;
 
-                common::ErrnoError err = common::file_system::read_file_cb(fdesc, 0, size, &send_data_frame, &help);
+                common::Error err = common::file_system::read_file_cb(fdesc, 0, size, &send_data_frame, &help);
                 if(err && err->isError()){
                     DEBUG_MSG_ERROR(err);
                     return err;
                 }
 
-                return common::ErrnoError();
+                return common::Error();
             }
 
             return HttpClient::send_file_by_fd(protocol, fdesc, size);
         }
 
-        common::ErrnoError Http2Client::send_headers(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* mime_type, off_t* length, time_t* mod, bool is_keep_alive, const HttpServerInfo& info)
+        common::Error Http2Client::send_headers(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* mime_type, off_t* length, time_t* mod, bool is_keep_alive, const HttpServerInfo& info)
         {
             using namespace common;
 

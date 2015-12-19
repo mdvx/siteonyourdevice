@@ -3,60 +3,17 @@
 #include "http_config.h"
 
 #include "http/http_server.h"
-#include "http/http_client.h"
 
 namespace fasto
 {
     namespace siteonyourdevice
     {
-        class ProxyRelayClient;
-
-        class RelayClient
-                : public Http2Client
-        {
-        public:
-            RelayClient(ITcpLoop* server, const common::net::socket_info& info);
-            const char* className() const;
-        };
-
-        class RelayClientEx
-                : public RelayClient
-        {
-        public:
-            RelayClientEx(ITcpLoop* server, const common::net::socket_info& info, const common::net::hostAndPort& externalHost);
-            const char* className() const;
-
-            common::net::hostAndPort externalHost() const;
-
-            ProxyRelayClient *eclient() const;
-            void setEclient(ProxyRelayClient* client);
-
-        private:
-            const common::net::hostAndPort external_host_;
-            ProxyRelayClient * eclient_;
-        };
-
-        class ProxyRelayClient
-                : public TcpClient
-        {
-        public:
-            ProxyRelayClient(ITcpLoop* server, const common::net::socket_info& info, RelayClientEx * relay);
-            RelayClientEx * relay() const;
-
-        private:
-            RelayClientEx * const relay_;
-        };
-
         class ProxyInnerServer
                 : public ITcpLoop
         {
         public:
-            ProxyInnerServer(ITcpLoopObserver* observer, const configuration_t& config);
-
+            ProxyInnerServer(ITcpLoopObserver* observer);
             virtual const char* className() const;
-
-        private:
-            const configuration_t& config_;
         };
 
         class Http2InnerServer

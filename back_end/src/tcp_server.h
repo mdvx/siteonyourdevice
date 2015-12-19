@@ -57,33 +57,6 @@ namespace fasto
             std::string name_;
         };
 
-        class TcpServer
-                : public ITcpLoop
-        {
-        public:
-            TcpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer = NULL);
-            virtual ~TcpServer();
-
-            common::ErrnoError bind() WARN_UNUSED_RESULT;
-            common::ErrnoError listen(int backlog) WARN_UNUSED_RESULT;
-
-            virtual void stop();
-
-            const char* className() const;
-            common::net::hostAndPort host() const;
-
-        private:
-            virtual void preLooped(LibEvLoop* loop);
-            virtual void stoped(LibEvLoop* loop);
-
-            static void accept_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
-
-            common::ErrnoError accept(common::net::socket_info& info) WARN_UNUSED_RESULT;
-
-            common::net::ServerSocketTcp sock_;
-            ev_io * accept_io_;
-        };
-
         class ITcpLoopObserver
         {
         public:
@@ -96,6 +69,33 @@ namespace fasto
             virtual void dataReceived(TcpClient* client) = 0;
             virtual void postLooped(ITcpLoop* server) = 0;
             virtual ~ITcpLoopObserver();
+        };
+
+        class TcpServer
+                : public ITcpLoop
+        {
+        public:
+            TcpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer = NULL);
+            virtual ~TcpServer();
+
+            common::Error bind() WARN_UNUSED_RESULT;
+            common::Error listen(int backlog) WARN_UNUSED_RESULT;
+
+            virtual void stop();
+
+            const char* className() const;
+            common::net::hostAndPort host() const;
+
+        private:
+            virtual void preLooped(LibEvLoop* loop);
+            virtual void stoped(LibEvLoop* loop);
+
+            static void accept_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
+
+            common::Error accept(common::net::socket_info& info) WARN_UNUSED_RESULT;
+
+            common::net::ServerSocketTcp sock_;
+            ev_io * accept_io_;
         };
     }
 }

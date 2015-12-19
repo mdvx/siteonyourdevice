@@ -8,8 +8,6 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        typedef std::string cmd_id_type;
-
         class RequestCallback
         {
         public:

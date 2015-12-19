@@ -10,7 +10,7 @@
 #include "network_events.h"
 #include "client_commands.h"
 
-#include "inner/http_inner_server.h"
+#include "inner/inner_relay_client.h"
 
 #define GB (1024*1024*1024)
 #define BUF_SIZE 4096
@@ -294,7 +294,7 @@ namespace fasto
         {
             char buff[MAX_COMMAND_SIZE] = {0};
             ssize_t nread = 0;
-            common::ErrnoError err = iclient->read(buff, MAX_COMMAND_SIZE, nread);
+            common::Error err = iclient->read(buff, MAX_COMMAND_SIZE, nread);
             if((err && err->isError()) || nread == 0){
                 iclient->close();
                 delete iclient;
@@ -308,7 +308,7 @@ namespace fasto
         {
             char buff[BUF_SIZE] = {0};
             ssize_t nread = 0;
-            common::ErrnoError err = rclient->read(buff, BUF_SIZE, nread);
+            common::Error err = rclient->read(buff, BUF_SIZE, nread);
             if((err && err->isError()) || nread == 0){
                 rclient->close();
                 delete rclient;
@@ -322,7 +322,7 @@ namespace fasto
         {
             char buff[BUF_SIZE] = {0};
             ssize_t nread = 0;
-            common::ErrnoError err = rclient->read(buff, BUF_SIZE, nread);
+            common::Error err = rclient->read(buff, BUF_SIZE, nread);
             if((err && err->isError()) || nread == 0){
                 rclient->close();
                 delete rclient;
@@ -375,7 +375,7 @@ namespace fasto
         {
             char buff[BUF_SIZE] = {0};
             ssize_t nread = 0;
-            common::ErrnoError err = prclient->read(buff, BUF_SIZE, nread);
+            common::Error err = prclient->read(buff, BUF_SIZE, nread);
             if((err && err->isError()) || nread == 0){
                 prclient->close();
                 delete prclient;

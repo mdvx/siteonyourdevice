@@ -47,11 +47,9 @@ namespace fasto
 
         void HttpServerHandler::dataReceived(TcpClient* client)
         {
-            using namespace common;
-
             char buff[BUF_SIZE] = {0};
             ssize_t nread = 0;
-            ErrnoError err = client->read(buff, BUF_SIZE, nread);
+            common::Error err = client->read(buff, BUF_SIZE, nread);
             if((err && err->isError()) || nread == 0){
                 client->close();
                 delete client;

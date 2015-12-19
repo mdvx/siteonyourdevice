@@ -2,8 +2,6 @@
 
 #include "tcp_server.h"
 
-#include "infos.h"
-
 namespace fasto
 {
     namespace siteonyourdevice

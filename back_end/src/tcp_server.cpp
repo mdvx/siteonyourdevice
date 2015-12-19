@@ -198,12 +198,12 @@ namespace fasto
             ITcpLoop::stoped(loop);
         }
 
-        common::ErrnoError TcpServer::bind()
+        common::Error TcpServer::bind()
         {
             return sock_.bind();
         }
 
-        common::ErrnoError TcpServer::listen(int backlog)
+        common::Error TcpServer::listen(int backlog)
         {
             return sock_.listen(backlog);
         }
@@ -224,7 +224,7 @@ namespace fasto
             return sock_.host();
         }
 
-        common::ErrnoError TcpServer::accept(common::net::socket_info& info)
+        common::Error TcpServer::accept(common::net::socket_info& info)
         {
             return sock_.accept(info);
         }
@@ -242,7 +242,7 @@ namespace fasto
             CHECK(watcher->fd == pserver->sock_.fd());
 
             common::net::socket_info sinfo;
-            common::ErrnoError er = pserver->accept(sinfo);
+            common::Error er = pserver->accept(sinfo);
 
             if (er && er->isError()){
                 return ;

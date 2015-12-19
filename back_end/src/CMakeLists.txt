@@ -51,11 +51,13 @@ SET(HEADERS_INNER
     inner/http_inner_server_handler.h
     inner/http_inner_server.h
     inner/inner_server_command_seq_parser.h
+    inner/inner_relay_client.h
 )
 SET(SOURCES_INNER
     inner/http_inner_server_handler.cpp
     inner/http_inner_server.cpp
     inner/inner_server_command_seq_parser.cpp
+    inner/inner_relay_client.cpp
 )
 
 SET(HEADERS_HTTP_CALLBACKS
