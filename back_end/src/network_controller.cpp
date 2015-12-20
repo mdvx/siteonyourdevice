@@ -260,11 +260,13 @@ namespace fasto
             if(server_type == FASTO_SERVER){                
                 Http2InnerServer* h2s = new Http2InnerServer(handler_, config_);
                 server_ = h2s;
-                bool res = common::file_system::change_directory(contentPath);
-                DCHECK(res);
+                common::Error err = common::file_system::change_directory(contentPath);
+                if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
+                }
                 server_->setName("local_http_server");
 
-                common::Error err = h2s->bind();
+                err = h2s->bind();
                 if(err && err->isError()){
                     delete server_;
                     server_ = NULL;
@@ -307,8 +309,10 @@ namespace fasto
             }
 
             const std::string appdir = fApp->appDir();
-            bool res = common::file_system::change_directory(appdir);
-            DCHECK(res);
+            err = common::file_system::change_directory(appdir);
+            if(err && err->isError()){
+                DEBUG_MSG_ERROR(err);
+            }
 
             return common::Error();
         }
