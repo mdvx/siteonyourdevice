@@ -164,7 +164,7 @@ namespace fasto
         NetworkController::NetworkController(int argc, char *argv[])
             : handler_(NULL), server_(NULL),
               config_(), thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>()),
-              authChecker_(NULL)
+              authChecker_(NULL), server_type_(FASTO_SERVER)
         {
             Http2InnerServerHandler* servh = new Http2InnerServerHandler(HttpServerInfo(PROJECT_NAME_TITLE, PROJECT_DOMAIN), g_inner_host);
             handler_ = servh;
@@ -245,32 +245,14 @@ namespace fasto
             handler_->setConfig(config);
 
             if(server_){
-                if(server_type == FASTO_SERVER){
-                    Http2InnerServer* h2server = dynamic_cast<Http2InnerServer*>(server_);
-                    if(h2server){
-                        return handler_->innerConnect(server_);
-                    }
-                    else{
-                        server_->stop();
-                        http_thread_->joinAndGet();
-                        delete server_;
-                        server_ = NULL;
-                    }
+                if(server_type == server_type_){
+                    return handler_->innerConnect(server_);
                 }
-                else if(server_type == EXTERNAL_SERVER && externalHost.isValid()) {
-                    ProxyInnerServer* prserver = dynamic_cast<ProxyInnerServer*>(server_);
-                    if(prserver){
-                       return handler_->innerConnect(server_);
-                    }
-                    else{
-                        server_->stop();
-                        http_thread_->joinAndGet();
-                        delete server_;
-                        server_ = NULL;
-                    }
-                }
-                else{
-                    return common::make_error_value("Invalid https server settings!", common::Value::E_ERROR, common::logging::L_ERR);
+                else {
+                    server_->stop();
+                    http_thread_->joinAndGet();
+                    delete server_;
+                    server_ = NULL;
                 }
             }
 
@@ -304,6 +286,8 @@ namespace fasto
             else{
                 return common::make_error_value("Invalid https server settings!", common::Value::E_ERROR, common::logging::L_ERR);
             }
+
+            server_type_ = server_type;
 
             http_thread_ = THREAD_MANAGER()->createThread(&ITcpLoop::exec, server_);
             http_thread_->start();
