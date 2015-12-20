@@ -29,7 +29,7 @@ namespace fasto
         {
         public:
             NetworkEventHandler(NetworkController *controller);
-            ~NetworkEventHandler();
+            virtual ~NetworkEventHandler();
 
             virtual int start(); //connect
 

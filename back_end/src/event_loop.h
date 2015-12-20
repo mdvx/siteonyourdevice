@@ -17,9 +17,9 @@ namespace fasto
         public:
             virtual ~EvLoopObserver();
 
-            virtual void preLooped(struct LibEvLoop* loop) = 0;
-            virtual void stoped(struct LibEvLoop* loop) = 0;
-            virtual void postLooped(struct LibEvLoop* loop) = 0;
+            virtual void preLooped(class LibEvLoop* loop) = 0;
+            virtual void stoped(class LibEvLoop* loop) = 0;
+            virtual void postLooped(class LibEvLoop* loop) = 0;
         };
 
         class LibEvLoop

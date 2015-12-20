@@ -40,7 +40,7 @@ namespace fasto
     namespace siteonyourdevice
     {
         ITcpLoop::ITcpLoop(ITcpLoopObserver* observer)
-            : observer_(observer), loop_(new LibEvLoop), total_clients_(0), id_()
+            : loop_(new LibEvLoop), observer_(observer), total_clients_(0), id_()
         {
             loop_->setObserver(this);
         }
