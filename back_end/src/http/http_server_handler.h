@@ -28,7 +28,7 @@ namespace fasto
             typedef common::shared_ptr<IHttpCallback> http_callback_t;
             typedef std::map<std::string, http_callback_t> http_callbacks_t;
 
-            HttpServerHandler(IHttpAuthObserver * observer);
+            HttpServerHandler(const HttpServerInfo& info, IHttpAuthObserver * observer);
             virtual void preLooped(ITcpLoop* server);
             virtual void accepted(TcpClient* client);
             virtual void moved(TcpClient* client);
@@ -43,7 +43,6 @@ namespace fasto
 
             void setAuthChecker(IHttpAuthObserver *observer);
 
-            void setHttpServerInfo(const HttpServerInfo& info);
             const HttpServerInfo& info() const;
 
         protected:
@@ -58,14 +57,14 @@ namespace fasto
             const common::shared_ptr<IHttpCallback> fshandler_;
             IHttpAuthObserver * authChecker_;
 
-            HttpServerInfo info_;
+            const HttpServerInfo info_;
         };
 
         class Http2ServerHandler
                 : public HttpServerHandler
         {
         public:
-            Http2ServerHandler(IHttpAuthObserver * observer);
+            Http2ServerHandler(const HttpServerInfo &info, IHttpAuthObserver * observer);
 
         protected:
             virtual void processReceived(HttpClient *hclient, const char* request, uint32_t req_len);

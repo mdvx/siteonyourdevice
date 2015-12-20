@@ -166,7 +166,7 @@ namespace fasto
               config_(), thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>()),
               authChecker_(NULL)
         {
-            Http2InnerServerHandler* servh = new Http2InnerServerHandler(g_inner_host);
+            Http2InnerServerHandler* servh = new Http2InnerServerHandler(HttpServerInfo(PROJECT_NAME_TITLE, PROJECT_DOMAIN), g_inner_host);
             handler_ = servh;
             authChecker_ = new HttpAuthObserver(servh);
             handler_->setAuthChecker(authChecker_);
@@ -275,9 +275,6 @@ namespace fasto
             }
 
             const std::string contentPath = config.content_path_;
-            HttpServerInfo hinf(PROJECT_NAME_TITLE, PROJECT_DOMAIN, contentPath);
-            handler_->setHttpServerInfo(hinf);
-
             if(server_type == FASTO_SERVER){                
                 Http2InnerServer* h2s = new Http2InnerServer(handler_, config_);
                 server_ = h2s;

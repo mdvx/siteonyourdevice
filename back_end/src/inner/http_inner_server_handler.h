@@ -18,7 +18,7 @@ namespace fasto
                 : public InnerServerCommandSeqParser, public Http2ServerHandler
         {
         public:
-            Http2InnerServerHandler(const common::net::hostAndPort& innerHost);
+            Http2InnerServerHandler(const HttpServerInfo &info, const common::net::hostAndPort& innerHost);
             ~Http2InnerServerHandler();
 
             virtual void preLooped(ITcpLoop* server);

@@ -87,11 +87,6 @@ namespace fasto
             authChecker_ = observer;
         }
 
-        void HttpServerHandler::setHttpServerInfo(const HttpServerInfo& info)
-        {
-            info_ = info;
-        }
-
         const HttpServerInfo& HttpServerHandler::info() const
         {
             return info_;
@@ -204,8 +199,8 @@ namespace fasto
             }
         }
 
-        HttpServerHandler::HttpServerHandler(IHttpAuthObserver *observer)
-            : fshandler_(IHttpCallback::createHttpCallback(file_system)), authChecker_(observer)
+        HttpServerHandler::HttpServerHandler(const HttpServerInfo& info, IHttpAuthObserver *observer)
+            : fshandler_(IHttpCallback::createHttpCallback(file_system)), authChecker_(observer), info_(info)
         {
             CHECK(fshandler_);
         }
@@ -214,8 +209,8 @@ namespace fasto
         {
         }
 
-        Http2ServerHandler::Http2ServerHandler(IHttpAuthObserver * observer)
-            : HttpServerHandler(observer)
+        Http2ServerHandler::Http2ServerHandler(const HttpServerInfo& info, IHttpAuthObserver * observer)
+            : HttpServerHandler(info, observer)
         {
 
         }

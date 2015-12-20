@@ -19,8 +19,8 @@ namespace fasto
 {
     namespace siteonyourdevice
     { 
-        Http2InnerServerHandler::Http2InnerServerHandler(const common::net::hostAndPort &innerHost)
-            : Http2ServerHandler(NULL), innerConnection_(NULL), innerHost_(innerHost), config_()
+        Http2InnerServerHandler::Http2InnerServerHandler(const HttpServerInfo& info, const common::net::hostAndPort &innerHost)
+            : Http2ServerHandler(info, NULL), innerConnection_(NULL), innerHost_(innerHost), config_()
         {
 
         }

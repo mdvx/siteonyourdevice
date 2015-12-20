@@ -31,11 +31,10 @@ namespace fasto
         struct HttpServerInfo
         {
             HttpServerInfo();
-            HttpServerInfo(const std::string& serverName, const std::string& serverUrl, const std::string& contentPath);
+            HttpServerInfo(const std::string& serverName, const std::string& serverUrl);
 
             std::string serverName_;
             std::string serverUrl_;
-            std::string contentPath_;
         };
     }
 }

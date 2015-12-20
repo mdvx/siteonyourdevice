@@ -24,13 +24,13 @@ namespace fasto
         }
 
         HttpServerInfo::HttpServerInfo()
-            : serverName_(), serverUrl_(), contentPath_()
+            : serverName_(), serverUrl_()
         {
 
         }
 
-        HttpServerInfo::HttpServerInfo(const std::string& serverName, const std::string& serverUrl, const std::string& contentPath)
-            : serverName_(serverName), serverUrl_(serverUrl), contentPath_(contentPath)
+        HttpServerInfo::HttpServerInfo(const std::string& serverName, const std::string& serverUrl)
+            : serverName_(serverName), serverUrl_(serverUrl)
         {
 
         }
