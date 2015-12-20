@@ -2,7 +2,6 @@
 
 #include <unistd.h>
 
-#include "common/file_system.h"
 #include "common/thread/thread_manager.h"
 #include "common/logger.h"
 
@@ -14,8 +13,8 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        HttpInnerServerHandlerHost::HttpInnerServerHandlerHost(HttpServerHandlerHost *parent)
-            : Http2ServerHandler(NULL), parent_(parent)
+        HttpInnerServerHandlerHost::HttpInnerServerHandlerHost(const HttpServerInfo &info, HttpServerHandlerHost *parent)
+            : Http2ServerHandler(info, NULL), parent_(parent)
         {
 
         }
@@ -102,11 +101,11 @@ namespace fasto
 
         }
 
-        HttpServerHandlerHost::HttpServerHandlerHost()
+        HttpServerHandlerHost::HttpServerHandlerHost(const HttpServerInfo &info)
             : connections_()
         {
             innerHandler_ = new InnerServerHandlerHost(this);
-            httpHandler_ = new HttpInnerServerHandlerHost(this);
+            httpHandler_ = new HttpInnerServerHandlerHost(info, this);
         }
 
         void HttpServerHandlerHost::setStorageConfig(const redis_sub_configuration_t& config)
@@ -178,15 +177,10 @@ namespace fasto
             delete httpHandler_;
         }
 
-        HttpServerHost::HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort &innerHost,
-                                       const HttpServerInfo &info, HttpServerHandlerHost * handler)
+        HttpServerHost::HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort &innerHost, HttpServerHandlerHost * handler)
             : httpServer_(NULL), innerServer_(NULL)
         {
             httpServer_ = new Http2Server(httpHost, handler->httpHandler());
-
-            const std::string contentPath = info.contentPath_;
-            bool res = common::file_system::change_directory(contentPath);
-            DCHECK(res);
 
             httpThread_ = THREAD_MANAGER()->createThread(&Http2Server::exec, httpServer_);
             httpServer_->setName("proxy_http_server");

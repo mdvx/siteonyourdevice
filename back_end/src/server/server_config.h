@@ -5,14 +5,8 @@
 #define HOST_PORT 8040
 #define INNER_HOST_PORT 8020
 
-#define REMOTE
-
-#ifdef REMOTE
 #define INNER_HOST_NAME "siteonyourdevice.com"
 #define HTTP_PROXY_HOST_NAME "proxy.siteonyourdevice.com"
-#else
-#define INNER_HOST_NAME "localhost"
-#endif
 
 #define HOST_PATH "/"
 

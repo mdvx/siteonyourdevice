@@ -6,6 +6,7 @@
 
 #include "common/logger.h"
 #include "common/utils.h"
+#include "common/file_system.h"
 
 #include "http_server_host.h"
 #include "server_config.h"
@@ -112,14 +113,15 @@ int main(int argc, char *argv[])
 		SET_LOG_HANDLER(&app_logger_hadler);
 	}
 
-    handler = new HttpServerHandlerHost;
-    HttpServerInfo hinfo(PROJECT_NAME_SERVER_TITLE, PROJECT_DOMAIN, HOST_PATH);
-    handler->httpHandler()->setHttpServerInfo(hinfo);
+    handler = new HttpServerHandlerHost(HttpServerInfo(PROJECT_NAME_SERVER_TITLE, PROJECT_DOMAIN));
 
     sync_config();
 
     common::net::hostAndPort hs(INNER_HOST_NAME, HOST_PORT);
-    server = new HttpServerHost(hs, g_inner_host, hinfo, handler);
+    server = new HttpServerHost(hs, g_inner_host, handler);
+
+    bool res = common::file_system::change_directory(HOST_PATH);
+    DCHECK(res);
 
     common::Error err = server->bind();
     int return_code = EXIT_FAILURE;

@@ -21,7 +21,7 @@ namespace fasto
             typedef Http2Server server_t;
             typedef HttpClient client_t;
 
-            HttpInnerServerHandlerHost(HttpServerHandlerHost * parent);
+            HttpInnerServerHandlerHost(const HttpServerInfo & info, HttpServerHandlerHost * parent);
             virtual void accepted(TcpClient* client);
             virtual void closed(TcpClient* client);
             virtual void dataReceived(TcpClient* client);
@@ -37,7 +37,7 @@ namespace fasto
         public:
             typedef std::unordered_map<std::string, InnerTcpClient*> inner_connections_type;
 
-            HttpServerHandlerHost();
+            HttpServerHandlerHost(const HttpServerInfo& info);
             ~HttpServerHandlerHost();
 
             bool unRegisterInnerConnectionByHost(TcpClient* connection) WARN_UNUSED_RESULT;
@@ -62,8 +62,7 @@ namespace fasto
         class HttpServerHost
         {
         public:
-            HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort& innerHost,
-                       const HttpServerInfo& info, HttpServerHandlerHost *handler);
+            HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort& innerHost, HttpServerHandlerHost *handler);
             virtual ~HttpServerHost();
 
             common::Error bind() WARN_UNUSED_RESULT;

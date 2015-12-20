@@ -62,7 +62,7 @@ namespace fasto
         int RelayServer::exec()
         {
             static const int max_poll_ev = 3;
-            common::ErrnoError err = bindAvailible();
+            common::Error err = bindAvailible();
             if(err && err->isError()){
                 NOTREACHED();
                 return EXIT_FAILURE;
@@ -352,7 +352,7 @@ namespace fasto
                 }
 
                 ssize_t nwrite = 0;
-                common::ErrnoError err = fclient->write(buff, len, nwrite);
+                common::Error err = fclient->write(buff, len, nwrite);
                 if(err && err->isError()){
                     int argc;
                     sds *argv = sdssplitargs(cmd, &argc);
@@ -482,7 +482,7 @@ namespace fasto
                         }
 
                         const std::string resp =  make_approve_responce(id, PING_COMMAND_APPROVE_SUCCESS);
-                        common::ErrnoError err = connection->write(resp.c_str(), resp.size(), nwrite);
+                        common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
                         if(err && err->isError()){
                             goto fail;
                         }
@@ -533,7 +533,7 @@ namespace fasto
                         }
 
                         const std::string resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_SUCCESS);
-                        common::ErrnoError err = connection->write(resp.c_str(), resp.size(), nwrite);
+                        common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
                         if(err && err->isError()){
                             const std::string resp2 = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, err->description());
                             connection->write(resp2.c_str(), resp2.size(), nwrite);
