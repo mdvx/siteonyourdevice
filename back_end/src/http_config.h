@@ -27,6 +27,5 @@ namespace fasto
             typedef std::pair<std::string, std::string>  handlers_urls_t;
             std::vector<handlers_urls_t> handlers_urls_;
         } configuration_t;
-
     }
 }

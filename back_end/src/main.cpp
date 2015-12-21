@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[])
 {
-    fasto::FastoApplication application(argc, argv);
+    fasto::siteonyourdevice::FastoApplication application(argc, argv);
     int res = application.exec();
     return res;
 }

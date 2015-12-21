@@ -21,13 +21,13 @@ namespace fasto
             virtual int showImpl();
             void setExternalChekboxState(LRESULT status);
 
-            static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-            virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+            static LRESULT CALLBACK wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+            virtual LRESULT handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-            LRESULT OnCreate();
-            LRESULT OnDestroy();
+            LRESULT onCreate();
+            LRESULT onDestroy();
 
-            BOOL ShowPopupMenu(POINT *curpos, int wDefaultItem);
+            BOOL showPopupMenu(POINT *curpos, int wDefaultItem);
 
             HWND hwnd_;
             HWND hwndDomainStatic_;

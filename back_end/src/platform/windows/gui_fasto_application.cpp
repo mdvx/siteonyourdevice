@@ -74,7 +74,7 @@ namespace fasto
             memset(&wclx, 0, sizeof(wclx));
             wclx.cbSize         = sizeof( wclx );
             wclx.style          = 0;
-            wclx.lpfnWndProc    = &WndProc;
+            wclx.lpfnWndProc    = &wndProc;
             wclx.cbClsExtra     = 0;
             wclx.cbWndExtra     = 0;
             wclx.hInstance      = GetModuleHandle(NULL);
@@ -152,7 +152,7 @@ namespace fasto
             }
         }
 
-        LRESULT Win32MainWindow::OnCreate()
+        LRESULT Win32MainWindow::onCreate()
         {
             const HINSTANCE hInstance = GetModuleHandle(NULL);
             const int control_height = 25;
@@ -323,7 +323,7 @@ namespace fasto
             return 0;
         }
 
-        LRESULT Win32MainWindow::OnDestroy()
+        LRESULT Win32MainWindow::onDestroy()
         {
             RemoveTrayIcon(hwnd_, 1);
             ::DestroyWindow(hwndConnectButton_);
@@ -351,7 +351,7 @@ namespace fasto
             return 0;
         }
 
-        BOOL Win32MainWindow::ShowPopupMenu(POINT *curpos, int wDefaultItem)
+        BOOL Win32MainWindow::showPopupMenu(POINT *curpos, int wDefaultItem)
         {
             HMENU hPop = CreatePopupMenu();
             if (isMessageBoxShown_) {
@@ -378,17 +378,17 @@ namespace fasto
             return 0;
         }
 
-        LRESULT Win32MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+        LRESULT Win32MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             switch (uMsg)
             {
                 case WM_CREATE:
                 {
-                    return OnCreate();
+                    return onCreate();
                 }
                 case WM_DESTROY:
                 {
-                    OnDestroy();
+                    onDestroy();
                     ::PostQuitMessage(0);
                     return 0;
                 }
@@ -484,7 +484,7 @@ namespace fasto
                         case WM_RBUTTONUP:
                         case WM_CONTEXTMENU:
                             SetForegroundWindow(hwnd_);
-                            ShowPopupMenu(NULL, -1);
+                            showPopupMenu(NULL, -1);
                             PostMessage(hwnd_, WM_APP + 1, 0, 0 );
                             return 0;
                     }
@@ -494,7 +494,7 @@ namespace fasto
             return DefWindowProc(hwnd_, uMsg, wParam, lParam );
         }
 
-        LRESULT CALLBACK Win32MainWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+        LRESULT CALLBACK Win32MainWindow::wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             Win32MainWindow *pThis = NULL;
             if (uMsg == WM_CREATE){
@@ -508,7 +508,7 @@ namespace fasto
             }
 
             if (pThis){
-                return pThis->HandleMessage(uMsg, wParam, lParam);
+                return pThis->handleMessage(uMsg, wParam, lParam);
             }
             else{
                 return DefWindowProc(hWnd, uMsg, wParam, lParam);
