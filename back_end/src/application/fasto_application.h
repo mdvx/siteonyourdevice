@@ -29,7 +29,7 @@ namespace fasto
             int argc() const;
             char **argv() const;
 
-            static FastoApplication *instance();
+            static FastoApplication * instance();
 
             int exec(); //EXIT_FAILURE, EXIT_SUCCESS
             static void exit(int result);
