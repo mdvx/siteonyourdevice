@@ -120,11 +120,13 @@ int main(int argc, char *argv[])
     common::net::hostAndPort hs(INNER_HOST_NAME, HOST_PORT);
     server = new HttpServerHost(hs, g_inner_host, handler);
 
-    bool res = common::file_system::change_directory(HOST_PATH);
-    DCHECK(res);
-
-    common::Error err = server->bind();
+    common::Error err = common::file_system::change_directory(HOST_PATH);
     int return_code = EXIT_FAILURE;
+    if(err && err->isError()){
+        goto exit;
+    }
+
+    err = server->bind();
     if(err && err->isError()){
         goto exit;
     }
