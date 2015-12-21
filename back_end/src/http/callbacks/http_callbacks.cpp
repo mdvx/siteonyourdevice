@@ -53,7 +53,7 @@ namespace fasto
                 return common::shared_ptr<IHttpCallback>(new HttpFileSystemCallback);
             }
             else{
-                return NULL;
+                return common::shared_ptr<IHttpCallback>();
             }
         }
 
