@@ -15,3 +15,4 @@
 #define CHANNEL_CLIENTS_STATE_NAME "CLIENTS_STATE"
 
 const common::net::hostAndPort g_inner_host(INNER_HOST_NAME, INNER_HOST_PORT);
+const common::net::hostAndPort g_relay_server_host(INNER_HOST_NAME, RANDOM_PORT);

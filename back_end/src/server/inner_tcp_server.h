@@ -90,7 +90,7 @@ namespace fasto
         {
         public:
             typedef common::shared_ptr<TcpClient> client_t;
-            RelayServer(InnerServerHandlerHost *handler, InnerTcpClient *parent, const common::net::hostAndPort& host, client_t client);
+            RelayServer(InnerServerHandlerHost *handler, InnerTcpClient *parent, client_t client);
             ~RelayServer();
 
             client_t client() const;

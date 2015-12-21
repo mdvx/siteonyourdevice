@@ -9,6 +9,7 @@
 
 #include "server/http_server_host.h"
 #include "server_commands.h"
+#include "server/server_config.h"
 
 #define BUF_SIZE 4096
 
@@ -20,10 +21,9 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        RelayServer::RelayServer(InnerServerHandlerHost *handler, InnerTcpClient *parent, const common::net::hostAndPort& host, client_t client)
-            : ServerSocketTcp(common::net::hostAndPort(host.host_, RANDOM_PORT)), stop_(false), client_(client), relayThread_(), parent_(parent), handler_(handler)
+        RelayServer::RelayServer(InnerServerHandlerHost *handler, InnerTcpClient *parent, client_t client)
+            : ServerSocketTcp(g_relay_server_host), stop_(false), client_(client), relayThread_(), parent_(parent), handler_(handler)
         {
-            DEBUG_MSG_FORMAT<1024>(common::logging::L_INFO, "ServerSocketTcp host:%s", host.host_);
             relayThread_ = THREAD_MANAGER()->createThread(&RelayServer::exec, this);
         }
 
@@ -224,11 +224,7 @@ namespace fasto
                 }
             }
 
-            TcpServer* server = dynamic_cast<TcpServer*>(rrclient->server());
-            CHECK(server);
-
-            common::net::hostAndPort hs = server->host();
-            std::shared_ptr<RelayServer> tmp(new RelayServer(handler, this, hs, rrclient));
+            std::shared_ptr<RelayServer> tmp(new RelayServer(handler, this, rrclient));
             tmp->addRequest(request);
             tmp->start();
             relays_.push_back(tmp);
