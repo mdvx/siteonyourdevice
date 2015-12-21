@@ -124,7 +124,7 @@ namespace fasto
         {
             common::Error err = controller_->connect();
             if(err && err->isError()){
-            
+                DEBUG_MSG_ERROR(err);
             }
             return EXIT_SUCCESS;        
         }
@@ -268,6 +268,7 @@ namespace fasto
 
                 err = h2s->bind();
                 if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
                     delete server_;
                     server_ = NULL;
                     return err;
@@ -275,6 +276,7 @@ namespace fasto
 
                 err = h2s->listen(5);
                 if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
                     delete server_;
                     server_ = NULL;
                     return err;
@@ -305,6 +307,7 @@ namespace fasto
 
             common::Error err = handler_->innerDisConnect(server_);
             if(err && err->isError()){
+                DEBUG_MSG_ERROR(err);
                 return err;
             }
 

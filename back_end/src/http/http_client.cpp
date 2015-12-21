@@ -156,6 +156,7 @@ namespace fasto
                         </html>\n", status, title, status, title, text, info.serverUrl_, info.serverName_);
                 common::Error err = send_headers(protocol, status, extra_header, "text/html", &err_len, NULL, is_keep_alive, info);
                 if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
                     return err;
                 }
 
@@ -195,6 +196,7 @@ namespace fasto
                 http2::frame_data fdata(hdr, buff);
                 common::Error err = header_stream->sendFrame(fdata);
                 if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
                     return err;
                 }
 

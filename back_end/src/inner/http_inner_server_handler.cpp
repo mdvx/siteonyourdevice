@@ -193,6 +193,7 @@ namespace fasto
                         const std::string resp = make_approve_responce(id, PING_COMMAND_APPROVE_SUCCESS);
                         common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
                         if(err && err->isError()){
+                            DEBUG_MSG_ERROR(err);
                             return;
                         }
                     }
@@ -345,6 +346,7 @@ namespace fasto
                 if(!eclient){
                     common::Error err = common::net::connect(externalHost, common::net::ST_SOCK_STREAM, 0, client_info);
                     if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
                         const std::string error_text = err->description();
                         rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL, error_text.c_str(), false, info());
                         return;
@@ -361,6 +363,7 @@ namespace fasto
                 ssize_t nwrite = 0;
                 err = eclient->write(buff, nread, nwrite);
                 if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
                     const std::string error_text = err->description();
                     rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL, error_text.c_str(), false, info());
                     return;
@@ -386,7 +389,7 @@ namespace fasto
             ssize_t nwrite = 0;
             err = rclient->TcpClient::write(buff, nread, nwrite);
             if(err && err->isError()){
-
+                DEBUG_MSG_ERROR(err);
             }
             return;
         }

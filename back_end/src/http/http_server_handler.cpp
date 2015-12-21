@@ -158,6 +158,7 @@ namespace fasto
 
             if(result.second && result.second->isError()){
                 const std::string error_text = result.second->description();
+                DEBUG_MSG_ERROR(result.second);
                 hclient->send_error(http::HP_1_1, result.first, NULL, error_text.c_str(), false, info());
                 hclient->close();
                 delete hclient;
@@ -254,6 +255,7 @@ namespace fasto
                 std::pair<common::http::http_status, common::Error> result = common::http2::parse_http_request(*head, request);
                 if(result.second && result.second->isError()){
                     const std::string error_text = result.second->description();
+                    DEBUG_MSG_ERROR(result.second);
                     h2client->send_error(http::HP_2_0, result.first, NULL, error_text.c_str(), false, info());
                     h2client->close();
                     delete h2client;

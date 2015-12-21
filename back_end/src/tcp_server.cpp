@@ -242,10 +242,11 @@ namespace fasto
             CHECK(watcher->fd == pserver->sock_.fd());
 
             common::net::socket_info sinfo;
-            common::Error er = pserver->accept(sinfo);
+            common::Error err = pserver->accept(sinfo);
 
-            if (er && er->isError()){
-                return ;
+            if (err && err->isError()){
+                DEBUG_MSG_ERROR(err);
+                return;
             }
 
             TcpClient* pclient = pserver->createClient(sinfo);
