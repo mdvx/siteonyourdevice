@@ -21,8 +21,9 @@ namespace fasto
     namespace siteonyourdevice
     {
         RelayServer::RelayServer(InnerServerHandlerHost *handler, InnerTcpClient *parent, const common::net::hostAndPort& host, client_t client)
-            : ServerSocketTcp(host), stop_(false), client_(client), relayThread_(), parent_(parent), handler_(handler)
+            : ServerSocketTcp(common::net::hostAndPort(host.host_, RANDOM_PORT)), stop_(false), client_(client), relayThread_(), parent_(parent), handler_(handler)
         {
+            DEBUG_MSG_FORMAT<1024>(common::logging::L_INFO, "ServerSocketTcp host:%s", host.host_);
             relayThread_ = THREAD_MANAGER()->createThread(&RelayServer::exec, this);
         }
 
@@ -47,22 +48,10 @@ namespace fasto
             relayThread_->joinAndGet();
         }
 
-        common::ErrnoError RelayServer::bindAvailible()
-        {
-            common::ErrnoError err;
-            do{
-                host_.port_ = common::net::getAvailiblePort();
-                err = bind();
-            }
-            while(err && err->isError());
-
-            return common::ErrnoError();
-        }
-
         int RelayServer::exec()
         {
             static const int max_poll_ev = 3;
-            common::Error err = bindAvailible();
+            common::Error err = bind();
             if(err && err->isError()){
                 NOTREACHED();
                 return EXIT_FAILURE;

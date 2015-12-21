@@ -246,7 +246,7 @@ IF(DEVELOPER_ENABLE_TESTS)
     INCLUDE_DIRECTORIES(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 ########## PREPARE GTEST LIBRARY ##########
 
-    ADD_EXECUTABLE(unit_tests ${CMAKE_SOURCE_DIR}/tests/unit_test_http_clients.cpp)
+    ADD_EXECUTABLE(unit_tests ${CMAKE_SOURCE_DIR}/tests/unit_test_http_clients.cpp ${CMAKE_SOURCE_DIR}/tests/unit_test_tcp_server.cpp)
     TARGET_LINK_LIBRARIES(unit_tests gtest gtest_main ${PROJECT_CORE_LIBRARY})
 
     ADD_TEST(NAME unit_tests COMMAND tests)

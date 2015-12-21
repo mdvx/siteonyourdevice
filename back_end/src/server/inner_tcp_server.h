@@ -102,7 +102,6 @@ namespace fasto
 
         private:
             int exec();
-            common::ErrnoError bindAvailible();
 
             volatile bool stop_;
             client_t client_;
