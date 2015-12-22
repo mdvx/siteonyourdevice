@@ -358,6 +358,10 @@ namespace fasto
             configSave.writeFormated("external_host=%s\n", common::convertToString(config_.external_host_));
             configSave.writeFormated("server_type=%u\n", config_.server_type_);
             configSave.write("[http_handlers_utls]\n");
+            for(int i = 0; i < config_.handlers_urls_.size(); ++i){
+                configuration_t::handlers_urls_t handurl = config_.handlers_urls_[i];
+                configSave.writeFormated("%s=%s\n", handurl.first, handurl.second);
+            }
             configSave.close();
         }
 

@@ -16,7 +16,7 @@ namespace common
             }
         }
 
-        NOTREACHED();
+        DNOTREACHED();
         return fasto::siteonyourdevice::system_shutdown;
     }
 }
