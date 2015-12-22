@@ -35,6 +35,11 @@ namespace fasto
             return isAuth_;
         }
 
+        common::Error HttpClient::send_ok(common::http::http_protocols protocol, const char* extra_header, const char* text, bool is_keep_alive, const HttpServerInfo& info)
+        {
+            return send_error(protocol, common::http::HS_OK, extra_header, text, is_keep_alive, info);
+        }
+
         common::Error HttpClient::send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive, const HttpServerInfo& info)
         {
             CHECK(protocol <= common::http::HP_1_1);

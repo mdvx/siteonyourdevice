@@ -1,5 +1,10 @@
 #include "http/callbacks/system_callback.h"
 
+#include "common/system/system.h"
+#include "common/string_util.h"
+
+#include "http/http_client.h"
+
 namespace common
 {
     std::string convertToString(fasto::siteonyourdevice::HSCTypes t)
@@ -44,7 +49,20 @@ namespace fasto
 
         bool HttpSystemShutdownCallback::handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info)
         {
-            return false;
+            using namespace common::http;
+            //keep alive
+            http_request::header_t connectionField = request.findHeaderByKey("Connection",false);
+            bool isKeepAlive = EqualsASCII(connectionField.value_, "Keep-Alive", false);
+            const http_protocols protocol = request.protocol();
+
+            common::Error err = common::system::systemShutdown(common::system::SHUTDOWN);
+            if(err && err->isError()){
+                hclient->send_error(protocol, HS_NOT_ALLOWED, NULL, "Shutdown failed.", isKeepAlive, info);
+                return true;
+            }
+
+            hclient->send_ok(protocol, NULL, "Your device shutdowned!", isKeepAlive, info);
+            return true;
         }
 
         common::shared_ptr<IHttpCallback> createSystemHttpCallback(const std::string& name)
