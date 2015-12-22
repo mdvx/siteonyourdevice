@@ -2,6 +2,7 @@
 
 #include "common/system/system.h"
 #include "common/string_util.h"
+#include "common/sprintf.h"
 
 #include "http/http_client.h"
 
@@ -57,7 +58,8 @@ namespace fasto
 
             common::Error err = common::system::systemShutdown(common::system::SHUTDOWN);
             if(err && err->isError()){
-                hclient->send_error(protocol, HS_NOT_ALLOWED, NULL, "Shutdown failed.", isKeepAlive, info);
+                const std::string cause = common::MemSPrintf("Shutdown failed(%s).", err->description());
+                hclient->send_error(protocol, HS_NOT_ALLOWED, NULL, cause.c_str(), isKeepAlive, info);
                 return true;
             }
 
