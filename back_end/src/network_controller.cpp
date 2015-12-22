@@ -235,7 +235,16 @@ namespace fasto
 
             for(int i = 0; i < config.handlers_urls_.size(); ++i){
                 configuration_t::handlers_urls_t handurl = config.handlers_urls_[i];
-                common::shared_ptr<IHttpCallback> handler = IHttpCallback::createHttpCallback(handurl.second);
+                const std::string httpcallbackstr = handurl.second;
+                std::string httpcallback_ns = handurl.second;
+                std::string httpcallback_name;
+                std::string::size_type ns_del = httpcallbackstr.find_first_of("::");
+                if(ns_del != std::string::npos){
+                    httpcallback_ns = httpcallbackstr.substr(0, ns_del);
+                    httpcallback_name = httpcallbackstr.substr(ns_del + 2);
+                }
+
+                common::shared_ptr<IHttpCallback> handler = IHttpCallback::createHttpCallback(httpcallback_ns, httpcallback_name);
                 if(handler){
                     handler_->registerHttpCallback(handurl.first, handler);
                 }

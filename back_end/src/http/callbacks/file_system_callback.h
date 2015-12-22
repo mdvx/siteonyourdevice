@@ -13,5 +13,7 @@ namespace fasto
             HttpFileSystemCallback();
             virtual bool handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info);
         };
+
+        common::shared_ptr<IHttpCallback> createFileSystemHttpCallback(const std::string& name);
     }
 }

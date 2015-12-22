@@ -46,21 +46,31 @@ namespace fasto
 
         common::shared_ptr<IHttpCallback> IHttpCallback::createHttpCallback(HCTypes type)
         {
-            if(type == system){
-                return common::shared_ptr<IHttpCallback>(new HttpSystemCallback);
-            }
-            else if(type == file_system){
+            if(type == file_system){
                 return common::shared_ptr<IHttpCallback>(new HttpFileSystemCallback);
             }
+            else if(type == system){
+                return common::shared_ptr<IHttpCallback>(new HttpSystemCallback);
+            }
             else{
+                DNOTREACHED();
                 return common::shared_ptr<IHttpCallback>();
             }
         }
 
-        common::shared_ptr<IHttpCallback> IHttpCallback::createHttpCallback(const std::string& name)
+        common::shared_ptr<IHttpCallback> IHttpCallback::createHttpCallback(const std::string& ns_name, const std::string &name)
         {
-            HCTypes t = common::convertFromString<HCTypes>(name);
-            return createHttpCallback(t);
+            HCTypes htype = common::convertFromString<HCTypes>(ns_name);
+            if(htype == file_system){
+                return createFileSystemHttpCallback(name);
+            }
+            else if(htype == system){
+                return createSystemHttpCallback(name);
+            }
+            else{
+                DNOTREACHED();
+                return common::shared_ptr<IHttpCallback>();
+            }
         }
     }
 }

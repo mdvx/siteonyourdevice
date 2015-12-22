@@ -90,5 +90,10 @@ namespace fasto
                 }
             }
         }
+
+        common::shared_ptr<IHttpCallback> createFileSystemHttpCallback(const std::string& name)
+        {
+            return common::shared_ptr<IHttpCallback>(new HttpFileSystemCallback);
+        }
     }
 }

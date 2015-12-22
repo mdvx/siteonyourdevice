@@ -1,3 +1,8 @@
+0.2.0 /
+[Alexandr Topilski]
+- [client] ability handle external http servers
+- [server] bind available port
+
 0.1.2 / December 18, 2015
 [Alexandr Topilski]
 - http2 support
@@ -5,7 +10,3 @@
 - console clients for(Windows, MacOSX, Linux, FreeBSD)
 - GUI clients for(Windows, MacOSX, Linux, FreeBSD)
 - shutdown, Info, Ping commands
-
-0.2.0 /
-[Alexandr Topilski]
-- ability handle external http servers

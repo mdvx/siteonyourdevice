@@ -26,7 +26,7 @@ namespace fasto
             virtual bool handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info) = 0;
 
             static common::shared_ptr<IHttpCallback> createHttpCallback(HCTypes type);
-            static common::shared_ptr<IHttpCallback> createHttpCallback(const std::string& name);
+            static common::shared_ptr<IHttpCallback> createHttpCallback(const std::string& ns_name, const std::string& name);
 
         protected:
             IHttpCallback(HCTypes type);
