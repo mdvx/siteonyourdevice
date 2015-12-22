@@ -1,5 +1,6 @@
 // load up the user model
 var User = require('../app/models/user');
+var Templates = require('../app/models/templates');
 
 function checkIsValidDomain(domain) { 
     var re = new RegExp(/^((?:(?:(?:\w[\.\-\+]?)*)\w)+)((?:(?:(?:\w[\.\-\+]?){0,62})\w)+)\.(\w{2,6})$/); 
@@ -17,6 +18,15 @@ module.exports = function(app, passport, redis, settings_config) {
         type : settings_config.client_version_type});
     });
 
+    app.post('/templates', function(req, res) {
+        Templates.find(function(err, templates) 
+        {
+            res.render('templates.ejs', {
+                templates: templates
+            });  
+        } ); 
+    });
+    
     app.post('/server_details', function(req, res) {
         var user = req.user;        
         var domain_name = req.body.domain_name;
