@@ -62,7 +62,10 @@ namespace fasto
                 const std::string mime = path.mime();
                 hclient->send_headers(protocol, HS_OK, NULL, mime.c_str(), &sb.st_size, &sb.st_mtime, isKeepAlive, info);
                 if(request.method_ == http_method::HM_GET){
-                    hclient->send_file_by_fd(protocol, file, sb.st_size);
+                    common::Error err = hclient->send_file_by_fd(protocol, file, sb.st_size);
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                    }
                 }
                 ::close(file);
                 return true;
