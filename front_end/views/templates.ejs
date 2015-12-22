@@ -10,7 +10,6 @@
     </head>
     <body>
         <div class="container">
-            <% if (templates.length > 0) { %>
             <div class="well">                
                     <h2>Availible templates:</h2>
                     <table class="table">
@@ -18,20 +17,30 @@
                       <tr>
                         <th>#</th>
                         <th>Name</th>
-                        <th>Download link</th>
                         <th>Http handler urls config file</th>
+                        <th>Download link</th>
                       </tr>
                     </thead>
                     <tbody>
-                        <% for (var i = 0; i < templates.length; i++) { %>
-                        <tr>
-                            <td><%= i + 1 %></td>
-                            <td><%= templates[i].name %></td>
-                            <td><%= templates[i].download_link %></td>
-                            <td><%= templates[i].http_handlers_utls %></td>
-                        </tr>    
-                        <% } %>
-                    </tbody>              
+                        <% if (templates.length > 0) { %>
+                            <% for (var i = 0; i < templates.length; i++) { %>
+                            <tr>
+                                <td><%= i + 1 %></td>
+                                <td><%= templates[i].name %></td>
+                                <td>
+                                    <% for (var j = 0; j < templates[i].http_handlers_utls.length; ++j) { %>
+                                    <%= templates[i].http_handlers_utls[j].key %>=<%= templates[i].http_handlers_utls[j].value %>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <form action=<%= templates[i].download_link %> method="get">
+                                        <button type="submit" class="btn btn-danger btn-small">Download</button>
+                                    </form>
+                                </td>
+                            </tr>    
+                            <% } %>
+                        <% } %> 
+                    </tbody>
                     </table>
             </div>
         </div>

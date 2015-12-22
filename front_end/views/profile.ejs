@@ -89,66 +89,67 @@
         <div class="col-sm-6">
         <% if (user.isReadOnlyMode()) { %>
             <div class="alert alert-danger">Read only mode</div>
-            <form action="/servers_status" method="get">
-                <button type="submit" class="btn btn-warning btn-small">All domains</button>
-            </form>
-            <form action="/templates" method="get">
-                <button type="submit" class="btn btn-warning btn-small">Availible templates</button>
-            </form>
-        <% } else { %>
-            <form action="/servers_status" method="get">
-                <button type="submit" class="btn btn-warning btn-small">All domains</button>
-            </form>
-            <form action="/templates" method="get">
-                <button type="submit" class="btn btn-warning btn-small">Availible templates</button>
-            </form>
-            <!-- Add site FORM -->
-            <% if (user.domains.length > 0) { %>
-                    <h2>Registered domains:</h2>
-                    <table class="table">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Date created</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                        <% for (var i = 0; i < user.domains.length; i++) { %>
-                        <tr>
-                            <td><%= i + 1 %></td>
-                            <td><%= user.domains[i].name %></td>
-                            <td><%= user.domains[i].created_date %></td>
-                            <td>                            
-                            <form action="/remove_domain" method="post">
-                                <input type="hidden" class="form-control" name="domain_id" value="<%= user.domains[i]._id %>">
-                                <button type="submit" class="btn btn-danger btn-xs">Remove</button>
+        <% } %> 
+        <div class="row">
+            <div class="col-sm-6">
+                <form action="/servers_status" method="get">
+                    <button type="submit" class="btn btn-info btn-small">All domains</button>
+                </form>
+            </div>
+            <div class="col-sm-6">
+                <form action="/templates" method="get">
+                    <button type="submit" class="btn btn-info btn-small">Availible templates</button>
+                </form>
+            </div>
+        </div>
+       
+        <% if (!user.isReadOnlyMode()) { %>
+            <h2>Registered domains:</h2>
+            <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Date created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+                <% for (var i = 0; i < user.domains.length; i++) { %>
+                    <tr>
+                        <td><%= i + 1 %></td>
+                        <td><%= user.domains[i].name %></td>
+                        <td><%= user.domains[i].created_date %></td>
+                        <td>                            
+                        <form action="/remove_domain" method="post">
+                            <input type="hidden" class="form-control" name="domain_id" value="<%= user.domains[i]._id %>">
+                            <button type="submit" class="btn btn-danger btn-xs">Remove</button>
+                        </form>
+                        <div>
+                            <a href="http://proxy.siteonyourdevice.com/<%= user.domains[i].name %>" class="btn btn-primary btn-xs">Hot link</a>
+                        </div>
+                        <div>
+                            <form action="/server_details" method="post">
+                                <input type="hidden" class="form-control" name="domain_name" value="<%= user.domains[i].name %>">
+                                <button type="submit" class="btn btn-info btn-xs">Details</button>
                             </form>
-                            <div>
-                                <a href="http://proxy.siteonyourdevice.com/<%= user.domains[i].name %>" class="btn btn-primary btn-xs">Hot link</a>
-                            </div>
-                            <div>
-                                <form action="/server_details" method="post">
-                                    <input type="hidden" class="form-control" name="domain_name" value="<%= user.domains[i].name %>">
-                                    <button type="submit" class="btn btn-info btn-xs">Details</button>
-                                </form>
-                            </div>
-                            </td>
-                        </tr>    
-                        <% } %>
-                    </tbody>              
-                    </table>
-            <% } %> 
+                        </div>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>    
+            </table>
             
+            <!-- Add site FORM -->
             <form action="/add_domain" method="post">                
                 <div class="form-group">
-                    <label>Domain name:</label>
-                    <input type="text" class="form-control" name="domain_name">
+                <label>Domain name:</label>
+                <input type="text" class="form-control" name="domain_name">
                 </div>
                 <button type="submit" class="btn btn-warning btn-small">Add new domain</button>
             </form>
         <% } %>
+        
         </div>
     </div>
 

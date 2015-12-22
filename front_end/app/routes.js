@@ -18,7 +18,7 @@ module.exports = function(app, passport, redis, settings_config) {
         type : settings_config.client_version_type});
     });
 
-    app.post('/templates', function(req, res) {
+    app.get('/templates', function(req, res) {
         Templates.find(function(err, templates) 
         {
             res.render('templates.ejs', {
