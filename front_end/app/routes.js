@@ -18,14 +18,19 @@ module.exports = function(app, passport, redis, settings_config) {
     });
 
     app.get('/templates', function(req, res) {
-        redis.hgetall('templates', function(err, templates) {
-           if (err) {
-           } 
-           else {
+        redis.hgetall('templates', function(err, result) {
+            if (err) {
+                console.log(err);
+            } 
+            else {
+                var templates = [];
+                for (i in result) {
+                    templates.push(JSON.parse(result[i]));
+                }
                 res.render('templates.ejs', {
                     templates: templates
                 }); 
-           }
+            }
         }); 
     });
     
