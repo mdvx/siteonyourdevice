@@ -9,10 +9,11 @@ namespace fasto
         enum HSCTypes
         {
             system_shutdown,
+            system_logout,
             system_reboot
         };
 
-        const std::string HSystemCallbackTypes[] = { "shutdown", "reboot" };
+        const std::string HSystemCallbackTypes[] = { "shutdown", "logout", "reboot" };
 
         class HttpSystemCallback
                 : public IHttpCallback
@@ -26,8 +27,11 @@ namespace fasto
                 : public IHttpCallback
         {
         public:
-            HttpSystemShutdownCallback();
+            HttpSystemShutdownCallback(HSCTypes type);
             virtual bool handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info);
+
+        private:
+            const HSCTypes type_;
         };
 
         common::shared_ptr<IHttpCallback> createSystemHttpCallback(const std::string& name);

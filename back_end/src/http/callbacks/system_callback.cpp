@@ -42,8 +42,8 @@ namespace fasto
             return false;
         }
 
-        HttpSystemShutdownCallback::HttpSystemShutdownCallback()
-            : IHttpCallback(system)
+        HttpSystemShutdownCallback::HttpSystemShutdownCallback(HSCTypes type)
+            : IHttpCallback(system), type_(type)
         {
 
         }
@@ -56,27 +56,35 @@ namespace fasto
             bool isKeepAlive = EqualsASCII(connectionField.value_, "Keep-Alive", false);
             const http_protocols protocol = request.protocol();
 
-            common::Error err = common::system::systemShutdown(common::system::SHUTDOWN);
+            common::system::shutdown_types sh_type;
+            if(type_ == system_shutdown){
+                sh_type = common::system::SHUTDOWN;
+            }
+            else if(type_ == system_logout){
+                sh_type = common::system::LOGOUT;
+            }
+            else if(type_ == system_reboot){
+                sh_type = common::system::REBOOT;
+            }
+            else{
+                DNOTREACHED();
+            }
+
+            common::Error err = common::system::systemShutdown(sh_type);
             if(err && err->isError()){
                 const std::string cause = common::MemSPrintf("Shutdown failed(%s).", err->description());
-                hclient->send_error(protocol, HS_NOT_ALLOWED, NULL, cause.c_str(), isKeepAlive, info);
+                hclient->send_error(protocol, HS_NOT_ALLOWED, extra_header, cause.c_str(), isKeepAlive, info);
                 return true;
             }
 
-            hclient->send_ok(protocol, NULL, "Your device shutdowned!", isKeepAlive, info);
+            hclient->send_ok(protocol, extra_header, "Your device shutdowned!", isKeepAlive, info);
             return true;
         }
 
         common::shared_ptr<IHttpCallback> createSystemHttpCallback(const std::string& name)
         {
             HSCTypes sys_type = common::convertFromString<HSCTypes>(name);
-            if(sys_type == system_shutdown){
-                return common::shared_ptr<IHttpCallback>(new HttpSystemShutdownCallback);
-            }
-            else{
-                DNOTREACHED();
-                return common::shared_ptr<IHttpCallback>();
-            }
+            return common::shared_ptr<IHttpCallback>(new HttpSystemShutdownCallback(sys_type));
         }
     }
 }

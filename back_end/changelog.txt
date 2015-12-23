@@ -2,6 +2,7 @@
 [Alexandr Topilski]
 - [client] ability handle external http servers
 - [client] shutdown template
+- [client] sendfile fixup for FreeBSD and MacOSX
 - [server] bind available port
 
 0.1.2 / December 18, 2015
