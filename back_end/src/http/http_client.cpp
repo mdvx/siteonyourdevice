@@ -59,11 +59,16 @@ namespace fasto
                     <address><a href=\"%s\">%s</a></address>\n\
                     </body>\n\
                     </html>\n", status, title, status, title, text, info.serverUrl_, info.serverName_);
-            send_headers(protocol, status, extra_header, "text/html", &err_len, NULL, is_keep_alive, info);
+            common::Error err = send_headers(protocol, status, extra_header, "text/html", &err_len, NULL, is_keep_alive, info);
+            if(err && err->isError()){
+                DEBUG_MSG_ERROR(err);
+            }
 
             ssize_t nwrite = 0;
-            common::Error err = write(err_data, err_len, nwrite);
-            DCHECK(!err);
+            err = write(err_data, err_len, nwrite);
+            if(err && err->isError()){
+                DEBUG_MSG_ERROR(err);
+            }
             return err;
         }
 

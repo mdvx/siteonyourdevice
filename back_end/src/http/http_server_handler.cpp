@@ -141,11 +141,18 @@ namespace fasto
                     }
                 }
 
-                hclient->send_error(http::HP_1_1, http::HS_UNAUTHORIZED, "WWW-Authenticate: " AUTH_BASIC_METHOD " realm=User or password incorrect, try again", NULL, true, info());
+                common::Error err = hclient->send_error(http::HP_1_1, http::HS_UNAUTHORIZED, "WWW-Authenticate: " AUTH_BASIC_METHOD " realm=User or password incorrect, try again", NULL, true, info());
+                if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
+                }
                 return true;
             }
 
-            hclient->send_error(http::HP_1_1, http::HS_UNAUTHORIZED, "WWW-Authenticate: " AUTH_BASIC_METHOD " realm=Private page please authenticate", NULL, true, info());
+            common::Error err = hclient->send_error(http::HP_1_1, http::HS_UNAUTHORIZED, "WWW-Authenticate: " AUTH_BASIC_METHOD " realm=Private page please authenticate", NULL, true, info());
+            if(err && err->isError()){
+                DEBUG_MSG_ERROR(err);
+            }
+
             return true;
         }
 
@@ -159,7 +166,10 @@ namespace fasto
             if(result.second && result.second->isError()){
                 const std::string error_text = result.second->description();
                 DEBUG_MSG_ERROR(result.second);
-                hclient->send_error(http::HP_1_1, result.first, NULL, error_text.c_str(), false, info());
+                common::Error err = hclient->send_error(http::HP_1_1, result.first, NULL, error_text.c_str(), false, info());
+                if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
+                }
                 hclient->close();
                 delete hclient;
                 return;
@@ -256,7 +266,10 @@ namespace fasto
                 if(result.second && result.second->isError()){
                     const std::string error_text = result.second->description();
                     DEBUG_MSG_ERROR(result.second);
-                    h2client->send_error(http::HP_2_0, result.first, NULL, error_text.c_str(), false, info());
+                    common::Error err = h2client->send_error(http::HP_2_0, result.first, NULL, error_text.c_str(), false, info());
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                    }
                     h2client->close();
                     delete h2client;
                     return;

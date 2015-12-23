@@ -3,6 +3,7 @@
 #include "common/system/system.h"
 #include "common/string_util.h"
 #include "common/sprintf.h"
+#include "common/logger.h"
 
 #include "http/http_client.h"
 
@@ -72,12 +73,19 @@ namespace fasto
 
             common::Error err = common::system::systemShutdown(sh_type);
             if(err && err->isError()){
+                DEBUG_MSG_ERROR(err);
                 const std::string cause = common::MemSPrintf("Shutdown failed(%s).", err->description());
-                hclient->send_error(protocol, HS_NOT_ALLOWED, extra_header, cause.c_str(), isKeepAlive, info);
+                err = hclient->send_error(protocol, HS_NOT_ALLOWED, extra_header, cause.c_str(), isKeepAlive, info);
+                if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
+                }
                 return true;
             }
 
-            hclient->send_ok(protocol, extra_header, "Your device shutdowned!", isKeepAlive, info);
+            err = hclient->send_ok(protocol, extra_header, "Your device shutdowned!", isKeepAlive, info);
+            if(err && err->isError()){
+                DEBUG_MSG_ERROR(err);
+            }
             return true;
         }
 

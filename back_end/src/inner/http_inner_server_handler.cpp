@@ -348,7 +348,10 @@ namespace fasto
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                         const std::string error_text = err->description();
-                        rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL, error_text.c_str(), false, info());
+                        err = rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL, error_text.c_str(), false, info());
+                        if(err && err->isError()){
+                            DEBUG_MSG_ERROR(err);
+                        }
                         return;
                     }
 
@@ -365,12 +368,18 @@ namespace fasto
                 if(err && err->isError()){
                     DEBUG_MSG_ERROR(err);
                     const std::string error_text = err->description();
-                    rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL, error_text.c_str(), false, info());
+                    err = rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL, error_text.c_str(), false, info());
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                    }
                     return;
                 }
             }
             else{
-                rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL, "Invalid external host!", false, info());
+                err = rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL, "Invalid external host!", false, info());
+                if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
+                }
             }
         }
 
