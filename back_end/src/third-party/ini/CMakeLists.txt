@@ -4,11 +4,11 @@ PROJECT(inih C)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/inih)
 
 SET(HEADERS_INIH
-	inih/ini.h
+    inih/ini.h
 )
 
 SET(SOURCES_INIH
-	inih/ini.c
+    inih/ini.c
 )
 
 SET(LIBS_INIH
