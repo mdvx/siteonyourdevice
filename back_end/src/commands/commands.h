@@ -1,6 +1,5 @@
 #pragma once
 
-#include <inttypes.h>
 #include "common/sprintf.h"
 
 #define END_OF_COMMAND "\r\n"
@@ -22,13 +21,15 @@
 #define MAX_COMMAND_SIZE 256
 #define IS_EQUAL_COMMAND(BUF, CMD) BUF && memcmp(BUF, CMD, sizeof(CMD) - 1) == 0
 
-#define GENERATE_FMT(CMD, CMD_FMT) "%" PRIu64 " %s " CMD " " CMD_FMT END_OF_COMMAND
-#define GENEATATE_SUCCESS_FMT(CMD, CMD_FMT) "%" PRIu64 " %s " SUCCESS_COMMAND " " CMD " " CMD_FMT END_OF_COMMAND
-#define GENEATATE_FAIL_FMT(CMD, CMD_FMT) "%" PRIu64 " %s " FAIL_COMMAND " " CMD " " CMD_FMT END_OF_COMMAND
+#define CID_FMT PRIu8
 
-#define REQUEST_COMMAND 0
-#define RESPONCE_COMMAND 1
-#define APPROVE_COMMAND 2
+#define GENERATE_FMT(CMD, CMD_FMT) "%" CID_FMT " %s " CMD " " CMD_FMT END_OF_COMMAND
+#define GENEATATE_SUCCESS_FMT(CMD, CMD_FMT) "%" CID_FMT " %s " SUCCESS_COMMAND " " CMD " " CMD_FMT END_OF_COMMAND
+#define GENEATATE_FAIL_FMT(CMD, CMD_FMT) "%" CID_FMT " %s " FAIL_COMMAND " " CMD " " CMD_FMT END_OF_COMMAND
+
+#define REQUEST_COMMAND 0u
+#define RESPONCE_COMMAND 1u
+#define APPROVE_COMMAND 2u
 
 #define PING_COMMAND "ping"
 #define PING_COMMAND_RESP_SUCCESS GENEATATE_SUCCESS_FMT(PING_COMMAND, "pong")
@@ -45,18 +46,19 @@
 #define SERVER_PLEASE_SYSTEM_INFO_COMMAND "plz_system_info"
 
 //request
-//[uint64_t](0) [hex_string]seq [std::string]command args ...
+//[size_t](0) [hex_string]seq [std::string]command args ...
 
 //responce
-//[uint64_t](1) [hex_string]seq [OK|FAIL] [std::string]command args ...
+//[size_t](1) [hex_string]seq [OK|FAIL] [std::string]command args ...
 
 //approve
-//[uint64_t](2) [hex_string]seq [OK|FAIL] [std::string]command args ...
+//[size_t](2) [hex_string]seq [OK|FAIL] [std::string]command args ...
 
 namespace fasto
 {
     namespace siteonyourdevice
     {
-        typedef std::string cmd_id_type;
+        typedef std::string cmd_seq_type;
+        typedef uint8_t cmd_id_type;
     }
 }

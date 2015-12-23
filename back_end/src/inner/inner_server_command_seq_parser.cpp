@@ -13,13 +13,13 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        RequestCallback::RequestCallback(cmd_id_type request_id, callback_t cb)
+        RequestCallback::RequestCallback(cmd_seq_type request_id, callback_t cb)
             : request_id_(request_id), cb_(cb)
         {
 
         }
 
-        cmd_id_type RequestCallback::request_id() const
+        cmd_seq_type RequestCallback::request_id() const
         {
             return request_id_;
         }
@@ -54,7 +54,7 @@ namespace fasto
 
         }
 
-        cmd_id_type InnerServerCommandSeqParser::next_id()
+        cmd_seq_type InnerServerCommandSeqParser::next_id()
         {
             size_t next_id = id_++;
             char bytes[sizeof(size_t)];
@@ -65,7 +65,7 @@ namespace fasto
 
         namespace
         {
-            bool exec_reqest(RequestCallback req, cmd_id_type request_id, int argc, char *argv[])
+            bool exec_reqest(RequestCallback req, cmd_seq_type request_id, int argc, char *argv[])
             {
                 if(request_id == req.request_id()){
                     req.execute(argc, argv);
@@ -76,7 +76,7 @@ namespace fasto
             }
         }
 
-        void InnerServerCommandSeqParser::processRequest(cmd_id_type request_id, int argc, char *argv[])
+        void InnerServerCommandSeqParser::processRequest(cmd_seq_type request_id, int argc, char *argv[])
         {
             subscribed_requests_.erase(std::remove_if(subscribed_requests_.begin(), subscribed_requests_.end(),
                                                       std::bind(&exec_reqest, std::placeholders::_1, request_id, argc, argv)),
@@ -107,7 +107,7 @@ namespace fasto
             *end = 0;
 
             char *star_seq = NULL;
-            uint64_t seq = strtoull(buff, &star_seq, 10);
+            cmd_id_type seq = strtoul(buff, &star_seq, 10);
             if (*star_seq != ' ') {
                 DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "PROBLEM EXTRACTING SEQUENCE: %s", buff);
                 const std::string resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
@@ -134,7 +134,7 @@ namespace fasto
             }
 
             size_t len_seq = id_ptr - (star_seq + 1);
-            cmd_id_type id = std::string(star_seq + 1, len_seq);
+            cmd_seq_type id = std::string(star_seq + 1, len_seq);
             const char *cmd = id_ptr;
 
             int argc;
@@ -152,7 +152,7 @@ namespace fasto
                 return;
             }
 
-            DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_INFO, "HANDLE INNER COMMAND client[%s] seq:% " PRIu64 ", id:%s, cmd: %s",
+            DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_INFO, "HANDLE INNER COMMAND client[%s] seq:% " CID_FMT ", id:%s, cmd: %s",
                                                    connection->formatedName(), seq, id, cmd);
             if(seq == REQUEST_COMMAND){
                 handleInnerRequestCommand(connection, id, argc, argv);

@@ -255,7 +255,7 @@ namespace fasto
 
             }
 
-            void processSubscribed(cmd_id_type request_id, int argc, char *argv[])
+            void processSubscribed(cmd_seq_type request_id, int argc, char *argv[])
             {
                 sds join = sdsempty();
                 join = sdscatfmt(join, "%s ", request_id.c_str());
@@ -286,8 +286,8 @@ namespace fasto
 
             virtual void handleMessage(char* channel, size_t channel_len, char* msg, size_t msg_len)
             {
-                // [std::string]site [uint64_t]seq [std::string]command args ...
-                // [uint64_t]seq OK/FAIL [std::string]command args ..
+                // [std::string]site [hex_string]seq [std::string]command args ...
+                // [hex_string]seq OK/FAIL [std::string]command args ..
                 DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_INFO, "InnerSubHandler channel: %s, %s", channel, msg);
 
                 char *space = strchr(msg, ' ');
@@ -304,7 +304,7 @@ namespace fasto
                 int len = sprintf(buff, STRINGIZE(REQUEST_COMMAND) " %s" END_OF_COMMAND, space + 1); //only REQUEST_COMMAND
 
                 char *star_seq = NULL;
-                uint64_t seq = strtoull(buff, &star_seq, 10);
+                cmd_id_type seq = strtoul(buff, &star_seq, 10);
                 if (*star_seq != ' ') {
                     const std::string resp = common::MemSPrintf("PROBLEM EXTRACTING SEQUENCE: %s", space + 1);
                     DEBUG_MSG(common::logging::L_WARNING, resp);
@@ -321,7 +321,7 @@ namespace fasto
                 }
 
                 size_t len_seq = id_ptr - (star_seq + 1);
-                cmd_id_type id = std::string(star_seq + 1, len_seq);
+                cmd_seq_type id = std::string(star_seq + 1, len_seq);
                 const char *cmd = id_ptr;
 
                 InnerTcpClient* fclient = parent_->parent_->findInnerConnectionByHost(msg);
@@ -436,7 +436,7 @@ namespace fasto
             redis_subscribe_command_in_thread_->start();
         }
 
-        void InnerServerHandlerHost::handleInnerRequestCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[])
+        void InnerServerHandlerHost::handleInnerRequestCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[])
         {
             char* command = argv[0];
 
@@ -450,7 +450,7 @@ namespace fasto
             }
         }
 
-        void InnerServerHandlerHost::handleInnerResponceCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[])
+        void InnerServerHandlerHost::handleInnerResponceCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[])
         {
             ssize_t nwrite = 0;
             char* state_command = argv[0];
@@ -568,7 +568,7 @@ namespace fasto
             delete connection;
         }
 
-        void InnerServerHandlerHost::handleInnerApproveCommand(InnerClient *connection, cmd_id_type id, int argc, char *argv[])
+        void InnerServerHandlerHost::handleInnerApproveCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[])
         {
 
         }
