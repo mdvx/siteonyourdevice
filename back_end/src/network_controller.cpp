@@ -170,7 +170,7 @@ namespace fasto
         NetworkController::NetworkController(int argc, char *argv[])
             : handler_(NULL), server_(NULL),
               config_(), thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>()),
-              authChecker_(NULL), server_type_(FASTO_SERVER)
+              authChecker_(NULL)
         {
             Http2InnerServerHandler* servh = new Http2InnerServerHandler(HttpServerInfo(PROJECT_NAME_TITLE, PROJECT_DOMAIN), g_inner_host);
             handler_ = servh;
@@ -230,12 +230,17 @@ namespace fasto
             }
 
             server_->stop();
+            http_thread_->joinAndGet();
         }
 
         common::Error NetworkController::connect()
         {
-            configuration_t config = config_;
+            if(server_){    //if connected
+                return common::Error();
+            }
 
+            configuration_t config = config_;
+            // handler prepare
             handler_->clearHttpCallback();
             handler_->clearSocketUrl();
 
@@ -265,18 +270,7 @@ namespace fasto
             const http_server_type server_type = config_.server_type_;
             const common::net::hostAndPort externalHost = config_.external_host_;
             handler_->setConfig(config);
-
-            if(server_){
-                if(server_type == server_type_){
-                    return handler_->innerConnect(server_);
-                }
-                else {
-                    server_->stop();
-                    http_thread_->joinAndGet();
-                    delete server_;
-                    server_ = NULL;
-                }
-            }
+            // handler prepare
 
             const std::string contentPath = config.content_path_;
             if(server_type == FASTO_SERVER){                
@@ -313,8 +307,6 @@ namespace fasto
                 return common::make_error_value("Invalid https server settings!", common::Value::E_ERROR, common::logging::L_ERR);
             }
 
-            server_type_ = server_type;
-
             http_thread_ = THREAD_MANAGER()->createThread(&ITcpLoop::exec, server_);
             http_thread_->start();
 
@@ -332,6 +324,11 @@ namespace fasto
                 DEBUG_MSG_ERROR(err);
                 return err;
             }
+
+            server_->stop();
+            http_thread_->joinAndGet();
+            delete server_;
+            server_ = NULL;
 
             const std::string appdir = fApp->appDir();
             err = common::file_system::change_directory(appdir);

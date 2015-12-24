@@ -16,13 +16,13 @@ namespace fasto
     {
         typedef UserAuthInfo HostInfo;
 
-        class HttpServerHandlerHost;
+        class HttpServerHost;
 
         class InnerServerHandlerHost
                 : public InnerServerCommandSeqParser, public ITcpLoopObserver
         {
         public:
-            InnerServerHandlerHost(HttpServerHandlerHost * parent);
+            InnerServerHandlerHost(HttpServerHost * parent);
 
             virtual void preLooped(ITcpLoop* server);
 
@@ -41,7 +41,7 @@ namespace fasto
             virtual void handleInnerResponceCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
             virtual void handleInnerApproveCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
 
-            HttpServerHandlerHost* const parent_;
+            HttpServerHost* const parent_;
 
             class InnerSubHandler;
             RedisSub *sub_commands_in_;
@@ -90,7 +90,7 @@ namespace fasto
         {
         public:
             typedef common::shared_ptr<TcpClient> client_t;
-            RelayServer(InnerServerHandlerHost *handler, InnerTcpClient *parent, client_t client);
+            RelayServer(InnerServerCommandSeqParser *handler, InnerTcpClient *parent, client_t client);
             ~RelayServer();
 
             client_t client() const;
@@ -107,7 +107,7 @@ namespace fasto
             client_t client_;
             std::shared_ptr<common::thread::Thread<int> > relayThread_;
             InnerTcpClient *parent_;
-            InnerServerHandlerHost *handler_;
+            InnerServerCommandSeqParser *handler_;
             std::vector<common::buffer_type> requests_;
         };
     }

@@ -70,7 +70,6 @@ namespace
 }
 
 fasto::siteonyourdevice::HttpServerHost* server = NULL;
-fasto::siteonyourdevice::HttpServerHandlerHost* handler = NULL;
 
 void signal_handler(int sig);
 void sync_config();
@@ -113,12 +112,10 @@ int main(int argc, char *argv[])
 		SET_LOG_HANDLER(&app_logger_hadler);
 	}
 
-    handler = new HttpServerHandlerHost(HttpServerInfo(PROJECT_NAME_SERVER_TITLE, PROJECT_DOMAIN));
+    common::net::hostAndPort hs(INNER_HOST_NAME, HOST_PORT);
+    server = new HttpServerHost(hs, g_inner_host);
 
     sync_config();
-
-    common::net::hostAndPort hs(INNER_HOST_NAME, HOST_PORT);
-    server = new HttpServerHost(hs, g_inner_host, handler);
 
     common::Error err = common::file_system::change_directory(HOST_PATH);
     int return_code = EXIT_FAILURE;
@@ -130,7 +127,6 @@ int main(int argc, char *argv[])
 
 exit:
     delete server;
-    delete handler;
 
     closelog();
     return return_code;
@@ -170,7 +166,7 @@ void sync_config()
         DEBUG_MSG_FORMAT<128>(common::logging::L_INFO, "Can't load config '%s', use default settings.", config_path);
     }
 
-    handler->setStorageConfig(config.redis_config_);
+    server->setStorageConfig(config.redis_config_);
 }
 
 void app_logger_hadler(common::logging::LEVEL_LOG level, const std::string& message)

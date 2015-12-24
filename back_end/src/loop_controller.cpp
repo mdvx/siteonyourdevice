@@ -16,14 +16,17 @@ namespace fasto
 
         int ILoopController::exec()
         {
-            handler_ = createHandler();
-            if(!handler_){
+            CHECK(!handler_);
+            CHECK(!loop_);
+
+            ITcpLoopObserver *handler = createHandler();
+            if(!handler){
                 return EXIT_FAILURE;
             }
 
-            loop_ = createServer(handler_);
+            loop_ = createServer(handler);
             if(!loop_){
-                delete handler_;
+                delete handler;
                 return EXIT_FAILURE;
             }
 
@@ -37,7 +40,10 @@ namespace fasto
 
         void ILoopController::stop()
         {
-            loop_->stop();
+            if(loop_){
+                loop_->stop();
+            }
+
             stoped();
         }
 
@@ -70,7 +76,7 @@ namespace fasto
 
         void ILoopThreadController::stoped()
         {
-            loop_thread_->join();
+            join();
         }
     }
 }

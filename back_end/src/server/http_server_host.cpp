@@ -15,8 +15,13 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        HttpInnerServerHandlerHost::HttpInnerServerHandlerHost(const HttpServerInfo &info, HttpServerHandlerHost *parent)
+        HttpInnerServerHandlerHost::HttpInnerServerHandlerHost(const HttpServerInfo &info, HttpServerHost *parent)
             : Http2ServerHandler(info, NULL), parent_(parent)
+        {
+
+        }
+
+        HttpInnerServerHandlerHost::~HttpInnerServerHandlerHost()
         {
 
         }
@@ -98,25 +103,61 @@ namespace fasto
             server->unregisterClient(hclient);
         }
 
-        HttpInnerServerHandlerHost::~HttpInnerServerHandlerHost()
+        namespace
         {
+            int exec_http_server(Http2Server * server)
+            {
+                common::Error err = server->bind();
+                if(err && err->isError()){
+                    return EXIT_FAILURE;
+                }
 
+                err = server->listen(5);
+                if(err && err->isError()){
+                    return EXIT_FAILURE;
+                }
+
+                return server->exec();
+            }
+
+            int exec_inner_server(InnerTcpServer * server)
+            {
+                common::Error err = server->bind();
+                if(err && err->isError()){
+                    return EXIT_FAILURE;
+                }
+
+                err = server->listen(5);
+                if(err && err->isError()){
+                    return EXIT_FAILURE;
+                }
+
+                return server->exec();
+            }
         }
 
-        HttpServerHandlerHost::HttpServerHandlerHost(const HttpServerInfo &info)
-            : connections_()
+        HttpServerHost::HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort &innerHost)
+            : httpHandler_(NULL), httpServer_(NULL), http_thread_(),
+              innerHandler_(NULL), innerServer_(NULL), inner_thread_(),
+              connections_(), rstorage_()
         {
+            httpHandler_ = new HttpInnerServerHandlerHost(HttpServerInfo(PROJECT_NAME_SERVER_TITLE, PROJECT_DOMAIN), this);
+            httpServer_ = new Http2Server(httpHost, httpHandler_);
+            httpServer_->setName("proxy_http_server");
+            http_thread_ = THREAD_MANAGER()->createThread(&exec_http_server, httpServer_);
+
             innerHandler_ = new InnerServerHandlerHost(this);
-            httpHandler_ = new HttpInnerServerHandlerHost(info, this);
+            innerServer_ = new InnerTcpServer(innerHost, innerHandler_);
+            innerServer_->setName("inner_server");
+            inner_thread_ = THREAD_MANAGER()->createThread(&exec_inner_server, innerServer_);
         }
 
-        void HttpServerHandlerHost::setStorageConfig(const redis_sub_configuration_t& config)
+        InnerServerHandlerHost * HttpServerHost::innerHandler() const
         {
-            rstorage_.setConfig(config);
-            innerHandler_->setStorageConfig(config);
+            return innerHandler_;
         }
 
-        bool HttpServerHandlerHost::unRegisterInnerConnectionByHost(TcpClient* connection)
+        bool HttpServerHost::unRegisterInnerConnectionByHost(TcpClient* connection)
         {
             InnerTcpClient * iconnection = dynamic_cast<InnerTcpClient *>(connection);
             if(!iconnection){
@@ -133,7 +174,7 @@ namespace fasto
             return true;
         }
 
-        bool HttpServerHandlerHost::registerInnerConnectionByUser(const UserAuthInfo& user, TcpClient* connection)
+        bool HttpServerHost::registerInnerConnectionByUser(const UserAuthInfo& user, TcpClient* connection)
         {
             CHECK(user.isValid());
             InnerTcpClient * iconnection = dynamic_cast<InnerTcpClient *>(connection);
@@ -148,12 +189,12 @@ namespace fasto
             return true;
         }
 
-        bool HttpServerHandlerHost::findUser(const UserAuthInfo& user) const
+        bool HttpServerHost::findUser(const UserAuthInfo& user) const
         {
             return rstorage_.findUser(user);
         }
 
-        InnerTcpClient * const HttpServerHandlerHost::findInnerConnectionByHost(const std::string& host) const
+        InnerTcpClient * const HttpServerHost::findInnerConnectionByHost(const std::string& host) const
         {
             inner_connections_type::const_iterator hs = connections_.find(host);
             if(hs == connections_.end()){
@@ -163,125 +204,28 @@ namespace fasto
             return (*hs).second;
         }
 
-        InnerServerHandlerHost* HttpServerHandlerHost::innerHandler() const
+        void HttpServerHost::setStorageConfig(const redis_sub_configuration_t &config)
         {
-            return innerHandler_;
-        }
-
-        HttpInnerServerHandlerHost* HttpServerHandlerHost::httpHandler() const
-        {
-            return httpHandler_;
-        }
-
-        HttpServerHandlerHost::~HttpServerHandlerHost()
-        {
-            delete innerHandler_;
-            delete httpHandler_;
-        }
-
-        namespace
-        {
-            class HttpServerController
-                    : public ILoopThreadController
-            {
-                const common::net::hostAndPort host_;
-                HttpInnerServerHandlerHost * handler_;
-
-            public:
-                HttpServerController(const common::net::hostAndPort& httpHost, HttpInnerServerHandlerHost * handler)
-                    : host_(httpHost), handler_(handler)
-                {
-
-                }
-
-            private:
-                virtual ITcpLoopObserver * createHandler()
-                {
-                    return handler_;
-                }
-
-                virtual ITcpLoop * createServer(ITcpLoopObserver * handler)
-                {
-                    Http2Server * server = new Http2Server(host_, handler);
-                    server->setName("proxy_http_server");
-
-                    common::Error err = server->bind();
-                    if(err && err->isError()){
-                        delete server;
-                        return NULL;
-                    }
-
-                    err = server->listen(5);
-                    if(err && err->isError()){
-                        delete server;
-                        return NULL;
-                    }
-
-                    return server;
-                }
-            };
-
-            class InnerServerController
-                    : public ILoopThreadController
-            {
-                const common::net::hostAndPort host_;
-                InnerServerHandlerHost * handler_;
-
-            public:
-                InnerServerController(const common::net::hostAndPort& innerHost, InnerServerHandlerHost * handler)
-                    : host_(innerHost), handler_(handler)
-                {
-
-                }
-
-            private:
-                virtual ITcpLoopObserver * createHandler()
-                {
-                    return handler_;
-                }
-
-                virtual ITcpLoop * createServer(ITcpLoopObserver * handler)
-                {
-                    InnerTcpServer * server = new InnerTcpServer(host_, handler);
-                    server->setName("inner_server");
-
-                    common::Error err = server->bind();
-                    if(err && err->isError()){
-                        delete server;
-                        return NULL;
-                    }
-
-                    err = server->listen(5);
-                    if(err && err->isError()){
-                        delete server;
-                        return NULL;
-                    }
-
-                    return server;
-                }
-            };
-        }
-
-        HttpServerHost::HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort &innerHost, HttpServerHandlerHost * handler)
-            : httpServer_(NULL), innerServer_(NULL)
-        {
-            httpServer_ = new HttpServerController(httpHost, handler->httpHandler());
-            innerServer_ = new InnerServerController(innerHost, handler->innerHandler());
+            rstorage_.setConfig(config);
+            innerHandler_->setStorageConfig(config);
         }
 
         HttpServerHost::~HttpServerHost()
         {
             delete httpServer_;
             delete innerServer_;
+
+            delete innerHandler_;
+            delete httpHandler_;
         }
 
         int HttpServerHost::exec()
         {
-            httpServer_->start();
-            innerServer_->start();
+            http_thread_->start();
+            inner_thread_->start();
 
-            int res = httpServer_->join();
-            res |= innerServer_->join();
+            int res = http_thread_->joinAndGet();
+            res |= inner_thread_->joinAndGet();
             return res;
         }
 

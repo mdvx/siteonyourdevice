@@ -10,6 +10,11 @@ namespace fasto
 
         }
 
+        WebSocketClient::~WebSocketClient()
+        {
+
+        }
+
         const char* WebSocketClient::className() const
         {
             return "WebSocketClient";

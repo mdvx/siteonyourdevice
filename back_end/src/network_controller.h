@@ -72,8 +72,6 @@ namespace fasto
 
             class HttpAuthObserver;
             HttpAuthObserver* authChecker_;
-
-            http_server_type server_type_;
         };
     }
 }

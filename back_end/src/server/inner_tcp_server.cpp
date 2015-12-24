@@ -21,7 +21,7 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        RelayServer::RelayServer(InnerServerHandlerHost *handler, InnerTcpClient *parent, client_t client)
+        RelayServer::RelayServer(InnerServerCommandSeqParser *handler, InnerTcpClient *parent, client_t client)
             : ServerSocketTcp(g_relay_server_host), stop_(false), client_(client), relayThread_(), parent_(parent), handler_(handler)
         {
             relayThread_ = THREAD_MANAGER()->createThread(&RelayServer::exec, this);
@@ -357,7 +357,7 @@ namespace fasto
             InnerServerHandlerHost * parent_;
         };
 
-        InnerServerHandlerHost::InnerServerHandlerHost(HttpServerHandlerHost *parent)
+        InnerServerHandlerHost::InnerServerHandlerHost(HttpServerHost *parent)
             : parent_(parent), sub_commands_in_(NULL), handler_(NULL)
         {
             handler_ = new InnerSubHandler(this);

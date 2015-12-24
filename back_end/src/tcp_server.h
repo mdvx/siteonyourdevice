@@ -51,7 +51,7 @@ namespace fasto
 
             ITcpLoopObserver* const observer_;
 
-            uint32_t total_clients_;
+            std::vector<TcpClient *> clients_;
             const common::id_counter<ITcpLoop> id_;
 
             std::string name_;

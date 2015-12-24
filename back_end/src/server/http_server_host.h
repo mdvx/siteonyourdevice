@@ -12,8 +12,7 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class HttpServerHandlerHost;
-        class ILoopThreadController;
+        class HttpServerHost;
 
         class HttpInnerServerHandlerHost
                 : public Http2ServerHandler
@@ -22,7 +21,7 @@ namespace fasto
             typedef Http2Server server_t;
             typedef HttpClient client_t;
 
-            HttpInnerServerHandlerHost(const HttpServerInfo & info, HttpServerHandlerHost * parent);
+            HttpInnerServerHandlerHost(const HttpServerInfo & info, HttpServerHost * parent);
             virtual void accepted(TcpClient* client);
             virtual void closed(TcpClient* client);
             virtual void dataReceived(TcpClient* client);
@@ -30,48 +29,40 @@ namespace fasto
             virtual ~HttpInnerServerHandlerHost();
 
         private:
-            HttpServerHandlerHost* const parent_;
+            HttpServerHost* const parent_;
         };
 
-        class HttpServerHandlerHost
+        class HttpServerHost
         {
         public:
             typedef std::unordered_map<std::string, InnerTcpClient*> inner_connections_type;
 
-            HttpServerHandlerHost(const HttpServerInfo& info);
-            ~HttpServerHandlerHost();
+            HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort& innerHost);
+            ~HttpServerHost();
+
+            void setStorageConfig(const redis_sub_configuration_t &config);
 
             bool unRegisterInnerConnectionByHost(TcpClient* connection) WARN_UNUSED_RESULT;
             bool registerInnerConnectionByUser(const UserAuthInfo& user, TcpClient* connection) WARN_UNUSED_RESULT;
             bool findUser(const UserAuthInfo& user) const;
             InnerTcpClient* const findInnerConnectionByHost(const std::string& host) const;
 
-            InnerServerHandlerHost* innerHandler() const;
-            HttpInnerServerHandlerHost* httpHandler() const;
-
-            void setStorageConfig(const redis_sub_configuration_t &config);
-
-        private:
-            inner_connections_type connections_;
-
-            InnerServerHandlerHost* innerHandler_;
-            HttpInnerServerHandlerHost* httpHandler_;
-
-            RedisStorage rstorage_;
-        };
-
-        class HttpServerHost
-        {
-        public:
-            HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort& innerHost, HttpServerHandlerHost *handler);
-            ~HttpServerHost();
-
             int exec() WARN_UNUSED_RESULT;
             void stop();
 
+            InnerServerHandlerHost * innerHandler() const;
+
         private:
-            ILoopThreadController* httpServer_;
-            ILoopThreadController* innerServer_;
+            HttpInnerServerHandlerHost* httpHandler_;
+            Http2Server* httpServer_;
+            std::shared_ptr<common::thread::Thread<int> > http_thread_;
+
+            InnerServerHandlerHost* innerHandler_;
+            InnerTcpServer * innerServer_;
+            std::shared_ptr<common::thread::Thread<int> > inner_thread_;
+
+            inner_connections_type connections_;
+            RedisStorage rstorage_;
         };
     }
 }

@@ -11,6 +11,7 @@ namespace fasto
         {
         public:
             WebSocketClient(ITcpLoop* server, const common::net::socket_info& info);
+            ~WebSocketClient();
 
             const char* className() const;
         };

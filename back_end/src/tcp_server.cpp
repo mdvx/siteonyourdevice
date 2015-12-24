@@ -40,7 +40,7 @@ namespace fasto
     namespace siteonyourdevice
     {
         ITcpLoop::ITcpLoop(ITcpLoopObserver* observer)
-            : loop_(new LibEvLoop), observer_(observer), total_clients_(0), id_()
+            : loop_(new LibEvLoop), observer_(observer), clients_(), id_()
         {
             loop_->setObserver(this);
         }
@@ -76,8 +76,9 @@ namespace fasto
             }
 
             client->server_ = NULL;
-            DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Successfully unregister client[%s], from server[%s], %d client(s) connected.",
-                                  client->formatedName(), formatedName(), id(), --total_clients_);
+            clients_.erase(std::remove(clients_.begin(), clients_.end(), client), clients_.end());
+            DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Successfully unregister client[%s], from server[%s], %" PRIuS " client(s) connected.",
+                                  client->formatedName(), formatedName(), id(), clients_.size());
         }
 
         void ITcpLoop::registerClient(TcpClient * client)
@@ -90,8 +91,9 @@ namespace fasto
             if(observer_){
                 observer_->accepted(client);
             }
-            DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Successfully connected with client[%s], from server[%s], %d client(s) connected.",
-                                  client->formatedName(), formatedName(), id(), ++total_clients_);
+            clients_.push_back(client);
+            DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Successfully connected with client[%s], from server[%s], %" PRIuS " client(s) connected.",
+                                  client->formatedName(), formatedName(), id(), clients_.size());
         }
 
         void ITcpLoop::closeClient(TcpClient *client)
@@ -102,8 +104,9 @@ namespace fasto
             if(observer_){
                 observer_->closed(client);
             }
-            DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Successfully disconnected client[%s], from server[%s], %d client(s) connected.",
-                                  client->formatedName(), formatedName(), --total_clients_);
+            clients_.erase(std::remove(clients_.begin(), clients_.end(), client), clients_.end());
+            DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Successfully disconnected client[%s], from server[%s], %" PRIuS " client(s) connected.",
+                                  client->formatedName(), formatedName(), clients_.size());
         }
 
         common::id_counter<ITcpLoop>::type_t ITcpLoop::id() const
@@ -168,6 +171,14 @@ namespace fasto
         {
             if(observer_){
                 observer_->postLooped(this);
+            }
+
+            const std::vector<TcpClient *> cl = clients_;
+
+            for(size_t i = 0; i < cl.size(); ++i){
+                TcpClient * client = cl[i];
+                client->close();
+                delete client;
             }
         }
 
