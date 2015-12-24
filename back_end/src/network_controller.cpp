@@ -377,7 +377,8 @@ namespace fasto
             configSave.write("[http_server_sockets]\n");
             for(int i = 0; i < config_.server_sockets_urls_.size(); ++i){
                 configuration_t::server_sockets_urls_t sock_url = config_.server_sockets_urls_[i];
-                configSave.writeFormated("%s=%s\n", sock_url.first, sock_url.second.get_url());
+                const std::string url = sock_url.second.get_url();
+                configSave.writeFormated("%s=%s\n", sock_url.first, url);
             }
             configSave.close();
         }

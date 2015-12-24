@@ -29,7 +29,6 @@ namespace fasto
             bool isAuthenticated() const;
 
         private:
-            using TcpClient::write;
             bool isAuth_;
         };
 

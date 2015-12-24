@@ -88,7 +88,9 @@ namespace fasto
             strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime( &now ));
 
             char header_data[1024] = {0};
-            int cur_pos = common::SPrintf(header_data, HTTP_2_0_PROTOCOL_NAME " %d %s\r\nServer: %s\r\nDate: %s\r\n", status, title, info.serverName_, timebuf);
+            int cur_pos = common::SPrintf(header_data,
+                                          protocol == common::http::HP_2_0 ? HTTP_2_0_PROTOCOL_NAME " %d %s\r\nServer: %s\r\nDate: %s\r\n" : HTTP_1_1_PROTOCOL_NAME " %d %s\r\nServer: %s\r\nDate: %s\r\n",
+                                          status, title, info.serverName_, timebuf);
 
             if (extra_header){
                 int exlen = common::SPrintf(header_data + cur_pos, "%s\r\n", extra_header);

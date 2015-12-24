@@ -28,9 +28,10 @@ namespace fasto
                     : public ILoopThreadController
             {
                 const common::net::hostAndPort host_;
+                const HttpServerInfo info_;
             public:
-                WebSocketController(const common::net::hostAndPort& host)
-                    : host_(host)
+                WebSocketController(const common::net::hostAndPort& host, const HttpServerInfo &info)
+                    : host_(host), info_(info)
                 {
 
                 }
@@ -38,7 +39,7 @@ namespace fasto
            private:
                 ITcpLoopObserver * createHandler()
                 {
-                    return new WebSocketServerHandler;
+                    return new WebSocketServerHandler(info_);
                 }
 
                 ITcpLoop * createServer(ITcpLoopObserver * handler)
@@ -86,7 +87,7 @@ namespace fasto
                     continue;
                 }
 
-                ILoopThreadController * loopc = new WebSocketController(host);
+                ILoopThreadController * loopc = new WebSocketController(host, info());
                 loopc->start();
                 sockets_urls_[i].second = loopc;
             }
@@ -234,7 +235,7 @@ namespace fasto
             return true;
         }
 
-        void HttpServerHandler::processReceived(HttpClient *hclient, const char* request, uint32_t req_len)
+        void HttpServerHandler::processReceived(HttpClient *hclient, const char* request, size_t req_len)
         {
             using namespace common;
 
@@ -304,7 +305,7 @@ namespace fasto
 
         }
 
-        void Http2ServerHandler::processReceived(HttpClient *hclient, const char* request, uint32_t req_len)
+        void Http2ServerHandler::processReceived(HttpClient *hclient, const char* request, size_t req_len)
         {
             using namespace common;            
             if(http2::is_preface_data(request, req_len)){

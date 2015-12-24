@@ -53,8 +53,8 @@ namespace fasto
             const HttpServerInfo& info() const;
 
         protected:
-            virtual void processReceived(HttpClient *hclient, const char* request, uint32_t req_len);
-            void handleRequest(HttpClient *hclient, const common::http::http_request& hrequest, bool notClose);
+            virtual void processReceived(HttpClient *hclient, const char* request, size_t req_len);
+            virtual void handleRequest(HttpClient *hclient, const common::http::http_request& hrequest, bool notClose);
 
         private:
             bool tryToHandleAsRegisteredCallback(HttpClient* hclient, const std::string& uri, const common::http::http_request& request);
@@ -77,7 +77,7 @@ namespace fasto
             Http2ServerHandler(const HttpServerInfo &info, IHttpAuthObserver * observer);
 
         protected:
-            virtual void processReceived(HttpClient *hclient, const char* request, uint32_t req_len);
+            virtual void processReceived(HttpClient *hclient, const char* request, size_t req_len);
 
         private:
             void handleHttp2Request(Http2Client* h2client, const char* request, uint32_t req_len);
