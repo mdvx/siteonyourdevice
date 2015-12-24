@@ -7,7 +7,7 @@ namespace fasto
     namespace siteonyourdevice
     {
         class HttpFileSystemCallback
-                : public IHttpCallback
+                : public HttpCallbackUrl
         {
         public:
             HttpFileSystemCallback();

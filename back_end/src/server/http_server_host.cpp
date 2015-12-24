@@ -7,6 +7,8 @@
 
 #include "http/http_client.h"
 
+#include "loop_controller.h"
+
 #define BUF_SIZE 4096
 
 namespace fasto
@@ -177,17 +179,94 @@ namespace fasto
             delete httpHandler_;
         }
 
+        namespace
+        {
+            class HttpServerController
+                    : public ILoopThreadController
+            {
+                const common::net::hostAndPort host_;
+                HttpInnerServerHandlerHost * handler_;
+
+            public:
+                HttpServerController(const common::net::hostAndPort& httpHost, HttpInnerServerHandlerHost * handler)
+                    : host_(httpHost), handler_(handler)
+                {
+
+                }
+
+            private:
+                virtual ITcpLoopObserver * createHandler()
+                {
+                    return handler_;
+                }
+
+                virtual ITcpLoop * createServer(ITcpLoopObserver * handler)
+                {
+                    Http2Server * server = new Http2Server(host_, handler);
+                    server->setName("proxy_http_server");
+
+                    common::Error err = server->bind();
+                    if(err && err->isError()){
+                        delete server;
+                        return NULL;
+                    }
+
+                    err = server->listen(5);
+                    if(err && err->isError()){
+                        delete server;
+                        return NULL;
+                    }
+
+                    return server;
+                }
+            };
+
+            class InnerServerController
+                    : public ILoopThreadController
+            {
+                const common::net::hostAndPort host_;
+                InnerServerHandlerHost * handler_;
+
+            public:
+                InnerServerController(const common::net::hostAndPort& innerHost, InnerServerHandlerHost * handler)
+                    : host_(innerHost), handler_(handler)
+                {
+
+                }
+
+            private:
+                virtual ITcpLoopObserver * createHandler()
+                {
+                    return handler_;
+                }
+
+                virtual ITcpLoop * createServer(ITcpLoopObserver * handler)
+                {
+                    InnerTcpServer * server = new InnerTcpServer(host_, handler);
+                    server->setName("inner_server");
+
+                    common::Error err = server->bind();
+                    if(err && err->isError()){
+                        delete server;
+                        return NULL;
+                    }
+
+                    err = server->listen(5);
+                    if(err && err->isError()){
+                        delete server;
+                        return NULL;
+                    }
+
+                    return server;
+                }
+            };
+        }
+
         HttpServerHost::HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort &innerHost, HttpServerHandlerHost * handler)
             : httpServer_(NULL), innerServer_(NULL)
         {
-            httpServer_ = new Http2Server(httpHost, handler->httpHandler());
-
-            httpThread_ = THREAD_MANAGER()->createThread(&Http2Server::exec, httpServer_);
-            httpServer_->setName("proxy_http_server");
-
-            innerServer_ = new InnerTcpServer(innerHost, handler->innerHandler());
-            innerThread_ = THREAD_MANAGER()->createThread(&InnerTcpServer::exec, innerServer_);
-            innerServer_->setName("inner_server");
+            httpServer_ = new HttpServerController(httpHost, handler->httpHandler());
+            innerServer_ = new InnerServerController(innerHost, handler->innerHandler());
         }
 
         HttpServerHost::~HttpServerHost()
@@ -196,33 +275,13 @@ namespace fasto
             delete innerServer_;
         }
 
-        common::Error HttpServerHost::bind()
-        {
-            common::Error err = httpServer_->bind();
-            if(err && err->isError()){
-                return err;
-            }
-
-            return innerServer_->bind();
-        }
-
-        common::Error HttpServerHost::listen(int backlog)
-        {
-            common::Error err = httpServer_->listen(backlog);
-            if(err && err->isError()){
-                return err;
-            }
-
-            return innerServer_->listen(backlog);
-        }
-
         int HttpServerHost::exec()
         {
-            httpThread_->start();
-            innerThread_->start();
+            httpServer_->start();
+            innerServer_->start();
 
-            int res = httpThread_->joinAndGet();
-            res = innerThread_->joinAndGet();
+            int res = httpServer_->join();
+            res |= innerServer_->join();
             return res;
         }
 

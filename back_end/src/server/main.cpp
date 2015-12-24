@@ -126,16 +126,6 @@ int main(int argc, char *argv[])
         goto exit;
     }
 
-    err = server->bind();
-    if(err && err->isError()){
-        goto exit;
-    }
-
-    err = server->listen(5);
-    if(err && err->isError()){
-        goto exit;
-    }
-
     return_code = server->exec();
 
 exit:

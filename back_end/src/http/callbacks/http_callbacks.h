@@ -21,15 +21,20 @@ namespace fasto
         class IHttpCallback
         {
         public:
-            ~IHttpCallback();
-            HCTypes type() const;
+            IHttpCallback();
+            virtual ~IHttpCallback();
             virtual bool handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info) = 0;
 
             static common::shared_ptr<IHttpCallback> createHttpCallback(HCTypes type);
             static common::shared_ptr<IHttpCallback> createHttpCallback(const std::string& ns_name, const std::string& name);
+        };
 
-        protected:
-            IHttpCallback(HCTypes type);
+        class HttpCallbackUrl
+                : public IHttpCallback
+        {
+        public:
+            HttpCallbackUrl(HCTypes type);
+            HCTypes type() const;
 
         private:
             const HCTypes type_;

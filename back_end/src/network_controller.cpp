@@ -62,6 +62,11 @@ namespace fasto
                     pconfig->handlers_urls_.push_back(std::make_pair(name, value));
                     return 1;
                 }
+                else if(strcmp(section, "http_server_sockets") == 0){
+                    common::uri::Uri uri = common::uri::Uri(value);
+                    pconfig->server_sockets_urls_.push_back(std::make_pair(name, uri));
+                    return 1;
+                }
                 else {
                     return 0;  /* unknown section/name, error */
                 }
@@ -232,6 +237,7 @@ namespace fasto
             configuration_t config = config_;
 
             handler_->clearHttpCallback();
+            handler_->clearSocketUrl();
 
             for(int i = 0; i < config.handlers_urls_.size(); ++i){
                 configuration_t::handlers_urls_t handurl = config.handlers_urls_[i];
@@ -248,6 +254,12 @@ namespace fasto
                 if(handler){
                     handler_->registerHttpCallback(handurl.first, handler);
                 }
+            }
+
+            for(int i = 0; i < config.server_sockets_urls_.size(); ++i){
+                configuration_t::server_sockets_urls_t sock_url = config.server_sockets_urls_[i];
+                const common::uri::Uri url = sock_url.second;
+                handler_->registerSocketUrl(url);
             }
 
             const http_server_type server_type = config_.server_type_;
@@ -361,6 +373,11 @@ namespace fasto
             for(int i = 0; i < config_.handlers_urls_.size(); ++i){
                 configuration_t::handlers_urls_t handurl = config_.handlers_urls_[i];
                 configSave.writeFormated("%s=%s\n", handurl.first, handurl.second);
+            }
+            configSave.write("[http_server_sockets]\n");
+            for(int i = 0; i < config_.server_sockets_urls_.size(); ++i){
+                configuration_t::server_sockets_urls_t sock_url = config_.server_sockets_urls_[i];
+                configSave.writeFormated("%s=%s\n", sock_url.first, sock_url.second.get_url());
             }
             configSave.close();
         }

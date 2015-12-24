@@ -28,8 +28,7 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        IHttpCallback::IHttpCallback(HCTypes type)
-            : type_(type)
+        IHttpCallback::IHttpCallback()
         {
 
         }
@@ -37,11 +36,6 @@ namespace fasto
         IHttpCallback::~IHttpCallback()
         {
 
-        }
-
-        HCTypes IHttpCallback::type() const
-        {
-            return type_;
         }
 
         common::shared_ptr<IHttpCallback> IHttpCallback::createHttpCallback(HCTypes type)
@@ -71,6 +65,17 @@ namespace fasto
                 DNOTREACHED();
                 return common::shared_ptr<IHttpCallback>();
             }
+        }
+
+        HttpCallbackUrl::HttpCallbackUrl(HCTypes type)
+            : IHttpCallback(), type_(type)
+        {
+
+        }
+
+        HCTypes HttpCallbackUrl::type() const
+        {
+            return type_;
         }
     }
 }

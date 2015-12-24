@@ -34,6 +34,7 @@ namespace fasto
         void Http2InnerServerHandler::preLooped(ITcpLoop *server)
         {
             innerConnect(server);
+            Http2ServerHandler::preLooped(server);
         }
 
         void Http2InnerServerHandler::accepted(TcpClient* client)
@@ -61,6 +62,7 @@ namespace fasto
         void Http2InnerServerHandler::postLooped(ITcpLoop *server)
         {
             innerDisConnect(server);
+            Http2ServerHandler::postLooped(server);
         }
 
         void Http2InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[])

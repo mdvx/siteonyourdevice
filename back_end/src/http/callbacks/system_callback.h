@@ -16,7 +16,7 @@ namespace fasto
         const std::string HSystemCallbackTypes[] = { "shutdown", "logout", "reboot" };
 
         class HttpSystemCallback
-                : public IHttpCallback
+                : public HttpCallbackUrl
         {
         public:
             HttpSystemCallback();
@@ -24,7 +24,7 @@ namespace fasto
         };
 
         class HttpSystemShutdownCallback
-                : public IHttpCallback
+                : public HttpCallbackUrl
         {
         public:
             HttpSystemShutdownCallback(HSCTypes type);

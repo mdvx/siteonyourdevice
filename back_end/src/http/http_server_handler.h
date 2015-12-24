@@ -12,6 +12,7 @@ namespace fasto
     namespace siteonyourdevice
     {
         class Http2Client;
+        class ILoopController;
 
         class IHttpAuthObserver
         {
@@ -28,6 +29,9 @@ namespace fasto
             typedef common::shared_ptr<IHttpCallback> http_callback_t;
             typedef std::map<std::string, http_callback_t> http_callbacks_t;
 
+            typedef std::pair<common::uri::Uri, ILoopController*> socket_url_t;
+            typedef std::vector<socket_url_t> sockets_url_t;
+
             HttpServerHandler(const HttpServerInfo& info, IHttpAuthObserver * observer);
             virtual void preLooped(ITcpLoop* server);
             virtual void accepted(TcpClient* client);
@@ -41,6 +45,9 @@ namespace fasto
             void unRegisterHttpCallback(const std::string& url);
             void clearHttpCallback();
 
+            void registerSocketUrl(const common::uri::Uri& url);
+            void clearSocketUrl();
+
             void setAuthChecker(IHttpAuthObserver *observer);
 
             const HttpServerInfo& info() const;
@@ -53,9 +60,12 @@ namespace fasto
             bool tryToHandleAsRegisteredCallback(HttpClient* hclient, const std::string& uri, const common::http::http_request& request);
             bool tryAuthenticateIfNeeded(HttpClient* hclient, const char* extra_header, const common::http::http_request& request);
 
+
             http_callbacks_t httpCallbacks_;
             const common::shared_ptr<IHttpCallback> fshandler_;
             IHttpAuthObserver * authChecker_;
+
+            sockets_url_t sockets_urls_;
 
             const HttpServerInfo info_;
         };

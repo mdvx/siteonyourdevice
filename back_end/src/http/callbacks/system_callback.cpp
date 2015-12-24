@@ -33,7 +33,7 @@ namespace fasto
     namespace siteonyourdevice
     {
         HttpSystemCallback::HttpSystemCallback()
-            : IHttpCallback(system)
+            : HttpCallbackUrl(system)
         {
 
         }
@@ -44,7 +44,7 @@ namespace fasto
         }
 
         HttpSystemShutdownCallback::HttpSystemShutdownCallback(HSCTypes type)
-            : IHttpCallback(system), type_(type)
+            : HttpCallbackUrl(system), type_(type)
         {
 
         }

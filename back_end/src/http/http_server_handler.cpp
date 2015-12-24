@@ -1,12 +1,19 @@
 #include "http/http_server_handler.h"
 
+#include "common/utils.h"
+#include "common/string_util.h"
+#include "common/logger.h"
+#include "common/net/net.h"
+
+
 #include "http/http_client.h"
 
 #include "server/server_config.h"
 
-#include "common/utils.h"
-#include "common/string_util.h"
-#include "common/logger.h"
+#include "loop_controller.h"
+
+#include "websocket/websocket_server.h"
+#include "websocket/websocket_server_handler.h"
 
 #define BUF_SIZE 4096
 #define AUTH_BASIC_METHOD "Basic"
@@ -15,6 +22,49 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
+        namespace
+        {
+            class WebSocketController
+                    : public ILoopThreadController
+            {
+                const common::net::hostAndPort host_;
+            public:
+                WebSocketController(const common::net::hostAndPort& host)
+                    : host_(host)
+                {
+
+                }
+
+           private:
+                ITcpLoopObserver * createHandler()
+                {
+                    return new WebSocketServerHandler;
+                }
+
+                ITcpLoop * createServer(ITcpLoopObserver * handler)
+                {
+                    WebSocketServer* serv = new WebSocketServer(host_, handler);
+                    serv->setName("websocket_server");
+
+                    common::Error err = serv->bind();
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                        delete serv;
+                        return NULL;
+                    }
+
+                    err = serv->listen(5);
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                        delete serv;
+                        return NULL;
+                    }
+
+                    return serv;
+                }
+            };
+        }
+
         IHttpAuthObserver::IHttpAuthObserver()
         {
 
@@ -27,7 +77,30 @@ namespace fasto
 
         void HttpServerHandler::preLooped(ITcpLoop *server)
         {
+            for(int i = 0; i < sockets_urls_.size(); ++i){
+                socket_url_t url = sockets_urls_[i];
+                CHECK(url.second == NULL);
 
+                const common::net::hostAndPort host = common::convertFromString<common::net::hostAndPort>(url.first.host());
+                if(!host.isValid()){
+                    continue;
+                }
+
+                ILoopThreadController * loopc = new WebSocketController(host);
+                loopc->start();
+                sockets_urls_[i].second = loopc;
+            }
+        }
+
+        void HttpServerHandler::postLooped(ITcpLoop *server)
+        {
+            for(int i = 0; i < sockets_urls_.size(); ++i){
+                socket_url_t url = sockets_urls_[i];
+
+                url.second->stop();
+                delete url.second;
+                sockets_urls_[i].second =  NULL;
+            }
         }
 
         void HttpServerHandler::accepted(TcpClient* client)
@@ -61,11 +134,6 @@ namespace fasto
             processReceived(hclient, buff, nread);
         }
 
-        void HttpServerHandler::postLooped(ITcpLoop *server)
-        {
-
-        }
-
         void HttpServerHandler::registerHttpCallback(const std::string& url, http_callback_t callback)
         {
             httpCallbacks_[url] = callback;
@@ -80,6 +148,16 @@ namespace fasto
         void HttpServerHandler::clearHttpCallback()
         {
             httpCallbacks_.clear();
+        }
+
+        void HttpServerHandler::registerSocketUrl(const common::uri::Uri& url)
+        {
+            sockets_urls_.push_back(std::make_pair(url, nullptr));
+        }
+
+        void HttpServerHandler::clearSocketUrl()
+        {
+            sockets_urls_.clear();
         }
 
         void HttpServerHandler::setAuthChecker(IHttpAuthObserver *observer)

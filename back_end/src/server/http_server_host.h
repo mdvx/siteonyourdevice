@@ -13,6 +13,7 @@ namespace fasto
     namespace siteonyourdevice
     {
         class HttpServerHandlerHost;
+        class ILoopThreadController;
 
         class HttpInnerServerHandlerHost
                 : public Http2ServerHandler
@@ -63,19 +64,14 @@ namespace fasto
         {
         public:
             HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort& innerHost, HttpServerHandlerHost *handler);
-            virtual ~HttpServerHost();
+            ~HttpServerHost();
 
-            common::Error bind() WARN_UNUSED_RESULT;
-            common::Error listen(int backlog) WARN_UNUSED_RESULT;
             int exec() WARN_UNUSED_RESULT;
             void stop();
 
         private:
-            Http2Server* httpServer_;
-            std::shared_ptr<common::thread::Thread<int> > httpThread_;
-
-            InnerTcpServer* innerServer_;
-            std::shared_ptr<common::thread::Thread<int> > innerThread_;
+            ILoopThreadController* httpServer_;
+            ILoopThreadController* innerServer_;
         };
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/net/types.h"
+#include "common/url.h"
 
 namespace fasto
 {
@@ -26,6 +27,9 @@ namespace fasto
 
             typedef std::pair<std::string, std::string>  handlers_urls_t;
             std::vector<handlers_urls_t> handlers_urls_;
+
+            typedef std::pair<std::string, common::uri::Uri> server_sockets_urls_t;
+            std::vector<server_sockets_urls_t> server_sockets_urls_;
         } configuration_t;
     }
 }

@@ -16,7 +16,7 @@ namespace fasto
     namespace siteonyourdevice
     {
         HttpFileSystemCallback::HttpFileSystemCallback()
-            : IHttpCallback(file_system)
+            : HttpCallbackUrl(file_system)
         {
 
         }
