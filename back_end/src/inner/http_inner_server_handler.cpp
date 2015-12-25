@@ -169,13 +169,6 @@ namespace fasto
                             return;
                         }
 
-                        const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_SUCCSESS_1S, hostandport);
-                        err = connection->write(resp.c_str(), resp.size(), nwrite);
-                        if(err && err->isError()){
-                            DEBUG_MSG_ERROR(err);
-                            return;
-                        }
-
                         if(config_.server_type_ == EXTERNAL_SERVER){
                             ITcpLoop* server = connection->server();
                             CHECK(server);
@@ -196,6 +189,13 @@ namespace fasto
 
                             RelayClient* relayConnection = new RelayClient(existWebServer, rinfo);
                             existWebServer->registerClient(relayConnection);
+                        }
+
+                        const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_SUCCSESS_1S, hostandport);
+                        err = connection->write(resp.c_str(), resp.size(), nwrite);
+                        if(err && err->isError()){
+                            DEBUG_MSG_ERROR(err);
+                            return;
                         }
                     }
                     else{

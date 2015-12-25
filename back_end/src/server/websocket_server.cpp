@@ -94,7 +94,7 @@ namespace fasto
 
             common::buffer_type res = common::convertToBytes(chrequest);
 
-            innerConnection->addWebsocketRelayClient(parent_->innerHandler(), hclient, res, host);
+            innerConnection->addWebsocketRelayClient(parent_->innerHandler(), hclient, res, common::net::hostAndPort("localhost", host.port_));
             ITcpLoop *server = hclient->server();
             server->unregisterClient(hclient);
         }
