@@ -84,7 +84,7 @@ namespace fasto
 
         std::string TcpClient::formatedName() const
         {
-            return common::MemSPrintf("[%s][%s(%" PRIu32 ")]", name(), className(), id());
+            return common::MemSPrintf("[%s][%s(%ju)]", name(), className(), id());
         }
     }
 }

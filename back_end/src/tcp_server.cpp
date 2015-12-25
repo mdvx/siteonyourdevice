@@ -77,8 +77,8 @@ namespace fasto
 
             client->server_ = NULL;
             clients_.erase(std::remove(clients_.begin(), clients_.end(), client), clients_.end());
-            DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Successfully unregister client[%s], from server[%s], %" PRIuS " client(s) connected.",
-                                  client->formatedName(), formatedName(), id(), clients_.size());
+            DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "Successfully unregister client[%s], from server[%s], %" PRIuS " client(s) connected.",
+                                  client->formatedName(), formatedName(), clients_.size());
         }
 
         void ITcpLoop::registerClient(TcpClient * client)
@@ -92,8 +92,8 @@ namespace fasto
                 observer_->accepted(client);
             }
             clients_.push_back(client);
-            DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Successfully connected with client[%s], from server[%s], %" PRIuS " client(s) connected.",
-                                  client->formatedName(), formatedName(), id(), clients_.size());
+            DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "Successfully connected with client[%s], from server[%s], %" PRIuS " client(s) connected.",
+                                  client->formatedName(), formatedName(), clients_.size());
         }
 
         void ITcpLoop::closeClient(TcpClient *client)
@@ -105,7 +105,7 @@ namespace fasto
                 observer_->closed(client);
             }
             clients_.erase(std::remove(clients_.begin(), clients_.end(), client), clients_.end());
-            DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Successfully disconnected client[%s], from server[%s], %" PRIuS " client(s) connected.",
+            DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "Successfully disconnected client[%s], from server[%s], %" PRIuS " client(s) connected.",
                                   client->formatedName(), formatedName(), clients_.size());
         }
 
@@ -136,7 +136,7 @@ namespace fasto
 
         std::string ITcpLoop::formatedName() const
         {
-            return common::MemSPrintf("[%s][%s(%" PRIu32 ")]", name(), className(), id());
+            return common::MemSPrintf("[%s][%s(%ju)]", name(), className(), id());
         }
 
         TcpClient * ITcpLoop::createClient(const common::net::socket_info& info)

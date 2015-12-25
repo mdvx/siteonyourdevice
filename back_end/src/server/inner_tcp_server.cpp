@@ -71,8 +71,8 @@ namespace fasto
                 return EXIT_FAILURE;
             }
 
-            const int server_fd = info_.fd();
-            int client_fd = INVALID_DESCRIPTOR;
+            const common::net::socket_descr_type server_fd = info_.fd();
+            common::net::socket_descr_type client_fd = INVALID_DESCRIPTOR;
 
             while (!stop_) {
                 client_t rclient = client_;

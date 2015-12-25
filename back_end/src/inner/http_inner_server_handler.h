@@ -29,12 +29,12 @@ namespace fasto
 
             UserAuthInfo authInfo() const;
 
-            common::Error innerConnect(ITcpLoop *server);
-            common::Error innerDisConnect(ITcpLoop *server);
-
             void setConfig(const configuration_t& config);
 
         private:
+            common::Error innerConnect(ITcpLoop *server);
+            common::Error innerDisConnect(ITcpLoop *server);
+
             virtual void handleInnerRequestCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
             virtual void handleInnerResponceCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
             virtual void handleInnerApproveCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);

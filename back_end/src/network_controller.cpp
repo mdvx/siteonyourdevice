@@ -256,6 +256,7 @@ namespace fasto
         common::Error NetworkController::connect()
         {
             if(server_){    //if connected
+                DNOTREACHED();
                 return common::Error();
             }
 
@@ -323,13 +324,8 @@ namespace fasto
         common::Error NetworkController::disConnect()
         {
             if(!server_){    //if connect dosen't clicked
+                DNOTREACHED();
                 return common::Error();
-            }
-
-            common::Error err = handler_->innerDisConnect(server_);
-            if(err && err->isError()){
-                DEBUG_MSG_ERROR(err);
-                return err;
             }
 
             server_->stop();
@@ -338,7 +334,7 @@ namespace fasto
             server_ = NULL;
 
             const std::string appdir = fApp->appDir();
-            err = common::file_system::change_directory(appdir);
+            common::Error err = common::file_system::change_directory(appdir);
             if(err && err->isError()){
                 DEBUG_MSG_ERROR(err);
             }
