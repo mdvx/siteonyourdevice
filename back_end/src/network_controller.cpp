@@ -233,6 +233,26 @@ namespace fasto
             http_thread_->joinAndGet();
         }
 
+        namespace
+        {
+            int exec_local_http_server(Http2InnerServer* server)
+            {
+                common::Error err = server->bind();
+                if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
+                    return EXIT_FAILURE;
+                }
+
+                err = server->listen(5);
+                if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
+                    return EXIT_FAILURE;
+                }
+
+                return server->exec();
+            }
+        }
+
         common::Error NetworkController::connect()
         {
             if(server_){    //if connected
@@ -282,33 +302,20 @@ namespace fasto
                 }
                 server_->setName("local_http_server");
 
-                err = h2s->bind();
-                if(err && err->isError()){
-                    DEBUG_MSG_ERROR(err);
-                    delete server_;
-                    server_ = NULL;
-                    return err;
-                }
-
-                err = h2s->listen(5);
-                if(err && err->isError()){
-                    DEBUG_MSG_ERROR(err);
-                    delete server_;
-                    server_ = NULL;
-                    return err;
-                }
+                http_thread_ = THREAD_MANAGER()->createThread(&exec_local_http_server, h2s);
+                http_thread_->start();
             }
             else if(server_type == EXTERNAL_SERVER && externalHost.isValid()) {
                 ProxyInnerServer* proxy_server = new ProxyInnerServer(handler_);
                 server_ = proxy_server;
                 server_->setName("proxy_http_server");
+
+                http_thread_ = THREAD_MANAGER()->createThread(&ITcpLoop::exec, server_);
+                http_thread_->start();
             }
             else{
                 return common::make_error_value("Invalid https server settings!", common::Value::E_ERROR, common::logging::L_ERR);
             }
-
-            http_thread_ = THREAD_MANAGER()->createThread(&ITcpLoop::exec, server_);
-            http_thread_->start();
 
             return common::Error();
         }

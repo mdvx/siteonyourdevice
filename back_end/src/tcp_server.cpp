@@ -119,6 +119,11 @@ namespace fasto
             loop_->execInLoopThread(func);
         }
 
+        bool ITcpLoop::isLoopThread() const
+        {
+            return loop_->isLoopThread();
+        }
+
         void ITcpLoop::setName(const std::string& name)
         {
             name_ = name;
@@ -205,6 +210,11 @@ namespace fasto
 
         void TcpServer::stoped(LibEvLoop* loop)
         {
+            common::Error err = sock_.close();
+            if(err && err->isError()){
+                DEBUG_MSG_ERROR(err);
+            }
+
             loop->stop_io(accept_io_);
             ITcpLoop::stoped(loop);
         }
@@ -217,12 +227,6 @@ namespace fasto
         common::Error TcpServer::listen(int backlog)
         {
             return sock_.listen(backlog);
-        }
-
-        void TcpServer::stop()
-        {
-            sock_.close();
-            ITcpLoop::stop();
         }
 
         const char* TcpServer::className() const

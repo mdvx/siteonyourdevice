@@ -37,6 +37,8 @@ namespace fasto
 
             void execInLoopThread(async_loop_exec_function_type func);
 
+            bool isLoopThread() const;
+
         protected:
             virtual TcpClient * createClient(const common::net::socket_info& info);
 
@@ -80,8 +82,6 @@ namespace fasto
 
             common::Error bind() WARN_UNUSED_RESULT;
             common::Error listen(int backlog) WARN_UNUSED_RESULT;
-
-            virtual void stop();
 
             const char* className() const;
             common::net::hostAndPort host() const;

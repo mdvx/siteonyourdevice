@@ -56,19 +56,19 @@ namespace fasto
 
         void LibEvLoop::start_io(ev_io *io)
         {
-            CHECK(exec_id_ == common::thread::PlatformThread::currentId());
+            CHECK(isLoopThread());
             ev_io_start(loop_, io);
         }
 
         void LibEvLoop::stop_io(ev_io *io)
         {
-            CHECK(exec_id_ == common::thread::PlatformThread::currentId());
+            CHECK(isLoopThread());
             ev_io_stop(loop_, io);
         }
 
         void LibEvLoop::execInLoopThread(async_loop_exec_function_type async_cb)
         {
-            if(exec_id_ == common::thread::PlatformThread::currentId()){
+            if(isLoopThread()){
                 async_cb();
             }
             else{
@@ -94,6 +94,11 @@ namespace fasto
                 observer_->postLooped(this);
             }
             return EXIT_SUCCESS;
+        }
+
+        bool LibEvLoop::isLoopThread() const
+        {
+            return exec_id_ == common::thread::PlatformThread::currentId();
         }
 
         void LibEvLoop::stop()

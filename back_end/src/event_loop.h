@@ -38,6 +38,8 @@ namespace fasto
             int exec();
             void stop();
 
+            bool isLoopThread() const;
+
         private:
             static void stop_cb(struct ev_loop* loop, struct ev_async* watcher, int revents);
 
