@@ -61,7 +61,8 @@ namespace fasto
                     return;
                 }
 
-                bool isWebSocketRequest = false;
+                common::http::http_request::header_t keyField = hrequest.findHeaderByKey("Sec-WebSocket-Key", false);
+                bool isWebSocketRequest = keyField.isValid();
 
                 if(isWebSocketRequest){
                     processWebsocketRequest(hclient, hrequest);
