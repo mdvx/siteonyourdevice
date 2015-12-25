@@ -87,7 +87,7 @@ namespace fasto
             }
 
             if(!innerConnection){
-                DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING, "not found host %s, request str:\n%s", hpath, convertToString(hrequest));
+                DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING, "HttpInnerServerHandlerHost not found host %s, request str:\n%s", hpath, convertToString(hrequest));
                 hclient->send_error(protocol, http::HS_NOT_FOUND, NULL, "Not registered host.", false, info());
                 hclient->close();
                 delete hclient;
