@@ -32,8 +32,8 @@ namespace fasto
             virtual ~HttpInnerServerHandlerHost();
 
         private:
-            void httpDataReceived(HttpClient *hclient);
-            void webSocketDataReceived(WebSocketClientHost * wclient);
+            void processHttpRequest(HttpClient *hclient, const common::http::http_request& hrequest);
+            void processWebsocketRequest(HttpClient *hclient, const common::http::http_request& hrequest);
             HttpServerHost* const parent_;
         };
 
@@ -66,7 +66,6 @@ namespace fasto
             InnerTcpServer * innerServer_;
             std::shared_ptr<common::thread::Thread<int> > inner_thread_;
 
-            WebSocketServerHandlerHost* websocketHandler_;
             WebSocketServerHost * websocketServer_;
             std::shared_ptr<common::thread::Thread<int> > websocket_thread_;
 

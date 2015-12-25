@@ -38,48 +38,46 @@ namespace fasto
 
         void HttpInnerServerHandlerHost::dataReceived(TcpClient* client)
         {
-            WebSocketClientHost* wclient = dynamic_cast<WebSocketClientHost*>(client);
-            if(wclient){
-                webSocketDataReceived(wclient);
+            char buff[BUF_SIZE] = {0};
+            ssize_t nread = 0;
+            common::Error err = client->read(buff, BUF_SIZE, nread);
+            if((err && err->isError()) || nread == 0){
+                client->close();
+                delete client;
                 return;
             }
 
             client_t* hclient = dynamic_cast<client_t*>(client);
             if(hclient){
-                httpDataReceived(hclient);
-                return;
+                std::string request(buff, nread);
+                common::http::http_request hrequest;
+                std::pair<common::http::http_status, common::Error> result = parse_http_request(request, hrequest);
+
+                if(result.second && result.second->isError()){
+                    const std::string error_text = result.second->description();
+                    hclient->send_error(common::http::HP_1_1, result.first, NULL, error_text.c_str(), false, info());
+                    hclient->close();
+                    delete hclient;
+                    return;
+                }
+
+                bool isWebSocketRequest = false;
+
+                if(isWebSocketRequest){
+                    processWebsocketRequest(hclient, hrequest);
+                }
+                else{
+                    processHttpRequest(hclient, hrequest);
+                }
+            }
+            else{
+                NOTREACHED();
             }
         }
 
-        void HttpInnerServerHandlerHost::httpDataReceived(HttpClient *hclient)
+        void HttpInnerServerHandlerHost::processHttpRequest(HttpClient *hclient, const common::http::http_request& hrequest)
         {
-            char buff[BUF_SIZE] = {0};
-            ssize_t nread = 0;
-            common::Error err = hclient->read(buff, BUF_SIZE, nread);
-            if((err && err->isError()) || nread == 0){
-                /*if(nread != 0){
-                    hclient->send_error(HS_FORBIDDEN, NULL, "Not allowed.", false);
-                }*/
-                hclient->close();
-                delete hclient;
-                return;
-            }
-
-            using namespace common;
-
-            std::string request(buff, nread);
-            http::http_request hrequest;
-            std::pair<http::http_status, common::Error> result = parse_http_request(request, hrequest);
-
-            if(result.second && result.second->isError()){
-                const std::string error_text = result.second->description();
-                hclient->send_error(http::HP_1_1, result.first, NULL, error_text.c_str(), false, info());
-                hclient->close();
-                delete hclient;
-                return;
-            }
-
-            const http::http_protocols protocol = hrequest.protocol();
+            const common::http::http_protocols protocol = hrequest.protocol();
             common::uri::Upath path = hrequest.path_;
             std::string hpath = path.hpath();
             std::string fpath = path.fpath();
@@ -100,15 +98,16 @@ namespace fasto
             }
 
             if(!innerConnection){
-                DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING, "HttpInnerServerHandlerHost not found host %s, request str:\n%s", hpath, convertToString(hrequest));
-                hclient->send_error(protocol, http::HS_NOT_FOUND, NULL, "Not registered host.", false, info());
+                DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING, "HttpInnerServerHandlerHost not found host %s, request str:\n%s",
+                                       hpath, common::convertToString(hrequest));
+                hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL, "Not registered host.", false, info());
                 hclient->close();
                 delete hclient;
                 return;
             }
 
             hclient->setName(hpath);
-            http::http_request chrequest = hrequest;
+            common::http::http_request chrequest = hrequest;
             chrequest.path_.setPath(fpath);
 
             common::buffer_type res = common::convertToBytes(chrequest);
@@ -118,35 +117,9 @@ namespace fasto
             server->unregisterClient(hclient);
         }
 
-        void HttpInnerServerHandlerHost::webSocketDataReceived(WebSocketClientHost * wclient)
+        void HttpInnerServerHandlerHost::processWebsocketRequest(HttpClient *hclient, const common::http::http_request& hrequest)
         {
-            char buff[BUF_SIZE] = {0};
-            ssize_t nread = 0;
-            common::Error err = wclient->read(buff, BUF_SIZE, nread);
-            if((err && err->isError()) || nread == 0){
-                /*if(nread != 0){
-                    hclient->send_error(HS_FORBIDDEN, NULL, "Not allowed.", false);
-                }*/
-                wclient->close();
-                delete wclient;
-                return;
-            }
-
-            using namespace common;
-
-            std::string request(buff, nread);
-            http::http_request hrequest;
-            std::pair<http::http_status, common::Error> result = parse_http_request(request, hrequest);
-
-            if(result.second && result.second->isError()){
-                const std::string error_text = result.second->description();
-                wclient->send_error(http::HP_1_1, result.first, NULL, error_text.c_str(), false, info());
-                wclient->close();
-                delete wclient;
-                return;
-            }
-
-            const http::http_protocols protocol = hrequest.protocol();
+            const common::http::http_protocols protocol = hrequest.protocol();
             common::uri::Upath path = hrequest.path_;
             std::string hpath = path.hpath();
             std::string fpath = path.fpath();
@@ -169,22 +142,23 @@ namespace fasto
             }
 
             if(!innerConnection){
-                DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING, "WebSocketServerHandlerHost not found host %s, request str:\n%s", hpath, convertToString(hrequest));
-                wclient->send_error(protocol, http::HS_NOT_FOUND, NULL, "Not registered host.", false, info());
-                wclient->close();
-                delete wclient;
+                DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING, "WebSocketServerHandlerHost not found host %s, request str:\n%s",
+                                       hpath, common::convertToString(hrequest));
+                hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL, "Not registered host.", false, info());
+                hclient->close();
+                delete hclient;
                 return;
             }
 
-            wclient->setName(hpath);
-            http::http_request chrequest = hrequest;
+            hclient->setName(hpath);
+            common::http::http_request chrequest = hrequest;
             chrequest.path_.setPath(fpath);
 
             common::buffer_type res = common::convertToBytes(chrequest);
 
-            innerConnection->addWebsocketRelayClient(parent_->innerHandler(), wclient, res);
-            ITcpLoop *server = wclient->server();
-            server->unregisterClient(wclient);
+            innerConnection->addWebsocketRelayClient(parent_->innerHandler(), hclient, res);
+            ITcpLoop *server = hclient->server();
+            server->unregisterClient(hclient);
         }
 
         namespace
@@ -240,7 +214,7 @@ namespace fasto
                                        const common::net::hostAndPort &webSocketHost)
             : httpHandler_(NULL), httpServer_(NULL), http_thread_(),
               innerHandler_(NULL), innerServer_(NULL), inner_thread_(),
-              websocketHandler_(NULL), websocketServer_(NULL), websocket_thread_(),
+              websocketServer_(NULL), websocket_thread_(),
               connections_(), rstorage_()
         {
             HttpServerInfo hinf(PROJECT_NAME_SERVER_TITLE, PROJECT_DOMAIN);
@@ -255,7 +229,6 @@ namespace fasto
             innerServer_->setName("inner_server");
             inner_thread_ = THREAD_MANAGER()->createThread(&exec_inner_server, innerServer_);
 
-            websocketHandler_ = new WebSocketServerHandlerHost(hinf, this);
             websocketServer_ = new WebSocketServerHost(webSocketHost, httpHandler_);
             websocketServer_->setName("websocket_server");
             websocket_thread_ = THREAD_MANAGER()->createThread(&exec_websocket_server, websocketServer_);
@@ -325,7 +298,6 @@ namespace fasto
             delete innerServer_;
             delete websocketServer_;
 
-            delete websocketHandler_;
             delete innerHandler_;
             delete httpHandler_;
         }

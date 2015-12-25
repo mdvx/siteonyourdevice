@@ -30,20 +30,5 @@ namespace fasto
         public:
             WebSocketClientHost(ITcpLoop* server, const common::net::socket_info& info);
         };
-
-        class WebSocketServerHandlerHost
-                : public Http2ServerHandler
-        {
-        public:
-            typedef WebSocketServerHost server_t;
-            typedef WebSocketClientHost client_t;
-
-            WebSocketServerHandlerHost(const HttpServerInfo & info, HttpServerHost * parent);
-
-            virtual void dataReceived(TcpClient* client);
-
-        private:
-            HttpServerHost * parent_;
-        };
     }
 }
