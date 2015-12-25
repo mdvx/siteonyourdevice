@@ -50,7 +50,7 @@ namespace fasto
         }
 
         InnerTcpClient::InnerTcpClient(TcpServer* server, const common::net::socket_info& info)
-            : InnerClient(server, info), hinfo_(), relays_()
+            : InnerClient(server, info), hinfo_(), relays_http_(), relays_websockets_()
         {
 
         }
@@ -64,8 +64,8 @@ namespace fasto
         {
             IRelayServer::client_t rrclient(client);
 
-            for(int i = 0; i < relays_.size(); ++i){
-                relay_server_t rserver = relays_[i];
+            for(int i = 0; i < relays_http_.size(); ++i){
+                relay_server_t rserver = relays_http_[i];
                 IRelayServer::client_t rclient = rserver->client();
                 if(!rclient){
                     rserver->addRequest(request);
@@ -82,15 +82,15 @@ namespace fasto
             std::shared_ptr<IRelayServer> tmp(new HttpRelayServer(handler, this, rrclient));
             tmp->addRequest(request);
             tmp->start();
-            relays_.push_back(tmp);
+            relays_http_.push_back(tmp);
         }
 
         void InnerTcpClient::addWebsocketRelayClient(InnerServerHandlerHost* handler, TcpClient* client, const common::buffer_type& request)
         {
             IRelayServer::client_t rrclient(client);
 
-            for(int i = 0; i < relays_.size(); ++i){
-                relay_server_t rserver = relays_[i];
+            for(int i = 0; i < relays_websockets_.size(); ++i){
+                relay_server_t rserver = relays_websockets_[i];
                 IRelayServer::client_t rclient = rserver->client();
                 if(!rclient){
                     rserver->addRequest(request);
@@ -107,12 +107,13 @@ namespace fasto
             std::shared_ptr<IRelayServer> tmp(new WebSocketRelayServer(handler, this, rrclient));
             tmp->addRequest(request);
             tmp->start();
-            relays_.push_back(tmp);
+            relays_websockets_.push_back(tmp);
         }
 
         InnerTcpClient::~InnerTcpClient()
         {
-            relays_.clear();
+            relays_http_.clear();
+            relays_websockets_.clear();
         }
 
         void InnerTcpClient::setServerHostInfo(const UserAuthInfo &info)

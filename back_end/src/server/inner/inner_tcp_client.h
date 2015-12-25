@@ -31,7 +31,8 @@ namespace fasto
 
         private:
             UserAuthInfo hinfo_;
-            std::vector<relay_server_t> relays_;
+            std::vector<relay_server_t> relays_http_;
+            std::vector<relay_server_t> relays_websockets_;
         };
     }
 }
