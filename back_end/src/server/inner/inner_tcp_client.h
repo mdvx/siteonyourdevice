@@ -27,7 +27,8 @@ namespace fasto
             const UserAuthInfo& serverHostInfo() const;
 
             void addHttpRelayClient(InnerServerHandlerHost* handler, TcpClient* client, const common::buffer_type& request); //move ovnerships
-            void addWebsocketRelayClient(InnerServerHandlerHost* handler, TcpClient* client, const common::buffer_type& request); //move ovnerships
+            void addWebsocketRelayClient(InnerServerHandlerHost* handler, TcpClient* client, const common::buffer_type& request,
+                                         const common::net::hostAndPort &srcHost); //move ovnerships
 
         private:
             UserAuthInfo hinfo_;

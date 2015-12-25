@@ -86,8 +86,12 @@ namespace fasto
             const char* className() const;
             common::net::hostAndPort host() const;
 
+            static TcpServer* findExistServerByHost(const common::net::hostAndPort& host);
+
         private:
             virtual void preLooped(LibEvLoop* loop);
+            virtual void postLooped(LibEvLoop* loop);
+
             virtual void stoped(LibEvLoop* loop);
 
             static void accept_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);

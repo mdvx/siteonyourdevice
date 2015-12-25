@@ -106,7 +106,6 @@ namespace fasto
             ev_async_send(loop_, async_stop_);
         }
 
-
         void LibEvLoop::stop_cb(struct ev_loop* loop, struct ev_async* watcher, int revents)
         {
             LibEvLoop* evloop = reinterpret_cast<LibEvLoop *>(ev_userdata(loop));

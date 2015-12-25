@@ -121,6 +121,9 @@ namespace fasto
                         relayConnection->setIsAuthenticated(!config_.is_private_site_);
                         server->registerClient(relayConnection);
                     }
+                    else{
+                        NOTREACHED();
+                    }
                 }
                 else{
                     const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
@@ -140,9 +143,20 @@ namespace fasto
                 delete connection;
             }
             else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONNECT_WEBSOCKET_COMMAND)){
-                if(argc > 1){
+                if(argc > 2){
                     const char* hostandport = argv[1];
-                    if(hostandport){
+                    const char* hostandport_src = argv[2];
+                    if(hostandport && hostandport_src){
+                        common::net::hostAndPort host_src = common::convertFromString<common::net::hostAndPort>(hostandport_src);
+                        if(!host_src.isValid()){
+                            const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
+                            common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
+                            if(err && err->isError()){
+                                DEBUG_MSG_ERROR(err);
+                            }
+                            return;
+                        }
+
                         common::net::hostAndPort host = common::convertFromString<common::net::hostAndPort>(hostandport);
                         common::net::socket_info rinfo;
                         common::Error err = common::net::connect(host, common::net::ST_SOCK_STREAM, NULL, rinfo);
@@ -162,18 +176,30 @@ namespace fasto
                             return;
                         }
 
-                        RelayClient *relayConnection = NULL;
                         if(config_.server_type_ == EXTERNAL_SERVER){
                             ITcpLoop* server = connection->server();
                             CHECK(server);
-                            relayConnection = new RelayClientEx(server, rinfo, config_.external_host_);
+
+                            RelayClientEx* relayConnection = new RelayClientEx(server, rinfo, host_src);
                             server->registerClient(relayConnection);
                         }
                         else{
-                            DNOTREACHED();
-                            //relayConnection = new RelayClient(server, rinfo);
-                            //server->registerClient(relayConnection);
+                            TcpServer * existWebServer = TcpServer::findExistServerByHost(host_src);
+                            if(!existWebServer){
+                                const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
+                                common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
+                                if(err && err->isError()){
+                                    DEBUG_MSG_ERROR(err);
+                                }
+                                return;
+                            }
+
+                            RelayClient* relayConnection = new RelayClient(existWebServer, rinfo);
+                            existWebServer->registerClient(relayConnection);
                         }
+                    }
+                    else{
+                        NOTREACHED();
                     }
                 }
                 else{

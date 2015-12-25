@@ -3,6 +3,7 @@
 #include <inttypes.h>
 
 #include "common/logger.h"
+#include "common/multi_threading/types.h"
 
 #include "tcp_client.h"
 
@@ -35,6 +36,12 @@ namespace
     } sig_init;
 }
 
+namespace
+{
+    common::multi_threading::mutex_t g_exists_servers_mutex_;
+    std::vector<fasto::siteonyourdevice::TcpServer*> g_exists_servers_;
+}
+
 namespace fasto
 {
     namespace siteonyourdevice
@@ -52,7 +59,8 @@ namespace fasto
 
         int ITcpLoop::exec()
         {
-            return loop_->exec();
+            int res = loop_->exec();
+            return res;
         }
 
         void ITcpLoop::stop()
@@ -200,12 +208,42 @@ namespace fasto
             accept_io_ = NULL;
         }
 
+        TcpServer* TcpServer::findExistServerByHost(const common::net::hostAndPort& host)
+        {
+            if(!host.isValid()){
+                return NULL;
+            }
+
+            common::multi_threading::unique_lock<common::multi_threading::mutex_t> loc(g_exists_servers_mutex_);
+            for(size_t i = 0; i < g_exists_servers_.size(); ++i){
+                TcpServer* server = g_exists_servers_[i];
+                if(server && server->host() == host){
+                    return server;
+                }
+            }
+            return NULL;
+        }
+
         void TcpServer::preLooped(LibEvLoop* loop)
         {
             int fd = sock_.fd();
             ev_io_init(accept_io_, accept_cb, fd, EV_READ);
             loop->start_io(accept_io_);
+
+            {
+                common::multi_threading::unique_lock<common::multi_threading::mutex_t> loc(g_exists_servers_mutex_);
+                g_exists_servers_.push_back(this);
+            }
             ITcpLoop::preLooped(loop);
+        }
+
+        void TcpServer::postLooped(LibEvLoop* loop)
+        {
+            {
+                common::multi_threading::unique_lock<common::multi_threading::mutex_t> loc(g_exists_servers_mutex_);
+                g_exists_servers_.erase(std::remove(g_exists_servers_.begin(), g_exists_servers_.end(), this), g_exists_servers_.end());
+            }
+            ITcpLoop::postLooped(loop);
         }
 
         void TcpServer::stoped(LibEvLoop* loop)

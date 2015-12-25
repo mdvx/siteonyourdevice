@@ -32,9 +32,10 @@ namespace fasto
             class WebSocketRelayServer
                     : public IRelayServer
             {
+               const common::net::hostAndPort srcHost_;
             public:
-                WebSocketRelayServer(InnerServerCommandSeqParser *handler, InnerTcpClient *parent, client_t client)
-                    : IRelayServer(parent, client), handler_(handler)
+                WebSocketRelayServer(InnerServerCommandSeqParser *handler, InnerTcpClient *parent, client_t client, const common::net::hostAndPort& srcHost)
+                    : IRelayServer(parent, client), handler_(handler), srcHost_(srcHost)
                 {
 
                 }
@@ -42,7 +43,7 @@ namespace fasto
             private:
                 virtual std::string createSocketCmd(const common::net::hostAndPort& host) const
                 {
-                    return handler_->make_request(SERVER_PLEASE_CONNECT_WEBSOCKET_COMMAND_REQ_1S, common::convertToString(host));
+                    return handler_->make_request(SERVER_PLEASE_CONNECT_WEBSOCKET_COMMAND_REQ_2SS, common::convertToString(host), common::convertToString(srcHost_));
                 }
 
                 InnerServerCommandSeqParser *handler_;
@@ -85,7 +86,7 @@ namespace fasto
             relays_http_.push_back(tmp);
         }
 
-        void InnerTcpClient::addWebsocketRelayClient(InnerServerHandlerHost* handler, TcpClient* client, const common::buffer_type& request)
+        void InnerTcpClient::addWebsocketRelayClient(InnerServerHandlerHost* handler, TcpClient* client, const common::buffer_type& request, const common::net::hostAndPort& srcHost)
         {
             IRelayServer::client_t rrclient(client);
 
@@ -104,7 +105,7 @@ namespace fasto
                 }
             }
 
-            std::shared_ptr<IRelayServer> tmp(new WebSocketRelayServer(handler, this, rrclient));
+            std::shared_ptr<IRelayServer> tmp(new WebSocketRelayServer(handler, this, rrclient, srcHost));
             tmp->addRequest(request);
             tmp->start();
             relays_websockets_.push_back(tmp);
