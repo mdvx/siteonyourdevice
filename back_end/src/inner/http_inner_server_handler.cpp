@@ -188,7 +188,11 @@ namespace fasto
                             }
 
                             RelayClient* relayConnection = new RelayClient(existWebServer, rinfo);
-                            existWebServer->registerClient(relayConnection);
+                            auto cb = [existWebServer, relayConnection]()
+                            {
+                                existWebServer->registerClient(relayConnection);
+                            };
+                            existWebServer->execInLoopThread(cb);
                         }
 
                         const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_SUCCSESS_1S, hostandport);
