@@ -10,8 +10,11 @@ INCLUDE_DIRECTORIES(../third-party/redis/deps)
 
 ADD_EXECUTABLE(${PROJECT_NAME}
                 main.cpp
+                relay_server.h relay_server.cpp
                 http_server_host.h http_server_host.cpp
-                inner_tcp_server.h inner_tcp_server.cpp
+                inner/inner_tcp_server.h inner/inner_tcp_server.cpp
+                inner/inner_tcp_client.h inner/inner_tcp_client.cpp
+                websocket_server.h websocket_server.cpp
                 redis_helpers.h redis_helpers.cpp
                 server_commands.h
 )

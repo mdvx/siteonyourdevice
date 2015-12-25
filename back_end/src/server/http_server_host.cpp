@@ -5,6 +5,8 @@
 #include "common/thread/thread_manager.h"
 #include "common/logger.h"
 
+#include "inner/inner_tcp_client.h"
+
 #include "http/http_client.h"
 
 #include "loop_controller.h"
@@ -98,7 +100,7 @@ namespace fasto
 
             common::buffer_type res = common::convertToBytes(chrequest);
 
-            innerConnection->addClient(parent_->innerHandler(), hclient, res);
+            innerConnection->addHttpRelayClient(parent_->innerHandler(), hclient, res);
             ITcpLoop *server = hclient->server();
             server->unregisterClient(hclient);
         }
@@ -134,14 +136,34 @@ namespace fasto
 
                 return server->exec();
             }
+
+            int exec_websocket_server(WebSocketServerHost * server)
+            {
+                common::Error err = server->bind();
+                if(err && err->isError()){
+                    return EXIT_FAILURE;
+                }
+
+                err = server->listen(5);
+                if(err && err->isError()){
+                    return EXIT_FAILURE;
+                }
+
+                return server->exec();
+            }
         }
 
-        HttpServerHost::HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort &innerHost)
+        HttpServerHost::HttpServerHost(const common::net::hostAndPort& httpHost,
+                                       const common::net::hostAndPort &innerHost,
+                                       const common::net::hostAndPort &webSocketHost)
             : httpHandler_(NULL), httpServer_(NULL), http_thread_(),
               innerHandler_(NULL), innerServer_(NULL), inner_thread_(),
+              websocketHandler_(NULL), websocketServer_(NULL), websocket_thread_(),
               connections_(), rstorage_()
         {
-            httpHandler_ = new HttpInnerServerHandlerHost(HttpServerInfo(PROJECT_NAME_SERVER_TITLE, PROJECT_DOMAIN), this);
+            HttpServerInfo hinf(PROJECT_NAME_SERVER_TITLE, PROJECT_DOMAIN);
+
+            httpHandler_ = new HttpInnerServerHandlerHost(hinf, this);
             httpServer_ = new Http2Server(httpHost, httpHandler_);
             httpServer_->setName("proxy_http_server");
             http_thread_ = THREAD_MANAGER()->createThread(&exec_http_server, httpServer_);
@@ -150,6 +172,11 @@ namespace fasto
             innerServer_ = new InnerTcpServer(innerHost, innerHandler_);
             innerServer_->setName("inner_server");
             inner_thread_ = THREAD_MANAGER()->createThread(&exec_inner_server, innerServer_);
+
+            websocketHandler_ = new WebSocketServerHandlerHost(hinf, this);
+            websocketServer_ = new WebSocketServerHost(webSocketHost, websocketHandler_);
+            websocketServer_->setName("websocket_server");
+            websocket_thread_ = THREAD_MANAGER()->createThread(&exec_websocket_server, websocketServer_);
         }
 
         InnerServerHandlerHost * HttpServerHost::innerHandler() const
@@ -164,7 +191,7 @@ namespace fasto
                 return false;
             }
 
-            HostInfo hinf = iconnection->serverHostInfo();
+            UserAuthInfo hinf = iconnection->serverHostInfo();
             if(!hinf.isValid()){
                 return false;
             }
@@ -214,7 +241,9 @@ namespace fasto
         {
             delete httpServer_;
             delete innerServer_;
+            delete websocketServer_;
 
+            delete websocketHandler_;
             delete innerHandler_;
             delete httpHandler_;
         }
@@ -223,9 +252,11 @@ namespace fasto
         {
             http_thread_->start();
             inner_thread_->start();
+            websocket_thread_->start();
 
             int res = http_thread_->joinAndGet();
             res |= inner_thread_->joinAndGet();
+            res |= websocket_thread_->joinAndGet();
             return res;
         }
 
@@ -233,6 +264,7 @@ namespace fasto
         {
             httpServer_->stop();
             innerServer_->stop();
+            websocketServer_->stop();
         }
     }
 }

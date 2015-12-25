@@ -112,8 +112,7 @@ int main(int argc, char *argv[])
 		SET_LOG_HANDLER(&app_logger_hadler);
 	}
 
-    common::net::hostAndPort hs(INNER_HOST_NAME, HOST_PORT);
-    server = new HttpServerHost(hs, g_inner_host);
+    server = new HttpServerHost(g_http_host, g_inner_host, g_websocket_host);
 
     sync_config();
 

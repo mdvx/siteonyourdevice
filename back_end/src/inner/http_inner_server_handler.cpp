@@ -85,7 +85,7 @@ namespace fasto
                     DEBUG_MSG_ERROR(err);
                 }
             }
-            else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONNECT_RELAY_COMMAND)){
+            else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONNECT_HTTP_COMMAND)){
                 if(argc > 1){
                     const char* hostandport = argv[1];
                     if(hostandport){
@@ -93,7 +93,7 @@ namespace fasto
                         common::net::socket_info rinfo;
                         common::Error err = common::net::connect(host, common::net::ST_SOCK_STREAM, NULL, rinfo);
                         if(err && err->isError()){
-                            const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_COMMAND_RESP_FAIL_1S, CAUSE_CONNECT_FAILED);
+                            const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S, CAUSE_CONNECT_FAILED);
                             err = connection->write(resp.c_str(), resp.size(), nwrite);
                             if(err && err->isError()){
                                 DEBUG_MSG_ERROR(err);
@@ -101,7 +101,7 @@ namespace fasto
                             return;
                         }
 
-                        const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_COMMAND_RESP_SUCCSESS_1S, hostandport);
+                        const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_SUCCSESS_1S, hostandport);
                         err = connection->write(resp.c_str(), resp.size(), nwrite);
                         if(err && err->isError()){
                             DEBUG_MSG_ERROR(err);
@@ -123,15 +123,69 @@ namespace fasto
                     }
                 }
                 else{
-                    const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
+                    const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
                     common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                     }
                 }
             }
-            else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_DISCONNECT_COMMAND)){
-                const std::string ok_disconnect = make_responce(id, CLIENT_PLEASE_DISCONNECT_COMMAND_RESP_SUCCSESS);
+            else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_DISCONNECT_HTTP_COMMAND)){
+                const std::string ok_disconnect = make_responce(id, CLIENT_PLEASE_DISCONNECT_HTTP_COMMAND_RESP_SUCCSESS);
+                common::Error err = connection->write(ok_disconnect.c_str(), ok_disconnect.size(), nwrite);
+                if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
+                }
+                connection->close();
+                delete connection;
+            }
+            else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONNECT_WEBSOCKET_COMMAND)){
+                if(argc > 1){
+                    const char* hostandport = argv[1];
+                    if(hostandport){
+                        common::net::hostAndPort host = common::convertFromString<common::net::hostAndPort>(hostandport);
+                        common::net::socket_info rinfo;
+                        common::Error err = common::net::connect(host, common::net::ST_SOCK_STREAM, NULL, rinfo);
+                        if(err && err->isError()){
+                            const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_CONNECT_FAILED);
+                            err = connection->write(resp.c_str(), resp.size(), nwrite);
+                            if(err && err->isError()){
+                                DEBUG_MSG_ERROR(err);
+                            }
+                            return;
+                        }
+
+                        const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_SUCCSESS_1S, hostandport);
+                        err = connection->write(resp.c_str(), resp.size(), nwrite);
+                        if(err && err->isError()){
+                            DEBUG_MSG_ERROR(err);
+                            return;
+                        }
+
+                        RelayClient *relayConnection = NULL;
+                        if(config_.server_type_ == EXTERNAL_SERVER){
+                            ITcpLoop* server = connection->server();
+                            CHECK(server);
+                            relayConnection = new RelayClientEx(server, rinfo, config_.external_host_);
+                            server->registerClient(relayConnection);
+                        }
+                        else{
+                            DNOTREACHED();
+                            //relayConnection = new RelayClient(server, rinfo);
+                            //server->registerClient(relayConnection);
+                        }
+                    }
+                }
+                else{
+                    const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
+                    common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                    }
+                }
+            }
+            else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_DISCONNECT_WEBSOCKET_COMMAND)){
+                const std::string ok_disconnect = make_responce(id, CLIENT_PLEASE_DISCONNECT_WEBSOCKET_COMMAND_RESP_SUCCSESS);
                 common::Error err = connection->write(ok_disconnect.c_str(), ok_disconnect.size(), nwrite);
                 if(err && err->isError()){
                     DEBUG_MSG_ERROR(err);

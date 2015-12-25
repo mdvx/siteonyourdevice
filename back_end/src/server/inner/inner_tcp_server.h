@@ -14,8 +14,6 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        typedef UserAuthInfo HostInfo;
-
         class HttpServerHost;
 
         class InnerServerHandlerHost
@@ -49,28 +47,7 @@ namespace fasto
             std::shared_ptr<common::thread::Thread<void> > redis_subscribe_command_in_thread_;
         };
 
-        class RelayServer;
-
-        class InnerTcpClient
-                : public InnerClient
-        {
-        public:
-            typedef std::shared_ptr<RelayServer> relay_server_t;
-
-            InnerTcpClient(TcpServer* server, const common::net::socket_info& info);
-            ~InnerTcpClient();
-
-            virtual const char* className() const;
-
-            void setServerHostInfo(const HostInfo& info);
-            const HostInfo& serverHostInfo() const;
-
-            void addClient(InnerServerHandlerHost* handler, TcpClient* client, const common::buffer_type& request); //move ovnerships
-
-        private:
-            HostInfo hinfo_;
-            std::vector<relay_server_t> relays_;
-        };
+        class IRelayServer;
 
         class InnerTcpServer
                 : public TcpServer
@@ -82,33 +59,6 @@ namespace fasto
 
         private:
             virtual TcpClient * createClient(const common::net::socket_info& info);
-        };
-
-
-        class RelayServer
-                : common::net::ServerSocketTcp
-        {
-        public:
-            typedef common::shared_ptr<TcpClient> client_t;
-            RelayServer(InnerServerCommandSeqParser *handler, InnerTcpClient *parent, client_t client);
-            ~RelayServer();
-
-            client_t client() const;
-            void setClient(client_t client);
-
-            void start();
-
-            void addRequest(const common::buffer_type& request);
-
-        private:
-            int exec();
-
-            volatile bool stop_;
-            client_t client_;
-            std::shared_ptr<common::thread::Thread<int> > relayThread_;
-            InnerTcpClient *parent_;
-            InnerServerCommandSeqParser *handler_;
-            std::vector<common::buffer_type> requests_;
         };
     }
 }

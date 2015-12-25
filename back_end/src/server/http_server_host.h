@@ -4,7 +4,9 @@
 
 #include "common/thread/thread.h"
 
-#include "server/inner_tcp_server.h"
+#include "server/inner/inner_tcp_server.h"
+
+#include "server/websocket_server.h"
 
 #include "http/http_server_handler.h"
 
@@ -13,6 +15,7 @@ namespace fasto
     namespace siteonyourdevice
     {
         class HttpServerHost;
+        class InnerTcpClient;
 
         class HttpInnerServerHandlerHost
                 : public Http2ServerHandler
@@ -37,7 +40,7 @@ namespace fasto
         public:
             typedef std::unordered_map<std::string, InnerTcpClient*> inner_connections_type;
 
-            HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort& innerHost);
+            HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort& innerHost, const common::net::hostAndPort& webSocketHost);
             ~HttpServerHost();
 
             void setStorageConfig(const redis_sub_configuration_t &config);
@@ -60,6 +63,10 @@ namespace fasto
             InnerServerHandlerHost* innerHandler_;
             InnerTcpServer * innerServer_;
             std::shared_ptr<common::thread::Thread<int> > inner_thread_;
+
+            WebSocketServerHandlerHost* websocketHandler_;
+            WebSocketServerHost * websocketServer_;
+            std::shared_ptr<common::thread::Thread<int> > websocket_thread_;
 
             inner_connections_type connections_;
             RedisStorage rstorage_;
