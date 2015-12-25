@@ -107,6 +107,9 @@ namespace fasto
                 return;
             }
 
+            DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING, "HttpInnerServerHandlerHost founded host %s, request str:\n%s",
+                                   hpath, common::convertToString(hrequest));
+
             hclient->setName(hpath);
             common::http::http_request chrequest = hrequest;
             chrequest.path_.setPath(fpath);
@@ -150,6 +153,9 @@ namespace fasto
                 delete hclient;
                 return;
             }
+
+            DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING, "WebSocketServerHandlerHost founded host %s, request str:\n%s",
+                                   hpath, common::convertToString(hrequest));
 
             hclient->setName(hpath);
             common::http::http_request chrequest = hrequest;
