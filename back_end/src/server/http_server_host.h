@@ -32,6 +32,8 @@ namespace fasto
             virtual ~HttpInnerServerHandlerHost();
 
         private:
+            void httpDataReceived(HttpClient *hclient);
+            void webSocketDataReceived(WebSocketClientHost * wclient);
             HttpServerHost* const parent_;
         };
 
