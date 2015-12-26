@@ -93,7 +93,9 @@ namespace fasto
                     for(int i = 0; i < requests_.size(); ++i){
                         common::buffer_type request = requests_[i];
                         common::Error err = common::net::write_to_socket(client_fd, request, nwrite);
-                        DCHECK(!err);
+                        if(err && err->isError()){
+                            DEBUG_MSG_ERROR(err);
+                        }
                     }
                     requests_.clear();
                 }
@@ -128,7 +130,7 @@ namespace fasto
                         }
                     }
                     else {
-                        if(fd == client_fd){
+                        if(fd == client_fd){ //device response
                             if (cevents & POLLIN){ //read
                                 char buff[BUF_SIZE] = {0};
                                 ssize_t nread = 0;
@@ -136,12 +138,13 @@ namespace fasto
                                 if((err && err->isError()) || nread == 0){
                                     common::net::close(client_fd);
                                     client_fd = INVALID_DESCRIPTOR;
+                                    DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "(relay) device client closed!");
                                 }
                                 else{
                                     ssize_t nwrite = 0;
                                     err = common::net::write_to_socket(rm_client_fd, buff, nread, nwrite);
                                     if(err && err->isError()){
-                                        //NOTREACHED();
+                                        DEBUG_MSG_ERROR(err);
                                     }
                                 }
                             }
@@ -150,7 +153,7 @@ namespace fasto
                                 NOTREACHED();
                             }
                         }
-                        else if(fd == rm_client_fd){
+                        else if(fd == rm_client_fd){ // client request
                             if (cevents & POLLIN){ //read
                                 char buff[BUF_SIZE] = {0};
                                 ssize_t nread = 0;
@@ -158,12 +161,13 @@ namespace fasto
                                 if((err && err->isError()) || nread == 0){
                                     rclient->close();
                                     client_.reset();
+                                    DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "(relay) client closed!");
                                 }
                                 else{
                                     ssize_t nwrite = 0;
                                     err = common::net::write_to_socket(client_fd, buff, nread, nwrite);
                                     if(err && err->isError()){
-                                        //NOTREACHED();
+                                        DEBUG_MSG_ERROR(err);
                                     }
                                 }
                             }
@@ -179,6 +183,19 @@ namespace fasto
                 }
             }
 
+            DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "(relay) exit loop!");
+            if(client_){
+                client_->close();
+                client_.reset();
+            }
+            
+            if(client_fd != INVALID_DESCRIPTOR){
+                common::net::close(client_fd);
+                client_fd = INVALID_DESCRIPTOR;
+            }
+            
+            close();
+            
             return EXIT_SUCCESS;
         }
 
