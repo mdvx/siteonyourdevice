@@ -15,7 +15,7 @@ Remote control any computer/mobile/device over the internet.
 **Our client(Web Server) has next features:**
 - Http 1.1 protocol.
 - Http 2 protocol.
-- WebSocket support.
+- WebSockets support.
 - Proxy to external http server.
 - Basic & digest authentication for secure access.
 - Directory index.
@@ -35,3 +35,43 @@ Compare with standard internet domains:
   1) It is not direct domain (proxies over siteonyourdevice.com).<br />
   2) Young solution.<br />
   3) Support only clear html/js page
+
+**Handlers**
+  You can add handlers url in your siteonyourdevice.ini file next options:
+  ```
+  [http_handlers_utls]
+  shutdown = system::shutdown
+  reboot = system::reboot
+  logout = system::logout
+  ```
+  examples of html page you can see here http://siteonyourdevice.com/templates/
+ 
+**WebSockets**
+  Port 8060 on proxe.siteonyourdevice.com allocated for proxy websockets connection.
+  Simple add next line on your server config file. 
+  ```
+  [http_server_sockets]
+  websocket=ws://localhost:8088/echo
+  ```
+  on html page write next:
+  ```
+  ws://proxy.siteonyourdevice.com:8060/<your site>:8088/echo
+  ```
+  When your websocket connected to http://proxy.siteonyourdevice.com:8060/<your site>:8088/echo,
+  we redirect this call to your device into websocketserver link ws://localhost:8088/echo.
+
+**External server proxing**
+  Add next line in server config:
+  ```
+  [http_server]
+  external_host = siteonyourdevice.com:80
+  server_type = 1
+  ```
+  
+**Private site**
+  If you want that your site will be available only for you you can add next:
+  ```
+  [http_server]
+  private_site = 1
+  ```
+  After that all connection to domain available only after passing phase of authentication.
