@@ -144,7 +144,7 @@ namespace fasto
 
         std::string ITcpLoop::formatedName() const
         {
-            return common::MemSPrintf("[%s][%s(%ju)]", name(), className(), id());
+            return common::MemSPrintf("[%s][%s(%" PRIuMAX ")]", name(), className(), id());
         }
 
         TcpClient * ITcpLoop::createClient(const common::net::socket_info& info)

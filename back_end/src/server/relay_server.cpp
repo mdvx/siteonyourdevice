@@ -58,6 +58,7 @@ namespace fasto
             }
 
             ssize_t nwrite = 0;
+            const std::string host_str = common::convertToString(host());
             const std::string createConnection = createSocketCmd(host());
             err = parent_->write(createConnection.c_str(), createConnection.size(), nwrite); //inner command write
             if(err && err->isError()){;
@@ -139,7 +140,7 @@ namespace fasto
                                 if((err && err->isError()) || nread == 0){
                                     common::net::close(client_fd);
                                     client_fd = INVALID_DESCRIPTOR;
-                                    DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "(relay) device client closed!");
+                                    DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "relay[%s] device client closed.", host_str);
                                 }
                                 else{
                                     ssize_t nwrite = 0;
@@ -162,7 +163,7 @@ namespace fasto
                                 if((err && err->isError()) || nread == 0){
                                     rclient->close();
                                     client_.reset();
-                                    DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "(relay) client closed!");
+                                    DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "relay[%s] client closed!", host_str);
                                 }
                                 else{
                                     ssize_t nwrite = 0;
@@ -184,7 +185,6 @@ namespace fasto
                 }
             }
 
-            DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "(relay) exit loop!");
             if(client_){
                 client_->close();
                 client_.reset();

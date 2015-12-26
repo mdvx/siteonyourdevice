@@ -238,9 +238,9 @@ namespace fasto
             uint8_t* sha_bin_ptr = sha1_result(&s);
 
             const common::buffer_type bin_sha1 = MAKE_BUFFER_TYPE_SIZE(sha_bin_ptr, HASH_LENGTH);
-
+            common::buffer_type enc_accept = common::utils::base64::encode64(bin_sha1);
             const std::string header_up = common::MemSPrintf("Upgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: %s",
-                                                             common::utils::base64::encode64(bin_sha1));
+                                                             common::convertToString(enc_accept));
             hclient->send_headers(protocol, HS_SWITCH_PROTOCOL, header_up.c_str(), NULL, NULL, NULL, notClose, info());
         }
     }

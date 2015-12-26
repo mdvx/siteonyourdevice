@@ -15,6 +15,8 @@ Remote control any computer/mobile/device over the internet.
 **Our client(Web Server) has next features:**
 - Http 1.1 protocol.
 - Http 2 protocol.
+- WebSocket support.
+- Proxy to external http server.
 - Basic & digest authentication for secure access.
 - Directory index.
 - Cross-platform support.

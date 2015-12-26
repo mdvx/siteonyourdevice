@@ -4,6 +4,7 @@
 - [client] shutdown template
 - [client] sendfile fixup for FreeBSD and MacOSX
 - [server] bind available port
+- [client/server] websocket support something like (ws://proxy.siteonyourdevice.com:8060/example.com:8088/echo)
 
 0.1.2 / December 18, 2015
 [Alexandr Topilski]
