@@ -36,7 +36,7 @@ Compare with standard internet domains:
   2) Young solution.<br />
   3) Support only clear html/js page
 
-**Handlers**
+**Handlers**<br />
   You can add handlers url in your siteonyourdevice.ini file next options:
   ```
   [http_handlers_utls]
@@ -46,7 +46,7 @@ Compare with standard internet domains:
   ```
   examples of html page you can see here http://siteonyourdevice.com/templates/
  
-**WebSockets**
+**WebSockets**<br />
   Port 8060 on proxe.siteonyourdevice.com allocated for proxy websockets connection.
   Simple add next line on your server config file. 
   ```
@@ -60,7 +60,7 @@ Compare with standard internet domains:
   When your websocket connected to http://proxy.siteonyourdevice.com:8060/<your site>:8088/echo,
   we redirect this call to your device into websocketserver link ws://localhost:8088/echo.
 
-**External server proxing**
+**External server proxing**<br />
   Add next line in server config:
   ```
   [http_server]
@@ -68,7 +68,7 @@ Compare with standard internet domains:
   server_type = 1
   ```
   
-**Private site**
+**Private site**<br />
   If you want that your site will be available only for you you can add next:
   ```
   [http_server]
