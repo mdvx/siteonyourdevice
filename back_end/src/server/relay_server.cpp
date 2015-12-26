@@ -4,6 +4,7 @@
 
 #include "common/thread/thread_manager.h"
 #include "common/net/net.h"
+#include "common/logger.h"
 
 #include "server/inner/inner_tcp_client.h"
 #include "server/server_config.h"
