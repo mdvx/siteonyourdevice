@@ -163,7 +163,7 @@ namespace fasto
                                 if((err && err->isError()) || nread == 0){
                                     rclient->close();
                                     client_.reset();
-                                    DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "relay[%s] client closed!", host_str);
+                                    DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "relay[%s] client closed.", host_str);
                                 }
                                 else{
                                     ssize_t nwrite = 0;
