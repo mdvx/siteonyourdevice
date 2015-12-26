@@ -57,7 +57,7 @@ Compare with standard internet domains:
   ```
   ws://proxy.siteonyourdevice.com:8060/<your site>:8088/echo
   ```
-  When your websocket connected to http://proxy.siteonyourdevice.com:8060/<your site>:8088/echo,
+  When your websocket connected to ```http://proxy.siteonyourdevice.com:8060/<your site>:8088/echo```,
   we redirect this call to your device into websocketserver link ws://localhost:8088/echo.
 
 **External server proxing**<br/>
