@@ -20,7 +20,7 @@ namespace fasto
                 : public Http2Server
         {
         public:
-            Http2InnerServer(ITcpLoopObserver * observer, const configuration_t& config);
+            Http2InnerServer(ITcpLoopObserver * observer, const HttpConfig& config);
 
             virtual const char* className() const;
 
@@ -28,7 +28,7 @@ namespace fasto
             virtual TcpClient * createClient(const common::net::socket_info &info);
 
         private:
-            const configuration_t& config_;
+            const HttpConfig config_;
         };
     }
 }

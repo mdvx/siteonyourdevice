@@ -20,7 +20,7 @@ namespace fasto
             return showImpl();
         }
 
-        void GuiNetworkEventHandler::onConnectClicked(const configuration_t& config)
+        void GuiNetworkEventHandler::onConnectClicked(const HttpConfig& config)
         {
             controller_->setConfig(config);
             common::Error err = controller_->connect();

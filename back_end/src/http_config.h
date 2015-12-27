@@ -13,7 +13,7 @@ namespace fasto
             EXTERNAL_SERVER = 1
         };
 
-        typedef struct
+        struct HttpConfig
         {
             uint16_t port_;
             std::string content_path_;
@@ -30,6 +30,6 @@ namespace fasto
 
             typedef std::pair<std::string, common::uri::Uri> server_sockets_urls_t;
             std::vector<server_sockets_urls_t> server_sockets_urls_;
-        } configuration_t;
+        };
     }
 }

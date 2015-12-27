@@ -2,8 +2,6 @@
 
 #include "common/thread/thread.h"
 
-#include "common/net/types.h"
-
 namespace fasto
 {
     namespace siteonyourdevice

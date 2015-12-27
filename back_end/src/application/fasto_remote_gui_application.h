@@ -57,7 +57,7 @@ namespace fasto
             virtual int start() final;
 
         protected:
-            void onConnectClicked(const configuration_t &config); //with config
+            void onConnectClicked(const HttpConfig &config); //with config
             void onDisconnectClicked();
 
         private:

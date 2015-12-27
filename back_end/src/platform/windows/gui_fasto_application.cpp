@@ -110,7 +110,7 @@ namespace fasto
             int yPos = (GetSystemMetrics(SM_CYSCREEN) - rc.bottom)/2;
             SetWindowPos(hwnd, 0, xPos, yPos, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
-            configuration_t cur_config = controller_->config();
+            HttpConfig cur_config = controller_->config();
 
             SetWindowText(hwndDomainTextBox_, cur_config.domain_.c_str());
             const std::string portstr = common::convertToString(cur_config.port_);
@@ -535,7 +535,7 @@ namespace fasto
 
         void Win32MainWindow::onConnectClicked()
         {
-            configuration_t old_config = controller_->config();
+            HttpConfig old_config = controller_->config();
 
             char lbl[1024] = {0};
             GetWindowText(hwndDomainTextBox_, lbl, sizeof(lbl));

@@ -2,7 +2,7 @@
 
 #include "common/http/http.h"
 
-#include "tcp_server.h"
+#include "tcp/tcp_server.h"
 #include "http/callbacks/http_callbacks.h"
 
 #include "infos.h"
@@ -42,13 +42,9 @@ namespace fasto
             virtual ~HttpServerHandler();
 
             void registerHttpCallback(const std::string& url, http_callback_t callback);
-            void unRegisterHttpCallback(const std::string& url);
-            void clearHttpCallback();
-
             void registerSocketUrl(const common::uri::Uri& url);
-            void clearSocketUrl();
 
-            void setAuthChecker(IHttpAuthObserver *observer);
+            void setAuthChecker(IHttpAuthObserver * authChecker);
 
             const HttpServerInfo& info() const;
 

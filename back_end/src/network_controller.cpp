@@ -7,6 +7,8 @@
 #include "common/logger.h"
 #include "common/utils.h"
 
+#include "loop_controller.h"
+
 #include "application/fasto_application.h"
 
 #include "server/server_config.h"
@@ -22,7 +24,7 @@ namespace fasto
         {
             int ini_handler_fasto(void* user, const char* section, const char* name, const char* value)
             {
-                configuration_t* pconfig = (configuration_t*)user;
+                HttpConfig* pconfig = (HttpConfig*)user;
 
                 #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
                 if (MATCH("http_server", "port")) {
@@ -135,7 +137,7 @@ namespace fasto
             return EXIT_SUCCESS;        
         }
 
-        class NetworkController::HttpAuthObserver
+        class HttpAuthObserver
                 : public IHttpAuthObserver
         {
         public:
@@ -167,16 +169,135 @@ namespace fasto
             Http2InnerServerHandler* const servh_;
         };
 
-        NetworkController::NetworkController(int argc, char *argv[])
-            : handler_(NULL), server_(NULL),
-              config_(), thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>()),
-              authChecker_(NULL)
+        namespace
         {
-            Http2InnerServerHandler* servh = new Http2InnerServerHandler(HttpServerInfo(PROJECT_NAME_TITLE, PROJECT_DOMAIN), g_inner_host);
-            handler_ = servh;
-            authChecker_ = new HttpAuthObserver(servh);
-            handler_->setAuthChecker(authChecker_);
+            class ServerControllerBase
+                : public ILoopThreadController
+            {
+            public:
+                ServerControllerBase(const HttpConfig& config)
+                    : config_(config), authChecker_(NULL)
+                {
 
+                }
+
+                ~ServerControllerBase()
+                {
+                    delete authChecker_;
+                }
+
+            protected:
+                const HttpConfig config_;
+
+            private:
+                ITcpLoopObserver * createHandler()
+                {
+                    Http2InnerServerHandler* handler =
+                            new Http2InnerServerHandler(HttpServerInfo(PROJECT_NAME_TITLE, PROJECT_DOMAIN), g_inner_host, config_);
+                    authChecker_ = new HttpAuthObserver(handler);
+                    handler->setAuthChecker(authChecker_);
+
+                    // handler prepare
+                    for(int i = 0; i < config_.handlers_urls_.size(); ++i){
+                        HttpConfig::handlers_urls_t handurl = config_.handlers_urls_[i];
+                        const std::string httpcallbackstr = handurl.second;
+                        std::string httpcallback_ns = handurl.second;
+                        std::string httpcallback_name;
+                        std::string::size_type ns_del = httpcallbackstr.find_first_of("::");
+                        if(ns_del != std::string::npos){
+                            httpcallback_ns = httpcallbackstr.substr(0, ns_del);
+                            httpcallback_name = httpcallbackstr.substr(ns_del + 2);
+                        }
+
+                        common::shared_ptr<IHttpCallback> hhandler = IHttpCallback::createHttpCallback(httpcallback_ns, httpcallback_name);
+                        if(hhandler){
+                            handler->registerHttpCallback(handurl.first, hhandler);
+                        }
+                    }
+
+                    for(int i = 0; i < config_.server_sockets_urls_.size(); ++i){
+                        HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls_[i];
+                        const common::uri::Uri url = sock_url.second;
+                        handler->registerSocketUrl(url);
+                    }
+
+                    // handler prepare
+                    return handler;
+                }
+
+                HttpAuthObserver* authChecker_;
+            };
+
+            class LocalHttpServerController
+                    : public ServerControllerBase
+            {
+            public:
+                LocalHttpServerController(const HttpConfig& config)
+                    : ServerControllerBase(config)
+                {
+                    const std::string contentPath = config.content_path_;
+                    common::Error err = common::file_system::change_directory(contentPath);
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                    }
+                }
+
+                ~LocalHttpServerController()
+                {
+                    const std::string appdir = fApp->appDir();
+                    common::Error err = common::file_system::change_directory(appdir);
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                    }
+                }
+
+           private:
+                ITcpLoop * createServer(ITcpLoopObserver * handler)
+                {
+                    Http2InnerServer* serv = new Http2InnerServer(handler, config_);
+                    serv->setName("local_http_server");
+
+                    common::Error err = serv->bind();
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                        delete serv;
+                        return NULL;
+                    }
+
+                    err = serv->listen(5);
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                        delete serv;
+                        return NULL;
+                    }
+
+                    return serv;
+                }
+            };
+
+            class ExternalHttpServerController
+                    : public ServerControllerBase
+            {
+            public:
+                ExternalHttpServerController(const HttpConfig& config)
+                    : ServerControllerBase(config)
+                {
+
+                }
+
+           private:
+                ITcpLoop * createServer(ITcpLoopObserver * handler)
+                {
+                    ProxyInnerServer* serv = new ProxyInnerServer(handler);
+                    serv->setName("proxy_http_server");
+                    return serv;
+                }
+            };
+        }
+
+        NetworkController::NetworkController(int argc, char *argv[])
+            : server_(NULL), config_(), thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>())
+        {
             bool daemon_mode = false;
 #ifdef OS_MACOSX
             std::string config_path = PROJECT_NAME ".app/Contents/Resources/" CONFIG_FILE_NAME;
@@ -203,10 +324,7 @@ namespace fasto
 
         NetworkController::~NetworkController()
         {
-            delete authChecker_;
-
             delete server_;
-            delete handler_;
 
             EVENT_BUS()->destroyEventThread(thread_);
             EVENT_BUS()->stop();
@@ -216,8 +334,8 @@ namespace fasto
 
         int NetworkController::exec()
         {
-            if(http_thread_){    //if connect dosen't clicked
-                return http_thread_->joinAndGet();
+            if(server_){    //if connect dosen't clicked
+                return server_->join();
             }
 
             return EXIT_SUCCESS;
@@ -230,27 +348,6 @@ namespace fasto
             }
 
             server_->stop();
-            http_thread_->joinAndGet();
-        }
-
-        namespace
-        {
-            int exec_local_http_server(Http2InnerServer* server)
-            {
-                common::Error err = server->bind();
-                if(err && err->isError()){
-                    DEBUG_MSG_ERROR(err);
-                    return EXIT_FAILURE;
-                }
-
-                err = server->listen(5);
-                if(err && err->isError()){
-                    DEBUG_MSG_ERROR(err);
-                    return EXIT_FAILURE;
-                }
-
-                return server->exec();
-            }
         }
 
         common::Error NetworkController::connect()
@@ -260,59 +357,15 @@ namespace fasto
                 return common::Error();
             }
 
-            configuration_t config = config_;
-            // handler prepare
-            handler_->clearHttpCallback();
-            handler_->clearSocketUrl();
-
-            for(int i = 0; i < config.handlers_urls_.size(); ++i){
-                configuration_t::handlers_urls_t handurl = config.handlers_urls_[i];
-                const std::string httpcallbackstr = handurl.second;
-                std::string httpcallback_ns = handurl.second;
-                std::string httpcallback_name;
-                std::string::size_type ns_del = httpcallbackstr.find_first_of("::");
-                if(ns_del != std::string::npos){
-                    httpcallback_ns = httpcallbackstr.substr(0, ns_del);
-                    httpcallback_name = httpcallbackstr.substr(ns_del + 2);
-                }
-
-                common::shared_ptr<IHttpCallback> handler = IHttpCallback::createHttpCallback(httpcallback_ns, httpcallback_name);
-                if(handler){
-                    handler_->registerHttpCallback(handurl.first, handler);
-                }
-            }
-
-            for(int i = 0; i < config.server_sockets_urls_.size(); ++i){
-                configuration_t::server_sockets_urls_t sock_url = config.server_sockets_urls_[i];
-                const common::uri::Uri url = sock_url.second;
-                handler_->registerSocketUrl(url);
-            }
-
             const http_server_type server_type = config_.server_type_;
             const common::net::hostAndPort externalHost = config_.external_host_;
-            handler_->setConfig(config);
-            // handler prepare
-
-            const std::string contentPath = config.content_path_;
-            if(server_type == FASTO_SERVER){                
-                Http2InnerServer* h2s = new Http2InnerServer(handler_, config_);
-                server_ = h2s;
-                common::Error err = common::file_system::change_directory(contentPath);
-                if(err && err->isError()){
-                    DEBUG_MSG_ERROR(err);
-                }
-                server_->setName("local_http_server");
-
-                http_thread_ = THREAD_MANAGER()->createThread(&exec_local_http_server, h2s);
-                http_thread_->start();
+            if(server_type == FASTO_SERVER){
+                server_ = new LocalHttpServerController(config_);
+                server_->start();
             }
             else if(server_type == EXTERNAL_SERVER && externalHost.isValid()) {
-                ProxyInnerServer* proxy_server = new ProxyInnerServer(handler_);
-                server_ = proxy_server;
-                server_->setName("proxy_http_server");
-
-                http_thread_ = THREAD_MANAGER()->createThread(&ITcpLoop::exec, server_);
-                http_thread_->start();
+                server_ = new ExternalHttpServerController(config_);
+                server_->start();
             }
             else{
                 return common::make_error_value("Invalid https server settings!", common::Value::E_ERROR, common::logging::L_ERR);
@@ -329,25 +382,18 @@ namespace fasto
             }
 
             server_->stop();
-            http_thread_->joinAndGet();
             delete server_;
             server_ = NULL;
-
-            const std::string appdir = fApp->appDir();
-            common::Error err = common::file_system::change_directory(appdir);
-            if(err && err->isError()){
-                DEBUG_MSG_ERROR(err);
-            }
 
             return common::Error();
         }
 
-        configuration_t NetworkController::config() const
+        HttpConfig NetworkController::config() const
         {
             return config_;
         }
 
-        void NetworkController::setConfig(const configuration_t& config)
+        void NetworkController::setConfig(const HttpConfig& config)
         {
             config_ = config;
         }
@@ -371,12 +417,12 @@ namespace fasto
             configSave.writeFormated("server_type=%u\n", config_.server_type_);
             configSave.write("[http_handlers_utls]\n");
             for(int i = 0; i < config_.handlers_urls_.size(); ++i){
-                configuration_t::handlers_urls_t handurl = config_.handlers_urls_[i];
+                HttpConfig::handlers_urls_t handurl = config_.handlers_urls_[i];
                 configSave.writeFormated("%s=%s\n", handurl.first, handurl.second);
             }
             configSave.write("[http_server_sockets]\n");
             for(int i = 0; i < config_.server_sockets_urls_.size(); ++i){
-                configuration_t::server_sockets_urls_t sock_url = config_.server_sockets_urls_[i];
+                HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls_[i];
                 const std::string url = sock_url.second.get_url();
                 configSave.writeFormated("%s=%s\n", sock_url.first, url);
             }
@@ -392,7 +438,7 @@ namespace fasto
             const char* path = config_path_.c_str();
         #endif
 
-            configuration_t config;
+            HttpConfig config;
             //default settings
             config.port_ = USER_SPECIFIC_DEFAULT_PORT;
             config.domain_ = USER_SPECIFIC_DEFAULT_DOMAIN;

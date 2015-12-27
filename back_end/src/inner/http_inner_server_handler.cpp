@@ -19,8 +19,8 @@ namespace fasto
 {
     namespace siteonyourdevice
     { 
-        Http2InnerServerHandler::Http2InnerServerHandler(const HttpServerInfo& info, const common::net::hostAndPort &innerHost)
-            : Http2ServerHandler(info, NULL), innerConnection_(NULL), innerHost_(innerHost), config_()
+        Http2InnerServerHandler::Http2InnerServerHandler(const HttpServerInfo& info, const common::net::hostAndPort &innerHost, const HttpConfig &config)
+            : Http2ServerHandler(info, NULL), innerConnection_(NULL), innerHost_(innerHost), config_(config)
         {
 
         }
@@ -40,7 +40,7 @@ namespace fasto
         void Http2InnerServerHandler::accepted(TcpClient* client)
         {
             if(client == innerConnection_){
-                EVENT_BUS()->postEvent(new InnerClientConnectedEvent(this, authInfo()));
+                EVENT_BUS()->postEvent(new InnerClientConnectedEvent(this));
             }
         }
 
@@ -313,7 +313,7 @@ namespace fasto
                     if(IS_EQUAL_COMMAND(okrespcommand, PING_COMMAND)){
                     }
                     else if(IS_EQUAL_COMMAND(okrespcommand, SERVER_WHO_ARE_YOU_COMMAND)){
-                        EVENT_BUS()->postEvent(new InnerClientAutorizedEvent(this));
+                        EVENT_BUS()->postEvent(new InnerClientAutorizedEvent(this, authInfo()));
                     }
                 }
             }
@@ -353,11 +353,6 @@ namespace fasto
 
             server->execInLoopThread(cb);
             return common::Error();
-        }
-
-        void Http2InnerServerHandler::setConfig(const configuration_t& config)
-        {
-            config_ = config;
         }
 
         common::Error Http2InnerServerHandler::innerDisConnect(ITcpLoop *server)

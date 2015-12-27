@@ -1,11 +1,11 @@
-#include "tcp_server.h"
+#include "tcp/tcp_server.h"
 
 #include <inttypes.h>
 
 #include "common/logger.h"
 #include "common/multi_threading/types.h"
 
-#include "tcp_client.h"
+#include "tcp/tcp_client.h"
 
 namespace
 {

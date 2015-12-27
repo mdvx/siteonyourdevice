@@ -18,7 +18,7 @@ namespace fasto
                 : public InnerServerCommandSeqParser, public Http2ServerHandler
         {
         public:
-            Http2InnerServerHandler(const HttpServerInfo &info, const common::net::hostAndPort& innerHost);
+            Http2InnerServerHandler(const HttpServerInfo &info, const common::net::hostAndPort& innerHost, const HttpConfig& config);
             ~Http2InnerServerHandler();
 
             virtual void preLooped(ITcpLoop* server);
@@ -28,9 +28,6 @@ namespace fasto
             virtual void postLooped(ITcpLoop* server);
 
             UserAuthInfo authInfo() const;
-
-            void setConfig(const configuration_t& config);
-
         private:
             common::Error innerConnect(ITcpLoop *server);
             common::Error innerDisConnect(ITcpLoop *server);
@@ -47,7 +44,7 @@ namespace fasto
             InnerClient* innerConnection_;
 
             const common::net::hostAndPort innerHost_;
-            configuration_t config_;
+            const HttpConfig config_;
         };
     }
 }

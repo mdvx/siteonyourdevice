@@ -140,30 +140,14 @@ namespace fasto
             httpCallbacks_[url] = callback;
         }
 
-        void HttpServerHandler::unRegisterHttpCallback(const std::string& url)
-        {
-            http_callbacks_t::const_iterator it = httpCallbacks_.find(url);
-            httpCallbacks_.erase(it, httpCallbacks_.end());
-        }
-
-        void HttpServerHandler::clearHttpCallback()
-        {
-            httpCallbacks_.clear();
-        }
-
         void HttpServerHandler::registerSocketUrl(const common::uri::Uri& url)
         {
             sockets_urls_.push_back(std::make_pair(url, nullptr));
         }
 
-        void HttpServerHandler::clearSocketUrl()
+        void HttpServerHandler::setAuthChecker(IHttpAuthObserver * authChecker)
         {
-            sockets_urls_.clear();
-        }
-
-        void HttpServerHandler::setAuthChecker(IHttpAuthObserver *observer)
-        {
-            authChecker_ = observer;
+            authChecker_ = authChecker;
         }
 
         const HttpServerInfo& HttpServerHandler::info() const

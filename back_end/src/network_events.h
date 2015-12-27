@@ -12,19 +12,18 @@ namespace fasto
         typedef NetworkEventTraits::event_t NetworkEvent;
         typedef NetworkEventTraits::listener_t NetworkEventListener;
 
-        template<NetworkEventTypes event_t, typename inf_t = void>
+        template<NetworkEventTypes event_t, typename inf_t>
         class NetworkEventBaseInfo
                 : public common::Event<NetworkEventTypes, event_t>
         {
         public:
             typedef inf_t info_t;
-            typedef NetworkEventBaseInfo<event_t, info_t> base_class_t;
-            typedef typename common::Event<NetworkEventTypes, event_t>::senders_t senders_t;
+            typedef common::Event<NetworkEventTypes, event_t> base_class_t;
+            typedef typename base_class_t::senders_t senders_t;
 
             NetworkEventBaseInfo(senders_t* sender, info_t info)
-                : common::Event<NetworkEventTypes, event_t>(sender), info_(info)
+                : base_class_t(sender), info_(info)
             {
-
             }
 
             info_t info() const
@@ -42,18 +41,17 @@ namespace fasto
         {
         public:
             typedef void info_t;
-            typedef NetworkEventBaseInfo<event_t, void> base_class_t;
-            typedef typename common::Event<NetworkEventTypes, event_t>::senders_t senders_t;
+            typedef common::Event<NetworkEventTypes, event_t> base_class_t;
+            typedef typename base_class_t::senders_t senders_t;
 
             NetworkEventBaseInfo(senders_t* sender)
-                : common::Event<NetworkEventTypes, event_t>(sender)
+                : base_class_t(sender)
             {
-
             }
         };
 
-        typedef NetworkEventBaseInfo<InnerClientConnected, UserAuthInfo> InnerClientConnectedEvent;
-        typedef NetworkEventBaseInfo<InnerClientAutorized> InnerClientAutorizedEvent;
-        typedef NetworkEventBaseInfo<InnerClientDisconnected> InnerClientDisconnectedEvent;
+        typedef NetworkEventBaseInfo<InnerClientConnected, void> InnerClientConnectedEvent;
+        typedef NetworkEventBaseInfo<InnerClientAutorized, UserAuthInfo> InnerClientAutorizedEvent;
+        typedef NetworkEventBaseInfo<InnerClientDisconnected, void> InnerClientDisconnectedEvent;
     }
 }
