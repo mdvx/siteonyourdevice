@@ -256,7 +256,7 @@ namespace fasto
 
         int GtkMainWindow::showImpl()
         {
-            configuration_t cur_config = controller_->config();
+            HttpConfig cur_config = controller_->config();
 
             gtk_entry_set_text(GTK_ENTRY(domain_text_), cur_config.domain_.c_str());
             const std::string portstr = common::convertToString(cur_config.port_);
@@ -278,7 +278,7 @@ namespace fasto
 
         void GtkMainWindow::onConnectClicked()
         {
-            configuration_t old_config = controller_->config();
+            HttpConfig old_config = controller_->config();
             
             old_config.domain_ = gtk_entry_get_text(GTK_ENTRY(domain_text_));
             const char *portstr = gtk_entry_get_text(GTK_ENTRY(port_text_));

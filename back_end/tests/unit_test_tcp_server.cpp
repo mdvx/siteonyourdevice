@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "common/thread/thread_manager.h"
-#include "tcp_server.h"
+#include "tcp/tcp_server.h"
 
 #define TCP_SERVERS_COUNT 10
 #define START_PORT 4567
