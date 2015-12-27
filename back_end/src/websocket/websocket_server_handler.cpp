@@ -1,5 +1,7 @@
 #include "websocket/websocket_server_handler.h"
 
+#include <arpa/inet.h>
+
 #include "common/http/http.h"
 #include "common/string_util.h"
 #include "common/sprintf.h"

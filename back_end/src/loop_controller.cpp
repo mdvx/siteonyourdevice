@@ -1,5 +1,7 @@
 #include "loop_controller.h"
 
+#include <stdlib.h>
+
 #include "tcp/tcp_server.h"
 
 #include "common/thread/thread_manager.h"
