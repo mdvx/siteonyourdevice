@@ -5,7 +5,6 @@
 #include "common/file_system.h"
 #include "common/thread/event_bus.h"
 #include "common/logger.h"
-#include "common/utils.h"
 
 #include "loop_controller.h"
 

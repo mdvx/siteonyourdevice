@@ -9,7 +9,7 @@
 #include "common/utils.h"
 #include "common/logger.h"
 
-#include "http/http_client.h"
+#include "websocket/websocket_client.h"
 
 #define WEBSOCK_GUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 #define BUF_LEN 0xFFFF
