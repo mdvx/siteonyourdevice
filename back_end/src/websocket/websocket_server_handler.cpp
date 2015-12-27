@@ -1,6 +1,8 @@
 #include "websocket/websocket_server_handler.h"
 
+#ifdef OS_FREEBSD
 #include <arpa/inet.h>
+#endif
 
 #include "common/http/http.h"
 #include "common/string_util.h"
