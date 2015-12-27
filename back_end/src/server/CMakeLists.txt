@@ -14,7 +14,8 @@ ADD_EXECUTABLE(${PROJECT_NAME}
                 http_server_host.h http_server_host.cpp
                 inner/inner_tcp_server.h inner/inner_tcp_server.cpp
                 inner/inner_tcp_client.h inner/inner_tcp_client.cpp
-                websocket_server.h websocket_server.cpp
+                websocket/websocket_server.h websocket/websocket_server.cpp
+                websocket/websocket_client.h websocket/websocket_client.cpp
                 redis_helpers.h redis_helpers.cpp
                 server_commands.h
 )

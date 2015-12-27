@@ -1,10 +1,10 @@
-#include "server/websocket_server.h"
+#include "server/websocket/websocket_server.h"
 
 #include "common/logger.h"
 
-#include "inner/inner_tcp_client.h"
-
+#include "server/inner/inner_tcp_client.h"
 #include "server/http_server_host.h"
+#include "server/websocket/websocket_client.h"
 
 #define BUF_SIZE 4096
 
@@ -28,12 +28,6 @@ namespace fasto
             return new WebSocketClientHost(this, info);
         }
 
-        WebSocketClientHost::WebSocketClientHost(ITcpLoop* server, const common::net::socket_info& info)
-            : Http2Client(server, info)
-        {
-
-        }
-
         WebSocketServerHandlerHost::WebSocketServerHandlerHost(const HttpServerInfo &info, HttpServerHost * parent)
             : Http2ServerHandler(info, NULL), parent_(parent)
         {
@@ -51,7 +45,7 @@ namespace fasto
                 return;
             }
 
-            client_t* hclient = dynamic_cast<client_t*>(client);
+            WebSocketClientHost* hclient = dynamic_cast<WebSocketClientHost*>(client);
             CHECK(hclient);
 
             std::string request(buff, nread);

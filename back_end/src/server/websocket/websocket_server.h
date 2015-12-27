@@ -3,14 +3,12 @@
 #include "http/http_server_handler.h"
 
 #include "http/http_server.h"
-#include "http/http_client.h"
 
 namespace fasto
 {
     namespace siteonyourdevice
     {
         class HttpServerHost;
-        class Http2Client;
 
         class WebSocketServerHost :
                 public Http2Server
@@ -24,20 +22,10 @@ namespace fasto
             virtual TcpClient * createClient(const common::net::socket_info &info);
         };
 
-        class WebSocketClientHost
-                : public Http2Client
-        {
-        public:
-            WebSocketClientHost(ITcpLoop* server, const common::net::socket_info& info);
-        };
-
         class WebSocketServerHandlerHost
             : public Http2ServerHandler
         {
         public:
-            typedef WebSocketServerHost server_t;
-            typedef WebSocketClientHost client_t;
-
             WebSocketServerHandlerHost(const HttpServerInfo & info, HttpServerHost * parent);
 
             virtual void dataReceived(TcpClient* client);

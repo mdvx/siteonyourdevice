@@ -6,7 +6,7 @@
 
 #include "server/inner/inner_tcp_server.h"
 
-#include "server/websocket_server.h"
+#include "server/websocket/websocket_server.h"
 
 #include "http/http_server_handler.h"
 
