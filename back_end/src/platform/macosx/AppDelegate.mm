@@ -157,7 +157,7 @@
     
     using namespace fasto::siteonyourdevice;
 
-    configuration_t config = cxx_controller_->config();
+    HttpConfig config = cxx_controller_->config();
     
     [domainLabel_ setStringValue:@ DOMAIN_LABEL];
     [domainLabel_ setBezeled:NO];
@@ -264,7 +264,7 @@
 {
     using namespace fasto::siteonyourdevice;
 
-    configuration_t config = cxx_controller_->config();
+    HttpConfig config = cxx_controller_->config();
     NSString *domain = [domainTextBox_ stringValue];
     config.domain_ = [domain UTF8String];
     int port = [portTextBox_ intValue];
