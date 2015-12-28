@@ -185,6 +185,17 @@ namespace fasto
                     DEBUG_MSG_ERROR(err);
                 }
             }
+            else if(frame_type == WS_BINARY_FRAME){
+                size_t frameSize = BUF_LEN;
+                uint8_t odata[BUF_LEN] = {0};
+                wsMakeFrame(data, dataSize, odata, &frameSize, WS_BINARY_FRAME);
+
+                ssize_t nwrite = 0;
+                common::Error err = hclient->write(odata, frameSize, nwrite);
+                if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
+                }
+            }
             else{
                 DNOTREACHED();
             }
