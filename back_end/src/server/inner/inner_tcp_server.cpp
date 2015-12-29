@@ -170,7 +170,7 @@ namespace fasto
                     const std::string ping_request = make_request(PING_COMMAND_REQ);
                     ssize_t nwrite = 0;
                     common::Error err = client->write(ping_request.c_str(), ping_request.size(), nwrite);
-                    DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "Pinged byte sended %" PRIuS " client[%s], from server[%s], %" PRIuS " client(s) connected.",
+                    DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "Pinged sended %" PRIuS " byte, client[%s], from server[%s], %" PRIuS " client(s) connected.",
                                           nwrite, client->formatedName(), server->formatedName(), online_clients.size());
                     if(err && err->isError() || nwrite == 0){
                         DEBUG_MSG_ERROR(err);
