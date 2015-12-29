@@ -531,6 +531,8 @@ namespace fasto
             else{
 
             }
+
+            GuiNetworkEventHandler::handleEvent(event);
         }
 
         void Win32MainWindow::onConnectClicked()

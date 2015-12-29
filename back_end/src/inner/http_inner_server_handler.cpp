@@ -20,7 +20,7 @@ namespace fasto
     namespace siteonyourdevice
     { 
         Http2InnerServerHandler::Http2InnerServerHandler(const HttpServerInfo& info, const common::net::hostAndPort &innerHost, const HttpConfig &config)
-            : Http2ServerHandler(info, NULL), innerConnection_(NULL), innerHost_(innerHost), config_(config)
+            : Http2ServerHandler(info, NULL), innerConnection_(NULL), ping_server_id_timer_(INVALID_TIMER_ID), innerHost_(innerHost), config_(config)
         {
 
         }
@@ -33,6 +33,7 @@ namespace fasto
 
         void Http2InnerServerHandler::preLooped(ITcpLoop *server)
         {
+            ping_server_id_timer_ = server->createTimer(ping_timeout_server, ping_timeout_server);
             innerConnect(server);
             Http2ServerHandler::preLooped(server);
         }
@@ -67,7 +68,16 @@ namespace fasto
 
         void Http2InnerServerHandler::timerEmited(ITcpLoop* server, timer_id_type id)
         {
-
+            if(id == ping_server_id_timer_ && innerConnection_){
+                const std::string ping_request = make_request(PING_COMMAND_REQ);
+                ssize_t nwrite = 0;
+                InnerClient* client = innerConnection_;
+                common::Error err = client->write(ping_request.c_str(), ping_request.size(), nwrite);
+                if(err && err->isError()){
+                    client->close();
+                    delete client;
+                }
+            }
         }
 
         void Http2InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[])

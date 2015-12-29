@@ -85,6 +85,7 @@ namespace fasto
             }
             else if(event->eventType() == InnerClientDisconnectedEvent::EventType){
                 //InnerClientDisconnectedEvent * ev = static_cast<InnerClientDisconnectedEvent*>(event);
+                controller_->disConnect();
             }
             else{
 
@@ -296,7 +297,7 @@ namespace fasto
         }
 
         NetworkController::NetworkController(int argc, char *argv[])
-            : server_(NULL), config_(), thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>())
+            : server_mutex_(), server_(NULL), config_(), thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>())
         {
             bool daemon_mode = false;
 #ifdef OS_MACOSX
@@ -334,6 +335,9 @@ namespace fasto
 
         int NetworkController::exec()
         {
+            using namespace common::multi_threading;
+            unique_lock<mutex_t> lock(server_mutex_);
+
             if(server_){    //if connect dosen't clicked
                 return server_->join();
             }
@@ -343,6 +347,9 @@ namespace fasto
 
         void NetworkController::exit(int result)
         {
+            using namespace common::multi_threading;
+            unique_lock<mutex_t> lock(server_mutex_);
+
             if(!server_){    //if connect dosen't clicked
                 return;
             }
@@ -352,6 +359,9 @@ namespace fasto
 
         common::Error NetworkController::connect()
         {
+            using namespace common::multi_threading;
+            unique_lock<mutex_t> lock(server_mutex_);
+
             if(server_){    //if connected
                 DNOTREACHED();
                 return common::Error();
@@ -376,6 +386,9 @@ namespace fasto
 
         common::Error NetworkController::disConnect()
         {
+            using namespace common::multi_threading;
+            unique_lock<mutex_t> lock(server_mutex_);
+
             if(!server_){    //if connect dosen't clicked
                 DNOTREACHED();
                 return common::Error();

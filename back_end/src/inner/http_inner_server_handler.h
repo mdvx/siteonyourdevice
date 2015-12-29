@@ -18,6 +18,11 @@ namespace fasto
                 : public InnerServerCommandSeqParser, public Http2ServerHandler
         {
         public:
+            enum
+            {
+                ping_timeout_server = 30 //sec
+            };
+
             Http2InnerServerHandler(const HttpServerInfo &info, const common::net::hostAndPort& innerHost, const HttpConfig& config);
             ~Http2InnerServerHandler();
 
@@ -43,6 +48,7 @@ namespace fasto
             void proxyDataReceived(ProxyRelayClient * prclient);
 
             InnerClient* innerConnection_;
+            timer_id_type ping_server_id_timer_;
 
             const common::net::hostAndPort innerHost_;
             const HttpConfig config_;

@@ -367,7 +367,23 @@ namespace fasto
 
         void InnerServerHandlerHost::handleInnerApproveCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[])
         {
+            char* command = argv[0];
 
+            if(IS_EQUAL_COMMAND(command, SUCCESS_COMMAND)){
+                if(argc > 1){
+                    const char* okrespcommand = argv[1];
+                    if(IS_EQUAL_COMMAND(okrespcommand, PING_COMMAND)){
+                    }
+                    else if(IS_EQUAL_COMMAND(okrespcommand, SERVER_WHO_ARE_YOU_COMMAND)){
+                    }
+                }
+            }
+            else if(IS_EQUAL_COMMAND(command, FAIL_COMMAND)){
+
+            }
+            else{
+                DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN COMMAND: %s", command);
+            }
         }
 
         InnerTcpServer::InnerTcpServer(const common::net::hostAndPort& host, ITcpLoopObserver *observer)

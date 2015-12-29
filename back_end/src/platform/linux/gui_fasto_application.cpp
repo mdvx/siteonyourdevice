@@ -252,6 +252,8 @@ namespace fasto
             else{
 
             }
+            
+            GuiNetworkEventHandler::handleEvent(event);
         }
 
         int GtkMainWindow::showImpl()

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/error.h"
+#include "common/multi_threading/types.h"
 
 #include "network_events.h"
 
@@ -41,6 +42,7 @@ namespace fasto
             void readConfig();
             void saveConfig();
 
+            common::multi_threading::mutex_t server_mutex_;
             ILoopThreadController * server_;
 
             std::string config_path_;

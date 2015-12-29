@@ -22,7 +22,7 @@ namespace fasto
         public:
             enum
             {
-                ping_timeout_clients = 60 //sec
+                ping_timeout_clients = 300 //sec
             };
 
             InnerServerHandlerHost(HttpServerHost * parent);
