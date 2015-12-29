@@ -113,11 +113,13 @@ namespace fasto
             {
                 common::Error err = server->bind();
                 if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
                     return EXIT_FAILURE;
                 }
 
                 err = server->listen(5);
                 if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
                     return EXIT_FAILURE;
                 }
 
@@ -128,11 +130,13 @@ namespace fasto
             {
                 common::Error err = server->bind();
                 if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
                     return EXIT_FAILURE;
                 }
 
                 err = server->listen(5);
                 if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
                     return EXIT_FAILURE;
                 }
 
@@ -143,11 +147,13 @@ namespace fasto
             {
                 common::Error err = server->bind();
                 if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
                     return EXIT_FAILURE;
                 }
 
                 err = server->listen(5);
                 if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
                     return EXIT_FAILURE;
                 }
 
