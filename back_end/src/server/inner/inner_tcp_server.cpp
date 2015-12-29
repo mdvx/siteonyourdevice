@@ -164,13 +164,16 @@ namespace fasto
         void InnerServerHandlerHost::timerEmited(ITcpLoop* server, timer_id_type id)
         {
             if(ping_client_id_timer_ == id){
-                std::vector<TcpClient *> online_clients = server->clients();                
+                std::vector<TcpClient *> online_clients = server->clients();
+                DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_INFO, "Ping inner client(%" PRIuS ") connected.", online_clients.size());
+                
                 for(size_t i = 0; i < online_clients.size(); ++i){
                     TcpClient* client = online_clients[i];
                     const std::string ping_request = make_request(PING_COMMAND_REQ);
                     ssize_t nwrite = 0;
                     common::Error err = client->write(ping_request.c_str(), ping_request.size(), nwrite);
                     if(err && err->isError() || nwrite == 0){
+                        DEBUG_MSG_ERROR(err);
                         client->close();
                         delete client;
                     }
