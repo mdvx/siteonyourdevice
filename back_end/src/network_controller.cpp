@@ -325,10 +325,10 @@ namespace fasto
 
         NetworkController::~NetworkController()
         {
-            delete server_;
-
             EVENT_BUS()->destroyEventThread(thread_);
             EVENT_BUS()->stop();
+
+            delete server_;
 
             saveConfig();
         }
