@@ -5,12 +5,17 @@
 
 #include "event_loop.h"
 
+#define INVALID_TIMER_ID -1
+
 namespace fasto
 {
     namespace siteonyourdevice
     {
         class ITcpLoopObserver;
         class TcpClient;
+        class LoopTimer;
+
+        typedef int timer_id_type;
 
         class ITcpLoop
                 : public EvLoopObserver, common::IMetaClassInfo
@@ -27,6 +32,9 @@ namespace fasto
             void unregisterClient(TcpClient * client);
             virtual void closeClient(TcpClient *client);
 
+            timer_id_type createTimer(double sec, double repeat);
+            void removeTimer(timer_id_type id);
+
             common::id_counter<ITcpLoop>::type_t id() const;
 
             void setName(const std::string& name);
@@ -39,6 +47,8 @@ namespace fasto
 
             bool isLoopThread() const;
 
+            std::vector<TcpClient *> clients() const;
+
         protected:
             virtual TcpClient * createClient(const common::net::socket_info& info);
 
@@ -50,10 +60,12 @@ namespace fasto
 
         private:
             static void read_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
+            static void timer_cb(struct ev_loop* loop, struct ev_timer* timer, int revents);
 
             ITcpLoopObserver* const observer_;
 
             std::vector<TcpClient *> clients_;
+            std::vector<LoopTimer *> timers_;
             const common::id_counter<ITcpLoop> id_;
 
             std::string name_;
@@ -70,6 +82,9 @@ namespace fasto
 
             virtual void dataReceived(TcpClient* client) = 0;
             virtual void postLooped(ITcpLoop* server) = 0;
+
+            virtual void timerEmited(ITcpLoop* server, timer_id_type id) = 0;
+
             virtual ~ITcpLoopObserver();
         };
 

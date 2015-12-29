@@ -33,6 +33,9 @@ namespace fasto
             void start_io(ev_io *io);
             void stop_io(ev_io *io);
 
+            void start_timer(ev_timer * timer);
+            void stop_timer(ev_timer * timer);
+
             void execInLoopThread(async_loop_exec_function_type async_cb);
 
             int exec();

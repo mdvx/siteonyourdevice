@@ -83,7 +83,7 @@ namespace fasto
                                                       subscribed_requests_.end());
         }
 
-        void InnerServerCommandSeqParser::subscribe_request(const RequestCallback& req)
+        void InnerServerCommandSeqParser::subscribeRequest(const RequestCallback& req)
         {
             subscribed_requests_.push_back(req);
         }

@@ -104,6 +104,11 @@ namespace fasto
             }
         }
 
+        void HttpServerHandler::timerEmited(ITcpLoop* server, timer_id_type id)
+        {
+
+        }
+
         void HttpServerHandler::accepted(TcpClient* client)
         {
 

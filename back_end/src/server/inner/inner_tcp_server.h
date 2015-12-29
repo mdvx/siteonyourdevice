@@ -20,6 +20,11 @@ namespace fasto
                 : public InnerServerCommandSeqParser, public ITcpLoopObserver
         {
         public:
+            enum
+            {
+                ping_timeout_clients = 60 //sec
+            };
+
             InnerServerHandlerHost(HttpServerHost * parent);
 
             virtual void preLooped(ITcpLoop* server);
@@ -30,6 +35,8 @@ namespace fasto
 
             virtual void dataReceived(TcpClient* client);
             virtual void postLooped(ITcpLoop* server);
+            virtual void timerEmited(ITcpLoop* server, timer_id_type id);
+
             virtual ~InnerServerHandlerHost();
 
             void setStorageConfig(const redis_sub_configuration_t &config);
@@ -45,6 +52,7 @@ namespace fasto
             RedisSub *sub_commands_in_;
             InnerSubHandler *handler_;
             std::shared_ptr<common::thread::Thread<void> > redis_subscribe_command_in_thread_;
+            timer_id_type ping_client_id_timer_;
         };
 
         class IRelayServer;

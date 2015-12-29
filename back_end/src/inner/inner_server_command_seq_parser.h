@@ -44,7 +44,7 @@ namespace fasto
                 return buff;
             }
 
-            void subscribe_request(const RequestCallback& req);
+            void subscribeRequest(const RequestCallback& req);
 
         protected:
             void handleInnerDataReceived(InnerClient *connection, char *buff, uint32_t buff_len);

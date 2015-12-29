@@ -65,6 +65,11 @@ namespace fasto
             Http2ServerHandler::postLooped(server);
         }
 
+        void Http2InnerServerHandler::timerEmited(ITcpLoop* server, timer_id_type id)
+        {
+
+        }
+
         void Http2InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[])
         {
             ssize_t nwrite = 0;

@@ -46,8 +46,33 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
+        class LoopTimer
+                : public common::id_counter<LoopTimer, timer_id_type>
+        {
+        public:
+            LoopTimer(ITcpLoop * server)
+                : server_(server), timer_((struct ev_timer*)calloc(1, sizeof(struct ev_timer)))
+            {
+                timer_->data = this;
+            }
+
+            ITcpLoop* server() const
+            {
+                return server_;
+            }
+
+            ~LoopTimer()
+            {
+                free(timer_);
+            }
+
+            ITcpLoop * server_;
+            struct ev_timer* const timer_;
+        };
+
+
         ITcpLoop::ITcpLoop(ITcpLoopObserver* observer)
-            : loop_(new LibEvLoop), observer_(observer), clients_(), id_()
+            : loop_(new LibEvLoop), observer_(observer), clients_(), timers_(), id_()
         {
             loop_->setObserver(this);
         }
@@ -117,6 +142,27 @@ namespace fasto
                                   client->formatedName(), formatedName(), clients_.size());
         }
 
+        timer_id_type ITcpLoop::createTimer(double sec, double repeat)
+        {
+            LoopTimer * timer = new LoopTimer(this);
+            ev_timer_init(timer->timer_, timer_cb, sec, repeat);
+            loop_->start_timer(timer->timer_);
+            timers_.push_back(timer);
+            return timer->id();
+        }
+
+        void ITcpLoop::removeTimer(timer_id_type id)
+        {
+            for(std::vector<LoopTimer *>::iterator it = timers_.begin(); it != timers_.end(); ++it){
+                LoopTimer * timer = *it;
+                if(timer->id() == id){
+                    timers_.erase(it);
+                    delete timer;
+                    return;
+                }
+            }
+        }
+
         common::id_counter<ITcpLoop>::type_t ITcpLoop::id() const
         {
             return id_.id();
@@ -130,6 +176,11 @@ namespace fasto
         bool ITcpLoop::isLoopThread() const
         {
             return loop_->isLoopThread();
+        }
+
+        std::vector<TcpClient *> ITcpLoop::clients() const
+        {
+            return clients_;
         }
 
         void ITcpLoop::setName(const std::string& name)
@@ -168,6 +219,22 @@ namespace fasto
             }
         }
 
+        void ITcpLoop::timer_cb(struct ev_loop* loop, struct ev_timer* timer, int revents)
+        {
+            LoopTimer* ptimer = reinterpret_cast<LoopTimer *>(timer->data);
+            ITcpLoop* pserver = ptimer->server();
+            LibEvLoop* evloop = reinterpret_cast<LibEvLoop *>(ev_userdata(loop));
+            CHECK(pserver && pserver->loop_ == evloop);
+
+            if(EV_ERROR & revents){
+                return;
+            }
+
+            if(pserver->observer_){
+                pserver->observer_->timerEmited(pserver, ptimer->id());
+            }
+        }
+
         void ITcpLoop::preLooped(LibEvLoop* loop)
         {
             if(observer_){
@@ -177,21 +244,25 @@ namespace fasto
 
         void ITcpLoop::stoped(LibEvLoop* loop)
         {
+            const std::vector<LoopTimer *> timers = timers_;
+            for(size_t i = 0; i < timers.size(); ++i){
+                LoopTimer * timer = timers[i];
+                removeTimer(timer->id());
+            }
 
+            const std::vector<TcpClient *> cl = clients();
+
+            for(size_t i = 0; i < cl.size(); ++i){
+                TcpClient * client = cl[i];
+                client->close();
+                delete client;
+            }
         }
 
         void ITcpLoop::postLooped(LibEvLoop* loop)
         {
             if(observer_){
                 observer_->postLooped(this);
-            }
-
-            const std::vector<TcpClient *> cl = clients_;
-
-            for(size_t i = 0; i < cl.size(); ++i){
-                TcpClient * client = cl[i];
-                client->close();
-                delete client;
             }
         }
 

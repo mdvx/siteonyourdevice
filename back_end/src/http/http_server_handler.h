@@ -39,6 +39,8 @@ namespace fasto
             virtual void closed(TcpClient* client);
             virtual void dataReceived(TcpClient* client);
             virtual void postLooped(ITcpLoop* server);
+            virtual void timerEmited(ITcpLoop* server, timer_id_type id);
+
             virtual ~HttpServerHandler();
 
             void registerHttpCallback(const std::string& url, http_callback_t callback);

@@ -124,14 +124,14 @@ namespace fasto
 
                 RequestCallback::callback_t cb = std::bind(&InnerSubHandler::processSubscribed, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                 RequestCallback rc(id, cb);
-                parent_->subscribe_request(rc);
+                parent_->subscribeRequest(rc);
             }
 
             InnerServerHandlerHost * parent_;
         };
 
         InnerServerHandlerHost::InnerServerHandlerHost(HttpServerHost *parent)
-            : parent_(parent), sub_commands_in_(NULL), handler_(NULL)
+            : parent_(parent), sub_commands_in_(NULL), handler_(NULL), ping_client_id_timer_(INVALID_TIMER_ID)
         {
             handler_ = new InnerSubHandler(this);
             sub_commands_in_ = new RedisSub(handler_);
@@ -148,7 +148,7 @@ namespace fasto
 
         void InnerServerHandlerHost::preLooped(ITcpLoop* server)
         {
-
+            ping_client_id_timer_ = server->createTimer(ping_timeout_clients, ping_timeout_clients);
         }
 
         void InnerServerHandlerHost::moved(TcpClient* client)
@@ -159,6 +159,23 @@ namespace fasto
         void InnerServerHandlerHost::postLooped(ITcpLoop *server)
         {
 
+        }
+
+        void InnerServerHandlerHost::timerEmited(ITcpLoop* server, timer_id_type id)
+        {
+            if(ping_client_id_timer_ == id){
+                std::vector<TcpClient *> online_clients = server->clients();
+                for(size_t i = 0; i < online_clients.size(); ++i){
+                    TcpClient* client = online_clients[i];
+                    const std::string ping_request = make_request(PING_COMMAND_REQ);
+                    ssize_t nwrite = 0;
+                    common::Error err = client->write(ping_request.c_str(), ping_request.size(), nwrite);
+                    if(err && err->isError()){
+                        client->close();
+                        delete client;
+                    }
+                }
+            }
         }
 
         void InnerServerHandlerHost::accepted(TcpClient* client)

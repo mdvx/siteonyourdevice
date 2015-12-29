@@ -66,6 +66,18 @@ namespace fasto
             ev_io_stop(loop_, io);
         }
 
+        void LibEvLoop::start_timer(ev_timer * timer)
+        {
+            CHECK(isLoopThread());
+            ev_timer_start(loop_, timer);
+        }
+
+        void LibEvLoop::stop_timer(ev_timer * timer)
+        {
+            CHECK(isLoopThread());
+            ev_timer_stop(loop_, timer);
+        }
+
         void LibEvLoop::execInLoopThread(async_loop_exec_function_type async_cb)
         {
             if(isLoopThread()){
