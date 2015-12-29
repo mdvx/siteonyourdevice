@@ -74,6 +74,7 @@ namespace fasto
                 InnerClient* client = innerConnection_;
                 common::Error err = client->write(ping_request.c_str(), ping_request.size(), nwrite);
                 if(err && err->isError() || nwrite == 0){
+                    DEBUG_MSG_ERROR(err);
                     client->close();
                     delete client;
                 }
@@ -393,6 +394,7 @@ namespace fasto
             ssize_t nread = 0;
             common::Error err = iclient->read(buff, MAX_COMMAND_SIZE, nread);
             if((err && err->isError()) || nread == 0){
+                DEBUG_MSG_ERROR(err);
                 iclient->close();
                 delete iclient;
                 return;

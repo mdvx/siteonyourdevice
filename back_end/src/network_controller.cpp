@@ -390,7 +390,7 @@ namespace fasto
             unique_lock<mutex_t> lock(server_mutex_);
 
             if(!server_){    //if connect dosen't clicked
-                DNOTREACHED();
+                //DNOTREACHED();
                 return common::Error();
             }
 

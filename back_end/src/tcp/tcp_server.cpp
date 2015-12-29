@@ -211,6 +211,7 @@ namespace fasto
             CHECK(pserver && pserver->loop_ == evloop);
 
             if(EV_ERROR & revents){
+                DNOTREACHED();
                 return;
             }
 
@@ -227,9 +228,11 @@ namespace fasto
             CHECK(pserver && pserver->loop_ == evloop);
 
             if(EV_ERROR & revents){
+                DNOTREACHED();
                 return;
             }
 
+            DCHECK(revents & EV_TIMEOUT);
             if(pserver->observer_){
                 pserver->observer_->timerEmited(pserver, ptimer->id());
             }
@@ -360,6 +363,7 @@ namespace fasto
             CHECK(pserver && pserver->loop_ == evloop);
 
             if(EV_ERROR & revents){
+                DNOTREACHED();
                 return;
             }
 
