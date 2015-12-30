@@ -4,6 +4,8 @@
 
 #include <gtk/gtk.h>
 
+#include "network/network_controller.h"
+
 namespace
 {
     void trayOnAbout(GtkMenuItem *item, gpointer user_data)

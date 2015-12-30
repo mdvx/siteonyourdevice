@@ -223,6 +223,11 @@ namespace fasto
             handleInnerDataReceived(iclient, buff, nread);
         }
 
+        void InnerServerHandlerHost::dataReadyToWrite(TcpClient* client)
+        {
+
+        }
+
         void InnerServerHandlerHost::setStorageConfig(const redis_sub_configuration_t& config)
         {
             sub_commands_in_->setConfig(config);
