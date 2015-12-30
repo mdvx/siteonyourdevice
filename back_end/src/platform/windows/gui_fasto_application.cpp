@@ -3,7 +3,8 @@
 #include <windows.h>
 #include <Shlobj.h>
 
-#include "network_events.h"
+#include "network/network_events.h"
+#include "network/network_controller.h"
 
 #define ID_ABOUT       2000
 #define ID_EXIT        2001

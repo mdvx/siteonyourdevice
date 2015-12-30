@@ -1,12 +1,14 @@
 #pragma once
 
-#include "network_controller.h"
 #include "application/fasto_application.h"
 
 namespace fasto
 {
     namespace siteonyourdevice
     {
+        class NetworkEventHandler;
+        class NetworkController;
+
         class FastoRemoteApplication
                 : public IFastoApplicationImpl
         {

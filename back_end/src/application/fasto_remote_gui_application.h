@@ -2,6 +2,9 @@
 
 #include "fasto_remote_application.h"
 
+#include "network/network_event_handler.h"
+#include "http_config.h"
+
 #define CONNECT_LABEL "Connect"
 #define DISCONNECT_LABEL "Disconnect"
 #define DOMAIN_LABEL "Domain:"

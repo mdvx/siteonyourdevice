@@ -7,7 +7,7 @@
 #include "common/net/net.h"
 #include "common/system_info/system_info.h"
 
-#include "network_events.h"
+#include "network/network_events.h"
 #include "client_commands.h"
 
 #include "inner/inner_relay_client.h"

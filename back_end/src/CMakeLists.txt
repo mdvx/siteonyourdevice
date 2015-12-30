@@ -3,16 +3,12 @@ SET(HEADERS_GLOBAL
     globals.h
     infos.h
     server/server_config.h
-    network_events.h
-    network_controller.h
     http_config.h
     loop_controller.h
 )
 SET(SOURCES_GLOBAL
     event_loop.cpp
     infos.cpp
-    network_events.cpp
-    network_controller.cpp
     loop_controller.cpp
 )
 
@@ -30,6 +26,17 @@ SET(HEADERS_COMMANDS
 )
 SET(SOURCES_COMMANDS
     commands/commands.cpp
+)
+
+SET(HEADERS_NETWORK
+    network/network_event_handler.h
+    network/network_controller.h
+    network/network_events.h
+)
+SET(SOURCES_NETWORK
+    network/network_event_handler.cpp
+    network/network_controller.cpp
+    network/network_events.cpp
 )
 
 SET(HEADERS_TCP
@@ -157,8 +164,12 @@ ADD_SUBDIRECTORY(third-party/redis)
 SET(INCLUDE_DIRS ${INCLUDE_DIRS} ${CMAKE_CURRENT_LIST_DIR} third-party/libev/src third-party/ini third-party/sds)
 INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
-SET(HEADERS ${HEADERS} ${HEADERS_GLOBAL} ${HEADERS_APPLICATION} ${HEADERS_TCP} ${HEADERS_HTTP} ${HEADERS_WEBSOCKET} ${HEADERS_INNER} ${HEADERS_HTTP_CALLBACKS} ${HEADERS_COMMANDS})
-SET(SOURCES ${SOURCES} ${SOURCES_GLOBAL} ${SOURCES_APPLICATION} ${SOURCES_TCP} ${SOURCES_HTTP} ${SOURCES_WEBSOCKET} ${SOURCES_INNER} ${SOURCES_HTTP_CALLBACKS} ${SOURCES_COMMANDS})
+SET(HEADERS ${HEADERS} ${HEADERS_GLOBAL} ${HEADERS_APPLICATION} ${HEADERS_NETWORK}
+            ${HEADERS_TCP} ${HEADERS_HTTP} ${HEADERS_WEBSOCKET} ${HEADERS_INNER}
+            ${HEADERS_HTTP_CALLBACKS} ${HEADERS_COMMANDS})
+SET(SOURCES ${SOURCES} ${SOURCES_GLOBAL} ${SOURCES_APPLICATION} ${SOURCES_NETWORK}
+            ${SOURCES_TCP} ${SOURCES_HTTP} ${SOURCES_WEBSOCKET} ${SOURCES_INNER}
+            ${SOURCES_HTTP_CALLBACKS} ${SOURCES_COMMANDS})
 
 SOURCE_GROUP("Header Files" FILES ${HEADERS})
 SOURCE_GROUP("Source Files" FILES ${SOURCES})

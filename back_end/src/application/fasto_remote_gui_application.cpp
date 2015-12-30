@@ -1,5 +1,7 @@
 #include "application/fasto_remote_gui_application.h"
 
+#include "network/network_controller.h"
+
 namespace fasto
 {
     namespace siteonyourdevice

@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 
+#include "network/network_controller.h"
+
 #if defined(BUILD_CONSOLE)
     #include "fasto_remote_application.h"
 #else
