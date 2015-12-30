@@ -57,14 +57,14 @@ namespace fasto
             GuiNetworkEventHandler(NetworkController *controller);
             ~GuiNetworkEventHandler();
 
-            virtual int start() final;
+            virtual void start() final;
 
         protected:
             void onConnectClicked(const HttpConfig &config); //with config
             void onDisconnectClicked();
 
         private:
-            virtual int showImpl() = 0;
+            virtual void showImpl() = 0;
         };
 
         class FastoRemoteGuiApplication

@@ -39,7 +39,7 @@ var CONNECTED_STATUS = {
 var COMMANDS = {
     PING : "ping", //+
     INFO : "plz_system_info", //+
-    SHUTDOWN : "plz_disconnect" //+
+    SHUTDOWN : "plz_disconnect_http" //+
 }
 
 // state parse

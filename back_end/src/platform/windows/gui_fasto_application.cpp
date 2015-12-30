@@ -94,7 +94,7 @@ namespace fasto
             UnregisterClass(PROJECT_NAME_TITLE, hInstance);
         }
 
-        int Win32MainWindow::showImpl()
+        void Win32MainWindow::showImpl()
         {
             const HINSTANCE hInstance = GetModuleHandle(NULL);
 
@@ -102,7 +102,7 @@ namespace fasto
                                  width, height, NULL, NULL, hInstance, this);
             if (!hwnd) {
                 MessageBox(NULL, "Can't create window!", TEXT("Warning!"), MB_ICONERROR | MB_OK | MB_TOPMOST);
-                return EXIT_FAILURE;
+                return;
             }
 
             RECT rc;
@@ -126,9 +126,6 @@ namespace fasto
             SetWindowText(hwndExternalHostTextBox_, ex_host.c_str());
             const std::string ex_portstr = common::convertToString(cur_config.external_host_.port_);
             SetWindowText(hwndExternalPortTextBox_, ex_portstr.c_str());
-
-
-            return EXIT_SUCCESS;
         }
 
         void Win32MainWindow::setExternalChekboxState(LRESULT status)

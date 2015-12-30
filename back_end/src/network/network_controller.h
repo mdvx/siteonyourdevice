@@ -27,11 +27,11 @@ namespace fasto
             NetworkController(int argc, char *argv[]);
             ~NetworkController();
 
-            int exec() SYNC_CALL;
+            int exec() SYNC_CALL();
             void exit(int result);
 
-            common::Error connect();
-            common::Error disConnect();
+            void connect() ASYNC_CALL(InnerClientConnectedEvent);
+            void disConnect() ASYNC_CALL(InnerClientDisconnectedEvent);
 
             HttpConfig config() const;
             void setConfig(const HttpConfig& config);

@@ -54,7 +54,8 @@ namespace fasto
         {
             controller_ = new NetworkController(fApp->argc(), fApp->argv());
             network_handler_ = createHandlerImpl(controller_);
-            return network_handler_->start();
+            network_handler_->start();
+            return EXIT_SUCCESS;
         }
 
         int FastoRemoteApplication::exec()

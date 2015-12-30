@@ -17,26 +17,20 @@ namespace fasto
 
         }
 
-        int GuiNetworkEventHandler::start()
+        void GuiNetworkEventHandler::start()
         {
-            return showImpl();
+            showImpl();
         }
 
         void GuiNetworkEventHandler::onConnectClicked(const HttpConfig& config)
         {
             controller_->setConfig(config);
-            common::Error err = controller_->connect();
-            if(err && err->isError()){
-                DNOTREACHED();
-            }
+            controller_->connect();
         }
 
         void GuiNetworkEventHandler::onDisconnectClicked()
         {
-            common::Error err = controller_->disConnect();
-            if(err && err->isError()){
-                DNOTREACHED();
-            }
+            controller_->disConnect();
         }
 
         FastoRemoteGuiApplication::FastoRemoteGuiApplication(int argc, char *argv[])

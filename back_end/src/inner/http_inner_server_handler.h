@@ -14,6 +14,8 @@ namespace fasto
         class RelayClientEx;
         class ProxyRelayClient;
 
+        // InnerClientConnectedEvent
+        // InnerClientDisconnectedEvent
         class Http2InnerServerHandler
                 : public InnerServerCommandSeqParser, public Http2ServerHandler
         {
@@ -35,10 +37,8 @@ namespace fasto
             virtual void timerEmited(ITcpLoop* server, timer_id_type id);
 
             UserAuthInfo authInfo() const;
-        private:
-            common::Error innerConnect(ITcpLoop *server);
-            common::Error innerDisConnect(ITcpLoop *server);
 
+        private:
             virtual void handleInnerRequestCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
             virtual void handleInnerResponceCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
             virtual void handleInnerApproveCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);

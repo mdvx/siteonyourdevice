@@ -34,7 +34,19 @@ namespace fasto
         void Http2InnerServerHandler::preLooped(ITcpLoop *server)
         {
             ping_server_id_timer_ = server->createTimer(ping_timeout_server, ping_timeout_server);
-            innerConnect(server);
+            CHECK(!innerConnection_);
+
+            common::net::socket_info client_info;
+            common::ErrnoError err = common::net::connect(innerHost_, common::net::ST_SOCK_STREAM, 0, client_info);
+            if(err && err->isError()){
+                DEBUG_MSG_ERROR(err);
+                return;
+            }
+
+            InnerClient* connection = new InnerClient(server, client_info);
+            innerConnection_ = connection;
+            server->registerClient(connection);
+
             Http2ServerHandler::preLooped(server);
         }
 
@@ -62,7 +74,12 @@ namespace fasto
 
         void Http2InnerServerHandler::postLooped(ITcpLoop *server)
         {
-            innerDisConnect(server);
+            if(innerConnection_){
+                InnerClient* connection = innerConnection_;
+                connection->close();
+                delete connection;
+            }
+
             Http2ServerHandler::postLooped(server);
         }
 
@@ -345,47 +362,6 @@ namespace fasto
         {
             const common::net::hostAndPort hs(config_.domain_, config_.port_);
             return UserAuthInfo(config_.login_, config_.password_, hs);
-        }
-
-        common::Error Http2InnerServerHandler::innerConnect(ITcpLoop *server)
-        {
-            if(innerConnection_){
-                return common::Error();
-            }
-
-            common::net::socket_info client_info;
-            common::ErrnoError err = common::net::connect(innerHost_, common::net::ST_SOCK_STREAM, 0, client_info);
-            if(err && err->isError()){
-                return err;
-            }
-
-            InnerClient* connection = new InnerClient(server, client_info);
-            innerConnection_ = connection;
-
-            auto cb = [server, connection]()
-            {               
-                server->registerClient(connection);
-            };
-
-            server->execInLoopThread(cb);
-            return common::Error();
-        }
-
-        common::Error Http2InnerServerHandler::innerDisConnect(ITcpLoop *server)
-        {
-            if(!innerConnection_){
-                return common::Error();
-            }
-
-            InnerClient* connection = innerConnection_;
-            auto cb = [connection]()
-            {
-                connection->close();
-                delete connection;
-            };
-
-            server->execInLoopThread(cb);
-            return common::Error();
         }
 
         void Http2InnerServerHandler::innerDataReceived(InnerClient* iclient)

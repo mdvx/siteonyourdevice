@@ -53,5 +53,6 @@ namespace fasto
         typedef NetworkEventBaseInfo<InnerClientConnected, void> InnerClientConnectedEvent;
         typedef NetworkEventBaseInfo<InnerClientAutorized, UserAuthInfo> InnerClientAutorizedEvent;
         typedef NetworkEventBaseInfo<InnerClientDisconnected, void> InnerClientDisconnectedEvent;
+        typedef common::IExceptionEvent<NetworkEventTypes> NetworkExceptionEvent;
     }
 }

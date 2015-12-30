@@ -26,6 +26,11 @@ namespace fasto
             }
         }
 
+        void NetworkEventHandler::handleExceptionEvent(NetworkEvent* event, common::Error err)
+        {
+
+        }
+
         class NetworkEventHandler::NetworkListener
                 : public common::IListener<NetworkEventTypes>
         {
@@ -50,6 +55,11 @@ namespace fasto
             {
                 app_->handleEvent(event);
             }
+
+            virtual void handleExceptionEvent(event_t* event, common::Error err)
+            {
+                app_->handleExceptionEvent(event, err);
+            }
         };
 
         NetworkEventHandler::NetworkEventHandler(NetworkController *controller)
@@ -63,15 +73,9 @@ namespace fasto
             delete networkListener_;
         }
 
-        int NetworkEventHandler::start()
+        void NetworkEventHandler::start()
         {
-            common::Error err = controller_->connect();
-            if(err && err->isError()){
-                DEBUG_MSG_ERROR(err);
-                return EXIT_FAILURE;
-            }
-
-            return EXIT_SUCCESS;
+            controller_->connect();
         }
     }
 }

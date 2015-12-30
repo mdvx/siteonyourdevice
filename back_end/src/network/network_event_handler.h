@@ -14,11 +14,12 @@ namespace fasto
             NetworkEventHandler(NetworkController *controller);
             virtual ~NetworkEventHandler();
 
-            virtual int start(); //connect
+            virtual void start() ASYNC_CALL(InnerClientConnectedEvent); //connect
 
         protected:
             NetworkController * controller_;
             virtual void handleEvent(NetworkEvent* event);
+            virtual void handleExceptionEvent(NetworkEvent* event, common::Error err);
 
         private:
             class NetworkListener;

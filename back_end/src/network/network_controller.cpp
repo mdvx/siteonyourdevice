@@ -294,14 +294,13 @@ namespace fasto
             server_->stop();
         }
 
-        common::Error NetworkController::connect()
+        void NetworkController::connect()
         {
             using namespace common::multi_threading;
             unique_lock<mutex_t> lock(server_mutex_);
 
             if(server_){    //if connected
-                DNOTREACHED();
-                return common::Error();
+                return;
             }
 
             const http_server_type server_type = config_.server_type_;
@@ -314,28 +313,20 @@ namespace fasto
                 server_ = new ExternalHttpServerController(config_);
                 server_->start();
             }
-            else{
-                return common::make_error_value("Invalid https server settings!", common::Value::E_ERROR, common::logging::L_ERR);
-            }
-
-            return common::Error();
         }
 
-        common::Error NetworkController::disConnect()
+        void NetworkController::disConnect()
         {
             using namespace common::multi_threading;
             unique_lock<mutex_t> lock(server_mutex_);
 
             if(!server_){    //if connect dosen't clicked
-                DNOTREACHED();
-                return common::Error();
+                return;
             }
 
             server_->stop();
             delete server_;
             server_ = NULL;
-
-            return common::Error();
         }
 
         HttpConfig NetworkController::config() const

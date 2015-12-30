@@ -18,7 +18,7 @@ namespace fasto
             void onConnectClicked();
 
         private:
-            virtual int showImpl();
+            virtual void showImpl();
             void setExternalChekboxState(LRESULT status);
 
             static LRESULT CALLBACK wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
