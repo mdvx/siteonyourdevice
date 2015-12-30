@@ -35,6 +35,8 @@ namespace fasto
             timer_id_type createTimer(double sec, double repeat);
             void removeTimer(timer_id_type id);
 
+            void changeFlags(TcpClient *client);
+
             common::id_counter<ITcpLoop>::type_t id() const;
 
             void setName(const std::string& name);
@@ -59,7 +61,7 @@ namespace fasto
             LibEvLoop* const loop_;
 
         private:
-            static void read_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
+            static void read_write_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
             static void timer_cb(struct ev_loop* loop, struct ev_timer* timer, int revents);
 
             ITcpLoopObserver* const observer_;
@@ -81,6 +83,7 @@ namespace fasto
             virtual void closed(TcpClient* client) = 0;
 
             virtual void dataReceived(TcpClient* client) = 0;
+            virtual void dataReadyToWrite(TcpClient* client) = 0;
             virtual void postLooped(ITcpLoop* server) = 0;
 
             virtual void timerEmited(ITcpLoop* server, timer_id_type id) = 0;

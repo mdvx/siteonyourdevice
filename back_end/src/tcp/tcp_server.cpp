@@ -102,7 +102,7 @@ namespace fasto
         void ITcpLoop::unregisterClient(TcpClient * client)
         {
             CHECK(client->server() == this);
-            loop_->stop_io(client->read_io_);
+            loop_->stop_io(client->read_write_io_);
 
             if(observer_){
                 observer_->moved(client);
@@ -118,8 +118,8 @@ namespace fasto
         {
             CHECK(client->server() == this);
             // Initialize and start watcher to read client requests
-            ev_io_init(client->read_io_, read_cb, client->fd(), EV_READ);
-            loop_->start_io(client->read_io_);
+            ev_io_init(client->read_write_io_, read_write_cb, client->fd(), client->flags());
+            loop_->start_io(client->read_write_io_);
 
             if(observer_){
                 observer_->accepted(client);
@@ -132,7 +132,7 @@ namespace fasto
         void ITcpLoop::closeClient(TcpClient *client)
         {
             CHECK(client->server() == this);
-            loop_->stop_io(client->read_io_);
+            loop_->stop_io(client->read_write_io_);
 
             if(observer_){
                 observer_->closed(client);
@@ -178,6 +178,15 @@ namespace fasto
             return loop_->isLoopThread();
         }
 
+        void ITcpLoop::changeFlags(TcpClient *client)
+        {
+            if(client->flags() != client->read_write_io_->events){
+                loop_->stop_io(client->read_write_io_);
+                ev_io_set(client->read_write_io_, client->fd(), client->flags());
+                loop_->start_io(client->read_write_io_);
+            }
+        }
+
         std::vector<TcpClient *> ITcpLoop::clients() const
         {
             return clients_;
@@ -203,7 +212,7 @@ namespace fasto
             return new TcpClient(this, info);
         }
 
-        void ITcpLoop::read_cb(struct ev_loop* loop, struct ev_io* watcher, int revents)
+        void ITcpLoop::read_write_cb(struct ev_loop* loop, struct ev_io* watcher, int revents)
         {
             TcpClient* pclient = reinterpret_cast<TcpClient *>(watcher->data);
             ITcpLoop* pserver = pclient->server();
@@ -215,8 +224,16 @@ namespace fasto
                 return;
             }
 
-            if(pserver->observer_){
-                pserver->observer_->dataReceived(pclient);
+            if(revents & EV_READ){
+                if(pserver->observer_){
+                    pserver->observer_->dataReceived(pclient);
+                }
+            }
+
+            if(revents & EV_WRITE){
+                if(pserver->observer_){
+                    pserver->observer_->dataReadyToWrite(pclient);
+                }
             }
         }
 

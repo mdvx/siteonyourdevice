@@ -140,6 +140,11 @@ namespace fasto
             processReceived(hclient, buff, nread);
         }
 
+        void HttpServerHandler::dataReadyToWrite(TcpClient* client)
+        {
+
+        }
+
         void HttpServerHandler::registerHttpCallback(const std::string& url, http_callback_t callback)
         {
             httpCallbacks_[url] = callback;

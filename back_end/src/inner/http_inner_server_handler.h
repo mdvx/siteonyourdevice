@@ -30,6 +30,7 @@ namespace fasto
             virtual void accepted(TcpClient* client);
             virtual void closed(TcpClient* client);
             virtual void dataReceived(TcpClient* client);
+            virtual void dataReadyToWrite(TcpClient* client);
             virtual void postLooped(ITcpLoop* server);
             virtual void timerEmited(ITcpLoop* server, timer_id_type id);
 

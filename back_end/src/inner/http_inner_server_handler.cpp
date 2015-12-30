@@ -73,7 +73,7 @@ namespace fasto
                 ssize_t nwrite = 0;
                 InnerClient* client = innerConnection_;
                 common::Error err = client->write(ping_request.c_str(), ping_request.size(), nwrite);
-                if(err && err->isError() || nwrite == 0){
+                if(err && err->isError()){
                     DEBUG_MSG_ERROR(err);
                     client->close();
                     delete client;
@@ -527,6 +527,11 @@ namespace fasto
             }
 
             Http2ServerHandler::dataReceived(client); //direct connection
+        }
+
+        void Http2InnerServerHandler::dataReadyToWrite(TcpClient* client)
+        {
+
         }
     }
 }

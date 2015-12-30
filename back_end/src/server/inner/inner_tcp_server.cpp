@@ -172,7 +172,7 @@ namespace fasto
                     common::Error err = client->write(ping_request.c_str(), ping_request.size(), nwrite);
                     DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "Pinged sended %" PRIuS " byte, client[%s], from server[%s], %" PRIuS " client(s) connected.",
                                           nwrite, client->formatedName(), server->formatedName(), online_clients.size());
-                    if(err && err->isError() || nwrite == 0){
+                    if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                         client->close();
                         delete client;

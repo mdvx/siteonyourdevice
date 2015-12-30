@@ -11,11 +11,11 @@ namespace fasto
     namespace siteonyourdevice
     {
         // client
-        TcpClient::TcpClient(ITcpLoop *server, const common::net::socket_info &info)
-            : server_(server), read_io_((struct ev_io*)calloc(1, sizeof(struct ev_io))),
-              sock_(info), name_(), id_()
+        TcpClient::TcpClient(ITcpLoop *server, const common::net::socket_info &info, flags_type flags)
+            : server_(server), read_write_io_((struct ev_io*)calloc(1, sizeof(struct ev_io))),
+              flags_(flags), sock_(info), name_(), id_()
         {
-            read_io_->data = this;
+            read_write_io_->data = this;
         }
 
         common::net::socket_info TcpClient::info() const
@@ -45,8 +45,8 @@ namespace fasto
 
         TcpClient::~TcpClient()
         {
-            free(read_io_);
-            read_io_ = NULL;
+            free(read_write_io_);
+            read_write_io_ = NULL;
         }
 
         ITcpLoop *TcpClient::server() const
@@ -70,6 +70,17 @@ namespace fasto
         std::string TcpClient::name() const
         {
             return name_;
+        }
+
+        TcpClient::flags_type TcpClient::flags() const
+        {
+            return flags_;
+        }
+
+        void TcpClient::setFlags(flags_type flags)
+        {
+            flags_ = flags;
+            server_->changeFlags(this);
         }
 
         common::id_counter<TcpClient>::type_t TcpClient::id() const
