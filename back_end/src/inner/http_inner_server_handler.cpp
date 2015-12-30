@@ -40,6 +40,7 @@ namespace fasto
             common::ErrnoError err = common::net::connect(innerHost_, common::net::ST_SOCK_STREAM, 0, client_info);
             if(err && err->isError()){
                 DEBUG_MSG_ERROR(err);
+                EVENT_BUS()->postEvent(make_exception_event(new InnerClientConnectedEvent(this, authInfo()), err));
                 return;
             }
 
@@ -52,15 +53,12 @@ namespace fasto
 
         void Http2InnerServerHandler::accepted(TcpClient* client)
         {
-            if(client == innerConnection_){
-                EVENT_BUS()->postEvent(new InnerClientConnectedEvent(this));
-            }
         }
 
         void Http2InnerServerHandler::closed(TcpClient* client)
         {
             if(client == innerConnection_){
-                EVENT_BUS()->postEvent(new InnerClientDisconnectedEvent(this));
+                EVENT_BUS()->postEvent(new InnerClientDisconnectedEvent(this, authInfo()));
                 innerConnection_ = NULL;
                 return;
             }
@@ -346,7 +344,7 @@ namespace fasto
                     if(IS_EQUAL_COMMAND(okrespcommand, PING_COMMAND)){
                     }
                     else if(IS_EQUAL_COMMAND(okrespcommand, SERVER_WHO_ARE_YOU_COMMAND)){
-                        EVENT_BUS()->postEvent(new InnerClientAutorizedEvent(this, authInfo()));
+                        EVENT_BUS()->postEvent(new InnerClientConnectedEvent(this, authInfo()));
                     }
                 }
             }

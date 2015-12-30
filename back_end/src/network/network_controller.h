@@ -5,6 +5,7 @@
 
 #include "globals.h"
 #include "http_config.h"
+#include "infos.h"
 
 namespace common
 {
@@ -33,6 +34,7 @@ namespace fasto
             void connect() ASYNC_CALL(InnerClientConnectedEvent);
             void disConnect() ASYNC_CALL(InnerClientDisconnectedEvent);
 
+            UserAuthInfo authInfo() const;
             HttpConfig config() const;
             void setConfig(const HttpConfig& config);
 

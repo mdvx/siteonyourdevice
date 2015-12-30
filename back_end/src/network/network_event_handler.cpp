@@ -14,9 +14,6 @@ namespace fasto
             if(event->eventType() == InnerClientConnectedEvent::EventType){
                 //InnerClientConnectedEvent * ev = static_cast<InnerClientConnectedEvent*>(event);
             }
-            else if(event->eventType() == InnerClientAutorizedEvent::EventType){
-                //InnerClientAutorizedEvent * ev = static_cast<InnerClientAutorizedEvent*>(event);
-            }
             else if(event->eventType() == InnerClientDisconnectedEvent::EventType){
                 //InnerClientDisconnectedEvent * ev = static_cast<InnerClientDisconnectedEvent*>(event);
                 controller_->disConnect();
@@ -28,7 +25,7 @@ namespace fasto
 
         void NetworkEventHandler::handleExceptionEvent(NetworkEvent* event, common::Error err)
         {
-
+            DEBUG_MSG_FORMAT<512>(common::logging::L_WARNING, "Exception event type: %d, text: %s", (int)(event->eventType()), err->description());
         }
 
         class NetworkEventHandler::NetworkListener
@@ -41,12 +38,10 @@ namespace fasto
             {
                 EVENT_BUS()->subscribe<InnerClientConnectedEvent>(this);
                 EVENT_BUS()->subscribe<InnerClientDisconnectedEvent>(this);
-                EVENT_BUS()->subscribe<InnerClientAutorizedEvent>(this);
             }
 
             ~NetworkListener()
             {
-                EVENT_BUS()->unsubscribe<InnerClientAutorizedEvent>(this);
                 EVENT_BUS()->unsubscribe<InnerClientDisconnectedEvent>(this);
                 EVENT_BUS()->unsubscribe<InnerClientConnectedEvent>(this);
             }

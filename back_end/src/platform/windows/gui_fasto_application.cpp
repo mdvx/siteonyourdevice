@@ -517,9 +517,6 @@ namespace fasto
         {
             if(event->eventType() == InnerClientConnectedEvent::EventType){
                 InnerClientConnectedEvent * ev = static_cast<InnerClientConnectedEvent*>(event);
-            }
-            else if(event->eventType() == InnerClientAutorizedEvent::EventType){
-                InnerClientAutorizedEvent * ev = static_cast<InnerClientAutorizedEvent*>(event);
                 SendMessage(hwndConnectButton_, WM_SETTEXT, 0, (LPARAM)DISCONNECT_LABEL);
             }
             else if(event->eventType() == InnerClientDisconnectedEvent::EventType){

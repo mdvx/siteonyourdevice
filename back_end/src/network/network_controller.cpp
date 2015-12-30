@@ -16,6 +16,8 @@
 #include "inner/http_inner_server.h"
 #include "inner/http_inner_server_handler.h"
 
+#include "network/network_events.h"
+
 namespace fasto
 {
     namespace siteonyourdevice
@@ -113,8 +115,8 @@ namespace fasto
                 : public ILoopThreadController
             {
             public:
-                ServerControllerBase(const HttpConfig& config)
-                    : config_(config), authChecker_(NULL)
+                ServerControllerBase(const HttpConfig& config, const UserAuthInfo& ainfo)
+                    : config_(config), authChecker_(NULL), ainfo_(ainfo)
                 {
 
                 }
@@ -126,17 +128,18 @@ namespace fasto
 
             protected:
                 const HttpConfig config_;
+                const UserAuthInfo ainfo_;
 
             private:
                 ITcpLoopObserver * createHandler()
                 {
-                    Http2InnerServerHandler* handler =
-                            new Http2InnerServerHandler(HttpServerInfo(PROJECT_NAME_TITLE, PROJECT_DOMAIN), g_inner_host, config_);
+                    HttpServerInfo hs(PROJECT_NAME_TITLE, PROJECT_DOMAIN);
+                    Http2InnerServerHandler* handler = new Http2InnerServerHandler(hs, g_inner_host, config_);
                     authChecker_ = new HttpAuthObserver(handler);
                     handler->setAuthChecker(authChecker_);
 
                     // handler prepare
-                    for(int i = 0; i < config_.handlers_urls_.size(); ++i){
+                    for(size_t i = 0; i < config_.handlers_urls_.size(); ++i){
                         HttpConfig::handlers_urls_t handurl = config_.handlers_urls_[i];
                         const std::string httpcallbackstr = handurl.second;
                         std::string httpcallback_ns = handurl.second;
@@ -153,7 +156,7 @@ namespace fasto
                         }
                     }
 
-                    for(int i = 0; i < config_.server_sockets_urls_.size(); ++i){
+                    for(size_t i = 0; i < config_.server_sockets_urls_.size(); ++i){
                         HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls_[i];
                         const common::uri::Uri url = sock_url.second;
                         handler->registerSocketUrl(url);
@@ -170,8 +173,8 @@ namespace fasto
                     : public ServerControllerBase
             {
             public:
-                LocalHttpServerController(const HttpConfig& config)
-                    : ServerControllerBase(config)
+                LocalHttpServerController(const HttpConfig& config, const UserAuthInfo& ainfo)
+                    : ServerControllerBase(config, ainfo)
                 {
                     const std::string contentPath = config.content_path_;
                     common::Error err = common::file_system::change_directory(contentPath);
@@ -198,6 +201,7 @@ namespace fasto
                     common::Error err = serv->bind();
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
+                        EVENT_BUS()->postEvent(make_exception_event(new InnerClientConnectedEvent(this, ainfo_), err));
                         delete serv;
                         return NULL;
                     }
@@ -205,6 +209,7 @@ namespace fasto
                     err = serv->listen(5);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
+                        EVENT_BUS()->postEvent(make_exception_event(new InnerClientConnectedEvent(this, ainfo_), err));
                         delete serv;
                         return NULL;
                     }
@@ -217,8 +222,8 @@ namespace fasto
                     : public ServerControllerBase
             {
             public:
-                ExternalHttpServerController(const HttpConfig& config)
-                    : ServerControllerBase(config)
+                ExternalHttpServerController(const HttpConfig& config, const UserAuthInfo& ainfo)
+                    : ServerControllerBase(config, ainfo)
                 {
 
                 }
@@ -300,18 +305,24 @@ namespace fasto
             unique_lock<mutex_t> lock(server_mutex_);
 
             if(server_){    //if connected
+                common::Error err = common::make_error_value("Failed, double connection!", common::Value::E_ERROR, common::logging::L_ERR);
+                EVENT_BUS()->postEvent(make_exception_event(new InnerClientConnectedEvent(this, authInfo()), err));
                 return;
             }
 
             const http_server_type server_type = config_.server_type_;
             const common::net::hostAndPort externalHost = config_.external_host_;
             if(server_type == FASTO_SERVER){
-                server_ = new LocalHttpServerController(config_);
+                server_ = new LocalHttpServerController(config_, authInfo());
                 server_->start();
             }
             else if(server_type == EXTERNAL_SERVER && externalHost.isValid()) {
-                server_ = new ExternalHttpServerController(config_);
+                server_ = new ExternalHttpServerController(config_, authInfo());
                 server_->start();
+            }
+            else{
+                common::Error err = common::make_error_value("Invalid https server settings!", common::Value::E_ERROR, common::logging::L_ERR);
+                EVENT_BUS()->postEvent(make_exception_event(new InnerClientConnectedEvent(this, authInfo()), err));
             }
         }
 
@@ -321,12 +332,20 @@ namespace fasto
             unique_lock<mutex_t> lock(server_mutex_);
 
             if(!server_){    //if connect dosen't clicked
+                common::Error err = common::make_error_value("Failed, not connected!", common::Value::E_ERROR, common::logging::L_ERR);
+                EVENT_BUS()->postEvent(make_exception_event(new InnerClientDisconnectedEvent(this, authInfo()), err));
                 return;
             }
 
             server_->stop();
             delete server_;
             server_ = NULL;
+        }
+
+        UserAuthInfo NetworkController::authInfo() const
+        {
+            const common::net::hostAndPort hs(config_.domain_, config_.port_);
+            return UserAuthInfo(config_.login_, config_.password_, hs);
         }
 
         HttpConfig NetworkController::config() const

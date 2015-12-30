@@ -7,7 +7,6 @@
 enum NetworkEventTypes
 {
     InnerClientConnected = 0,
-    InnerClientAutorized,
     InnerClientDisconnected,
 
     CountNetworkEvent
