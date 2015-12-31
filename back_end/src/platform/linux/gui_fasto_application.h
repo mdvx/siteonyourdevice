@@ -22,7 +22,7 @@ namespace fasto
             void setExternalChekboxState(bool is_active);
 
         private:
-            virtual int showImpl();
+            virtual void showImpl();
 
             GtkWidget * window_;
             GtkWidget * connect_button_;

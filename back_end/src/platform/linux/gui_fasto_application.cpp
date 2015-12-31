@@ -239,8 +239,8 @@ namespace fasto
             if(event->eventType() == InnerClientConnectedEvent::EventType){
                 InnerClientConnectedEvent * ev = static_cast<InnerClientConnectedEvent*>(event);
             }
-            else if(event->eventType() == InnerClientAutorizedEvent::EventType){
-                InnerClientAutorizedEvent * ev = static_cast<InnerClientAutorizedEvent*>(event);
+            else if(event->eventType() == InnerClientConnectedEvent::EventType){
+                InnerClientConnectedEvent * ev = static_cast<InnerClientConnectedEvent*>(event);
                 gtk_button_set_label(GTK_BUTTON(connect_button_), DISCONNECT_LABEL);
                 g_signal_handler_disconnect(connect_button_, connect_signal_id);
                 connect_signal_id = g_signal_connect(G_OBJECT(connect_button_), "clicked", G_CALLBACK(EventHandler::click_disconnect_callback), evhandler_);
@@ -258,7 +258,7 @@ namespace fasto
             GuiNetworkEventHandler::handleEvent(event);
         }
 
-        int GtkMainWindow::showImpl()
+        void GtkMainWindow::showImpl()
         {
             HttpConfig cur_config = controller_->config();
 
@@ -277,7 +277,6 @@ namespace fasto
             gtk_entry_set_text(GTK_ENTRY(external_port_), exportstr.c_str());
 
             gtk_widget_show_all(window_);
-            return EXIT_SUCCESS;
         }
 
         void GtkMainWindow::onConnectClicked()
