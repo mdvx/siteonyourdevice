@@ -33,7 +33,7 @@ namespace fasto
             virtual void handleEvent(NetworkEvent* event);
 
         private:
-            virtual int showImpl();
+            virtual void showImpl();
             class impl;
             impl* const impl_;
         };

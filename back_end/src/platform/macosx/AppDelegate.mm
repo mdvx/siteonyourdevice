@@ -2,6 +2,8 @@
 
 #include "gui_fasto_application.h"
 
+#include "network/network_controller.h"
+
 @interface OnlyIntegerValueFormatter : NSNumberFormatter
 @end
 
@@ -345,7 +347,7 @@
      NetworkEvent* event = reinterpret_cast<NetworkEvent*>(revent);
      if(event->eventType() == InnerClientConnectedEvent::EventType){
      }
-     else if(event->eventType() == InnerClientAutorizedEvent::EventType){
+     else if(event->eventType() == InnerClientConnectedEvent::EventType){
          [connetButton_ setTitle:@ DISCONNECT_LABEL];
          [connetButton_ setAction:@selector(disConnectAction:)];
      }

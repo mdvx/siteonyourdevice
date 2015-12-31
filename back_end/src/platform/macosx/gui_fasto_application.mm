@@ -47,9 +47,8 @@ namespace fasto
             fApp->exit(EXIT_SUCCESS);
         }
 
-        int MacMainWindow::showImpl()
+        void MacMainWindow::showImpl()
         {
-            return EXIT_SUCCESS;
         }
 
         void MacMainWindow::handleEvent(NetworkEvent* event)
