@@ -23,7 +23,7 @@ namespace fasto
             return lhs.login_ == rhs.login_ && lhs.password_ == rhs.password_ && lhs.host_ == rhs.host_;
         }
 
-        inline bool operator!=(const UserAuthInfo& x, const UserAuthInfo& y)
+        inline bool operator !=(const UserAuthInfo& x, const UserAuthInfo& y)
         {
             return !(x == y);
         }

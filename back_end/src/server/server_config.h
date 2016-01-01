@@ -2,8 +2,8 @@
 
 #include "common/net/types.h"
 
-#define HOST_PORT 8040
 #define INNER_HOST_PORT 8020
+#define HOST_PORT 8040
 #define WEBSOCKET_PORT 8060
 
 #define INNER_HOST_NAME "siteonyourdevice.com"
