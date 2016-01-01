@@ -6,42 +6,45 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        GuiNetworkEventHandler::GuiNetworkEventHandler(NetworkController *controller)
-            : NetworkEventHandler(controller)
+        namespace application
         {
+            GuiNetworkEventHandler::GuiNetworkEventHandler(network::NetworkController *controller)
+                : NetworkEventHandler(controller)
+            {
 
-        }
+            }
 
-        GuiNetworkEventHandler::~GuiNetworkEventHandler()
-        {
+            GuiNetworkEventHandler::~GuiNetworkEventHandler()
+            {
 
-        }
+            }
 
-        void GuiNetworkEventHandler::start()
-        {
-            showImpl();
-        }
+            void GuiNetworkEventHandler::start()
+            {
+                showImpl();
+            }
 
-        void GuiNetworkEventHandler::onConnectClicked(const HttpConfig& config)
-        {
-            controller_->setConfig(config);
-            controller_->connect();
-        }
+            void GuiNetworkEventHandler::onConnectClicked(const HttpConfig& config)
+            {
+                controller_->setConfig(config);
+                controller_->connect();
+            }
 
-        void GuiNetworkEventHandler::onDisconnectClicked()
-        {
-            controller_->disConnect();
-        }
+            void GuiNetworkEventHandler::onDisconnectClicked()
+            {
+                controller_->disConnect();
+            }
 
-        FastoRemoteGuiApplication::FastoRemoteGuiApplication(int argc, char *argv[])
-            : FastoRemoteApplication(argc, argv)
-        {
+            FastoRemoteGuiApplication::FastoRemoteGuiApplication(int argc, char *argv[])
+                : FastoRemoteApplication(argc, argv)
+            {
 
-        }
+            }
 
-        FastoRemoteGuiApplication::~FastoRemoteGuiApplication()
-        {
+            FastoRemoteGuiApplication::~FastoRemoteGuiApplication()
+            {
 
+            }
         }
     }
 }

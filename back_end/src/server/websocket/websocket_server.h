@@ -8,32 +8,35 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class HttpServerHost;
-
-        class WebSocketServerHost :
-                public Http2Server
+        namespace server
         {
-        public:
-            WebSocketServerHost(const common::net::hostAndPort& host, ITcpLoopObserver *observer);
+            class HttpServerHost;
 
-            virtual const char* className() const;
+            class WebSocketServerHost :
+                    public http::Http2Server
+            {
+            public:
+                WebSocketServerHost(const common::net::hostAndPort& host, tcp::ITcpLoopObserver *observer);
 
-        protected:
-            virtual TcpClient * createClient(const common::net::socket_info &info);
-        };
+                virtual const char* className() const;
 
-        class WebSocketServerHandlerHost
-            : public Http2ServerHandler
-        {
-        public:
-            WebSocketServerHandlerHost(const HttpServerInfo & info, HttpServerHost * parent);
+            protected:
+                virtual tcp::TcpClient * createClient(const common::net::socket_info &info);
+            };
 
-            virtual void dataReceived(TcpClient* client);
+            class WebSocketServerHandlerHost
+                : public http::Http2ServerHandler
+            {
+            public:
+                WebSocketServerHandlerHost(const HttpServerInfo & info, HttpServerHost * parent);
 
-        private:
-            void processWebsocketRequest(HttpClient *hclient, const common::http::http_request& hrequest);
+                virtual void dataReceived(tcp::TcpClient* client);
 
-            HttpServerHost * parent_;
-        };
+            private:
+                void processWebsocketRequest(http::HttpClient *hclient, const common::http::http_request& hrequest);
+
+                HttpServerHost * parent_;
+            };
+        }
     }
 }

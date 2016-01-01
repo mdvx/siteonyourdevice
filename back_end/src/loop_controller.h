@@ -6,8 +6,11 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class ITcpLoop;
-        class ITcpLoopObserver;
+        namespace tcp
+        {
+            class ITcpLoop;
+            class ITcpLoopObserver;
+        }
 
         class ILoopController
         {
@@ -20,12 +23,12 @@ namespace fasto
             void stop();
 
         protected:
-            ITcpLoop * loop_;
-            ITcpLoopObserver * handler_;
+            tcp::ITcpLoop * loop_;
+            tcp::ITcpLoopObserver * handler_;
 
         private:
-            virtual ITcpLoopObserver * createHandler() = 0;
-            virtual ITcpLoop * createServer(ITcpLoopObserver * handler) = 0;
+            virtual tcp::ITcpLoopObserver * createHandler() = 0;
+            virtual tcp::ITcpLoop * createServer(tcp::ITcpLoopObserver * handler) = 0;
             virtual void started() = 0;
             virtual void stoped() = 0;
         };
@@ -42,8 +45,8 @@ namespace fasto
         private:
             using ILoopController::exec;
 
-            virtual ITcpLoopObserver * createHandler() = 0;
-            virtual ITcpLoop * createServer(ITcpLoopObserver * handler) = 0;
+            virtual tcp::ITcpLoopObserver * createHandler() = 0;
+            virtual tcp::ITcpLoop * createServer(tcp::ITcpLoopObserver * handler) = 0;
 
             virtual void started();
             virtual void stoped();

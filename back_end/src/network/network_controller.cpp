@@ -78,10 +78,10 @@ namespace fasto
         }
 
         class HttpAuthObserver
-                : public IHttpAuthObserver
+                : public http::IHttpAuthObserver
         {
         public:
-            HttpAuthObserver(Http2InnerServerHandler* servh)
+            HttpAuthObserver(inner::Http2InnerServerHandler* servh)
                 : servh_(servh)
             {
 
@@ -106,7 +106,7 @@ namespace fasto
             }
 
         private:
-            Http2InnerServerHandler* const servh_;
+            inner::Http2InnerServerHandler* const servh_;
         };
 
         namespace
@@ -131,10 +131,10 @@ namespace fasto
                 const UserAuthInfo ainfo_;
 
             private:
-                ITcpLoopObserver * createHandler()
+                tcp::ITcpLoopObserver * createHandler()
                 {
                     HttpServerInfo hs(PROJECT_NAME_TITLE, PROJECT_DOMAIN);
-                    Http2InnerServerHandler* handler = new Http2InnerServerHandler(hs, g_inner_host, config_);
+                    inner::Http2InnerServerHandler* handler = new inner::Http2InnerServerHandler(hs, g_inner_host, config_);
                     authChecker_ = new HttpAuthObserver(handler);
                     handler->setAuthChecker(authChecker_);
 
@@ -193,15 +193,15 @@ namespace fasto
                 }
 
            private:
-                ITcpLoop * createServer(ITcpLoopObserver * handler)
+                tcp::ITcpLoop * createServer(tcp::ITcpLoopObserver * handler)
                 {
-                    Http2InnerServer* serv = new Http2InnerServer(handler, config_);
+                    inner::Http2InnerServer* serv = new inner::Http2InnerServer(handler, config_);
                     serv->setName("local_http_server");
 
                     common::Error err = serv->bind();
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
-                        EVENT_BUS()->postEvent(make_exception_event(new InnerClientConnectedEvent(this, ainfo_), err));
+                        EVENT_BUS()->postEvent(make_exception_event(new network::InnerClientConnectedEvent(this, ainfo_), err));
                         delete serv;
                         return NULL;
                     }
@@ -209,7 +209,7 @@ namespace fasto
                     err = serv->listen(5);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
-                        EVENT_BUS()->postEvent(make_exception_event(new InnerClientConnectedEvent(this, ainfo_), err));
+                        EVENT_BUS()->postEvent(make_exception_event(new network::InnerClientConnectedEvent(this, ainfo_), err));
                         delete serv;
                         return NULL;
                     }
@@ -229,192 +229,195 @@ namespace fasto
                 }
 
            private:
-                ITcpLoop * createServer(ITcpLoopObserver * handler)
+                tcp::ITcpLoop * createServer(tcp::ITcpLoopObserver * handler)
                 {
-                    ProxyInnerServer* serv = new ProxyInnerServer(handler);
+                    inner::ProxyInnerServer* serv = new inner::ProxyInnerServer(handler);
                     serv->setName("proxy_http_server");
                     return serv;
                 }
             };
         }
 
-        NetworkController::NetworkController(int argc, char *argv[])
-            : server_mutex_(), server_(NULL), config_(), thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>())
+        namespace network
         {
-            bool daemon_mode = false;
+            NetworkController::NetworkController(int argc, char *argv[])
+                : server_mutex_(), server_(NULL), config_(), thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>())
+            {
+                bool daemon_mode = false;
 #ifdef OS_MACOSX
-            std::string config_path = PROJECT_NAME ".app/Contents/Resources/" CONFIG_FILE_NAME;
+                std::string config_path = PROJECT_NAME ".app/Contents/Resources/" CONFIG_FILE_NAME;
 #else
-            std::string config_path = CONFIG_FILE_NAME;
+                std::string config_path = CONFIG_FILE_NAME;
 #endif
-            for (int i = 0; i < argc; i++) {
-                if (strcmp(argv[i], "-c") == 0) {
-                    config_path = argv[++i];
+                for (int i = 0; i < argc; i++) {
+                    if (strcmp(argv[i], "-c") == 0) {
+                        config_path = argv[++i];
+                    }
+                    else if(strcmp(argv[i], "-d") == 0){
+                        daemon_mode = true;
+                    }
                 }
-                else if(strcmp(argv[i], "-d") == 0){
-                    daemon_mode = true;
-                }
-            }
 
-            config_path_ = config_path;
+                config_path_ = config_path;
 #if defined(BUILD_CONSOLE) && defined(OS_POSIX)
-            if(daemon_mode){
-                common::create_as_daemon();
-            }
+                if(daemon_mode){
+                    common::create_as_daemon();
+                }
 #endif
-            readConfig();
-        }
-
-        NetworkController::~NetworkController()
-        {
-            EVENT_BUS()->destroyEventThread(thread_);
-            EVENT_BUS()->stop();
-
-            delete server_;
-
-            saveConfig();
-        }
-
-        int NetworkController::exec()
-        {
-            using namespace common::multi_threading;
-            unique_lock<mutex_t> lock(server_mutex_);
-
-            if(server_){    //if connect dosen't clicked
-                return server_->join();
+                readConfig();
             }
 
-            return EXIT_SUCCESS;
-        }
+            NetworkController::~NetworkController()
+            {
+                EVENT_BUS()->destroyEventThread(thread_);
+                EVENT_BUS()->stop();
 
-        void NetworkController::exit(int result)
-        {
-            using namespace common::multi_threading;
-            unique_lock<mutex_t> lock(server_mutex_);
+                delete server_;
 
-            if(!server_){    //if connect dosen't clicked
-                return;
+                saveConfig();
             }
 
-            server_->stop();
-        }
+            int NetworkController::exec()
+            {
+                using namespace common::multi_threading;
+                unique_lock<mutex_t> lock(server_mutex_);
 
-        void NetworkController::connect()
-        {
-            using namespace common::multi_threading;
-            unique_lock<mutex_t> lock(server_mutex_);
+                if(server_){    //if connect dosen't clicked
+                    return server_->join();
+                }
 
-            if(server_){    //if connected
-                common::Error err = common::make_error_value("Failed, double connection!", common::Value::E_ERROR, common::logging::L_ERR);
-                EVENT_BUS()->postEvent(make_exception_event(new InnerClientConnectedEvent(this, authInfo()), err));
-                return;
+                return EXIT_SUCCESS;
             }
 
-            const http_server_type server_type = config_.server_type_;
-            const common::net::hostAndPort externalHost = config_.external_host_;
-            if(server_type == FASTO_SERVER){
-                server_ = new LocalHttpServerController(config_, authInfo());
-                server_->start();
-            }
-            else if(server_type == EXTERNAL_SERVER && externalHost.isValid()) {
-                server_ = new ExternalHttpServerController(config_, authInfo());
-                server_->start();
-            }
-            else{
-                common::Error err = common::make_error_value("Invalid https server settings!", common::Value::E_ERROR, common::logging::L_ERR);
-                EVENT_BUS()->postEvent(make_exception_event(new InnerClientConnectedEvent(this, authInfo()), err));
-            }
-        }
+            void NetworkController::exit(int result)
+            {
+                using namespace common::multi_threading;
+                unique_lock<mutex_t> lock(server_mutex_);
 
-        void NetworkController::disConnect()
-        {
-            using namespace common::multi_threading;
-            unique_lock<mutex_t> lock(server_mutex_);
+                if(!server_){    //if connect dosen't clicked
+                    return;
+                }
 
-            if(!server_){    //if connect dosen't clicked
-                common::Error err = common::make_error_value("Failed, not connected!", common::Value::E_ERROR, common::logging::L_ERR);
-                EVENT_BUS()->postEvent(make_exception_event(new InnerClientDisconnectedEvent(this, authInfo()), err));
-                return;
+                server_->stop();
             }
 
-            server_->stop();
-            delete server_;
-            server_ = NULL;
-        }
+            void NetworkController::connect()
+            {
+                using namespace common::multi_threading;
+                unique_lock<mutex_t> lock(server_mutex_);
 
-        UserAuthInfo NetworkController::authInfo() const
-        {
-            const common::net::hostAndPort hs(config_.domain_, config_.port_);
-            return UserAuthInfo(config_.login_, config_.password_, hs);
-        }
+                if(server_){    //if connected
+                    common::Error err = common::make_error_value("Failed, double connection!", common::Value::E_ERROR, common::logging::L_ERR);
+                    EVENT_BUS()->postEvent(make_exception_event(new InnerClientConnectedEvent(this, authInfo()), err));
+                    return;
+                }
 
-        HttpConfig NetworkController::config() const
-        {
-            return config_;
-        }
-
-        void NetworkController::setConfig(const HttpConfig& config)
-        {
-            config_ = config;
-        }
-
-        void NetworkController::saveConfig()
-        {
-            common::file_system::Path configPath(config_path_);
-            common::file_system::File configSave(configPath);
-            if(!configSave.open("w")){
-                return;
+                const http_server_type server_type = config_.server_type_;
+                const common::net::hostAndPort externalHost = config_.external_host_;
+                if(server_type == FASTO_SERVER){
+                    server_ = new LocalHttpServerController(config_, authInfo());
+                    server_->start();
+                }
+                else if(server_type == EXTERNAL_SERVER && externalHost.isValid()) {
+                    server_ = new ExternalHttpServerController(config_, authInfo());
+                    server_->start();
+                }
+                else{
+                    common::Error err = common::make_error_value("Invalid https server settings!", common::Value::E_ERROR, common::logging::L_ERR);
+                    EVENT_BUS()->postEvent(make_exception_event(new InnerClientConnectedEvent(this, authInfo()), err));
+                }
             }
 
-            configSave.write("[http_server]\n");
-            configSave.writeFormated("domain=%s\n", config_.domain_);
-            configSave.writeFormated("port=%u\n", config_.port_);
-            configSave.writeFormated("login=%s\n", config_.login_);
-            configSave.writeFormated("password=%s\n", config_.password_);
-            configSave.writeFormated("content_path=%s\n", config_.content_path_);
-            configSave.writeFormated("private_site=%u\n", config_.is_private_site_);
-            configSave.writeFormated("external_host=%s\n", common::convertToString(config_.external_host_));
-            configSave.writeFormated("server_type=%u\n", config_.server_type_);
-            configSave.write("[http_handlers_utls]\n");
-            for(int i = 0; i < config_.handlers_urls_.size(); ++i){
-                HttpConfig::handlers_urls_t handurl = config_.handlers_urls_[i];
-                configSave.writeFormated("%s=%s\n", handurl.first, handurl.second);
-            }
-            configSave.write("[http_server_sockets]\n");
-            for(int i = 0; i < config_.server_sockets_urls_.size(); ++i){
-                HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls_[i];
-                const std::string url = sock_url.second.get_url();
-                configSave.writeFormated("%s=%s\n", sock_url.first, url);
-            }
-            configSave.close();
-        }
+            void NetworkController::disConnect()
+            {
+                using namespace common::multi_threading;
+                unique_lock<mutex_t> lock(server_mutex_);
 
-        void NetworkController::readConfig()
-        {
-        #ifdef OS_MACOSX
-            const std::string spath = fApp->appDir() + config_path_;
-            const char* path = spath.c_str();
-        #else
-            const char* path = config_path_.c_str();
-        #endif
+                if(!server_){    //if connect dosen't clicked
+                    common::Error err = common::make_error_value("Failed, not connected!", common::Value::E_ERROR, common::logging::L_ERR);
+                    EVENT_BUS()->postEvent(make_exception_event(new InnerClientDisconnectedEvent(this, authInfo()), err));
+                    return;
+                }
 
-            HttpConfig config;
-            //default settings
-            config.port_ = USER_SPECIFIC_DEFAULT_PORT;
-            config.domain_ = USER_SPECIFIC_DEFAULT_DOMAIN;
-            config.content_path_ = fApp->appDir();
-            config.login_ = USER_SPECIFIC_DEFAULT_LOGIN;
-            config.password_ = USER_SPECIFIC_DEFAULT_PASSWORD;
-            config.is_private_site_ = USER_SPECIFIC_DEFAULT_PRIVATE_SITE;
-            config.external_host_ = common::net::hostAndPort("localhost", 80);
-            config.server_type_ = FASTO_SERVER;
-
-            //try to parse settings file
-            if (ini_parse(path, ini_handler_fasto, &config) < 0) {
-                DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Can't load config '%s', use default settings.", path);
+                server_->stop();
+                delete server_;
+                server_ = NULL;
             }
 
-            config_ = config;
+            UserAuthInfo NetworkController::authInfo() const
+            {
+                const common::net::hostAndPort hs(config_.domain_, config_.port_);
+                return UserAuthInfo(config_.login_, config_.password_, hs);
+            }
+
+            HttpConfig NetworkController::config() const
+            {
+                return config_;
+            }
+
+            void NetworkController::setConfig(const HttpConfig& config)
+            {
+                config_ = config;
+            }
+
+            void NetworkController::saveConfig()
+            {
+                common::file_system::Path configPath(config_path_);
+                common::file_system::File configSave(configPath);
+                if(!configSave.open("w")){
+                    return;
+                }
+
+                configSave.write("[http_server]\n");
+                configSave.writeFormated("domain=%s\n", config_.domain_);
+                configSave.writeFormated("port=%u\n", config_.port_);
+                configSave.writeFormated("login=%s\n", config_.login_);
+                configSave.writeFormated("password=%s\n", config_.password_);
+                configSave.writeFormated("content_path=%s\n", config_.content_path_);
+                configSave.writeFormated("private_site=%u\n", config_.is_private_site_);
+                configSave.writeFormated("external_host=%s\n", common::convertToString(config_.external_host_));
+                configSave.writeFormated("server_type=%u\n", config_.server_type_);
+                configSave.write("[http_handlers_utls]\n");
+                for(int i = 0; i < config_.handlers_urls_.size(); ++i){
+                    HttpConfig::handlers_urls_t handurl = config_.handlers_urls_[i];
+                    configSave.writeFormated("%s=%s\n", handurl.first, handurl.second);
+                }
+                configSave.write("[http_server_sockets]\n");
+                for(int i = 0; i < config_.server_sockets_urls_.size(); ++i){
+                    HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls_[i];
+                    const std::string url = sock_url.second.get_url();
+                    configSave.writeFormated("%s=%s\n", sock_url.first, url);
+                }
+                configSave.close();
+            }
+
+            void NetworkController::readConfig()
+            {
+#ifdef OS_MACOSX
+                const std::string spath = fApp->appDir() + config_path_;
+                const char* path = spath.c_str();
+#else
+                const char* path = config_path_.c_str();
+#endif
+
+                HttpConfig config;
+                //default settings
+                config.port_ = USER_SPECIFIC_DEFAULT_PORT;
+                config.domain_ = USER_SPECIFIC_DEFAULT_DOMAIN;
+                config.content_path_ = fApp->appDir();
+                config.login_ = USER_SPECIFIC_DEFAULT_LOGIN;
+                config.password_ = USER_SPECIFIC_DEFAULT_PASSWORD;
+                config.is_private_site_ = USER_SPECIFIC_DEFAULT_PRIVATE_SITE;
+                config.external_host_ = common::net::hostAndPort("localhost", 80);
+                config.server_type_ = FASTO_SERVER;
+
+                //try to parse settings file
+                if (ini_parse(path, ini_handler_fasto, &config) < 0) {
+                    DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Can't load config '%s', use default settings.", path);
+                }
+
+                config_ = config;
+            }
         }
     }
 }

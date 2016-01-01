@@ -44,5 +44,9 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
+        namespace server
+        {
+
+        }
     }
 }

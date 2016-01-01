@@ -11,17 +11,17 @@ TEST(TcpServer, start_exec_stop_exit)
     using namespace fasto::siteonyourdevice;
 
     std::shared_ptr<common::thread::Thread<int> > tp[TCP_SERVERS_COUNT];
-    TcpServer* servers[TCP_SERVERS_COUNT];
+    tcp::TcpServer* servers[TCP_SERVERS_COUNT];
 
     for (int i = 0; i < SIZEOFMASS(tp); ++i){
         common::net::hostAndPort host("localhost", START_PORT + i);
-        servers[i] = new TcpServer(host);
+        servers[i] = new tcp::TcpServer(host);
         common::Error err = servers[i]->bind();
         ASSERT_FALSE(err);
         err = servers[i]->listen(5);
         ASSERT_FALSE(err);
 
-        tp[i] = THREAD_MANAGER()->createThread(&ITcpLoop::exec, servers[i]);
+        tp[i] = THREAD_MANAGER()->createThread(&tcp::ITcpLoop::exec, servers[i]);
         tp[i]->start();
     }
 

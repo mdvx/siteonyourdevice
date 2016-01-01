@@ -41,38 +41,41 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class GuiNetworkEventHandler
-                : public NetworkEventHandler
+        namespace application
         {
-        public:
-            enum
+            class GuiNetworkEventHandler
+                    : public network::NetworkEventHandler
             {
-                height = 240,
-                width = 320,
-                login_max_length = 32,
-                domain_max_length = 32,
-                port_max_length = 6
+            public:
+                enum
+                {
+                    height = 240,
+                    width = 320,
+                    login_max_length = 32,
+                    domain_max_length = 32,
+                    port_max_length = 6
+                };
+
+                GuiNetworkEventHandler(network::NetworkController *controller);
+                ~GuiNetworkEventHandler();
+
+                virtual void start() final;
+
+            protected:
+                void onConnectClicked(const HttpConfig &config); //with config
+                void onDisconnectClicked();
+
+            private:
+                virtual void showImpl() = 0;
             };
 
-            GuiNetworkEventHandler(NetworkController *controller);
-            ~GuiNetworkEventHandler();
-
-            virtual void start() final;
-
-        protected:
-            void onConnectClicked(const HttpConfig &config); //with config
-            void onDisconnectClicked();
-
-        private:
-            virtual void showImpl() = 0;
-        };
-
-        class FastoRemoteGuiApplication
-                : public FastoRemoteApplication
-        {
-        public:
-            FastoRemoteGuiApplication(int argc, char *argv[]);
-            ~FastoRemoteGuiApplication();
-        };
+            class FastoRemoteGuiApplication
+                    : public FastoRemoteApplication
+            {
+            public:
+                FastoRemoteGuiApplication(int argc, char *argv[]);
+                ~FastoRemoteGuiApplication();
+            };
+        }
     }
 }

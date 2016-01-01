@@ -11,75 +11,79 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class Http2Client;
         class ILoopController;
 
-        class IHttpAuthObserver
+        namespace http
         {
-        public:
-            IHttpAuthObserver();
-            virtual bool userCanAuth(const std::string& user, const std::string& password) = 0;
-            virtual ~IHttpAuthObserver();
-        };
+            class Http2Client;
 
-        class HttpServerHandler
-                : public ITcpLoopObserver
-        {
-        public:
-            typedef common::shared_ptr<IHttpCallback> http_callback_t;
-            typedef std::map<std::string, http_callback_t> http_callbacks_t;
+            class IHttpAuthObserver
+            {
+            public:
+                IHttpAuthObserver();
+                virtual bool userCanAuth(const std::string& user, const std::string& password) = 0;
+                virtual ~IHttpAuthObserver();
+            };
 
-            typedef std::pair<common::uri::Uri, ILoopController*> socket_url_t;
-            typedef std::vector<socket_url_t> sockets_url_t;
+            class HttpServerHandler
+                    : public tcp::ITcpLoopObserver
+            {
+            public:
+                typedef common::shared_ptr<IHttpCallback> http_callback_t;
+                typedef std::map<std::string, http_callback_t> http_callbacks_t;
 
-            HttpServerHandler(const HttpServerInfo& info, IHttpAuthObserver * observer);
-            virtual void preLooped(ITcpLoop* server);
-            virtual void accepted(TcpClient* client);
-            virtual void moved(TcpClient* client);
-            virtual void closed(TcpClient* client);
-            virtual void dataReceived(TcpClient* client);
-            virtual void dataReadyToWrite(TcpClient* client);
-            virtual void postLooped(ITcpLoop* server);
-            virtual void timerEmited(ITcpLoop* server, timer_id_type id);
+                typedef std::pair<common::uri::Uri, ILoopController*> socket_url_t;
+                typedef std::vector<socket_url_t> sockets_url_t;
 
-            virtual ~HttpServerHandler();
+                HttpServerHandler(const HttpServerInfo& info, IHttpAuthObserver * observer);
+                virtual void preLooped(tcp::ITcpLoop* server);
+                virtual void accepted(tcp::TcpClient* client);
+                virtual void moved(tcp::TcpClient* client);
+                virtual void closed(tcp::TcpClient* client);
+                virtual void dataReceived(tcp::TcpClient* client);
+                virtual void dataReadyToWrite(tcp::TcpClient* client);
+                virtual void postLooped(tcp::ITcpLoop* server);
+                virtual void timerEmited(tcp::ITcpLoop* server, timer_id_type id);
 
-            void registerHttpCallback(const std::string& url, http_callback_t callback);
-            void registerSocketUrl(const common::uri::Uri& url);
+                virtual ~HttpServerHandler();
 
-            void setAuthChecker(IHttpAuthObserver * authChecker);
+                void registerHttpCallback(const std::string& url, http_callback_t callback);
+                void registerSocketUrl(const common::uri::Uri& url);
 
-            const HttpServerInfo& info() const;
+                void setAuthChecker(IHttpAuthObserver * authChecker);
 
-        protected:
-            virtual void processReceived(HttpClient *hclient, const char* request, size_t req_len);
-            virtual void handleRequest(HttpClient *hclient, const common::http::http_request& hrequest, bool notClose);
+                const HttpServerInfo& info() const;
 
-        private:
-            bool tryToHandleAsRegisteredCallback(HttpClient* hclient, const std::string& uri, const common::http::http_request& request);
-            bool tryAuthenticateIfNeeded(HttpClient* hclient, const char* extra_header, const common::http::http_request& request);
+            protected:
+                virtual void processReceived(HttpClient *hclient, const char* request, size_t req_len);
+                virtual void handleRequest(HttpClient *hclient, const common::http::http_request& hrequest, bool notClose);
+
+            private:
+                bool tryToHandleAsRegisteredCallback(HttpClient* hclient, const std::string& uri, const common::http::http_request& request);
+                bool tryAuthenticateIfNeeded(HttpClient* hclient, const char* extra_header, const common::http::http_request& request);
 
 
-            http_callbacks_t httpCallbacks_;
-            const common::shared_ptr<IHttpCallback> fshandler_;
-            IHttpAuthObserver * authChecker_;
+                http_callbacks_t httpCallbacks_;
+                const common::shared_ptr<IHttpCallback> fshandler_;
+                IHttpAuthObserver * authChecker_;
 
-            sockets_url_t sockets_urls_;
+                sockets_url_t sockets_urls_;
 
-            const HttpServerInfo info_;
-        };
+                const HttpServerInfo info_;
+            };
 
-        class Http2ServerHandler
-                : public HttpServerHandler
-        {
-        public:
-            Http2ServerHandler(const HttpServerInfo &info, IHttpAuthObserver * observer);
+            class Http2ServerHandler
+                    : public HttpServerHandler
+            {
+            public:
+                Http2ServerHandler(const HttpServerInfo &info, IHttpAuthObserver * observer);
 
-        protected:
-            virtual void processReceived(HttpClient *hclient, const char* request, size_t req_len);
+            protected:
+                virtual void processReceived(HttpClient *hclient, const char* request, size_t req_len);
 
-        private:
-            void handleHttp2Request(Http2Client* h2client, const char* request, uint32_t req_len);
-        };
+            private:
+                void handleHttp2Request(Http2Client* h2client, const char* request, uint32_t req_len);
+            };
+        }
     }
 }

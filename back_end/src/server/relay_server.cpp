@@ -15,194 +15,197 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        IRelayServer::IRelayServer(InnerTcpClient *parent, client_t client)
-            : ServerSocketTcp(g_relay_server_host), stop_(false), client_(client), relayThread_(), parent_(parent)
+        namespace server
         {
-            relayThread_ = THREAD_MANAGER()->createThread(&IRelayServer::exec, this);
-        }
-
-        IRelayServer::client_t IRelayServer::client() const
-        {
-            return client_;
-        }
-
-        void IRelayServer::setClient(client_t client)
-        {
-            client_ = client;
-        }
-
-        void IRelayServer::start()
-        {
-            relayThread_->start();
-        }
-
-        IRelayServer::~IRelayServer()
-        {
-            stop_ = true;
-            relayThread_->joinAndGet();
-        }
-
-        int IRelayServer::exec()
-        {
-            static const int max_poll_ev = 3;
-            common::Error err = bind();
-            if(err && err->isError()){
-                NOTREACHED();
-                return EXIT_FAILURE;
+            IRelayServer::IRelayServer(inner::InnerTcpClient *parent, client_t client)
+                : ServerSocketTcp(g_relay_server_host), stop_(false), client_(client), relayThread_(), parent_(parent)
+            {
+                relayThread_ = THREAD_MANAGER()->createThread(&IRelayServer::exec, this);
             }
 
-            err = listen(5);
-            if(err && err->isError()){
-                NOTREACHED();
-                return EXIT_FAILURE;
+            IRelayServer::client_t IRelayServer::client() const
+            {
+                return client_;
             }
 
-            ssize_t nwrite = 0;
-            const std::string host_str = common::convertToString(host());
-            const cmd_request_t createConnection = createSocketCmd(host());
-            err = parent_->write(createConnection, nwrite); //inner command write
-            if(err && err->isError()){;
-                NOTREACHED();
-                return EXIT_FAILURE;
+            void IRelayServer::setClient(client_t client)
+            {
+                client_ = client;
             }
 
-            const common::net::socket_descr_type server_fd = info_.fd();
-            common::net::socket_descr_type client_fd = INVALID_DESCRIPTOR;
+            void IRelayServer::start()
+            {
+                relayThread_->start();
+            }
 
-            while (!stop_) {
-                client_t rclient = client_;
+            IRelayServer::~IRelayServer()
+            {
+                stop_ = true;
+                relayThread_->joinAndGet();
+            }
 
-                struct pollfd events[max_poll_ev] = {0};
-                int fds = 1;
-                //prepare fd
-                events[0].fd = server_fd;
-                events[0].events = POLLIN | POLLPRI;
+            int IRelayServer::exec()
+            {
+                static const int max_poll_ev = 3;
+                common::Error err = bind();
+                if(err && err->isError()){
+                    NOTREACHED();
+                    return EXIT_FAILURE;
+                }
 
-                int rm_client_fd = rclient ? rclient->fd() : INVALID_DESCRIPTOR;
-                if(rm_client_fd != INVALID_DESCRIPTOR){
-                    events[fds].fd = rm_client_fd;
-                    events[fds].events = POLLIN | POLLPRI;
-                    fds++;
+                err = listen(5);
+                if(err && err->isError()){
+                    NOTREACHED();
+                    return EXIT_FAILURE;
+                }
+
+                ssize_t nwrite = 0;
+                const std::string host_str = common::convertToString(host());
+                const cmd_request_t createConnection = createSocketCmd(host());
+                err = parent_->write(createConnection, nwrite); //inner command write
+                if(err && err->isError()){;
+                    NOTREACHED();
+                    return EXIT_FAILURE;
+                }
+
+                const common::net::socket_descr_type server_fd = info_.fd();
+                common::net::socket_descr_type client_fd = INVALID_DESCRIPTOR;
+
+                while (!stop_) {
+                    client_t rclient = client_;
+
+                    struct pollfd events[max_poll_ev] = {0};
+                    int fds = 1;
+                    //prepare fd
+                    events[0].fd = server_fd;
+                    events[0].events = POLLIN | POLLPRI;
+
+                    int rm_client_fd = rclient ? rclient->fd() : INVALID_DESCRIPTOR;
+                    if(rm_client_fd != INVALID_DESCRIPTOR){
+                        events[fds].fd = rm_client_fd;
+                        events[fds].events = POLLIN | POLLPRI;
+                        fds++;
+                    }
+
+                    if(client_fd != INVALID_DESCRIPTOR){
+                        events[fds].fd = client_fd;
+                        events[fds].events = POLLIN | POLLPRI ;
+                        fds++;
+                    }
+
+                    if(rclient && client_fd != INVALID_DESCRIPTOR){
+                        for(int i = 0; i < requests_.size(); ++i){
+                            common::buffer_type request = requests_[i];
+                            common::Error err = common::net::write_to_socket(client_fd, request, nwrite);
+                            if(err && err->isError()){
+                                DEBUG_MSG_ERROR(err);
+                            }
+                        }
+                        requests_.clear();
+                    }
+
+                    int rc = poll(events, fds, 1000);
+                    for (int i = 0; i < fds && !stop_; ++i){
+                        int fd = events[i].fd;
+                        short int cevents = events[i].revents;
+                        if(cevents == 0){
+                            continue;
+                        }
+
+                        if(fd == server_fd){ //accept
+                            if (cevents & POLLIN){ //read
+                                int new_sd = INVALID_DESCRIPTOR;
+                                while(new_sd == INVALID_DESCRIPTOR){
+                                    common::net::socket_info client_info;
+                                    common::Error er = accept(client_info);
+                                    if(!er){
+                                        new_sd = client_info.fd();
+                                        client_fd = new_sd;
+                                    }
+                                    else{
+                                        NOTREACHED();
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if(cevents & POLLPRI){
+                                NOTREACHED();
+                            }
+                        }
+                        else {
+                            if(fd == client_fd){ //device response
+                                if (cevents & POLLIN){ //read
+                                    char buff[BUF_SIZE] = {0};
+                                    ssize_t nread = 0;
+                                    common::Error err = common::net::read_from_socket(fd, buff, BUF_SIZE, nread);
+                                    if((err && err->isError()) || nread == 0){
+                                        common::net::close(client_fd);
+                                        client_fd = INVALID_DESCRIPTOR;
+                                        DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "relay[%s] device client closed.", host_str);
+                                    }
+                                    else{
+                                        ssize_t nwrite = 0;
+                                        err = common::net::write_to_socket(rm_client_fd, buff, nread, nwrite);
+                                        if(err && err->isError()){
+                                            DEBUG_MSG_ERROR(err);
+                                        }
+                                    }
+                                }
+
+                                if(cevents & POLLPRI){
+                                    NOTREACHED();
+                                }
+                            }
+                            else if(fd == rm_client_fd){ // client request
+                                if (cevents & POLLIN){ //read
+                                    char buff[BUF_SIZE] = {0};
+                                    ssize_t nread = 0;
+                                    common::Error err = common::net::read_from_socket(fd, buff, BUF_SIZE, nread);
+                                    if((err && err->isError()) || nread == 0){
+                                        rclient->close();
+                                        client_.reset();
+                                        DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "relay[%s] client closed.", host_str);
+                                    }
+                                    else{
+                                        ssize_t nwrite = 0;
+                                        err = common::net::write_to_socket(client_fd, buff, nread, nwrite);
+                                        if(err && err->isError()){
+                                            DEBUG_MSG_ERROR(err);
+                                        }
+                                    }
+                                }
+
+                                if(cevents & POLLPRI){
+                                    NOTREACHED();
+                                }
+                            }
+                            else{
+                                NOTREACHED();
+                            }
+                        }
+                    }
+                }
+
+                if(client_){
+                    client_->close();
+                    client_.reset();
                 }
 
                 if(client_fd != INVALID_DESCRIPTOR){
-                    events[fds].fd = client_fd;
-                    events[fds].events = POLLIN | POLLPRI ;
-                    fds++;
+                    common::net::close(client_fd);
+                    client_fd = INVALID_DESCRIPTOR;
                 }
 
-                if(rclient && client_fd != INVALID_DESCRIPTOR){
-                    for(int i = 0; i < requests_.size(); ++i){
-                        common::buffer_type request = requests_[i];
-                        common::Error err = common::net::write_to_socket(client_fd, request, nwrite);
-                        if(err && err->isError()){
-                            DEBUG_MSG_ERROR(err);
-                        }
-                    }
-                    requests_.clear();
-                }
+                close();
 
-                int rc = poll(events, fds, 1000);
-                for (int i = 0; i < fds && !stop_; ++i){
-                    int fd = events[i].fd;
-                    short int cevents = events[i].revents;
-                    if(cevents == 0){
-                        continue;
-                    }
-
-                    if(fd == server_fd){ //accept
-                        if (cevents & POLLIN){ //read
-                            int new_sd = INVALID_DESCRIPTOR;
-                            while(new_sd == INVALID_DESCRIPTOR){
-                                common::net::socket_info client_info;
-                                common::Error er = accept(client_info);
-                                if(!er){
-                                    new_sd = client_info.fd();
-                                    client_fd = new_sd;
-                                }
-                                else{
-                                    NOTREACHED();
-                                    break;
-                                }
-                            }                            
-                        }
-
-                        if(cevents & POLLPRI){
-                            NOTREACHED();
-                        }
-                    }
-                    else {
-                        if(fd == client_fd){ //device response
-                            if (cevents & POLLIN){ //read
-                                char buff[BUF_SIZE] = {0};
-                                ssize_t nread = 0;
-                                common::Error err = common::net::read_from_socket(fd, buff, BUF_SIZE, nread);
-                                if((err && err->isError()) || nread == 0){
-                                    common::net::close(client_fd);
-                                    client_fd = INVALID_DESCRIPTOR;
-                                    DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "relay[%s] device client closed.", host_str);
-                                }
-                                else{
-                                    ssize_t nwrite = 0;
-                                    err = common::net::write_to_socket(rm_client_fd, buff, nread, nwrite);
-                                    if(err && err->isError()){
-                                        DEBUG_MSG_ERROR(err);
-                                    }
-                                }
-                            }
-
-                            if(cevents & POLLPRI){
-                                NOTREACHED();
-                            }
-                        }
-                        else if(fd == rm_client_fd){ // client request
-                            if (cevents & POLLIN){ //read
-                                char buff[BUF_SIZE] = {0};
-                                ssize_t nread = 0;
-                                common::Error err = common::net::read_from_socket(fd, buff, BUF_SIZE, nread);
-                                if((err && err->isError()) || nread == 0){
-                                    rclient->close();
-                                    client_.reset();
-                                    DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "relay[%s] client closed.", host_str);
-                                }
-                                else{
-                                    ssize_t nwrite = 0;
-                                    err = common::net::write_to_socket(client_fd, buff, nread, nwrite);
-                                    if(err && err->isError()){
-                                        DEBUG_MSG_ERROR(err);
-                                    }
-                                }
-                            }
-
-                            if(cevents & POLLPRI){
-                                NOTREACHED();
-                            }
-                        }
-                        else{
-                            NOTREACHED();
-                        }
-                    }
-                }
+                return EXIT_SUCCESS;
             }
 
-            if(client_){
-                client_->close();
-                client_.reset();
+            void IRelayServer::addRequest(const common::buffer_type& request)
+            {
+                requests_.push_back(request);
             }
-            
-            if(client_fd != INVALID_DESCRIPTOR){
-                common::net::close(client_fd);
-                client_fd = INVALID_DESCRIPTOR;
-            }
-            
-            close();
-            
-            return EXIT_SUCCESS;
-        }
-
-        void IRelayServer::addRequest(const common::buffer_type& request)
-        {
-            requests_.push_back(request);
         }
     }
 }

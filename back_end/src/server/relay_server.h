@@ -10,34 +10,44 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class InnerTcpClient;
-        class TcpClient;
-
-        class IRelayServer
-                : common::net::ServerSocketTcp
+        namespace tcp
         {
-        public:
-            typedef common::shared_ptr<TcpClient> client_t;
-            IRelayServer(InnerTcpClient *parent, client_t client);
-            ~IRelayServer();
+            class TcpClient;
+        }
 
-            client_t client() const;
-            void setClient(client_t client);
+        namespace server
+        {
+            namespace inner
+            {
+                class InnerTcpClient;
+            }
 
-            void start();
+            class IRelayServer
+                : common::net::ServerSocketTcp
+            {
+            public:
+                typedef common::shared_ptr<tcp::TcpClient> client_t;
+                IRelayServer(inner::InnerTcpClient *parent, client_t client);
+                ~IRelayServer();
 
-            void addRequest(const common::buffer_type& request);
+                client_t client() const;
+                void setClient(client_t client);
 
-        private:
-            virtual cmd_request_t createSocketCmd(const common::net::hostAndPort& host) const = 0;
+                void start();
 
-            int exec();
+                void addRequest(const common::buffer_type& request);
 
-            volatile bool stop_;
-            client_t client_;
-            std::shared_ptr<common::thread::Thread<int> > relayThread_;
-            InnerTcpClient *parent_;
-            std::vector<common::buffer_type> requests_;
-        };
+            private:
+                virtual cmd_request_t createSocketCmd(const common::net::hostAndPort& host) const = 0;
+
+                int exec();
+
+                volatile bool stop_;
+                client_t client_;
+                std::shared_ptr<common::thread::Thread<int> > relayThread_;
+                inner::InnerTcpClient *parent_;
+                std::vector<common::buffer_type> requests_;
+            };
+        }
     }
 }

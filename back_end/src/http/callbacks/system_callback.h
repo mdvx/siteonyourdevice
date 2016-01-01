@@ -20,7 +20,7 @@ namespace fasto
         {
         public:
             HttpSystemCallback();
-            virtual bool handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info);
+            virtual bool handleRequest(http::HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info);
         };
 
         class HttpSystemShutdownCallback
@@ -28,7 +28,7 @@ namespace fasto
         {
         public:
             HttpSystemShutdownCallback(HSCTypes type);
-            virtual bool handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info);
+            virtual bool handleRequest(http::HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info);
 
         private:
             const HSCTypes type_;

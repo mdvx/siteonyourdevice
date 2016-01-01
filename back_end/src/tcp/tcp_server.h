@@ -11,113 +11,116 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class ITcpLoopObserver;
-        class TcpClient;
-        class LoopTimer;
-
         typedef int timer_id_type;
 
-        class ITcpLoop
-                : public EvLoopObserver, common::IMetaClassInfo
+        namespace tcp
         {
-        public:
-            ITcpLoop(ITcpLoopObserver* observer = NULL);
-            virtual ~ITcpLoop();
+            class ITcpLoopObserver;
+            class TcpClient;
+            class LoopTimer;
 
-            int exec() WARN_UNUSED_RESULT;
-            virtual void stop();
+            class ITcpLoop
+                    : public EvLoopObserver, common::IMetaClassInfo
+            {
+            public:
+                ITcpLoop(ITcpLoopObserver* observer = NULL);
+                virtual ~ITcpLoop();
 
-            void registerClient(const common::net::socket_info& info);
-            void registerClient(TcpClient * client);
-            void unregisterClient(TcpClient * client);
-            virtual void closeClient(TcpClient *client);
+                int exec() WARN_UNUSED_RESULT;
+                virtual void stop();
 
-            timer_id_type createTimer(double sec, double repeat);
-            void removeTimer(timer_id_type id);
+                void registerClient(const common::net::socket_info& info);
+                void registerClient(TcpClient * client);
+                void unregisterClient(TcpClient * client);
+                virtual void closeClient(TcpClient *client);
 
-            void changeFlags(TcpClient *client);
+                timer_id_type createTimer(double sec, double repeat);
+                void removeTimer(timer_id_type id);
 
-            common::id_counter<ITcpLoop>::type_t id() const;
+                void changeFlags(TcpClient *client);
 
-            void setName(const std::string& name);
-            std::string name() const;
+                common::id_counter<ITcpLoop>::type_t id() const;
 
-            virtual const char* className() const = 0;
-            std::string formatedName() const;
+                void setName(const std::string& name);
+                std::string name() const;
 
-            void execInLoopThread(async_loop_exec_function_type func);
+                virtual const char* className() const = 0;
+                std::string formatedName() const;
 
-            bool isLoopThread() const;
+                void execInLoopThread(async_loop_exec_function_type func);
 
-            std::vector<TcpClient *> clients() const;
+                bool isLoopThread() const;
 
-        protected:
-            virtual TcpClient * createClient(const common::net::socket_info& info);
+                std::vector<TcpClient *> clients() const;
 
-            virtual void preLooped(LibEvLoop* loop);
-            virtual void stoped(LibEvLoop* loop);
-            virtual void postLooped(LibEvLoop* loop);
+            protected:
+                virtual TcpClient * createClient(const common::net::socket_info& info);
 
-            LibEvLoop* const loop_;
+                virtual void preLooped(LibEvLoop* loop);
+                virtual void stoped(LibEvLoop* loop);
+                virtual void postLooped(LibEvLoop* loop);
 
-        private:
-            static void read_write_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
-            static void timer_cb(struct ev_loop* loop, struct ev_timer* timer, int revents);
+                LibEvLoop* const loop_;
 
-            ITcpLoopObserver* const observer_;
+            private:
+                static void read_write_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
+                static void timer_cb(struct ev_loop* loop, struct ev_timer* timer, int revents);
 
-            std::vector<TcpClient *> clients_;
-            std::vector<LoopTimer *> timers_;
-            const common::id_counter<ITcpLoop> id_;
+                ITcpLoopObserver* const observer_;
 
-            std::string name_;
-        };
+                std::vector<TcpClient *> clients_;
+                std::vector<LoopTimer *> timers_;
+                const common::id_counter<ITcpLoop> id_;
 
-        class ITcpLoopObserver
-        {
-        public:
-            virtual void preLooped(ITcpLoop* server) = 0;
+                std::string name_;
+            };
 
-            virtual void accepted(TcpClient* client) = 0;
-            virtual void moved(TcpClient* client) = 0;
-            virtual void closed(TcpClient* client) = 0;
+            class ITcpLoopObserver
+            {
+            public:
+                virtual void preLooped(ITcpLoop* server) = 0;
 
-            virtual void dataReceived(TcpClient* client) = 0;
-            virtual void dataReadyToWrite(TcpClient* client) = 0;
-            virtual void postLooped(ITcpLoop* server) = 0;
+                virtual void accepted(TcpClient* client) = 0;
+                virtual void moved(TcpClient* client) = 0;
+                virtual void closed(TcpClient* client) = 0;
 
-            virtual void timerEmited(ITcpLoop* server, timer_id_type id) = 0;
+                virtual void dataReceived(TcpClient* client) = 0;
+                virtual void dataReadyToWrite(TcpClient* client) = 0;
+                virtual void postLooped(ITcpLoop* server) = 0;
 
-            virtual ~ITcpLoopObserver();
-        };
+                virtual void timerEmited(ITcpLoop* server, timer_id_type id) = 0;
 
-        class TcpServer
-                : public ITcpLoop
-        {
-        public:
-            TcpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer = NULL);
-            virtual ~TcpServer();
+                virtual ~ITcpLoopObserver();
+            };
 
-            common::Error bind() WARN_UNUSED_RESULT;
-            common::Error listen(int backlog) WARN_UNUSED_RESULT;
+            class TcpServer
+                    : public ITcpLoop
+            {
+            public:
+                TcpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer = NULL);
+                virtual ~TcpServer();
 
-            const char* className() const;
-            common::net::hostAndPort host() const;
+                common::Error bind() WARN_UNUSED_RESULT;
+                common::Error listen(int backlog) WARN_UNUSED_RESULT;
 
-            static TcpServer* findExistServerByHost(const common::net::hostAndPort& host);
+                const char* className() const;
+                common::net::hostAndPort host() const;
 
-        private:
-            virtual void preLooped(LibEvLoop* loop);
-            virtual void postLooped(LibEvLoop* loop);
+                static TcpServer* findExistServerByHost(const common::net::hostAndPort& host);
 
-            virtual void stoped(LibEvLoop* loop);
+            private:
+                virtual void preLooped(LibEvLoop* loop);
+                virtual void postLooped(LibEvLoop* loop);
 
-            static void accept_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
+                virtual void stoped(LibEvLoop* loop);
 
-            common::Error accept(common::net::socket_info& info) WARN_UNUSED_RESULT;
+                static void accept_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
 
-            common::net::ServerSocketTcp sock_;
-            ev_io * accept_io_;
-        };
+                common::Error accept(common::net::socket_info& info) WARN_UNUSED_RESULT;
+
+                common::net::ServerSocketTcp sock_;
+                ev_io * accept_io_;
+            };
+        }
     }
 }

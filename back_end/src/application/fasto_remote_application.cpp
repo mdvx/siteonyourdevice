@@ -22,57 +22,60 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        NetworkEventHandler* createHandlerImpl(NetworkController * controler)
+        namespace application
         {
-            using namespace siteonyourdevice;
-            #if defined(BUILD_CONSOLE)
-                return new NetworkEventHandler(controler);
-            #else
-            #if defined(OS_WIN)
-                return new Win32MainWindow(controler);
-            #elif defined(OS_MACOSX)
-                return new MacMainWindow(controler);
-            #elif defined(OS_ANDROID)
-                return new NetworkEventHandler(controler);
-            #else
-                return new GtkMainWindow(controler);
-            #endif
-            #endif
-        }
+            network::NetworkEventHandler* createHandlerImpl(network::NetworkController * controler)
+            {
+                using namespace siteonyourdevice;
+                #if defined(BUILD_CONSOLE)
+                    return new NetworkEventHandler(controler);
+                #else
+                #if defined(OS_WIN)
+                    return new Win32MainWindow(controler);
+                #elif defined(OS_MACOSX)
+                    return new MacMainWindow(controler);
+                #elif defined(OS_ANDROID)
+                    return new NetworkEventHandler(controler);
+                #else
+                    return new GtkMainWindow(controler);
+                #endif
+                #endif
+            }
 
-        FastoRemoteApplication::FastoRemoteApplication(int argc, char *argv[])
-            : IFastoApplicationImpl(argc, argv), controller_(NULL), network_handler_(NULL)
-        {
-        }
+            FastoRemoteApplication::FastoRemoteApplication(int argc, char *argv[])
+                : IFastoApplicationImpl(argc, argv), controller_(NULL), network_handler_(NULL)
+            {
+            }
 
-        FastoRemoteApplication::~FastoRemoteApplication()
-        {
+            FastoRemoteApplication::~FastoRemoteApplication()
+            {
 
-        }
+            }
 
-        int FastoRemoteApplication::preExec()
-        {
-            controller_ = new NetworkController(fApp->argc(), fApp->argv());
-            network_handler_ = createHandlerImpl(controller_);
-            network_handler_->start();
-            return EXIT_SUCCESS;
-        }
+            int FastoRemoteApplication::preExec()
+            {
+                controller_ = new network::NetworkController(fApp->argc(), fApp->argv());
+                network_handler_ = createHandlerImpl(controller_);
+                network_handler_->start();
+                return EXIT_SUCCESS;
+            }
 
-        int FastoRemoteApplication::exec()
-        {
-            return controller_->exec();
-        }
+            int FastoRemoteApplication::exec()
+            {
+                return controller_->exec();
+            }
 
-        int FastoRemoteApplication::postExec()
-        {
-            delete network_handler_;
-            delete controller_;
-            return EXIT_SUCCESS;
-        }
+            int FastoRemoteApplication::postExec()
+            {
+                delete network_handler_;
+                delete controller_;
+                return EXIT_SUCCESS;
+            }
 
-        void FastoRemoteApplication::exit(int result)
-        {
-            controller_->exit(result);
+            void FastoRemoteApplication::exit(int result)
+            {
+                controller_->exit(result);
+            }
         }
     }
 }

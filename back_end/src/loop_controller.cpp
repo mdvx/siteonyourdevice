@@ -21,7 +21,7 @@ namespace fasto
             CHECK(!handler_);
             CHECK(!loop_);
 
-            ITcpLoopObserver *handler = createHandler();
+            tcp::ITcpLoopObserver *handler = createHandler();
             if(!handler){
                 return EXIT_FAILURE;
             }

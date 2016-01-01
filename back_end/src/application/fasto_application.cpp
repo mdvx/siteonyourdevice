@@ -22,102 +22,105 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        namespace
+        namespace application
         {
-            IFastoApplicationImpl* createImpl(int argc, char *argv[])
+            namespace
             {
-            #if defined(BUILD_CONSOLE)
-                return new FastoRemoteApplication(argc, argv);
-            #else
-                #if defined(OS_WIN)
-                    return new WinGuiFastoRemoteApplication(argc, argv);
-                #elif defined(OS_MACOSX)
-                    return new MacOSXGuiFastoRemoteApplication(argc, argv);
-                #elif defined(OS_ANDROID)
+                IFastoApplicationImpl* createImpl(int argc, char *argv[])
+                {
+                #if defined(BUILD_CONSOLE)
                     return new FastoRemoteApplication(argc, argv);
                 #else
-                    return new GtkGuiFastoRemoteApplication(argc, argv);
+                    #if defined(OS_WIN)
+                        return new WinGuiFastoRemoteApplication(argc, argv);
+                    #elif defined(OS_MACOSX)
+                        return new MacOSXGuiFastoRemoteApplication(argc, argv);
+                    #elif defined(OS_ANDROID)
+                        return new FastoRemoteApplication(argc, argv);
+                    #else
+                        return new GtkGuiFastoRemoteApplication(argc, argv);
+                    #endif
                 #endif
+                }
+            }
+
+            IFastoApplicationImpl::IFastoApplicationImpl(int argc, char *argv[])
+            {
+            }
+
+            IFastoApplicationImpl::~IFastoApplicationImpl()
+            {
+
+            }
+
+            FastoApplication* FastoApplication::self_ = NULL;
+
+            FastoApplication::FastoApplication(int argc, char *argv[])
+                : argc_(argc), argv_(argv), impl_(createImpl(argc, argv))
+            {
+                CHECK(!self_);
+                if(!self_){
+                    self_ = this;
+                }
+            }
+
+            int FastoApplication::argc() const
+            {
+                return argc_;
+            }
+
+            char **FastoApplication::argv() const
+            {
+                return argv_;
+            }
+
+            FastoApplication::~FastoApplication()
+            {
+                self_ = NULL;
+            }
+
+            FastoApplication *FastoApplication::instance()
+            {
+                return self_;
+            }
+
+            std::string FastoApplication::appPath() const
+            {
+                return argv_[0];
+            }
+
+            std::string FastoApplication::appDir() const
+            {
+            #ifdef OS_MACOSX
+                const std::string appP = common::file_system::pwd();
+            #else
+                const std::string appP = appPath();
             #endif
-            }
-        }
-
-        IFastoApplicationImpl::IFastoApplicationImpl(int argc, char *argv[])
-        {
-        }
-
-        IFastoApplicationImpl::~IFastoApplicationImpl()
-        {
-
-        }
-
-        FastoApplication* FastoApplication::self_ = NULL;
-
-        FastoApplication::FastoApplication(int argc, char *argv[])
-            : argc_(argc), argv_(argv), impl_(createImpl(argc, argv))
-        {
-            CHECK(!self_);
-            if(!self_){
-                self_ = this;
-            }
-        }
-
-        int FastoApplication::argc() const
-        {
-            return argc_;
-        }
-
-        char **FastoApplication::argv() const
-        {
-            return argv_;
-        }
-
-        FastoApplication::~FastoApplication()
-        {
-            self_ = NULL;
-        }
-
-        FastoApplication *FastoApplication::instance()
-        {
-            return self_;
-        }
-
-        std::string FastoApplication::appPath() const
-        {
-            return argv_[0];
-        }
-
-        std::string FastoApplication::appDir() const
-        {
-        #ifdef OS_MACOSX
-            const std::string appP = common::file_system::pwd();
-        #else
-            const std::string appP = appPath();
-        #endif
-            return common::file_system::get_dir_path(appP);
-        }
-
-        int FastoApplication::exec()
-        {
-            int res = impl_->preExec();
-            if(res == EXIT_FAILURE){
-                return EXIT_FAILURE;
+                return common::file_system::get_dir_path(appP);
             }
 
-            res = impl_->exec();
-            if(res == EXIT_FAILURE){
-                return EXIT_FAILURE;
-            }
-            return impl_->postExec();
-        }
+            int FastoApplication::exec()
+            {
+                int res = impl_->preExec();
+                if(res == EXIT_FAILURE){
+                    return EXIT_FAILURE;
+                }
 
-        void FastoApplication::exit(int result)
-        {
-            if(!self_){
-                return;
+                res = impl_->exec();
+                if(res == EXIT_FAILURE){
+                    return EXIT_FAILURE;
+                }
+                return impl_->postExec();
             }
 
-            self_->impl_->exit(result);
+            void FastoApplication::exit(int result)
+            {
+                if(!self_){
+                    return;
+                }
+
+                self_->impl_->exit(result);
+            }
         }
     }
 }

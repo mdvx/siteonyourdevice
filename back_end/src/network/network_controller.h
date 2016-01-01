@@ -22,33 +22,36 @@ namespace fasto
     {
         class ILoopThreadController;
 
-        class NetworkController
+        namespace network
         {
-        public:
-            NetworkController(int argc, char *argv[]);
-            ~NetworkController();
+            class NetworkController
+            {
+            public:
+                NetworkController(int argc, char *argv[]);
+                ~NetworkController();
 
-            int exec() SYNC_CALL();
-            void exit(int result);
+                int exec() SYNC_CALL();
+                void exit(int result);
 
-            void connect() ASYNC_CALL(InnerClientConnectedEvent);
-            void disConnect() ASYNC_CALL(InnerClientDisconnectedEvent);
+                void connect() ASYNC_CALL(InnerClientConnectedEvent);
+                void disConnect() ASYNC_CALL(InnerClientDisconnectedEvent);
 
-            UserAuthInfo authInfo() const;
-            HttpConfig config() const;
-            void setConfig(const HttpConfig& config);
+                UserAuthInfo authInfo() const;
+                HttpConfig config() const;
+                void setConfig(const HttpConfig& config);
 
-        private:
-            void readConfig();
-            void saveConfig();
+            private:
+                void readConfig();
+                void saveConfig();
 
-            common::multi_threading::mutex_t server_mutex_;
-            ILoopThreadController * server_;
+                common::multi_threading::mutex_t server_mutex_;
+                ILoopThreadController * server_;
 
-            std::string config_path_;
-            HttpConfig config_;
+                std::string config_path_;
+                HttpConfig config_;
 
-            common::thread::EventThread<NetworkEventTypes>* const thread_; //event thread handle
-        };
+                common::thread::EventThread<NetworkEventTypes>* const thread_; //event thread handle
+            };
+        }
     }
 }

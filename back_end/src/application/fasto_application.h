@@ -6,43 +6,46 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class IFastoApplicationImpl
+        namespace application
         {
-        public:
-            IFastoApplicationImpl(int argc, char *argv[]);
-            virtual int preExec() = 0; //EXIT_FAILURE, EXIT_SUCCESS
-            virtual int exec() = 0; //EXIT_FAILURE, EXIT_SUCCESS
-            virtual int postExec() = 0; //EXIT_FAILURE, EXIT_SUCCESS
+            class IFastoApplicationImpl
+            {
+            public:
+                IFastoApplicationImpl(int argc, char *argv[]);
+                virtual int preExec() = 0; //EXIT_FAILURE, EXIT_SUCCESS
+                virtual int exec() = 0; //EXIT_FAILURE, EXIT_SUCCESS
+                virtual int postExec() = 0; //EXIT_FAILURE, EXIT_SUCCESS
 
-            virtual void exit(int result) = 0;
-            virtual ~IFastoApplicationImpl();
-        };
+                virtual void exit(int result) = 0;
+                virtual ~IFastoApplicationImpl();
+            };
 
-        class FastoApplication
-        {
-        public:
-            FastoApplication(int argc, char *argv[]);
-            ~FastoApplication();
+            class FastoApplication
+            {
+            public:
+                FastoApplication(int argc, char *argv[]);
+                ~FastoApplication();
 
-            std::string appPath() const;
-            std::string appDir() const;
-            int argc() const;
-            char **argv() const;
+                std::string appPath() const;
+                std::string appDir() const;
+                int argc() const;
+                char **argv() const;
 
-            static FastoApplication * instance();
+                static FastoApplication * instance();
 
-            int exec(); //EXIT_FAILURE, EXIT_SUCCESS
-            static void exit(int result);
+                int exec(); //EXIT_FAILURE, EXIT_SUCCESS
+                static void exit(int result);
 
-        private:
-            static FastoApplication * self_;
+            private:
+                static FastoApplication * self_;
 
-            int argc_;
-            char **argv_;
+                int argc_;
+                char **argv_;
 
-            const common::scoped_ptr<IFastoApplicationImpl> impl_;
-        };
+                const common::scoped_ptr<IFastoApplicationImpl> impl_;
+            };
+        }
     }
 }
 
-#define fApp fasto::siteonyourdevice::FastoApplication::instance()
+#define fApp fasto::siteonyourdevice::application::FastoApplication::instance()

@@ -6,24 +6,27 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class NetworkController;
-
-        class NetworkEventHandler
+        namespace network
         {
-        public:
-            NetworkEventHandler(NetworkController *controller);
-            virtual ~NetworkEventHandler();
+            class NetworkController;
 
-            virtual void start() ASYNC_CALL(InnerClientConnectedEvent); //connect
+            class NetworkEventHandler
+            {
+            public:
+                NetworkEventHandler(NetworkController *controller);
+                virtual ~NetworkEventHandler();
 
-        protected:
-            NetworkController * controller_;
-            virtual void handleEvent(NetworkEvent* event);
-            virtual void handleExceptionEvent(NetworkEvent* event, common::Error err);
+                virtual void start() ASYNC_CALL(InnerClientConnectedEvent); //connect
 
-        private:
-            class NetworkListener;
-            NetworkListener* networkListener_;
-        };
+            protected:
+                NetworkController * controller_;
+                virtual void handleEvent(NetworkEvent* event);
+                virtual void handleExceptionEvent(NetworkEvent* event, common::Error err);
+
+            private:
+                class NetworkListener;
+                NetworkListener* networkListener_;
+            };
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace fasto
 
         }
 
-        bool HttpFileSystemCallback::handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info)
+        bool HttpFileSystemCallback::handleRequest(http::HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info)
         {
             std::string requeststr = common::convertToString(request);
             DEBUG_MSG_FORMAT<1024>(common::logging::L_INFO, "handleRequest:\n%s", requeststr);

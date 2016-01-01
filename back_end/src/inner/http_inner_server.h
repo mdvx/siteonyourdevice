@@ -8,27 +8,30 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class ProxyInnerServer
-                : public ITcpLoop
+        namespace inner
         {
-        public:
-            ProxyInnerServer(ITcpLoopObserver* observer);
-            virtual const char* className() const;
-        };
+            class ProxyInnerServer
+                    : public tcp::ITcpLoop
+            {
+            public:
+                ProxyInnerServer(tcp::ITcpLoopObserver* observer);
+                virtual const char* className() const;
+            };
 
-        class Http2InnerServer
-                : public Http2Server
-        {
-        public:
-            Http2InnerServer(ITcpLoopObserver * observer, const HttpConfig& config);
+            class Http2InnerServer
+                    : public http::Http2Server
+            {
+            public:
+                Http2InnerServer(tcp::ITcpLoopObserver * observer, const HttpConfig& config);
 
-            virtual const char* className() const;
+                virtual const char* className() const;
 
-        protected:
-            virtual TcpClient * createClient(const common::net::socket_info &info);
+            protected:
+                virtual tcp::TcpClient * createClient(const common::net::socket_info &info);
 
-        private:
-            const HttpConfig config_;
-        };
+            private:
+                const HttpConfig config_;
+            };
+        }
     }
 }

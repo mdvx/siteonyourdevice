@@ -6,26 +6,32 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class NetworkEventHandler;
-        class NetworkController;
-
-        class FastoRemoteApplication
-                : public IFastoApplicationImpl
+        namespace network
         {
-        public:
-            FastoRemoteApplication(int argc, char *argv[]);
-            ~FastoRemoteApplication();
+            class NetworkEventHandler;
+            class NetworkController;
+        }
 
-            virtual int exec();
-            virtual void exit(int result);
+        namespace application
+        {
+            class FastoRemoteApplication
+                    : public IFastoApplicationImpl
+            {
+            public:
+                FastoRemoteApplication(int argc, char *argv[]);
+                ~FastoRemoteApplication();
 
-        protected:
-            virtual int preExec();
-            virtual int postExec();
+                virtual int exec();
+                virtual void exit(int result);
 
-        protected:
-            NetworkController * controller_;
-            NetworkEventHandler * network_handler_;
-        };
+            protected:
+                virtual int preExec();
+                virtual int postExec();
+
+            protected:
+                network::NetworkController * controller_;
+                network::NetworkEventHandler * network_handler_;
+            };
+        }
     }
 }

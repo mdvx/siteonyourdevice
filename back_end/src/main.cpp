@@ -4,7 +4,9 @@
 
 int main(int argc, char *argv[])
 {
-    fasto::siteonyourdevice::FastoApplication application(argc, argv);
+    using namespace fasto::siteonyourdevice;
+
+    application::FastoApplication application(argc, argv);
     int res = application.exec();
     return res;
 }

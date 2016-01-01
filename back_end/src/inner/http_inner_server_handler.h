@@ -10,49 +10,52 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class RelayClient;
-        class RelayClientEx;
-        class ProxyRelayClient;
-
-        // InnerClientConnectedEvent
-        // InnerClientDisconnectedEvent
-        class Http2InnerServerHandler
-                : public InnerServerCommandSeqParser, public Http2ServerHandler
+        namespace inner
         {
-        public:
-            enum
+            class RelayClient;
+            class RelayClientEx;
+            class ProxyRelayClient;
+
+            // InnerClientConnectedEvent
+            // InnerClientDisconnectedEvent
+            class Http2InnerServerHandler
+                    : public InnerServerCommandSeqParser, public http::Http2ServerHandler
             {
-                ping_timeout_server = 30 //sec
+            public:
+                enum
+                {
+                    ping_timeout_server = 30 //sec
+                };
+
+                Http2InnerServerHandler(const HttpServerInfo &info, const common::net::hostAndPort& innerHost, const HttpConfig& config);
+                ~Http2InnerServerHandler();
+
+                virtual void preLooped(tcp::ITcpLoop* server);
+                virtual void accepted(tcp::TcpClient* client);
+                virtual void closed(tcp::TcpClient* client);
+                virtual void dataReceived(tcp::TcpClient* client);
+                virtual void dataReadyToWrite(tcp::TcpClient* client);
+                virtual void postLooped(tcp::ITcpLoop* server);
+                virtual void timerEmited(tcp::ITcpLoop* server, timer_id_type id);
+
+                UserAuthInfo authInfo() const;
+
+            private:
+                virtual void handleInnerRequestCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
+                virtual void handleInnerResponceCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
+                virtual void handleInnerApproveCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
+
+                void innerDataReceived(InnerClient *iclient);
+                void relayDataReceived(RelayClient *rclient);
+                void relayExDataReceived(RelayClientEx *rclient);
+                void proxyDataReceived(ProxyRelayClient * prclient);
+
+                InnerClient* innerConnection_;
+                timer_id_type ping_server_id_timer_;
+
+                const common::net::hostAndPort innerHost_;
+                const HttpConfig config_;
             };
-
-            Http2InnerServerHandler(const HttpServerInfo &info, const common::net::hostAndPort& innerHost, const HttpConfig& config);
-            ~Http2InnerServerHandler();
-
-            virtual void preLooped(ITcpLoop* server);
-            virtual void accepted(TcpClient* client);
-            virtual void closed(TcpClient* client);
-            virtual void dataReceived(TcpClient* client);
-            virtual void dataReadyToWrite(TcpClient* client);
-            virtual void postLooped(ITcpLoop* server);
-            virtual void timerEmited(ITcpLoop* server, timer_id_type id);
-
-            UserAuthInfo authInfo() const;
-
-        private:
-            virtual void handleInnerRequestCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
-            virtual void handleInnerResponceCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
-            virtual void handleInnerApproveCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
-
-            void innerDataReceived(InnerClient *iclient);
-            void relayDataReceived(RelayClient *rclient);
-            void relayExDataReceived(RelayClientEx *rclient);
-            void proxyDataReceived(ProxyRelayClient * prclient);
-
-            InnerClient* innerConnection_;
-            timer_id_type ping_server_id_timer_;
-
-            const common::net::hostAndPort innerHost_;
-            const HttpConfig config_;
-        };
+        }
     }
 }

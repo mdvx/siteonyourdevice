@@ -4,6 +4,9 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
+        namespace network
+        {
 
+        }
     }
 }

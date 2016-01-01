@@ -14,63 +14,70 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class HttpServerHost;
-        class InnerTcpClient;
-
-        class HttpInnerServerHandlerHost
-                : public Http2ServerHandler
+        namespace server
         {
-        public:
-            typedef Http2Server server_t;
-            typedef HttpClient client_t;
+            class HttpServerHost;
 
-            HttpInnerServerHandlerHost(const HttpServerInfo & info, HttpServerHost * parent);
-            virtual void accepted(TcpClient* client);
-            virtual void closed(TcpClient* client);
-            virtual void dataReceived(TcpClient* client);
+            namespace inner
+            {
+                class InnerTcpClient;
+            }
 
-            virtual ~HttpInnerServerHandlerHost();
+            class HttpInnerServerHandlerHost
+                    : public http::Http2ServerHandler
+            {
+            public:
+                typedef http::Http2Server server_t;
+                typedef http::HttpClient client_t;
 
-        private:
-            void processHttpRequest(HttpClient *hclient, const common::http::http_request& hrequest);
-            HttpServerHost* const parent_;
-        };
+                HttpInnerServerHandlerHost(const HttpServerInfo & info, HttpServerHost * parent);
+                virtual void accepted(tcp::TcpClient* client);
+                virtual void closed(tcp::TcpClient* client);
+                virtual void dataReceived(tcp::TcpClient* client);
 
-        class HttpServerHost
-        {
-        public:
-            typedef std::unordered_map<std::string, InnerTcpClient*> inner_connections_type;
+                virtual ~HttpInnerServerHandlerHost();
 
-            HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort& innerHost, const common::net::hostAndPort& webSocketHost);
-            ~HttpServerHost();
+            private:
+                void processHttpRequest(http::HttpClient *hclient, const common::http::http_request& hrequest);
+                HttpServerHost* const parent_;
+            };
 
-            void setStorageConfig(const redis_sub_configuration_t &config);
+            class HttpServerHost
+            {
+            public:
+                typedef std::unordered_map<std::string, inner::InnerTcpClient*> inner_connections_type;
 
-            bool unRegisterInnerConnectionByHost(TcpClient* connection) WARN_UNUSED_RESULT;
-            bool registerInnerConnectionByUser(const UserAuthInfo& user, TcpClient* connection) WARN_UNUSED_RESULT;
-            bool findUser(const UserAuthInfo& user) const;
-            InnerTcpClient* const findInnerConnectionByHost(const std::string& host) const;
+                HttpServerHost(const common::net::hostAndPort& httpHost, const common::net::hostAndPort& innerHost, const common::net::hostAndPort& webSocketHost);
+                ~HttpServerHost();
 
-            int exec() WARN_UNUSED_RESULT;
-            void stop();
+                void setStorageConfig(const redis_sub_configuration_t &config);
 
-            InnerServerHandlerHost * innerHandler() const;
+                bool unRegisterInnerConnectionByHost(tcp::TcpClient* connection) WARN_UNUSED_RESULT;
+                bool registerInnerConnectionByUser(const UserAuthInfo& user, tcp::TcpClient* connection) WARN_UNUSED_RESULT;
+                bool findUser(const UserAuthInfo& user) const;
+                inner::InnerTcpClient* const findInnerConnectionByHost(const std::string& host) const;
 
-        private:
-            HttpInnerServerHandlerHost* httpHandler_;
-            Http2Server* httpServer_;
-            std::shared_ptr<common::thread::Thread<int> > http_thread_;
+                int exec() WARN_UNUSED_RESULT;
+                void stop();
 
-            InnerServerHandlerHost* innerHandler_;
-            InnerTcpServer * innerServer_;
-            std::shared_ptr<common::thread::Thread<int> > inner_thread_;
+                inner::InnerServerHandlerHost * innerHandler() const;
 
-            WebSocketServerHandlerHost* websocketHandler_;
-            WebSocketServerHost * websocketServer_;
-            std::shared_ptr<common::thread::Thread<int> > websocket_thread_;
+            private:
+                HttpInnerServerHandlerHost* httpHandler_;
+                http::Http2Server* httpServer_;
+                std::shared_ptr<common::thread::Thread<int> > http_thread_;
 
-            inner_connections_type connections_;
-            RedisStorage rstorage_;
-        };
+                inner::InnerServerHandlerHost* innerHandler_;
+                inner::InnerTcpServer * innerServer_;
+                std::shared_ptr<common::thread::Thread<int> > inner_thread_;
+
+                WebSocketServerHandlerHost* websocketHandler_;
+                WebSocketServerHost * websocketServer_;
+                std::shared_ptr<common::thread::Thread<int> > websocket_thread_;
+
+                inner_connections_type connections_;
+                RedisStorage rstorage_;
+            };
+        }
     }
 }

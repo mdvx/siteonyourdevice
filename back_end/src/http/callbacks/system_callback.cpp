@@ -38,7 +38,7 @@ namespace fasto
 
         }
 
-        bool HttpSystemCallback::handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info)
+        bool HttpSystemCallback::handleRequest(http::HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info)
         {
             return false;
         }
@@ -49,7 +49,7 @@ namespace fasto
 
         }
 
-        bool HttpSystemShutdownCallback::handleRequest(HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info)
+        bool HttpSystemShutdownCallback::handleRequest(http::HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info)
         {
             using namespace common::http;
             //keep alive

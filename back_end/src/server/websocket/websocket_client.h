@@ -6,13 +6,16 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class WebSocketClientHost
-                : public Http2Client
+        namespace server
         {
-        public:
-            WebSocketClientHost(ITcpLoop* server, const common::net::socket_info& info);
+            class WebSocketClientHost
+                    : public http::Http2Client
+            {
+            public:
+                WebSocketClientHost(tcp::ITcpLoop* server, const common::net::socket_info& info);
 
-            virtual const char* className() const;
-        };
+                virtual const char* className() const;
+            };
+        }
     }
 }

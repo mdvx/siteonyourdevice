@@ -6,41 +6,44 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        HttpServer::HttpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer)
-            : TcpServer(host, observer)
+        namespace http
         {
+            HttpServer::HttpServer(const common::net::hostAndPort& host, tcp::ITcpLoopObserver* observer)
+                : TcpServer(host, observer)
+            {
 
-        }
+            }
 
-        HttpServer::~HttpServer()
-        {
+            HttpServer::~HttpServer()
+            {
 
-        }
+            }
 
-        TcpClient *HttpServer::createClient(const common::net::socket_info& info)
-        {
-            return new HttpClient(this, info);
-        }
+            tcp::TcpClient *HttpServer::createClient(const common::net::socket_info& info)
+            {
+                return new HttpClient(this, info);
+            }
 
-        const char* HttpServer::className() const
-        {
-            return "HttpServer";
-        }
+            const char* HttpServer::className() const
+            {
+                return "HttpServer";
+            }
 
-        Http2Server::Http2Server(const common::net::hostAndPort& host, ITcpLoopObserver *observer)
-            : HttpServer(host, observer)
-        {
+            Http2Server::Http2Server(const common::net::hostAndPort& host, tcp::ITcpLoopObserver *observer)
+                : HttpServer(host, observer)
+            {
 
-        }
+            }
 
-        TcpClient *Http2Server::createClient(const common::net::socket_info &info)
-        {
-            return new Http2Client(this, info);
-        }
+            tcp::TcpClient *Http2Server::createClient(const common::net::socket_info &info)
+            {
+                return new Http2Client(this, info);
+            }
 
-        const char* Http2Server::className() const
-        {
-            return "Http2Server";
+            const char* Http2Server::className() const
+            {
+                return "Http2Server";
+            }
         }
     }
 }
