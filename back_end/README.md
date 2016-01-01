@@ -16,6 +16,7 @@ Remote control any computer/mobile/device over the internet.
 - Http 1.1 protocol.
 - Http 2 protocol.
 - WebSockets support.
+- IPV6 connections.
 - Proxy to external http server.
 - Basic & digest authentication for secure access.
 - Directory index.

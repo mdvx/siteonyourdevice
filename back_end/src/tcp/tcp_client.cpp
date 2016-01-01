@@ -61,7 +61,11 @@ namespace fasto
                 if(server_){
                     server_->closeClient(this);
                 }
-                sock_.close();
+
+                common::Error err = sock_.close();
+                if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
+                }
             }
 
             void TcpClient::setName(const std::string& name)
