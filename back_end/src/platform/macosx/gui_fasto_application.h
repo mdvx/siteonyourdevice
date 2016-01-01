@@ -6,36 +6,39 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        class MacOSXGuiFastoRemoteApplication
-                : public FastoRemoteGuiApplication
+        namespace application
         {
-        public:
-            MacOSXGuiFastoRemoteApplication(int argc, char *argv[]);
-            ~MacOSXGuiFastoRemoteApplication();
+            class MacOSXGuiFastoRemoteApplication
+                    : public FastoRemoteGuiApplication
+            {
+            public:
+                MacOSXGuiFastoRemoteApplication(int argc, char *argv[]);
+                ~MacOSXGuiFastoRemoteApplication();
 
-            virtual int exec();
-            virtual void exit(int result);
-        };
+                virtual int exec();
+                virtual void exit(int result);
+            };
 
-        class MacMainWindow
-                : public GuiNetworkEventHandler
-        {
-            friend class MacOSXGuiFastoRemoteApplication;
-        public:
-            MacMainWindow(NetworkController * controler);
-            ~MacMainWindow();
+            class MacMainWindow
+                    : public GuiNetworkEventHandler
+            {
+                friend class MacOSXGuiFastoRemoteApplication;
+            public:
+                MacMainWindow(network::NetworkController * controler);
+                ~MacMainWindow();
 
-            using GuiNetworkEventHandler::onConnectClicked; //with config
-            using GuiNetworkEventHandler::onDisconnectClicked;
-            void onExit();
+                using GuiNetworkEventHandler::onConnectClicked; //with config
+                using GuiNetworkEventHandler::onDisconnectClicked;
+                void onExit();
 
-        protected:
-            virtual void handleEvent(NetworkEvent* event);
+            protected:
+                virtual void handleEvent(network::NetworkEvent* event);
 
-        private:
-            virtual void showImpl();
-            class impl;
-            impl* const impl_;
-        };
+            private:
+                virtual void showImpl();
+                class impl;
+                impl* const impl_;
+            };
+        }
     }
 }

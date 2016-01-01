@@ -28,8 +28,8 @@
 @end
 
 @interface  AppDelegate()
-@property (nonatomic, assign) fasto::siteonyourdevice::MacMainWindow *cxx_window_;
-@property (nonatomic, assign) fasto::siteonyourdevice::NetworkController *cxx_controller_;
+@property (nonatomic, assign) fasto::siteonyourdevice::application::MacMainWindow *cxx_window_;
+@property (nonatomic, assign) fasto::siteonyourdevice::network::NetworkController *cxx_controller_;
 @end
 
 @implementation AppDelegate
@@ -40,10 +40,10 @@
 {    
     using namespace fasto::siteonyourdevice;
     if ( self = [super init] ) {
-        cxx_window_ = (MacMainWindow *)cxxWindow;
-        cxx_controller_ = (NetworkController *)controller;
+        cxx_window_ = (application::MacMainWindow *)cxxWindow;
+        cxx_controller_ = (network::NetworkController *)controller;
         // create a reference rect
-        NSRect contentSize = NSMakeRect(0.0f, 0.0f, MacMainWindow::width, MacMainWindow::height);
+        NSRect contentSize = NSMakeRect(0.0f, 0.0f, application::MacMainWindow::width, application::MacMainWindow::height);
         
         // allocate window
         window = [[NSWindow alloc] initWithContentRect:contentSize styleMask:NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask backing:NSBackingStoreBuffered defer:YES];
@@ -55,10 +55,10 @@
         const int padding = 10;
         const int left_padding = padding;
         const int buttom_padding = padding;
-        const int top_padding = MacMainWindow::height - padding - control_heigth;
+        const int top_padding = application::MacMainWindow::height - padding - control_heigth;
 
-        const int center_widget_width = MacMainWindow::width / 2;
-        const int center_widget_height = MacMainWindow::height / 2;
+        const int center_widget_width = application::MacMainWindow::width / 2;
+        const int center_widget_height = application::MacMainWindow::height / 2;
         
         NSRect domainFrameLabel = NSMakeRect(left_padding, top_padding, width_control, control_heigth);
         domainLabel_ = [[NSTextField alloc] initWithFrame:domainFrameLabel];
@@ -344,14 +344,12 @@
 - (void) handleNetworkEvent: (void*) revent
 {
      using namespace fasto::siteonyourdevice;
-     NetworkEvent* event = reinterpret_cast<NetworkEvent*>(revent);
-     if(event->eventType() == InnerClientConnectedEvent::EventType){
-     }
-     else if(event->eventType() == InnerClientConnectedEvent::EventType){
+     network::NetworkEvent* event = reinterpret_cast<network::NetworkEvent*>(revent);
+     if(event->eventType() == network::InnerClientConnectedEvent::EventType){
          [connetButton_ setTitle:@ DISCONNECT_LABEL];
          [connetButton_ setAction:@selector(disConnectAction:)];
      }
-     else if(event->eventType() == InnerClientDisconnectedEvent::EventType){
+     else if(event->eventType() == network::InnerClientDisconnectedEvent::EventType){
          [connetButton_ setTitle:@ CONNECT_LABEL];
          [connetButton_ setAction:@selector(connectAction:)];
      }
