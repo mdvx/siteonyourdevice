@@ -240,9 +240,6 @@ namespace fasto
             {
                 if(event->eventType() == network::InnerClientConnectedEvent::EventType){
                     network::InnerClientConnectedEvent * ev = static_cast<network::InnerClientConnectedEvent*>(event);
-                }
-                else if(event->eventType() == network::InnerClientConnectedEvent::EventType){
-                    network::InnerClientConnectedEvent * ev = static_cast<network::InnerClientConnectedEvent*>(event);
                     gtk_button_set_label(GTK_BUTTON(connect_button_), DISCONNECT_LABEL);
                     g_signal_handler_disconnect(connect_button_, connect_signal_id);
                     connect_signal_id = g_signal_connect(G_OBJECT(connect_button_), "clicked", G_CALLBACK(EventHandler::click_disconnect_callback), evhandler_);

@@ -75,6 +75,7 @@ OPTION(DEVELOPER_FEATURES "Use some debug tricks for developers" OFF)
 OPTION(DEVELOPER_ENABLE_TESTS "Enable tests for ${PROJECT_NAME_TITLE} project" OFF)
 OPTION(BUILD_CONSOLE "Build ${PROJECT_NAME_TITLE} project as service" OFF)
 OPTION(BUILD_SERVER "Build server for ${PROJECT_NAME_TITLE} project" OFF)
+OPTION(IPV6_SUPPORT "Build server and client with ipv6 support" OFF)
 
 IF(MSVC)
     IF(CMAKE_CL_64)
