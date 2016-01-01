@@ -46,17 +46,17 @@ namespace fasto
 
         common::Error InnerClient::write(const cmd_request_t& request, ssize_t &nwrite)
         {
-            return write(request.data(), request.size(), nwrite);
+            return TcpClient::write(request.data(), request.size(), nwrite);
         }
 
         common::Error InnerClient::write(const cmd_responce_t& responce, ssize_t &nwrite)
         {
-            return write(responce.data(), responce.size(), nwrite);
+            return TcpClient::write(responce.data(), responce.size(), nwrite);
         }
 
         common::Error InnerClient::write(const cmd_approve_t& approve, ssize_t &nwrite)
         {
-            return write(approve.data(), approve.size(), nwrite);
+            return TcpClient::write(approve.data(), approve.size(), nwrite);
         }
 
         InnerServerCommandSeqParser::InnerServerCommandSeqParser()

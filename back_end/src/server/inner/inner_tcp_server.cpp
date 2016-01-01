@@ -110,7 +110,7 @@ namespace fasto
                 }
 
                 ssize_t nwrite = 0;
-                common::Error err = fclient->write(buff, len, nwrite);
+                common::Error err = fclient->TcpClient::write(buff, len, nwrite);
                 if(err && err->isError()){
                     int argc;
                     sds *argv = sdssplitargs(cmd, &argc);
@@ -167,9 +167,9 @@ namespace fasto
                 std::vector<TcpClient *> online_clients = server->clients();
                 for(size_t i = 0; i < online_clients.size(); ++i){
                     TcpClient* client = online_clients[i];
-                    const std::string ping_request = make_request(PING_COMMAND_REQ);
+                    const cmd_request_t ping_request = make_request(PING_COMMAND_REQ);
                     ssize_t nwrite = 0;
-                    common::Error err = client->write(ping_request.c_str(), ping_request.size(), nwrite);
+                    common::Error err = client->write(ping_request.data(), ping_request.size(), nwrite);
                     DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "Pinged sended %" PRIuS " byte, client[%s], from server[%s], %" PRIuS " client(s) connected.",
                                           nwrite, client->formatedName(), server->formatedName(), online_clients.size());
                     if(err && err->isError()){
@@ -184,8 +184,8 @@ namespace fasto
         void InnerServerHandlerHost::accepted(TcpClient* client)
         {
             ssize_t nwrite = 0;
-            const std::string whoareyou = make_request(SERVER_WHO_ARE_YOU_COMMAND_REQ);
-            client->write(whoareyou.c_str(), whoareyou.size(), nwrite);
+            const cmd_request_t whoareyou = make_request(SERVER_WHO_ARE_YOU_COMMAND_REQ);
+            client->write(whoareyou.data(), whoareyou.size(), nwrite);
         }
 
         void InnerServerHandlerHost::closed(TcpClient* client)
@@ -239,9 +239,9 @@ namespace fasto
             char* command = argv[0];
 
             if(IS_EQUAL_COMMAND(command, PING_COMMAND)){
-                const std::string pong = make_responce(id, PING_COMMAND_RESP_SUCCESS);
+                const cmd_responce_t pong = make_responce(id, PING_COMMAND_RESP_SUCCESS);
                 ssize_t nwrite = 0;
-                connection->write(pong.c_str(), pong.size(), nwrite);
+                connection->write(pong, nwrite);
             }
             else{
                 DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN COMMAND: %s", command);
@@ -259,35 +259,35 @@ namespace fasto
                     if(argc > 2){
                         const char* pong = argv[2];
                         if(!pong){
-                            const std::string resp = make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
-                            connection->write(resp.c_str(), resp.size(), nwrite);
+                            const cmd_approve_t resp = make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
+                            connection->write(resp, nwrite);
                             goto fail;
                         }
 
-                        const std::string resp =  make_approve_responce(id, PING_COMMAND_APPROVE_SUCCESS);
-                        common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
+                        const cmd_approve_t resp =  make_approve_responce(id, PING_COMMAND_APPROVE_SUCCESS);
+                        common::Error err = connection->write(resp, nwrite);
                         if(err && err->isError()){
                             goto fail;
                         }
                     }
                     else{
-                        const std::string resp = make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
-                        connection->write(resp.c_str(), resp.size(), nwrite);
+                        const cmd_approve_t resp = make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
+                        connection->write(resp, nwrite);
                     }
                 }
                 else if(IS_EQUAL_COMMAND(command, SERVER_WHO_ARE_YOU_COMMAND)){
                     if(argc > 2){
                         const char* uauthstr = argv[2];
                         if(!uauthstr){
-                            const std::string resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
-                            connection->write(resp.c_str(), resp.size(), nwrite);
+                            const cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
+                            connection->write(resp, nwrite);
                             goto fail;
                         }
 
                         UserAuthInfo uauth = common::convertFromString<UserAuthInfo>(uauthstr);
                         if(!uauth.isValid()){
-                            const std::string resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_USER);
-                            connection->write(resp.c_str(), resp.size(), nwrite);
+                            const cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_USER);
+                            connection->write(resp, nwrite);
                             goto fail;
                         }
 
@@ -302,24 +302,24 @@ namespace fasto
 
                         bool isOk = parent_->findUser(uauth);
                         if(!isOk){
-                            const std::string resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_UNREGISTERED_USER);
-                            connection->write(resp.c_str(), resp.size(), nwrite);
+                            const cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_UNREGISTERED_USER);
+                            connection->write(resp, nwrite);
                             goto fail;
                         }
 
                         const std::string hoststr = uauth.host_.host_;
                         InnerTcpClient* fclient = parent_->findInnerConnectionByHost(hoststr);
                         if(fclient){
-                            const std::string resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_DOUBLE_CONNECTION_HOST);
-                            connection->write(resp.c_str(), resp.size(), nwrite);
+                            const cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_DOUBLE_CONNECTION_HOST);
+                            connection->write(resp, nwrite);
                             goto fail;
                         }
 
-                        const std::string resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_SUCCESS);
-                        common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
+                        const cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_SUCCESS);
+                        common::Error err = connection->write(resp, nwrite);
                         if(err && err->isError()){
-                            const std::string resp2 = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, err->description());
-                            connection->write(resp2.c_str(), resp2.size(), nwrite);
+                            const cmd_approve_t resp2 = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, err->description());
+                            connection->write(resp2, nwrite);
                             goto fail;
                         }
 
@@ -334,8 +334,8 @@ namespace fasto
                         }
                     }
                     else{
-                        const std::string resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
-                        connection->write(resp.c_str(), resp.size(), nwrite);
+                        const cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
+                        connection->write(resp, nwrite);
                     }
                 }
                 else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONNECT_HTTP_COMMAND)){

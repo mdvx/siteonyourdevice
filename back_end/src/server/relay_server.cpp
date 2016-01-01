@@ -59,8 +59,8 @@ namespace fasto
 
             ssize_t nwrite = 0;
             const std::string host_str = common::convertToString(host());
-            const std::string createConnection = createSocketCmd(host());
-            err = parent_->write(createConnection.c_str(), createConnection.size(), nwrite); //inner command write
+            const cmd_request_t createConnection = createSocketCmd(host());
+            err = parent_->write(createConnection, nwrite); //inner command write
             if(err && err->isError()){;
                 NOTREACHED();
                 return EXIT_FAILURE;

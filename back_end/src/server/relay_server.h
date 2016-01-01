@@ -4,6 +4,8 @@
 
 #include "common/net/socket_tcp.h"
 
+#include "commands/commands.h"
+
 namespace fasto
 {
     namespace siteonyourdevice
@@ -27,7 +29,7 @@ namespace fasto
             void addRequest(const common::buffer_type& request);
 
         private:
-            virtual std::string createSocketCmd(const common::net::hostAndPort& host) const = 0;
+            virtual cmd_request_t createSocketCmd(const common::net::hostAndPort& host) const = 0;
 
             int exec();
 

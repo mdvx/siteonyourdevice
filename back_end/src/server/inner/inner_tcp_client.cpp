@@ -21,7 +21,7 @@ namespace fasto
                 }
 
             private:
-                virtual std::string createSocketCmd(const common::net::hostAndPort& host) const
+                virtual cmd_request_t createSocketCmd(const common::net::hostAndPort& host) const
                 {
                     return handler_->make_request(SERVER_PLEASE_CONNECT_HTTP_COMMAND_REQ_1S, common::convertToString(host));
                 }
@@ -41,7 +41,7 @@ namespace fasto
                 }
 
             private:
-                virtual std::string createSocketCmd(const common::net::hostAndPort& host) const
+                virtual cmd_request_t createSocketCmd(const common::net::hostAndPort& host) const
                 {
                     return handler_->make_request(SERVER_PLEASE_CONNECT_WEBSOCKET_COMMAND_REQ_2SS, common::convertToString(host), common::convertToString(srcHost_));
                 }
