@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/patterns/crtp_pattern.h"
+
 #include "common/net/socket_tcp.h"
 
 #include "event_loop.h"
