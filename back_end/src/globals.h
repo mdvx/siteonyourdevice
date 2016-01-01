@@ -12,6 +12,8 @@ enum NetworkEventTypes
     CountNetworkEvent
 };
 
+const std::string SNetworkEventTypes[] = { "InnerClientConnected", "InnerClientDisconnected", "CountNetworkEvent" };
+
 namespace common
 {
     template<>
@@ -23,4 +25,6 @@ namespace common
         static const unsigned max_count = CountNetworkEvent;
         static const unsigned id = NETWORK_EVENT_LOOP_ID;
     };
+
+    std::string convertToString(NetworkEventTypes net);
 }

@@ -63,5 +63,49 @@ namespace fasto
     {
         typedef std::string cmd_seq_type;
         typedef uint8_t cmd_id_type;
+
+        template<cmd_id_type cmd_id>
+        class InnerCmd
+        {
+        public:
+            InnerCmd(cmd_seq_type id, const std::string& cmd)
+                : id_(id), cmd_(cmd)
+            {
+
+            }
+
+            static cmd_id_type type()
+            {
+                return cmd_id;
+            }
+
+            cmd_seq_type id() const
+            {
+                return id_;
+            }
+
+            const std::string& cmd() const
+            {
+                return cmd_;
+            }
+
+            const char * data() const
+            {
+                return cmd_.c_str();
+            }
+
+            size_t size() const
+            {
+                return cmd_.size();
+            }
+
+        private:
+            cmd_seq_type id_;
+            std::string cmd_;
+        };
+
+        typedef InnerCmd<REQUEST_COMMAND> cmd_request_t;
+        typedef InnerCmd<RESPONCE_COMMAND> cmd_responce_t;
+        typedef InnerCmd<APPROVE_COMMAND> cmd_approve_t;
     }
 }

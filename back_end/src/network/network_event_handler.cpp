@@ -25,7 +25,7 @@ namespace fasto
 
         void NetworkEventHandler::handleExceptionEvent(NetworkEvent* event, common::Error err)
         {
-            DEBUG_MSG_FORMAT<512>(common::logging::L_WARNING, "Exception event type: %d, text: %s", (int)(event->eventType()), err->description());
+            DEBUG_MSG_FORMAT<512>(common::logging::L_WARNING, "Exception event %s, %s", common::convertToString(event->eventType()), err->description());
         }
 
         class NetworkEventHandler::NetworkListener

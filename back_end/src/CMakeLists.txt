@@ -9,6 +9,7 @@ SET(HEADERS_GLOBAL
 SET(SOURCES_GLOBAL
     event_loop.cpp
     infos.cpp
+    globals.cpp
     loop_controller.cpp
 )
 

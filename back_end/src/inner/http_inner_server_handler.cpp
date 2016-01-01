@@ -84,10 +84,10 @@ namespace fasto
         void Http2InnerServerHandler::timerEmited(ITcpLoop* server, timer_id_type id)
         {
             if(id == ping_server_id_timer_ && innerConnection_){
-                const std::string ping_request = make_request(PING_COMMAND_REQ);
+                const cmd_request_t ping_request = make_request(PING_COMMAND_REQ);
                 ssize_t nwrite = 0;
                 InnerClient* client = innerConnection_;
-                common::Error err = client->write(ping_request.c_str(), ping_request.size(), nwrite);
+                common::Error err = client->write(ping_request, nwrite);
                 if(err && err->isError()){
                     DEBUG_MSG_ERROR(err);
                     client->close();
@@ -102,16 +102,16 @@ namespace fasto
             char* command = argv[0];
 
             if(IS_EQUAL_COMMAND(command, PING_COMMAND)){
-                const std::string pong = make_responce(id, PING_COMMAND_RESP_SUCCESS);
-                common::Error err = connection->write(pong.c_str(), pong.size(), nwrite);
+                const cmd_responce_t pong = make_responce(id, PING_COMMAND_RESP_SUCCESS);
+                common::Error err = connection->write(pong, nwrite);
                 if(err && err->isError()){
                     DEBUG_MSG_ERROR(err);
                 }
             }
             else if(IS_EQUAL_COMMAND(command, SERVER_WHO_ARE_YOU_COMMAND)){
                 const std::string authStr = common::convertToString(authInfo());
-                const std::string iAm = make_responce(id, CLIENT_WHO_ARE_YOU_COMMAND_RESP_SUCCSESS_1S, authStr);
-                common::Error err = connection->write(iAm.c_str(), iAm.size(), nwrite);
+                const cmd_responce_t iAm = make_responce(id, CLIENT_WHO_ARE_YOU_COMMAND_RESP_SUCCSESS_1S, authStr);
+                common::Error err = connection->write(iAm, nwrite);
                 if(err && err->isError()){
                     DEBUG_MSG_ERROR(err);
                 }
@@ -124,16 +124,16 @@ namespace fasto
                         common::net::socket_info rinfo;
                         common::Error err = common::net::connect(host, common::net::ST_SOCK_STREAM, NULL, rinfo);
                         if(err && err->isError()){
-                            const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S, CAUSE_CONNECT_FAILED);
-                            err = connection->write(resp.c_str(), resp.size(), nwrite);
+                            const cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S, CAUSE_CONNECT_FAILED);
+                            err = connection->write(resp, nwrite);
                             if(err && err->isError()){
                                 DEBUG_MSG_ERROR(err);
                             }
                             return;
                         }
 
-                        const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_SUCCSESS_1S, hostandport);
-                        err = connection->write(resp.c_str(), resp.size(), nwrite);
+                        const cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_SUCCSESS_1S, hostandport);
+                        err = connection->write(resp, nwrite);
                         if(err && err->isError()){
                             DEBUG_MSG_ERROR(err);
                             return;
@@ -157,16 +157,16 @@ namespace fasto
                     }
                 }
                 else{
-                    const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
-                    common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
+                    const cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
+                    common::Error err = connection->write(resp, nwrite);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                     }
                 }
             }
             else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_DISCONNECT_HTTP_COMMAND)){
-                const std::string ok_disconnect = make_responce(id, CLIENT_PLEASE_DISCONNECT_HTTP_COMMAND_RESP_SUCCSESS);
-                common::Error err = connection->write(ok_disconnect.c_str(), ok_disconnect.size(), nwrite);
+                const cmd_responce_t ok_disconnect = make_responce(id, CLIENT_PLEASE_DISCONNECT_HTTP_COMMAND_RESP_SUCCSESS);
+                common::Error err = connection->write(ok_disconnect, nwrite);
                 if(err && err->isError()){
                     DEBUG_MSG_ERROR(err);
                 }
@@ -180,8 +180,8 @@ namespace fasto
                     if(hostandport && hostandport_src){
                         common::net::hostAndPort host_src = common::convertFromString<common::net::hostAndPort>(hostandport_src);
                         if(!host_src.isValid()){
-                            const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
-                            common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
+                            const cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
+                            common::Error err = connection->write(resp, nwrite);
                             if(err && err->isError()){
                                 DEBUG_MSG_ERROR(err);
                             }
@@ -192,8 +192,8 @@ namespace fasto
                         common::net::socket_info rinfo;
                         common::Error err = common::net::connect(host, common::net::ST_SOCK_STREAM, NULL, rinfo);
                         if(err && err->isError()){
-                            const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_CONNECT_FAILED);
-                            err = connection->write(resp.c_str(), resp.size(), nwrite);
+                            const cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_CONNECT_FAILED);
+                            err = connection->write(resp, nwrite);
                             if(err && err->isError()){
                                 DEBUG_MSG_ERROR(err);
                             }
@@ -210,8 +210,8 @@ namespace fasto
                         else{
                             TcpServer * existWebServer = TcpServer::findExistServerByHost(host_src);
                             if(!existWebServer){
-                                const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
-                                common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
+                                const cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
+                                common::Error err = connection->write(resp, nwrite);
                                 if(err && err->isError()){
                                     DEBUG_MSG_ERROR(err);
                                 }
@@ -226,8 +226,8 @@ namespace fasto
                             existWebServer->execInLoopThread(cb);
                         }
 
-                        const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_SUCCSESS_1S, hostandport);
-                        err = connection->write(resp.c_str(), resp.size(), nwrite);
+                        const cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_SUCCSESS_1S, hostandport);
+                        err = connection->write(resp, nwrite);
                         if(err && err->isError()){
                             DEBUG_MSG_ERROR(err);
                             return;
@@ -238,16 +238,16 @@ namespace fasto
                     }
                 }
                 else{
-                    const std::string resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
-                    common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
+                    const cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
+                    common::Error err = connection->write(resp, nwrite);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                     }
                 }
             }
             else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_DISCONNECT_WEBSOCKET_COMMAND)){
-                const std::string ok_disconnect = make_responce(id, CLIENT_PLEASE_DISCONNECT_WEBSOCKET_COMMAND_RESP_SUCCSESS);
-                common::Error err = connection->write(ok_disconnect.c_str(), ok_disconnect.size(), nwrite);
+                const cmd_responce_t ok_disconnect = make_responce(id, CLIENT_PLEASE_DISCONNECT_WEBSOCKET_COMMAND_RESP_SUCCSESS);
+                common::Error err = connection->write(ok_disconnect, nwrite);
                 if(err && err->isError()){
                     DEBUG_MSG_ERROR(err);
                 }
@@ -276,8 +276,8 @@ namespace fasto
                 json_object_object_add(info_json, "ram_free", json_object_new_int64(ram_free));
 
                 const char *info_json_string = json_object_get_string(info_json);
-                const std::string resp = make_responce(id, CLIENT_PLEASE_SYSTEM_INFO_COMMAND_RESP_SUCCSESS_1J, info_json_string);
-                common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
+                const cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SYSTEM_INFO_COMMAND_RESP_SUCCSESS_1J, info_json_string);
+                common::Error err = connection->write(resp, nwrite);
                 if(err && err->isError()){
                     DEBUG_MSG_ERROR(err);
                 }
@@ -299,24 +299,24 @@ namespace fasto
                     if(argc > 2){
                         const char* pong = argv[2];
                         if(!pong){
-                            const std::string resp = make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
-                            common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
+                            const cmd_approve_t resp = make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
+                            common::Error err = connection->write(resp, nwrite);
                             if(err && err->isError()){
                                 DEBUG_MSG_ERROR(err);
                             }
                             return;
                         }
 
-                        const std::string resp = make_approve_responce(id, PING_COMMAND_APPROVE_SUCCESS);
-                        common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
+                        const cmd_approve_t resp = make_approve_responce(id, PING_COMMAND_APPROVE_SUCCESS);
+                        common::Error err = connection->write(resp, nwrite);
                         if(err && err->isError()){
                             DEBUG_MSG_ERROR(err);
                             return;
                         }
                     }
                     else{
-                        const std::string resp = make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
-                        common::Error err = connection->write(resp.c_str(), resp.size(), nwrite);
+                        const cmd_approve_t resp = make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
+                        common::Error err = connection->write(resp, nwrite);
                         if(err && err->isError()){
                             DEBUG_MSG_ERROR(err);
                         }

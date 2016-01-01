@@ -27,6 +27,13 @@ namespace fasto
         public:
             InnerClient(ITcpLoop *server, const common::net::socket_info& info);
             const char* className() const;
+
+            common::Error write(const cmd_request_t& request, ssize_t &nwrite) WARN_UNUSED_RESULT;
+            common::Error write(const cmd_responce_t& responce, ssize_t &nwrite) WARN_UNUSED_RESULT;
+            common::Error write(const cmd_approve_t& approve, ssize_t &nwrite) WARN_UNUSED_RESULT;
+
+        private:
+            using TcpClient::write;
         };
 
         class InnerServerCommandSeqParser
@@ -36,12 +43,13 @@ namespace fasto
             virtual ~InnerServerCommandSeqParser();
 
             template<typename... Args>
-            std::string make_request(const char* cmd_fmt, Args... args)
+            cmd_request_t make_request(const char* cmd_fmt, Args... args)
             {
                 char buff[MAX_COMMAND_SIZE] = {0};
-                int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, REQUEST_COMMAND, next_id(), args...);
+                cmd_seq_type id = next_id();
+                int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, REQUEST_COMMAND, id, args...);
                 CHECK(res != -1);
-                return buff;
+                return cmd_request_t(id, buff);
             }
 
             void subscribeRequest(const RequestCallback& req);
@@ -50,21 +58,21 @@ namespace fasto
             void handleInnerDataReceived(InnerClient *connection, char *buff, uint32_t buff_len);
 
             template<typename... Args>
-            std::string make_responce(cmd_seq_type id, const char* cmd_fmt, Args... args)
+            cmd_responce_t make_responce(cmd_seq_type id, const char* cmd_fmt, Args... args)
             {
                 char buff[MAX_COMMAND_SIZE] = {0};
                 int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, RESPONCE_COMMAND, id, args...);
                 CHECK(res != -1);
-                return buff;;
+                return cmd_responce_t(id, buff);
             }
 
             template<typename... Args>
-            std::string make_approve_responce(cmd_seq_type id, const char* cmd_fmt, Args... args)
+            cmd_approve_t make_approve_responce(cmd_seq_type id, const char* cmd_fmt, Args... args)
             {
                 char buff[MAX_COMMAND_SIZE] = {0};
                 int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, APPROVE_COMMAND, id, args...);
                 CHECK(res != -1);
-                return buff;;
+                return cmd_approve_t(id, buff);
             }
 
         private:
