@@ -4,7 +4,7 @@
 
 #include "inner/inner_server_command_seq_parser.h"
 
-#include "server/relay_server.h"
+#include "loop_controller.h"
 
 namespace fasto
 {
@@ -26,15 +26,18 @@ namespace fasto
                         : public ILoopThreadController
                 {
                 public:
-                    IInnerRelayLoop(fasto::siteonyourdevice::inner::InnerServerCommandSeqParser *handler, InnerTcpClient *parent,
-                                    tcp::TcpClient *client, const common::buffer_type& request);
+                    typedef std::pair<tcp::TcpClient *, common::buffer_type> request_t;
+                    IInnerRelayLoop(fasto::siteonyourdevice::inner::InnerServerCommandSeqParser *handler, InnerTcpClient *parent, const request_t& request);
                     ~IInnerRelayLoop();
+
+                    bool readyForRequest() const;
+                    void addRequest(const request_t& request);
 
                 protected:
                     InnerTcpClient *const parent_;
                     fasto::siteonyourdevice::inner::InnerServerCommandSeqParser *ihandler_;
-                    tcp::TcpClient * const client_;
-                    const common::buffer_type request_;
+
+                    const request_t request_;
                 };
 
                 class InnerTcpClient

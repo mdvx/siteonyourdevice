@@ -10,7 +10,6 @@ INCLUDE_DIRECTORIES(../third-party/redis/deps)
 
 ADD_EXECUTABLE(${PROJECT_NAME}
                 main.cpp
-                relay_server.h relay_server.cpp
                 http_server_host.h http_server_host.cpp
                 inner/inner_tcp_server.h inner/inner_tcp_server.cpp
                 inner/inner_tcp_client.h inner/inner_tcp_client.cpp
