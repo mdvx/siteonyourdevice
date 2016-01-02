@@ -41,7 +41,7 @@ namespace fasto
 
                     virtual void accepted(tcp::TcpClient* client)
                     {
-                        if(!client_secondary_){
+                        if(!client_secondary_ && client != client_primary_){
                             client_secondary_ = client;
                             client_secondary_->setName("device");
 
