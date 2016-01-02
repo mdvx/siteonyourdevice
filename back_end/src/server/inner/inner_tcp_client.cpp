@@ -18,7 +18,7 @@ namespace fasto
                 class RelayHandlerEx
                         : public RelayHandler
                 {
-                    const common::buffer_type request_;
+                    common::buffer_type request_;
                 public:
                     RelayHandlerEx(client_t client, const common::buffer_type& request)
                         : RelayHandler(), request_(request)
@@ -41,18 +41,19 @@ namespace fasto
 
                     virtual void accepted(tcp::TcpClient* client)
                     {
-                        if(client_primary_ != client){
+                        if(!client_secondary_){
                             client_secondary_ = client;
                             client_secondary_->setName("device");
-                        }
 
-                        if(!request_.empty()){
-                            ssize_t nwrite = 0;
-                            common::Error err = client_secondary_->write((const char*) request_.data(), request_.size(), nwrite);
-                            if(err && err->isError()){
-                                DEBUG_MSG_ERROR(err);
+                            if(!request_.empty()){
+                                ssize_t nwrite = 0;
+                                common::Error err = client_secondary_->write((const char*) request_.data(), request_.size(), nwrite);
+                                if(err && err->isError()){
+                                    DEBUG_MSG_ERROR(err);
+                                }
+                                request_.clear();
                             }
-                        }
+                        }                        
 
                         RelayHandler::accepted(client);
                     }
