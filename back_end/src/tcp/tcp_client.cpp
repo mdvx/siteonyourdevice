@@ -35,14 +35,9 @@ namespace fasto
                 return sock_.write(data, size, nwrite);
             }
 
-            common::Error TcpClient::write(const uint8_t *data, uint16_t size, ssize_t &nwrite)
+            common::Error TcpClient::read(char* out, uint16_t max_size, ssize_t &nread)
             {
-                return sock_.write(data, size, nwrite);
-            }
-
-            common::Error TcpClient::read(char* outData, uint16_t maxSize, ssize_t &nread)
-            {
-                return sock_.read(outData, maxSize, nread);
+                return sock_.read(out, max_size, nread);
             }
 
             TcpClient::~TcpClient()

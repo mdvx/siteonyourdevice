@@ -1,7 +1,5 @@
 #include "tcp/tcp_server.h"
 
-#include <inttypes.h>
-
 #include "common/logger.h"
 #include "common/multi_threading/types.h"
 

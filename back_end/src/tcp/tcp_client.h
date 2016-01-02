@@ -28,8 +28,7 @@ namespace fasto
                 int fd() const;
 
                 virtual common::Error write(const char *data, uint16_t size, ssize_t &nwrite) WARN_UNUSED_RESULT;
-                virtual common::Error write(const uint8_t *data, uint16_t size, ssize_t &nwrite) WARN_UNUSED_RESULT;
-                virtual common::Error read(char* outData, uint16_t maxSize, ssize_t &nread) WARN_UNUSED_RESULT;
+                virtual common::Error read(char * out, uint16_t max_size, ssize_t &nread) WARN_UNUSED_RESULT;
 
                 void close();
 

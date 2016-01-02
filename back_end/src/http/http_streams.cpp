@@ -13,7 +13,7 @@ namespace fasto
                 return init_frame_.type();
             }
 
-            uint32_t IStream::sid() const
+            IStream::stream_id_type IStream::sid() const
             {
                 return init_frame_.stream_id();
             }
@@ -36,7 +36,7 @@ namespace fasto
             common::ErrnoError IStream::sendData(const common::buffer_type& buff)
             {
                 ssize_t nwrite = 0;
-                return sock_.write(buff.data(), buff.size(), nwrite);
+                return sock_.write((const char*)buff.data(), buff.size(), nwrite);
             }
 
             common::ErrnoError IStream::sendFrame(const common::http2::frame_base& frame)

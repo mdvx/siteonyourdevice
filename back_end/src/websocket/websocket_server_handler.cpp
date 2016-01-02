@@ -165,7 +165,7 @@ namespace fasto
                     wsMakeFrame(NULL, 0, odata, &frameSize, WS_CLOSING_FRAME);
 
                     ssize_t nwrite = 0;
-                    common::Error err = hclient->write(odata, frameSize, nwrite);
+                    common::Error err = hclient->write((const char*)odata, frameSize, nwrite);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                     }
@@ -182,7 +182,7 @@ namespace fasto
                     wsMakeFrame(data, dataSize, odata, &frameSize, WS_TEXT_FRAME);
 
                     ssize_t nwrite = 0;
-                    common::Error err = hclient->write(odata, frameSize, nwrite);
+                    common::Error err = hclient->write((const char*)odata, frameSize, nwrite);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                     }
@@ -193,7 +193,7 @@ namespace fasto
                     wsMakeFrame(data, dataSize, odata, &frameSize, WS_BINARY_FRAME);
 
                     ssize_t nwrite = 0;
-                    common::Error err = hclient->write(odata, frameSize, nwrite);
+                    common::Error err = hclient->write((const char*)odata, frameSize, nwrite);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                     }

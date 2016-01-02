@@ -84,12 +84,12 @@ namespace fasto
                 virtual void accepted(TcpClient* client) = 0;
                 virtual void moved(TcpClient* client) = 0;
                 virtual void closed(TcpClient* client) = 0;
+                virtual void timerEmited(ITcpLoop* server, timer_id_type id) = 0;
 
                 virtual void dataReceived(TcpClient* client) = 0;
                 virtual void dataReadyToWrite(TcpClient* client) = 0;
-                virtual void postLooped(ITcpLoop* server) = 0;
 
-                virtual void timerEmited(ITcpLoop* server, timer_id_type id) = 0;
+                virtual void postLooped(ITcpLoop* server) = 0;
 
                 virtual ~ITcpLoopObserver();
             };

@@ -12,8 +12,10 @@ namespace fasto
             class IStream
             {
             public:
+                typedef uint32_t stream_id_type;
+
                 common::http2::frame_type type() const;
-                uint32_t sid() const;
+                stream_id_type sid() const;
 
                 bool processFrame(const common::http2::frame_base& frame); //true if is handled
 

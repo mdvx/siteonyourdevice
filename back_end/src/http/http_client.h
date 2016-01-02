@@ -20,7 +20,7 @@ namespace fasto
             public:
                 HttpClient(tcp::ITcpLoop* server, const common::net::socket_info& info);
 
-                virtual common::Error send_ok(common::http::http_protocols protocol, const char* extra_header, const char* text, bool is_keep_alive, const HttpServerInfo& info) WARN_UNUSED_RESULT;
+                common::Error send_ok(common::http::http_protocols protocol, const char* extra_header, const char* text, bool is_keep_alive, const HttpServerInfo& info) WARN_UNUSED_RESULT;
                 virtual common::Error send_error(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* text, bool is_keep_alive, const HttpServerInfo& info) WARN_UNUSED_RESULT;
                 virtual common::Error send_file_by_fd(common::http::http_protocols protocol, int fdesc, off_t size) WARN_UNUSED_RESULT;
                 virtual common::Error send_headers(common::http::http_protocols protocol, common::http::http_status status, const char* extra_header, const char* mime_type, off_t* length, time_t* mod, bool is_keep_alive, const HttpServerInfo& info) WARN_UNUSED_RESULT;
@@ -37,7 +37,6 @@ namespace fasto
             class Http2Client
                     : public HttpClient
             {
-                friend class Http2Server;
             public:
                 typedef StreamSPtr stream_t;
                 typedef std::vector<stream_t> streams_t;
@@ -56,7 +55,7 @@ namespace fasto
 
             private:
                 bool is_http2() const;
-                StreamSPtr findStreamByStreamID(uint32_t stream_id) const;
+                StreamSPtr findStreamByStreamID(IStream::stream_id_type stream_id) const;
                 StreamSPtr findStreamByType(common::http2::frame_type type) const;
                 streams_t streams_;
             };

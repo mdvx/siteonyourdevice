@@ -313,9 +313,9 @@ namespace fasto
                 return HttpClient::send_headers(protocol, status, extra_header, mime_type, length, mod, is_keep_alive, info);
             }
 
-            StreamSPtr Http2Client::findStreamByStreamID(uint32_t stream_id) const
+            StreamSPtr Http2Client::findStreamByStreamID(IStream::stream_id_type stream_id) const
             {
-                for (int i = 0; i < streams_.size(); ++i) {
+                for (size_t i = 0; i < streams_.size(); ++i) {
                     StreamSPtr stream = streams_[i];
                     if(stream->sid() == stream_id){
                         return stream;
@@ -327,7 +327,7 @@ namespace fasto
 
             StreamSPtr Http2Client::findStreamByType(common::http2::frame_type type) const
             {
-                for (int i = 0; i < streams_.size(); ++i) {
+                for (size_t i = 0; i < streams_.size(); ++i) {
                     StreamSPtr stream = streams_[i];
                     if(stream->type() == type){
                         return stream;
