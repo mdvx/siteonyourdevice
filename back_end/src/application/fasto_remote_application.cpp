@@ -28,7 +28,7 @@ namespace fasto
             {
                 using namespace siteonyourdevice;
                 #if defined(BUILD_CONSOLE)
-                    return new NetworkEventHandler(controler);
+                    return new network::NetworkEventHandler(controler);
                 #else
                 #if defined(OS_WIN)
                     return new Win32MainWindow(controler);
