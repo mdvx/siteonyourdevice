@@ -116,7 +116,10 @@ namespace fasto
 
             void ITcpLoop::registerClient(TcpClient * client)
             {
-                CHECK(client->server() == this);
+                if(client->server()){
+                    CHECK(client->server() == this);
+                }
+
                 // Initialize and start watcher to read client requests
                 ev_io_init(client->read_write_io_, read_write_cb, client->fd(), client->flags());
                 loop_->start_io(client->read_write_io_);
@@ -124,6 +127,8 @@ namespace fasto
                 if(observer_){
                     observer_->accepted(client);
                 }
+
+                client->server_ = this;
                 clients_.push_back(client);
                 DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "Successfully connected with client[%s], from server[%s], %" PRIuS " client(s) connected.",
                                       client->formatedName(), formatedName(), clients_.size());
