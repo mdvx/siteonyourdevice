@@ -70,8 +70,6 @@ namespace fasto
                         void preLooped(tcp::ITcpLoop* server)
                         {
                             server_ = server;
-
-                            setClient(request_.first, request_.second);
                         }
 
                         virtual void accepted(tcp::TcpClient* client)
@@ -83,6 +81,8 @@ namespace fasto
                             if(!client_device_){
                                 client_device_ = client;
                                 client_device_->setName("device");
+
+                                setClient(request_.first, request_.second);
                             }
                         }
 
