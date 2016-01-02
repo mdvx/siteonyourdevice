@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "network/network_controller.h"
+#include "network/network_event_handler.h"
 
 #if defined(BUILD_CONSOLE)
     #include "fasto_remote_application.h"
