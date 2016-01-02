@@ -1,10 +1,10 @@
 #pragma once
 
-#include "common/thread/thread.h"
-
-#include "common/net/socket_tcp.h"
-
 #include "commands/commands.h"
+
+#include "tcp/tcp_server.h"
+
+#include "loop_controller.h"
 
 namespace fasto
 {
@@ -12,36 +12,26 @@ namespace fasto
     {
         namespace server
         {
-            namespace inner
-            {
-                class InnerTcpClient;
-            }
-
-            class IRelayServer
-                : common::net::ServerSocketTcp
+            class RelayHandler
+                    : public tcp::ITcpLoopObserver
             {
             public:
-                typedef common::net::socket_descr_type client_t;
-                IRelayServer(inner::InnerTcpClient *parent, client_t client);
-                ~IRelayServer();
+                typedef tcp::TcpClient* client_t;
 
-                client_t client() const;
-                void setClient(client_t client);
+                RelayHandler();
 
-                void start();
+                virtual void preLooped(tcp::ITcpLoop* server);
+                virtual void accepted(tcp::TcpClient* client);
+                virtual void moved(tcp::TcpClient* client);
+                virtual void closed(tcp::TcpClient* client);
+                virtual void timerEmited(tcp::ITcpLoop* server, timer_id_type id);
+                virtual void dataReceived(tcp::TcpClient* client);
+                virtual void dataReadyToWrite(tcp::TcpClient* client);
+                virtual void postLooped(tcp::ITcpLoop* server);
 
-                void addRequest(const common::buffer_type& request);
-
-            private:
-                virtual cmd_request_t createSocketCmd(const common::net::hostAndPort& host) const = 0;
-
-                int exec();
-
-                volatile bool stop_;
-                client_t client_fd_;
-                std::shared_ptr<common::thread::Thread<int> > relayThread_;
-                inner::InnerTcpClient *parent_;
-                std::vector<common::buffer_type> requests_;
+            protected:                
+                client_t client_primary_;
+                client_t client_secondary_;
             };
         }
     }

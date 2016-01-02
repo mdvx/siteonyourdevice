@@ -102,12 +102,9 @@ namespace fasto
                 common::http::http_request chrequest = hrequest;
                 chrequest.path_.setPath(fpath);
 
-                common::buffer_type res = common::convertToBytes(chrequest);
-
-                innerConnection->addHttpRelayClient(parent_->innerHandler(), hclient->fd(), res);
                 tcp::ITcpLoop *server = hclient->server();
                 server->unregisterClient(hclient);
-                delete hclient;
+                innerConnection->addHttpRelayClient(parent_->innerHandler(), hclient, common::convertToBytes(chrequest));
             }
 
             namespace
