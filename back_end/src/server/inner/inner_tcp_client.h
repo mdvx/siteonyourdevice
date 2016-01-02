@@ -4,6 +4,8 @@
 
 #include "inner/inner_server_command_seq_parser.h"
 
+#include "server/relay_server.h"
+
 namespace fasto
 {
     namespace siteonyourdevice
@@ -15,8 +17,6 @@ namespace fasto
 
         namespace server
         {
-            class IRelayServer;
-
             namespace inner
             {
                 class InnerServerHandlerHost;
@@ -25,6 +25,7 @@ namespace fasto
                         : public fasto::siteonyourdevice::inner::InnerClient
                 {
                 public:
+                    typedef IRelayServer::client_t client_t;
                     typedef std::shared_ptr<IRelayServer> relay_server_t;
 
                     InnerTcpClient(tcp::TcpServer* server, const common::net::socket_info& info);
@@ -35,8 +36,8 @@ namespace fasto
                     void setServerHostInfo(const UserAuthInfo& info);
                     const UserAuthInfo& serverHostInfo() const;
 
-                    void addHttpRelayClient(InnerServerHandlerHost* handler, TcpClient* client, const common::buffer_type& request); //move ovnerships
-                    void addWebsocketRelayClient(InnerServerHandlerHost* handler, TcpClient* client, const common::buffer_type& request,
+                    void addHttpRelayClient(InnerServerHandlerHost* handler, client_t client, const common::buffer_type& request); //move ovnerships
+                    void addWebsocketRelayClient(InnerServerHandlerHost* handler, client_t client, const common::buffer_type& request,
                                                  const common::net::hostAndPort &srcHost); //move ovnerships
 
                 private:

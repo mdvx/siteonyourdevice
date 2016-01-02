@@ -10,11 +10,6 @@ namespace fasto
 {
     namespace siteonyourdevice
     {
-        namespace tcp
-        {
-            class TcpClient;
-        }
-
         namespace server
         {
             namespace inner
@@ -26,7 +21,7 @@ namespace fasto
                 : common::net::ServerSocketTcp
             {
             public:
-                typedef common::shared_ptr<tcp::TcpClient> client_t;
+                typedef common::net::socket_descr_type client_t;
                 IRelayServer(inner::InnerTcpClient *parent, client_t client);
                 ~IRelayServer();
 
@@ -43,7 +38,7 @@ namespace fasto
                 int exec();
 
                 volatile bool stop_;
-                client_t client_;
+                client_t client_fd_;
                 std::shared_ptr<common::thread::Thread<int> > relayThread_;
                 inner::InnerTcpClient *parent_;
                 std::vector<common::buffer_type> requests_;

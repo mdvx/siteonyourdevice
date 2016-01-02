@@ -65,51 +65,47 @@ namespace fasto
                     return "InnerTcpClient";
                 }
 
-                void InnerTcpClient::addHttpRelayClient(InnerServerHandlerHost *handler, tcp::TcpClient* client, const common::buffer_type &request)
+                void InnerTcpClient::addHttpRelayClient(InnerServerHandlerHost *handler, client_t client, const common::buffer_type &request)
                 {
-                    IRelayServer::client_t rrclient(client);
-
-                    for(int i = 0; i < relays_http_.size(); ++i){
+                    for(size_t i = 0; i < relays_http_.size(); ++i){
                         relay_server_t rserver = relays_http_[i];
                         IRelayServer::client_t rclient = rserver->client();
-                        if(!rclient){
+                        if(rclient == INVALID_DESCRIPTOR){
                             rserver->addRequest(request);
-                            rserver->setClient(rrclient);
+                            rserver->setClient(client);
                             return;
                         }
 
-                        if(rclient == rrclient){
+                        if(rclient == client){
                             rserver->addRequest(request);
                             return;
                         }
                     }
 
-                    std::shared_ptr<IRelayServer> tmp(new HttpRelayServer(handler, this, rrclient));
+                    std::shared_ptr<IRelayServer> tmp(new HttpRelayServer(handler, this, client));
                     tmp->addRequest(request);
                     tmp->start();
                     relays_http_.push_back(tmp);
                 }
 
-                void InnerTcpClient::addWebsocketRelayClient(InnerServerHandlerHost* handler, tcp::TcpClient* client, const common::buffer_type& request, const common::net::hostAndPort& srcHost)
+                void InnerTcpClient::addWebsocketRelayClient(InnerServerHandlerHost* handler, client_t client, const common::buffer_type& request, const common::net::hostAndPort& srcHost)
                 {
-                    IRelayServer::client_t rrclient(client);
-
-                    for(int i = 0; i < relays_websockets_.size(); ++i){
+                    for(size_t i = 0; i < relays_websockets_.size(); ++i){
                         relay_server_t rserver = relays_websockets_[i];
                         IRelayServer::client_t rclient = rserver->client();
-                        if(!rclient){
+                        if(rclient == INVALID_DESCRIPTOR){
                             rserver->addRequest(request);
-                            rserver->setClient(rrclient);
+                            rserver->setClient(client);
                             return;
                         }
 
-                        if(rclient == rrclient){
+                        if(rclient == client){
                             rserver->addRequest(request);
                             return;
                         }
                     }
 
-                    std::shared_ptr<IRelayServer> tmp(new WebSocketRelayServer(handler, this, rrclient, srcHost));
+                    std::shared_ptr<IRelayServer> tmp(new WebSocketRelayServer(handler, this, client, srcHost));
                     tmp->addRequest(request);
                     tmp->start();
                     relays_websockets_.push_back(tmp);
