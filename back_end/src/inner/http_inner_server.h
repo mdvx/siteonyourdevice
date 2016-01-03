@@ -16,6 +16,9 @@ namespace fasto
             public:
                 ProxyInnerServer(tcp::ITcpLoopObserver* observer);
                 virtual const char* className() const;
+
+            protected:
+                tcp::TcpClient * createClient(const common::net::socket_info& info);
             };
 
             class Http2InnerServer

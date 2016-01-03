@@ -19,6 +19,11 @@ namespace fasto
                 return "ProxyInnerServer";
             }
 
+            tcp::TcpClient * ProxyInnerServer::createClient(const common::net::socket_info& info)
+            {
+                return new tcp::TcpClient(this, info);
+            }
+
             Http2InnerServer::Http2InnerServer(tcp::ITcpLoopObserver * observer, const HttpConfig& config)
                 : Http2Server(common::net::hostAndPort(config.domain_, config.port_), observer), config_(config)
             {

@@ -55,7 +55,7 @@ namespace fasto
                 std::vector<TcpClient *> clients() const;
 
             protected:
-                virtual TcpClient * createClient(const common::net::socket_info& info);
+                virtual TcpClient * createClient(const common::net::socket_info& info) = 0;
 
                 virtual void preLooped(LibEvLoop* loop);
                 virtual void stoped(LibEvLoop* loop);
@@ -110,6 +110,7 @@ namespace fasto
                 static TcpServer* findExistServerByHost(const common::net::hostAndPort& host);
 
             private:
+                TcpClient * createClient(const common::net::socket_info& info);
                 virtual void preLooped(LibEvLoop* loop);
                 virtual void postLooped(LibEvLoop* loop);
 

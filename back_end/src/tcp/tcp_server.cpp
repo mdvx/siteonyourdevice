@@ -212,11 +212,6 @@ namespace fasto
                 return common::MemSPrintf("[%s][%s(%" PRIuMAX ")]", name(), className(), id());
             }
 
-            TcpClient * ITcpLoop::createClient(const common::net::socket_info& info)
-            {
-                return new TcpClient(this, info);
-            }
-
             void ITcpLoop::read_write_cb(struct ev_loop* loop, struct ev_io* watcher, int revents)
             {
                 TcpClient* pclient = reinterpret_cast<TcpClient *>(watcher->data);
@@ -318,6 +313,11 @@ namespace fasto
                     }
                 }
                 return NULL;
+            }
+
+            TcpClient * TcpServer::createClient(const common::net::socket_info& info)
+            {
+                return new TcpClient(this, info);
             }
 
             void TcpServer::preLooped(LibEvLoop* loop)

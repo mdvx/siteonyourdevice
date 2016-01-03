@@ -18,6 +18,21 @@
 
 #include "network/network_events.h"
 
+#define SERVER_SETTINGS_SECTION_LABEL "http_server"
+
+#define DOMAIN_SETTING_LABEL "domain"
+#define PORT_SETTING_LABEL "port"
+#define LOGIN_SETTING_LABEL "login"
+#define CONTENT_PATH_SETTING_LABEL "content_path"
+#define PASSWORD_SETTING_LABEL "password"
+#define PRIVATE_SITE_SETTING_LABEL "private_site"
+#define EXTERNAL_HOST_SETTING_LABEL "external_host"
+#define SERVER_TYPE_SETTING_LABEL "server_type"
+
+#define HANDLERS_URLS_SECTION_LABEL "http_handlers_utls"
+
+#define SERVER_SOCKETS_SECTION_LABEL "http_server_sockets"
+
 namespace fasto
 {
     namespace siteonyourdevice
@@ -29,44 +44,44 @@ namespace fasto
                 HttpConfig* pconfig = (HttpConfig*)user;
 
                 #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
-                if (MATCH("http_server", "port")) {
+                if (MATCH(SERVER_SETTINGS_SECTION_LABEL, PORT_SETTING_LABEL)) {
                     pconfig->port_ = atoi(value);
                     return 1;
                 }
-                else if (MATCH("http_server", "content_path")) {
+                else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, CONTENT_PATH_SETTING_LABEL)) {
                     const std::string contentPath = value;
                     pconfig->content_path_ = common::file_system::stable_dir_path(contentPath);
                     return 1;
                 }
-                else if (MATCH("http_server", "domain")) {
+                else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, DOMAIN_SETTING_LABEL)) {
                     pconfig->domain_ = value;
                     return 1;
                 }
-                else if (MATCH("http_server", "login")) {
+                else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, LOGIN_SETTING_LABEL)) {
                     pconfig->login_ = value;
                     return 1;
                 }
-                else if (MATCH("http_server", "password")) {
+                else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, PASSWORD_SETTING_LABEL)) {
                     pconfig->password_ = value;
                     return 1;
                 }
-                else if(MATCH("http_server", "private_site")){
+                else if(MATCH(SERVER_SETTINGS_SECTION_LABEL, PRIVATE_SITE_SETTING_LABEL)){
                     pconfig->is_private_site_ = atoi(value);
                     return 1;
                 }
-                else if(MATCH("http_server", "external_host")){
+                else if(MATCH(SERVER_SETTINGS_SECTION_LABEL, EXTERNAL_HOST_SETTING_LABEL)){
                     pconfig->external_host_ = common::convertFromString<common::net::hostAndPort>(value);
                     return 1;
                 }
-                else if(MATCH("http_server", "server_type")){
+                else if(MATCH(SERVER_SETTINGS_SECTION_LABEL, SERVER_TYPE_SETTING_LABEL)){
                     pconfig->server_type_ = (http_server_type)atoi(value);
                     return 1;
                 }
-                else if(strcmp(section, "http_handlers_utls") == 0){
+                else if(strcmp(section, HANDLERS_URLS_SECTION_LABEL) == 0){
                     pconfig->handlers_urls_.push_back(std::make_pair(name, value));
                     return 1;
                 }
-                else if(strcmp(section, "http_server_sockets") == 0){
+                else if(strcmp(section, SERVER_SOCKETS_SECTION_LABEL) == 0){
                     common::uri::Uri uri = common::uri::Uri(value);
                     pconfig->server_sockets_urls_.push_back(std::make_pair(name, uri));
                     return 1;
@@ -368,21 +383,21 @@ namespace fasto
                     return;
                 }
 
-                configSave.write("[http_server]\n");
-                configSave.writeFormated("domain=%s\n", config_.domain_);
-                configSave.writeFormated("port=%u\n", config_.port_);
-                configSave.writeFormated("login=%s\n", config_.login_);
-                configSave.writeFormated("password=%s\n", config_.password_);
-                configSave.writeFormated("content_path=%s\n", config_.content_path_);
-                configSave.writeFormated("private_site=%u\n", config_.is_private_site_);
-                configSave.writeFormated("external_host=%s\n", common::convertToString(config_.external_host_));
-                configSave.writeFormated("server_type=%u\n", config_.server_type_);
-                configSave.write("[http_handlers_utls]\n");
+                configSave.write("[" SERVER_SETTINGS_SECTION_LABEL "]\n");
+                configSave.writeFormated(DOMAIN_SETTING_LABEL "=%s\n", config_.domain_);
+                configSave.writeFormated(PORT_SETTING_LABEL "=%u\n", config_.port_);
+                configSave.writeFormated(LOGIN_SETTING_LABEL "=%s\n", config_.login_);
+                configSave.writeFormated(PASSWORD_SETTING_LABEL "=%s\n", config_.password_);
+                configSave.writeFormated(CONTENT_PATH_SETTING_LABEL "=%s\n", config_.content_path_);
+                configSave.writeFormated(PRIVATE_SITE_SETTING_LABEL "=%u\n", config_.is_private_site_);
+                configSave.writeFormated(EXTERNAL_HOST_SETTING_LABEL "=%s\n", common::convertToString(config_.external_host_));
+                configSave.writeFormated(SERVER_TYPE_SETTING_LABEL "=%u\n", config_.server_type_);
+                configSave.write("[" HANDLERS_URLS_SECTION_LABEL "]\n");
                 for(int i = 0; i < config_.handlers_urls_.size(); ++i){
                     HttpConfig::handlers_urls_t handurl = config_.handlers_urls_[i];
                     configSave.writeFormated("%s=%s\n", handurl.first, handurl.second);
                 }
-                configSave.write("[http_server_sockets]\n");
+                configSave.write("[" SERVER_SOCKETS_SECTION_LABEL "]\n");
                 for(int i = 0; i < config_.server_sockets_urls_.size(); ++i){
                     HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls_[i];
                     const std::string url = sock_url.second.get_url();
