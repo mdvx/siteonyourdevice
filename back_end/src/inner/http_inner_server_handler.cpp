@@ -285,6 +285,26 @@ namespace fasto
                     }
                     json_object_put(info_json);
                 }
+                else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONFIG_COMMAND)){
+                    json_object * config_json = json_object_new_object();
+                    json_object_object_add(config_json, DOMAIN_SETTING_LABEL, json_object_new_string(config_.domain_.c_str()));
+                    json_object_object_add(config_json, PORT_SETTING_LABEL, json_object_new_int(config_.port_));
+                    json_object_object_add(config_json, LOGIN_SETTING_LABEL, json_object_new_string(config_.login_.c_str()));
+                    json_object_object_add(config_json, PASSWORD_SETTING_LABEL, json_object_new_string(config_.password_.c_str()));
+                    json_object_object_add(config_json, CONTENT_PATH_SETTING_LABEL, json_object_new_string(config_.content_path_.c_str()));
+                    json_object_object_add(config_json, PRIVATE_SITE_SETTING_LABEL, json_object_new_boolean(config_.is_private_site_));
+                    const std::string host_str = common::convertToString(config_.external_host_);
+                    json_object_object_add(config_json, EXTERNAL_HOST_SETTING_LABEL, json_object_new_string(host_str.c_str()));
+                    json_object_object_add(config_json, SERVER_TYPE_SETTING_LABEL, json_object_new_int(config_.server_type_));
+
+                    const char *config_json_string = json_object_get_string(config_json);
+                    const cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONFIG_COMMAND_RESP_SUCCSESS_1J, config_json_string);
+                    common::Error err = connection->write(resp, nwrite);
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                    }
+                    json_object_put(config_json);
+                }
                 else{
                     DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN REQUEST COMMAND: %s", command);
                 }

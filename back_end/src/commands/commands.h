@@ -44,9 +44,13 @@
 #define SERVER_WHO_ARE_YOU_COMMAND "who_are_you"
 #define SERVER_PLEASE_CONNECT_HTTP_COMMAND "plz_connect_http"
 #define SERVER_PLEASE_DISCONNECT_HTTP_COMMAND "plz_disconnect_http"
+
 #define SERVER_PLEASE_CONNECT_WEBSOCKET_COMMAND "plz_connect_websocket"
 #define SERVER_PLEASE_DISCONNECT_WEBSOCKET_COMMAND "plz_disconnect_websocket"
+
 #define SERVER_PLEASE_SYSTEM_INFO_COMMAND "plz_system_info"
+
+#define SERVER_PLEASE_CONFIG_COMMAND "plz_config"
 
 //request
 //[size_t](0) [hex_string]seq [std::string]command args ...

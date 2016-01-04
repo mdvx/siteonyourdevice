@@ -3,6 +3,21 @@
 #include "common/net/types.h"
 #include "common/url.h"
 
+#define SERVER_SETTINGS_SECTION_LABEL "http_server"
+
+#define DOMAIN_SETTING_LABEL "domain"
+#define PORT_SETTING_LABEL "port"
+#define LOGIN_SETTING_LABEL "login"
+#define PASSWORD_SETTING_LABEL "password"
+#define CONTENT_PATH_SETTING_LABEL "content_path"
+#define PRIVATE_SITE_SETTING_LABEL "private_site"
+#define EXTERNAL_HOST_SETTING_LABEL "external_host"
+#define SERVER_TYPE_SETTING_LABEL "server_type"
+
+#define HANDLERS_URLS_SECTION_LABEL "http_handlers_utls"
+
+#define SERVER_SOCKETS_SECTION_LABEL "http_server_sockets"
+
 namespace fasto
 {
     namespace siteonyourdevice

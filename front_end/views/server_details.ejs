@@ -25,16 +25,22 @@
                     $('#status_img').attr("src", SERVER_STATUS_IMG.ONLINE);
                     $('#info_button').prop('disabled', false);
                     $('#shutdown_button').prop('disabled', false);
+                    $('#get_config_button').prop('disabled', false);
                 }
                 else{
                     $('#status_label').html(SERVER_STATUS.OFFLINE);
                     $('#status_img').attr("src", SERVER_STATUS_IMG.OFFLINE);
                     $('#info_button').prop('disabled', true); 
                     $('#shutdown_button').prop('disabled', true);
+                    $('#get_config_button').prop('disabled', true);
                     
                     $('#os_label').html(SERVER_OS_DEFAULT_LABEL);
                     $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
                     $('#ram_label').html(SERVER_RAM_DEFAULT_LABEL);
+                    
+                    $('#server_setting_content_path_label').html(SERVER_SETTING_CONTENT_PATH_LABEL);
+                    $('#server_setting_private_site_label').html(SERVER_SETTING_PRIVATE_SITE_LABEL);
+                    $('#server_setting_ex_host_label').html(SERVER_SETTING_EXTERNAL_HOST_LABEL);
                 }
             }
             
@@ -75,6 +81,19 @@
                 }
                 else if(is_shutdown_command(msgObj)){
                 
+                }
+                else if(is_config_command(msgObj)){
+                    if(is_ok){
+                        var config = JSON.parse(msgObj.args);
+                        $('#server_setting_content_path_label').html(config.content_path);
+                        $('#server_setting_private_site_label').html(config.private_site);
+                        $('#server_setting_ex_host_label').html(config.external_host);
+                    }
+                    else{
+                        $('#server_setting_content_path_label').html(SERVER_SETTING_CONTENT_PATH_LABEL);
+                        $('#server_setting_private_site_label').html(SERVER_SETTING_PRIVATE_SITE_LABEL);
+                        $('#server_setting_ex_host_label').html(SERVER_SETTING_EXTERNAL_HOST_LABEL);
+                    }
                 }
             }
             
@@ -118,6 +137,10 @@
                 $('#os_label').html(SERVER_OS_DEFAULT_LABEL);
                 $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
                 $('#ram_label').html(SERVER_RAM_DEFAULT_LABEL);
+                
+                $('#server_setting_content_path_label').html(SERVER_SETTING_CONTENT_PATH_LABEL);
+                $('#server_setting_private_site_label').html(SERVER_SETTING_PRIVATE_SITE_LABEL);
+                $('#server_setting_ex_host_label').html(SERVER_SETTING_EXTERNAL_HOST_LABEL);
             }
             
         </script>
@@ -135,6 +158,13 @@
                 </div>
                 <button id="info_button" disabled onclick="server_info('<%- user._id %>', '<%- domain_name %>', socket)">Info</button>
                 <button id="shutdown_button" disabled onclick="shutdown_server('<%- user._id %>', '<%- domain_name %>', socket)">Shutdown</button>
+                
+                <div class="well">
+                    Content path: <label id="server_setting_content_path_label"></label><br>
+                    Private site: <label id="server_setting_private_site_label"></label><br>
+                    External host: <label id="server_setting_ex_host_label"></label>
+                </div>
+                <button id="get_config_button" disabled onclick="sync_server_config('<%- user._id %>', '<%- domain_name %>', socket)">Sync settings</button>
             </div>
         </div>
     </body>

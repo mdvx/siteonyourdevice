@@ -39,7 +39,8 @@ var CONNECTED_STATUS = {
 var COMMANDS = {
     PING : "ping", //+
     INFO : "plz_system_info", //+
-    SHUTDOWN : "plz_disconnect_http" //+
+    SHUTDOWN : "plz_disconnect_http", //+
+    CONFIG : "plz_config",
 }
 
 // state parse
@@ -67,6 +68,10 @@ function is_info_command(msgObj)
 function is_shutdown_command(msgObj)
 {
     return msgObj.command === COMMANDS.SHUTDOWN;    
+}
+function is_config_command(msgObj)
+{
+    return msgObj.command === COMMANDS.CONFIG;    
 }
 // status off command
 function is_failed_command(msgObj)
@@ -160,6 +165,16 @@ function server_info(id, name, socket)
     socket.emit('publish', msg);
 }
 
+function sync_server_config(id, name, socket)
+{
+    if(name === undefined){
+        return;
+    }
+    
+    var msg = name + " " + id + " " + COMMANDS.CONFIG;
+    socket.emit('publish', msg);
+}
+
 //// server_details constant
 const SERVER_DEFAULT_LABEL = "Unknown";
 const SERVER_CPU_DEFAULT_LABEL = "Unknown"
@@ -174,3 +189,12 @@ var SERVER_STATUS_IMG = {
     ONLINE : "images/online.png",
     OFFLINE : "images/offline.png"
 };
+
+const SERVER_SETTING_DOMAIN_LABEL = SERVER_DEFAULT_LABEL;
+const SERVER_SETTING_PORT_LABEL = "Unknown";
+const SERVER_SETTING_LOGIN_LABEL = "Unknown";
+const SERVER_SETTING_PASSWORD_LABEL = "Unknown";
+const SERVER_SETTING_CONTENT_PATH_LABEL = "Unknown";
+const SERVER_SETTING_PRIVATE_SITE_LABEL = "Unknown";
+const SERVER_SETTING_EXTERNAL_HOST_LABEL = "Unknown";
+const SERVER_SETTING_TYPE_LABEL = "Unknown";
