@@ -288,7 +288,7 @@ namespace fasto
                     json_object_put(config_json);
                 }
                 else{
-                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN REQUEST COMMAND: %s", command);
+                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN REQUEST COMMAND: %s", command);
                 }
             }
 
@@ -327,14 +327,14 @@ namespace fasto
                         }
                     }
                     else{
-                        DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN RESPONCE COMMAND: %s", command);
+                        DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN RESPONCE COMMAND: %s", command);
                     }
                 }
                 else if(IS_EQUAL_COMMAND(state_command, FAIL_COMMAND) && argc > 1){
 
                 }
                 else{
-                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN STATE COMMAND: %s", state_command);
+                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN STATE COMMAND: %s", state_command);
                 }
             }
 
@@ -356,7 +356,7 @@ namespace fasto
 
                 }
                 else{
-                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN COMMAND: %s", command);
+                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN COMMAND: %s", command);
                 }
             }
 

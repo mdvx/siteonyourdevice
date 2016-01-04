@@ -168,9 +168,9 @@
     [domainLabel_ setSelectable:NO];
     [window.contentView addSubview:domainLabel_];
     
-    NSString *domain = [NSString stringWithCString:config.domain_.c_str()
+    NSString *loc_host = [NSString stringWithCString:config.local_host_.host_.c_str()
                                                 encoding:[NSString defaultCStringEncoding]];
-    [domainTextBox_ setStringValue: domain];
+    [domainTextBox_ setStringValue: loc_host];
     [window.contentView addSubview:domainTextBox_];
     
     [portLabel_ setStringValue:@ PORT_LABEL];
@@ -180,7 +180,8 @@
     [portLabel_ setSelectable:NO];
     [window.contentView addSubview:portLabel_];
     
-    [portTextBox_ setIntValue: config.port_];    
+    const uint16 loc_port = config.local_host_.port_;
+    [portTextBox_ setIntValue: loc_port];
     OnlyIntegerValueFormatter * formatter = [[OnlyIntegerValueFormatter alloc] init];
     [portTextBox_ setFormatter: formatter];
     [window.contentView addSubview:portTextBox_];
@@ -267,10 +268,11 @@
     using namespace fasto::siteonyourdevice;
 
     HttpConfig config = cxx_controller_->config();
-    NSString *domain = [domainTextBox_ stringValue];
-    config.domain_ = [domain UTF8String];
-    int port = [portTextBox_ intValue];
-    config.port_ = port;
+    NSString *loc_domain = [domainTextBox_ stringValue];
+    const std::string loc_domain_str = [loc_domain UTF8String];
+    int loc_port = [portTextBox_ intValue];
+    config.local_host_ = common::net::hostAndPort(loc_domain_str, loc_port);
+
     NSString *login = [loginTextBox_ stringValue];
     config.login_ = [login UTF8String];
     NSString *password = [passwordTextBox_ stringValue];

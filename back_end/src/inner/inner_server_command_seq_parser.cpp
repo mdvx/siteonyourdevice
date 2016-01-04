@@ -110,7 +110,7 @@ namespace fasto
                 ssize_t nwrite = 0;
                 char *end = strstr(buff, END_OF_COMMAND);
                 if (!end) {
-                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN SEQUENCE: %s", buff);
+                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN SEQUENCE: %s", buff);
                     const cmd_responce_t resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
                     common::Error err = connection->write(resp, nwrite);
                     if(err && err->isError()){
@@ -126,7 +126,7 @@ namespace fasto
                 char *star_seq = NULL;
                 cmd_id_type seq = strtoul(buff, &star_seq, 10);
                 if (*star_seq != ' ') {
-                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "PROBLEM EXTRACTING SEQUENCE: %s", buff);
+                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "PROBLEM EXTRACTING SEQUENCE: %s", buff);
                     const cmd_responce_t resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
                     common::Error err = connection->write(resp, nwrite);
                     if(err && err->isError()){
@@ -139,7 +139,7 @@ namespace fasto
 
                 const char* id_ptr = strchr(star_seq + 1, ' ');
                 if (!id_ptr) {
-                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "PROBLEM EXTRACTING ID: %s", buff);
+                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "PROBLEM EXTRACTING ID: %s", buff);
                     const cmd_responce_t resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
                     common::Error err = connection->write(resp, nwrite);
                     if(err && err->isError()){
@@ -158,7 +158,7 @@ namespace fasto
                 sds *argv = sdssplitargs(cmd, &argc);
                 processRequest(id, argc, argv);
                 if (argv == NULL) {
-                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "PROBLEM PARSING INNER COMMAND: %s", buff);
+                    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "PROBLEM PARSING INNER COMMAND: %s", buff);
                     const cmd_responce_t resp = make_responce(id, STATE_COMMAND_RESP_FAIL_1S, buff);
                     common::Error err = connection->write(resp, nwrite);
                     if(err && err->isError()){
@@ -169,7 +169,7 @@ namespace fasto
                     return;
                 }
 
-                DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_INFO, "HANDLE INNER COMMAND client[%s] seq:% " CID_FMT ", id:%s, cmd: %s",
+                DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_INFO, "HANDLE INNER COMMAND client[%s] seq:% " CID_FMT ", id:%s, cmd: %s",
                                                        connection->formatedName(), seq, id, cmd);
                 if(seq == REQUEST_COMMAND){
                     handleInnerRequestCommand(connection, id, argc, argv);
