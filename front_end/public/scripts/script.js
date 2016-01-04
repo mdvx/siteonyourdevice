@@ -190,14 +190,12 @@ var SERVER_STATUS_IMG = {
     OFFLINE : "images/offline.png"
 };
 
-var SERVER_SETTING_ACCSESS_SITE
-{
+var SERVER_SETTING_ACCSESS_SITE = {
     PUBLIC : "public",
     PRIVATE : "private"
 };
 
-var SERVER_SETTING_HTTP_SERVER_TYPE
-{
+var SERVER_SETTING_HTTP_SERVER_TYPE = {
     LOCAL_SERVER : "local",
     EXTERNAL_SERVER : "external"
 };
