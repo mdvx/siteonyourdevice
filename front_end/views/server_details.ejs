@@ -39,7 +39,7 @@
                     $('#server_setting_content_path_label').val(SERVER_SETTING_CONTENT_PATH_LABEL);
                     $('#server_setting_private_site_label').html(SERVER_SETTING_ACCSESS_SITE.PUBLIC);
                     
-                    $('#server_setting_http_server_type_label').html(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
+                    $('#server_setting_http_server_type').value = SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER;
                     $('#server_setting_ex_host_label').html(SERVER_SETTING_EXTERNAL_HOST_LABEL);
                     $('#server_setting_local_host_label').html(SERVER_SETTING_LOCAL_HOST_LABEL);
                 }
@@ -86,7 +86,7 @@
                         $('#server_setting_content_path_label').val(config.content_path);
                         $('#server_setting_private_site_label').html(config.private_site ? SERVER_SETTING_ACCSESS_SITE.PRIVATE : SERVER_SETTING_ACCSESS_SITE.PUBLIC);
                         
-                        $('#server_setting_http_server_type_label').html(config.server_type ? SERVER_SETTING_HTTP_SERVER_TYPE.EXTERNAL_SERVER : SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
+                        $('#server_setting_http_server_type').value = config.server_type;
                         $('#server_setting_ex_host_label').html(config.external_host);
                         $('#server_setting_local_host_label').html(config.local_host);
                     }
@@ -94,7 +94,7 @@
                         $('#server_setting_content_path_label').val(SERVER_SETTING_CONTENT_PATH_LABEL);
                         $('#server_setting_private_site_label').html(SERVER_SETTING_ACCSESS_SITE.PUBLIC);
                         
-                        $('#server_setting_http_server_type_label').html(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
+                        $('#server_setting_http_server_type').value = SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER;
                         $('#server_setting_ex_host_label').html(SERVER_SETTING_EXTERNAL_HOST_LABEL);
                         $('#server_setting_local_host_label').html(SERVER_SETTING_LOCAL_HOST_LABEL);
                     }
@@ -144,7 +144,7 @@
                 
                 $('#server_setting_content_path_label').val(SERVER_SETTING_CONTENT_PATH_LABEL);
                 $('#server_setting_private_site_label').html(SERVER_SETTING_ACCSESS_SITE.PUBLIC);
-                $('#server_setting_http_server_type_label').html(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
+                $('#server_setting_http_server_type').value = SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER;
                 
                 $('#server_setting_ex_host_label').html(SERVER_SETTING_EXTERNAL_HOST_LABEL);
                 $('#server_setting_local_host_label').html(SERVER_SETTING_LOCAL_HOST_LABEL);
@@ -170,7 +170,11 @@
                     <div class="well">
                             Content path: <input id="server_setting_content_path_label" disabled></input><br>
                             
-                            Server type: <label id="server_setting_http_server_type_label"></label><br>
+                            Server type:  
+                            <select name="http_type" id="server_setting_http_server_type">
+                                <option value="0">Local</option>
+                                <option value="1">External</option>
+                            </select><br>
                             External server: <label id="server_setting_ex_host_label"></label><br>
                             Local server: <label id="server_setting_local_host_label"></label><br>
                             
