@@ -279,12 +279,34 @@ namespace fasto
                     json_object_object_add(config_json, EXTERNAL_HOST_SETTING_LABEL, json_object_new_string(external_host_str.c_str()));
                     json_object_object_add(config_json, SERVER_TYPE_SETTING_LABEL, json_object_new_int(config_.server_type_));
 
+                    json_object* jhttp_urls = json_object_new_array();
+                    for(size_t i = 0; i < config_.handlers_urls_.size(); ++i){
+                        HttpConfig::handlers_urls_t url = config_.handlers_urls_[i];
+                        json_object* jhttp_url = json_object_new_object();
+                        json_object_object_add(jhttp_url, "url", json_object_new_string(url.first.c_str()));
+                        json_object_object_add(jhttp_url, "handler", json_object_new_string(url.second.c_str()));
+                        json_object_array_add(jhttp_urls, jhttp_url);
+                    }
+                    json_object_object_add(config_json, HANDLERS_URLS_SECTION_LABEL, jhttp_urls);
+
+                    json_object* jsockets_urls = json_object_new_array();
+                    for(size_t i = 0; i < config_.server_sockets_urls_.size(); ++i){
+                        HttpConfig::server_sockets_urls_t url = config_.server_sockets_urls_[i];
+                        json_object* jsocket_url = json_object_new_object();
+                        json_object_object_add(jsocket_url, "type", json_object_new_string(url.first.c_str()));
+                        const std::string surl = url.second.get_url();
+                        json_object_object_add(jsocket_url, "path", json_object_new_string(surl.c_str()));
+                        json_object_array_add(jsockets_urls, jsocket_url);
+                    }
+                    json_object_object_add(config_json, SERVER_SOCKETS_SECTION_LABEL, jsockets_urls);
+
                     const char *config_json_string = json_object_get_string(config_json);
                     const cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONFIG_COMMAND_RESP_SUCCSESS_1J, config_json_string);
                     common::Error err = connection->write(resp, nwrite);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                     }
+
                     json_object_put(config_json);
                 }
                 else{

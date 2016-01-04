@@ -18,7 +18,7 @@
 #define FAIL_COMMAND "fail"
 #define SUCCESS_COMMAND "ok"
 
-#define MAX_COMMAND_SIZE 512
+#define MAX_COMMAND_SIZE 1024
 #define IS_EQUAL_COMMAND(BUF, CMD) BUF && memcmp(BUF, CMD, sizeof(CMD) - 1) == 0
 
 #define CID_FMT PRIu8
