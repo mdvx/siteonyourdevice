@@ -39,7 +39,9 @@
                     $('#ram_label').html(SERVER_RAM_DEFAULT_LABEL);
                     
                     $('#server_setting_content_path_label').html(SERVER_SETTING_CONTENT_PATH_LABEL);
-                    $('#server_setting_private_site_label').html(SERVER_SETTING_PRIVATE_SITE_LABEL);
+                    $('#server_setting_private_site_label').html(SERVER_SETTING_ACCSESS_SITE.PUBLIC);
+                    
+                    $('#server_setting_http_server_type_label').html(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
                     $('#server_setting_ex_host_label').html(SERVER_SETTING_EXTERNAL_HOST_LABEL);
                 }
             }
@@ -86,12 +88,16 @@
                     if(is_ok){
                         var config = JSON.parse(msgObj.args);
                         $('#server_setting_content_path_label').html(config.content_path);
-                        $('#server_setting_private_site_label').html(config.private_site);
+                        $('#server_setting_private_site_label').html(config.private_site ? SERVER_SETTING_ACCSESS_SITE.PRIVATE : SERVER_SETTING_ACCSESS_SITE.PUBLIC);
+                        
+                        $('#server_setting_http_server_type_label').html(config.server_type ? SERVER_SETTING_HTTP_SERVER_TYPE.EXTERNAL_SERVER : SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
                         $('#server_setting_ex_host_label').html(config.external_host);
                     }
                     else{
                         $('#server_setting_content_path_label').html(SERVER_SETTING_CONTENT_PATH_LABEL);
-                        $('#server_setting_private_site_label').html(SERVER_SETTING_PRIVATE_SITE_LABEL);
+                        $('#server_setting_private_site_label').html(SERVER_SETTING_ACCSESS_SITE.PUBLIC);
+                        
+                        $('#server_setting_http_server_type_label').html(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
                         $('#server_setting_ex_host_label').html(SERVER_SETTING_EXTERNAL_HOST_LABEL);
                     }
                 }
@@ -139,7 +145,8 @@
                 $('#ram_label').html(SERVER_RAM_DEFAULT_LABEL);
                 
                 $('#server_setting_content_path_label').html(SERVER_SETTING_CONTENT_PATH_LABEL);
-                $('#server_setting_private_site_label').html(SERVER_SETTING_PRIVATE_SITE_LABEL);
+                $('#server_setting_private_site_label').html(SERVER_SETTING_ACCSESS_SITE.PUBLIC);
+                $('#server_setting_http_server_type_label').html(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
                 $('#server_setting_ex_host_label').html(SERVER_SETTING_EXTERNAL_HOST_LABEL);
             }
             
@@ -147,24 +154,30 @@
 
     </head>
     <body onload = "init()">
-        <div class="container">
-            <div class="page-header text-left">
-                <div class="well">
-                    <legend id="server_name_label"><%- domain_name %></legend>
-                    Status: <img id="status_img" src="images/offline.png"/> <label id="status_label"></label><br>
-                    Os: <label id="os_label"></label><br>
-                    Processor: <label id="cpu_label"></label><br>
-                    Installed memory(RAM): <label id="ram_label"></label>
+        <div class="row">
+            <div class="container">
+                <legend id="server_name_label"><%- domain_name %></legend>
+                <div class="col-sm-6">
+                    <div class="well">                        
+                        Status: <img id="status_img" src="images/offline.png"/> <label id="status_label"></label><br>
+                        Os: <label id="os_label"></label><br>
+                        Processor: <label id="cpu_label"></label><br>
+                        Installed memory(RAM): <label id="ram_label"></label>
+                    </div>
+                    <button id="info_button" disabled onclick="server_info('<%- user._id %>', '<%- domain_name %>', socket)">Info</button>
+                    <button id="shutdown_button" disabled onclick="shutdown_server('<%- user._id %>', '<%- domain_name %>', socket)">Shutdown</button>
                 </div>
-                <button id="info_button" disabled onclick="server_info('<%- user._id %>', '<%- domain_name %>', socket)">Info</button>
-                <button id="shutdown_button" disabled onclick="shutdown_server('<%- user._id %>', '<%- domain_name %>', socket)">Shutdown</button>
                 
-                <div class="well">
-                    Content path: <label id="server_setting_content_path_label"></label><br>
-                    Private site: <label id="server_setting_private_site_label"></label><br>
-                    External host: <label id="server_setting_ex_host_label"></label>
+                <div class="col-sm-6">
+                    <div class="well">
+                            Content path: <label id="server_setting_content_path_label"></label><br>
+                            Private site: <label id="server_setting_private_site_label"></label><br>
+                            
+                            Server type: <label id="server_setting_http_server_type_label"></label>
+                            External server: <label id="server_setting_ex_host_label"></label>
+                    </div>
+                    <button id="get_config_button" disabled onclick="sync_server_config('<%- user._id %>', '<%- domain_name %>', socket)">Sync settings</button>
                 </div>
-                <button id="get_config_button" disabled onclick="sync_server_config('<%- user._id %>', '<%- domain_name %>', socket)">Sync settings</button>
             </div>
         </div>
     </body>
