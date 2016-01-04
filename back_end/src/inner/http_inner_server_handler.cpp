@@ -287,14 +287,14 @@ namespace fasto
                 }
                 else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONFIG_COMMAND)){
                     json_object * config_json = json_object_new_object();
-                    json_object_object_add(config_json, DOMAIN_SETTING_LABEL, json_object_new_string(config_.domain_.c_str()));
-                    json_object_object_add(config_json, PORT_SETTING_LABEL, json_object_new_int(config_.port_));
-                    json_object_object_add(config_json, LOGIN_SETTING_LABEL, json_object_new_string(config_.login_.c_str()));
-                    json_object_object_add(config_json, PASSWORD_SETTING_LABEL, json_object_new_string(config_.password_.c_str()));
+                    const std::string local_host_str = common::convertToString(config_.local_host_);
+                    json_object_object_add(config_json, LOCAL_HOST_SETTING_LABEL, json_object_new_string(local_host_str.c_str()));
+                    //json_object_object_add(config_json, LOGIN_SETTING_LABEL, json_object_new_string(config_.login_.c_str()));
+                    //json_object_object_add(config_json, PASSWORD_SETTING_LABEL, json_object_new_string(config_.password_.c_str()));
                     json_object_object_add(config_json, CONTENT_PATH_SETTING_LABEL, json_object_new_string(config_.content_path_.c_str()));
                     json_object_object_add(config_json, PRIVATE_SITE_SETTING_LABEL, json_object_new_boolean(config_.is_private_site_));
-                    const std::string host_str = common::convertToString(config_.external_host_);
-                    json_object_object_add(config_json, EXTERNAL_HOST_SETTING_LABEL, json_object_new_string(host_str.c_str()));
+                    const std::string external_host_str = common::convertToString(config_.external_host_);
+                    json_object_object_add(config_json, EXTERNAL_HOST_SETTING_LABEL, json_object_new_string(external_host_str.c_str()));
                     json_object_object_add(config_json, SERVER_TYPE_SETTING_LABEL, json_object_new_int(config_.server_type_));
 
                     const char *config_json_string = json_object_get_string(config_json);
@@ -380,8 +380,7 @@ namespace fasto
 
             UserAuthInfo Http2InnerServerHandler::authInfo() const
             {
-                const common::net::hostAndPort hs(config_.domain_, config_.port_);
-                return UserAuthInfo(config_.login_, config_.password_, hs);
+                return UserAuthInfo(config_.login_, config_.password_, config_.local_host_);
             }
 
             void Http2InnerServerHandler::innerDataReceived(InnerClient* iclient)

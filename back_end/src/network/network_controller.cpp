@@ -29,17 +29,13 @@ namespace fasto
                 HttpConfig* pconfig = (HttpConfig*)user;
 
                 #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
-                if (MATCH(SERVER_SETTINGS_SECTION_LABEL, PORT_SETTING_LABEL)) {
-                    pconfig->port_ = atoi(value);
-                    return 1;
-                }
-                else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, CONTENT_PATH_SETTING_LABEL)) {
+                if (MATCH(SERVER_SETTINGS_SECTION_LABEL, CONTENT_PATH_SETTING_LABEL)) {
                     const std::string contentPath = value;
                     pconfig->content_path_ = common::file_system::stable_dir_path(contentPath);
                     return 1;
                 }
-                else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, DOMAIN_SETTING_LABEL)) {
-                    pconfig->domain_ = value;
+                else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, LOCAL_HOST_SETTING_LABEL)) {
+                    pconfig->local_host_ = common::convertFromString<common::net::hostAndPort>(value);
                     return 1;
                 }
                 else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, LOGIN_SETTING_LABEL)) {
@@ -346,8 +342,7 @@ namespace fasto
 
             UserAuthInfo NetworkController::authInfo() const
             {
-                const common::net::hostAndPort hs(config_.domain_, config_.port_);
-                return UserAuthInfo(config_.login_, config_.password_, hs);
+                return UserAuthInfo(config_.login_, config_.password_, config_.local_host_);
             }
 
             HttpConfig NetworkController::config() const
@@ -369,8 +364,7 @@ namespace fasto
                 }
 
                 configSave.write("[" SERVER_SETTINGS_SECTION_LABEL "]\n");
-                configSave.writeFormated(DOMAIN_SETTING_LABEL "=%s\n", config_.domain_);
-                configSave.writeFormated(PORT_SETTING_LABEL "=%u\n", config_.port_);
+                configSave.writeFormated(LOCAL_HOST_SETTING_LABEL "=%s\n", common::convertToString(config_.local_host_));
                 configSave.writeFormated(LOGIN_SETTING_LABEL "=%s\n", config_.login_);
                 configSave.writeFormated(PASSWORD_SETTING_LABEL "=%s\n", config_.password_);
                 configSave.writeFormated(CONTENT_PATH_SETTING_LABEL "=%s\n", config_.content_path_);
@@ -402,8 +396,7 @@ namespace fasto
 
                 HttpConfig config;
                 //default settings
-                config.port_ = USER_SPECIFIC_DEFAULT_PORT;
-                config.domain_ = USER_SPECIFIC_DEFAULT_DOMAIN;
+                config.local_host_ = common::net::hostAndPort(USER_SPECIFIC_DEFAULT_DOMAIN, USER_SPECIFIC_DEFAULT_PORT);
                 config.content_path_ = fApp->appDir();
                 config.login_ = USER_SPECIFIC_DEFAULT_LOGIN;
                 config.password_ = USER_SPECIFIC_DEFAULT_PASSWORD;

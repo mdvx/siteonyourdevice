@@ -25,7 +25,7 @@ namespace fasto
             }
 
             Http2InnerServer::Http2InnerServer(tcp::ITcpLoopObserver * observer, const HttpConfig& config)
-                : Http2Server(common::net::hostAndPort(config.domain_, config.port_), observer), config_(config)
+                : Http2Server(config.local_host_, observer), config_(config)
             {
 
             }

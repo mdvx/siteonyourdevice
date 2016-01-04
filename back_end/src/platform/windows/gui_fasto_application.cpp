@@ -115,9 +115,10 @@ namespace fasto
 
                 HttpConfig cur_config = controller_->config();
 
-                SetWindowText(hwndDomainTextBox_, cur_config.domain_.c_str());
-                const std::string portstr = common::convertToString(cur_config.port_);
-                SetWindowText(hwndPortTextBox_, portstr.c_str());
+                const std::string loc_host = cur_config.local_host_.host_;
+                SetWindowText(hwndDomainTextBox_, loc_host.c_str());
+                const std::string loc_port = common::convertToString(cur_config.local_host_.port_);
+                SetWindowText(hwndPortTextBox_, loc_port.c_str());
                 SetWindowText(hwndLoginTextBox_, cur_config.login_.c_str());
                 SetWindowText(hwndPasswordTextBox_, cur_config.password_.c_str());
                 SetWindowText(hwndContentPathTextBox_, cur_config.content_path_.c_str());
@@ -538,10 +539,12 @@ namespace fasto
 
                 char lbl[1024] = {0};
                 GetWindowText(hwndDomainTextBox_, lbl, sizeof(lbl));
-                old_config.domain_ = lbl;
+                std::string loc_host = lbl;
 
                 GetWindowText(hwndPortTextBox_, lbl, sizeof(lbl));
-                old_config.port_ = common::convertFromString<uint16_t>(lbl);
+                uint16_t loc_port = common::convertFromString<uint16_t>(lbl);
+
+                old_config.local_host_ = common::net::hostAndPort(loc_host, loc_port);
 
                 GetWindowText(hwndLoginTextBox_, lbl, sizeof(lbl));
                 old_config.login_ = lbl;

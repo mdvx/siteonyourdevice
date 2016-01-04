@@ -39,7 +39,6 @@ var CONNECTED_STATUS = {
 var COMMANDS = {
     PING : "ping", //+
     INFO : "plz_system_info", //+
-    SHUTDOWN : "plz_disconnect_http", //+
     CONFIG : "plz_config",
 }
 
@@ -64,10 +63,6 @@ function is_ping_command(msgObj)
 function is_info_command(msgObj)
 {
     return msgObj.command === COMMANDS.INFO;    
-}
-function is_shutdown_command(msgObj)
-{
-    return msgObj.command === COMMANDS.SHUTDOWN;    
 }
 function is_config_command(msgObj)
 {
@@ -145,16 +140,6 @@ function ping_server(id, name, socket)
     socket.emit('publish', msg);
 }
 
-function shutdown_server(id, name, socket)
-{
-    if(name === undefined){
-        return;
-    }
-    
-    var msg = name + " " + id + " " + COMMANDS.SHUTDOWN;
-    socket.emit('publish', msg);
-}
-
 function server_info(id, name, socket)
 {
     if(name === undefined){
@@ -200,7 +185,7 @@ var SERVER_SETTING_HTTP_SERVER_TYPE = {
     EXTERNAL_SERVER : "external"
 };
 
-const SERVER_SETTING_PORT_LABEL = "Unknown";
 const SERVER_SETTING_CONTENT_PATH_LABEL = "Unknown";
 const SERVER_SETTING_EXTERNAL_HOST_LABEL = "Unknown";
+const SERVER_SETTING_LOCAL_HOST_LABEL = "Unknown";
 const SERVER_SETTING_TYPE_LABEL = "Unknown";
