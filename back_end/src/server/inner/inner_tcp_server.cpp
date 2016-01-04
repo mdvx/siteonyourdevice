@@ -345,18 +345,13 @@ namespace fasto
                         else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONNECT_HTTP_COMMAND)){
 
                         }
-                        else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_DISCONNECT_HTTP_COMMAND)){
-                            connection->close();
-                            delete connection;
-                        }
                         else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONNECT_WEBSOCKET_COMMAND)){
 
                         }
-                        else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_DISCONNECT_WEBSOCKET_COMMAND)){
-                            connection->close();
-                            delete connection;
-                        }
                         else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_SYSTEM_INFO_COMMAND)){
+
+                        }
+                        else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONFIG_COMMAND)){
 
                         }
                         else{

@@ -261,9 +261,10 @@ namespace fasto
             {
                 HttpConfig cur_config = controller_->config();
 
-                gtk_entry_set_text(GTK_ENTRY(domain_text_), cur_config.domain_.c_str());
-                const std::string portstr = common::convertToString(cur_config.port_);
-                gtk_entry_set_text(GTK_ENTRY(port_text_), portstr.c_str());
+                const std::string loc_host = cur_config.local_host_.host_;
+                gtk_entry_set_text(GTK_ENTRY(domain_text_), loc_host.c_str());
+                const std::string loc_portstr = common::convertToString(cur_config.local_host_.port_);
+                gtk_entry_set_text(GTK_ENTRY(port_text_), loc_portstr.c_str());
                 gtk_entry_set_text(GTK_ENTRY(login_text_), cur_config.login_.c_str());
                 gtk_entry_set_text(GTK_ENTRY(password_text_), cur_config.password_.c_str());
                 gtk_entry_set_text(GTK_ENTRY(content_path_text_), cur_config.content_path_.c_str());
@@ -282,14 +283,16 @@ namespace fasto
             {
                 HttpConfig old_config = controller_->config();
 
-                old_config.domain_ = gtk_entry_get_text(GTK_ENTRY(domain_text_));
-                const char *portstr = gtk_entry_get_text(GTK_ENTRY(port_text_));
-                old_config.port_ = common::convertFromString<uint16_t>(portstr);
+                const std::string loc_host = gtk_entry_get_text(GTK_ENTRY(domain_text_));
+                const uint16_t loc_port = common::convertFromString<uint16_t>(gtk_entry_get_text(GTK_ENTRY(port_text_)));
+                old_config.local_host_ = common::net::hostAndPort(loc_host, loc_port);
+
                 old_config.login_ = gtk_entry_get_text(GTK_ENTRY(login_text_));
                 old_config.password_ = gtk_entry_get_text(GTK_ENTRY(password_text_));
                 old_config.content_path_ = gtk_entry_get_text(GTK_ENTRY(content_path_text_));
                 old_config.is_private_site_ = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(is_private_site_));
                 old_config.server_type_ = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(is_external_domain_)) ? EXTERNAL_SERVER : FASTO_SERVER;
+
                 const std::string exhoststr = gtk_entry_get_text(GTK_ENTRY(external_host_));
                 const uint16_t ex_port = common::convertFromString<uint16_t>(gtk_entry_get_text(GTK_ENTRY(external_port_)));
                 old_config.external_host_ = common::net::hostAndPort(exhoststr, ex_port);

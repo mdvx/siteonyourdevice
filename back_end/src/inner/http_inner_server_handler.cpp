@@ -166,15 +166,6 @@ namespace fasto
                         }
                     }
                 }
-                else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_DISCONNECT_HTTP_COMMAND)){
-                    const cmd_responce_t ok_disconnect = make_responce(id, CLIENT_PLEASE_DISCONNECT_HTTP_COMMAND_RESP_SUCCSESS);
-                    common::Error err = connection->write(ok_disconnect, nwrite);
-                    if(err && err->isError()){
-                        DEBUG_MSG_ERROR(err);
-                    }
-                    connection->close();
-                    delete connection;
-                }
                 else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONNECT_WEBSOCKET_COMMAND)){
                     if(argc > 2){
                         const char* hostandport = argv[1];
@@ -246,15 +237,6 @@ namespace fasto
                             DEBUG_MSG_ERROR(err);
                         }
                     }
-                }
-                else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_DISCONNECT_WEBSOCKET_COMMAND)){
-                    const cmd_responce_t ok_disconnect = make_responce(id, CLIENT_PLEASE_DISCONNECT_WEBSOCKET_COMMAND_RESP_SUCCSESS);
-                    common::Error err = connection->write(ok_disconnect, nwrite);
-                    if(err && err->isError()){
-                        DEBUG_MSG_ERROR(err);
-                    }
-                    connection->close();
-                    delete connection;
                 }
                 else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_SYSTEM_INFO_COMMAND)){
                     using namespace common::system_info;
