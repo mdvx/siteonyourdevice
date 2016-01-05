@@ -11,6 +11,7 @@
 #include "client_commands.h"
 
 #include "inner/inner_relay_client.h"
+#include "inner/inner_client.h"
 
 #define GB (1024*1024*1024)
 #define BUF_SIZE 4096

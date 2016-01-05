@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tcp/tcp_client.h"
+#include <functional>
 
 #include "commands/commands.h"
 
@@ -10,6 +10,8 @@ namespace fasto
     {
         namespace inner
         {
+            class InnerClient;
+
             class RequestCallback
             {
             public:
@@ -21,18 +23,6 @@ namespace fasto
             private:
                 cmd_seq_type request_id_;
                 callback_t cb_;
-            };
-
-            class InnerClient
-                    : public tcp::TcpClient
-            {
-            public:
-                InnerClient(tcp::ITcpLoop *server, const common::net::socket_info& info);
-                const char* className() const;
-
-                common::Error write(const cmd_request_t& request, ssize_t& nwrite) WARN_UNUSED_RESULT;
-                common::Error write(const cmd_responce_t& responce, ssize_t& nwrite) WARN_UNUSED_RESULT;
-                common::Error write(const cmd_approve_t& approve, ssize_t& nwrite) WARN_UNUSED_RESULT;
             };
 
             class InnerServerCommandSeqParser

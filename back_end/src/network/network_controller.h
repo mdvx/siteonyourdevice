@@ -1,6 +1,5 @@
 #pragma once
 
-#include "common/error.h"
 #include "common/multi_threading/types.h"
 
 #include "globals.h"
@@ -31,7 +30,7 @@ namespace fasto
                 ~NetworkController();
 
                 int exec() SYNC_CALL();
-                void exit(int result);
+                void exit(int result) SYNC_CALL();
 
                 void connect() ASYNC_CALL(InnerClientConnectedEvent);
                 void disConnect() ASYNC_CALL(InnerClientDisconnectedEvent);

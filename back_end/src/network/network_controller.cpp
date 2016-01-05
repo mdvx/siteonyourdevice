@@ -7,72 +7,73 @@
 #include "common/utils.h"
 #include "common/thread/event_bus.h"
 
+#include "inner/http_inner_server.h"
+#include "inner/http_inner_server_handler.h"
+
 #include "loop_controller.h"
 
 #include "application/fasto_application.h"
 
 #include "server/server_config.h"
 
-#include "inner/http_inner_server.h"
-#include "inner/http_inner_server_handler.h"
-
 #include "network/network_events.h"
+
+namespace
+{
+    int ini_handler_fasto(void* user, const char* section, const char* name, const char* value)
+    {
+        using namespace fasto::siteonyourdevice;
+        HttpConfig* pconfig = (HttpConfig*)user;
+
+        #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+        if (MATCH(SERVER_SETTINGS_SECTION_LABEL, CONTENT_PATH_SETTING_LABEL)) {
+            const std::string contentPath = value;
+            pconfig->content_path_ = common::file_system::stable_dir_path(contentPath);
+            return 1;
+        }
+        else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, LOCAL_HOST_SETTING_LABEL)) {
+            pconfig->local_host_ = common::convertFromString<common::net::hostAndPort>(value);
+            return 1;
+        }
+        else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, LOGIN_SETTING_LABEL)) {
+            pconfig->login_ = value;
+            return 1;
+        }
+        else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, PASSWORD_SETTING_LABEL)) {
+            pconfig->password_ = value;
+            return 1;
+        }
+        else if(MATCH(SERVER_SETTINGS_SECTION_LABEL, PRIVATE_SITE_SETTING_LABEL)){
+            pconfig->is_private_site_ = atoi(value);
+            return 1;
+        }
+        else if(MATCH(SERVER_SETTINGS_SECTION_LABEL, EXTERNAL_HOST_SETTING_LABEL)){
+            pconfig->external_host_ = common::convertFromString<common::net::hostAndPort>(value);
+            return 1;
+        }
+        else if(MATCH(SERVER_SETTINGS_SECTION_LABEL, SERVER_TYPE_SETTING_LABEL)){
+            pconfig->server_type_ = (http_server_type)atoi(value);
+            return 1;
+        }
+        else if(strcmp(section, HANDLERS_URLS_SECTION_LABEL) == 0){
+            pconfig->handlers_urls_.push_back(std::make_pair(name, value));
+            return 1;
+        }
+        else if(strcmp(section, SERVER_SOCKETS_SECTION_LABEL) == 0){
+            common::uri::Uri uri = common::uri::Uri(value);
+            pconfig->server_sockets_urls_.push_back(std::make_pair(name, uri));
+            return 1;
+        }
+        else {
+            return 0;  /* unknown section/name, error */
+        }
+    }
+}
 
 namespace fasto
 {
     namespace siteonyourdevice
     {
-        namespace
-        {
-            int ini_handler_fasto(void* user, const char* section, const char* name, const char* value)
-            {
-                HttpConfig* pconfig = (HttpConfig*)user;
-
-                #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
-                if (MATCH(SERVER_SETTINGS_SECTION_LABEL, CONTENT_PATH_SETTING_LABEL)) {
-                    const std::string contentPath = value;
-                    pconfig->content_path_ = common::file_system::stable_dir_path(contentPath);
-                    return 1;
-                }
-                else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, LOCAL_HOST_SETTING_LABEL)) {
-                    pconfig->local_host_ = common::convertFromString<common::net::hostAndPort>(value);
-                    return 1;
-                }
-                else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, LOGIN_SETTING_LABEL)) {
-                    pconfig->login_ = value;
-                    return 1;
-                }
-                else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, PASSWORD_SETTING_LABEL)) {
-                    pconfig->password_ = value;
-                    return 1;
-                }
-                else if(MATCH(SERVER_SETTINGS_SECTION_LABEL, PRIVATE_SITE_SETTING_LABEL)){
-                    pconfig->is_private_site_ = atoi(value);
-                    return 1;
-                }
-                else if(MATCH(SERVER_SETTINGS_SECTION_LABEL, EXTERNAL_HOST_SETTING_LABEL)){
-                    pconfig->external_host_ = common::convertFromString<common::net::hostAndPort>(value);
-                    return 1;
-                }
-                else if(MATCH(SERVER_SETTINGS_SECTION_LABEL, SERVER_TYPE_SETTING_LABEL)){
-                    pconfig->server_type_ = (http_server_type)atoi(value);
-                    return 1;
-                }
-                else if(strcmp(section, HANDLERS_URLS_SECTION_LABEL) == 0){
-                    pconfig->handlers_urls_.push_back(std::make_pair(name, value));
-                    return 1;
-                }
-                else if(strcmp(section, SERVER_SOCKETS_SECTION_LABEL) == 0){
-                    common::uri::Uri uri = common::uri::Uri(value);
-                    pconfig->server_sockets_urls_.push_back(std::make_pair(name, uri));
-                    return 1;
-                }
-                else {
-                    return 0;  /* unknown section/name, error */
-                }
-            }
-        }
-
         class HttpAuthObserver
                 : public http::IHttpAuthObserver
         {
@@ -245,7 +246,7 @@ namespace fasto
 #else
                 std::string config_path = CONFIG_FILE_NAME;
 #endif
-                for (int i = 0; i < argc; i++) {
+                for (int i = 0; i < argc; ++i) {
                     if (strcmp(argv[i], "-c") == 0) {
                         config_path = argv[++i];
                     }
@@ -372,12 +373,12 @@ namespace fasto
                 configSave.writeFormated(EXTERNAL_HOST_SETTING_LABEL "=%s\n", common::convertToString(config_.external_host_));
                 configSave.writeFormated(SERVER_TYPE_SETTING_LABEL "=%u\n", config_.server_type_);
                 configSave.write("[" HANDLERS_URLS_SECTION_LABEL "]\n");
-                for(int i = 0; i < config_.handlers_urls_.size(); ++i){
+                for(size_t i = 0; i < config_.handlers_urls_.size(); ++i){
                     HttpConfig::handlers_urls_t handurl = config_.handlers_urls_[i];
                     configSave.writeFormated("%s=%s\n", handurl.first, handurl.second);
                 }
                 configSave.write("[" SERVER_SOCKETS_SECTION_LABEL "]\n");
-                for(int i = 0; i < config_.server_sockets_urls_.size(); ++i){
+                for(size_t i = 0; i < config_.server_sockets_urls_.size(); ++i){
                     HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls_[i];
                     const std::string url = sock_url.second.get_url();
                     configSave.writeFormated("%s=%s\n", sock_url.first, url);
