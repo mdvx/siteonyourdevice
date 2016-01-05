@@ -215,7 +215,10 @@ namespace fasto
 
                 const http_protocols protocol = request.protocol();
                 if(request.method_ != http_method::HM_GET){
-                    hclient->send_error(protocol, HS_BAD_REQUEST, NULL, "Bad Request", notClose, info());
+                    common::Error err = hclient->send_error(protocol, HS_BAD_REQUEST, NULL, "Bad Request", notClose, info());
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                    }
                     return;
                 }
 
@@ -223,26 +226,38 @@ namespace fasto
                 const std::string lconnectionField = common::StringToLowerASCII(connectionField.value_);
                 bool isUpgrade = lconnectionField.find_first_of("upgrade") != std::string::npos;
                 if(!isUpgrade){
-                    hclient->send_error(protocol, HS_BAD_REQUEST, NULL, "Bad Request", notClose, info());
+                    common::Error err = hclient->send_error(protocol, HS_BAD_REQUEST, NULL, "Bad Request", notClose, info());
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                    }
                     return;
                 }
 
                 http_request::header_t upgradeField = request.findHeaderByKey("Upgrade", false);
                 bool isWebSocket = EqualsASCII(upgradeField.value_, "websocket", false);
                 if(!isWebSocket){
-                    hclient->send_error(protocol, HS_BAD_REQUEST, NULL, "Bad Request", notClose, info());
+                    common::Error err = hclient->send_error(protocol, HS_BAD_REQUEST, NULL, "Bad Request", notClose, info());
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                    }
                     return;
                 }
 
                 http_request::header_t keyField = request.findHeaderByKey("Sec-WebSocket-Key", false);
                 if(!keyField.isValid()){
-                    hclient->send_error(protocol, HS_BAD_REQUEST, NULL, "Bad Request", notClose, info());
+                    common::Error err = hclient->send_error(protocol, HS_BAD_REQUEST, NULL, "Bad Request", notClose, info());
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                    }
                     return;
                 }
 
                 http_request::header_t webVersionField = request.findHeaderByKey("Sec-WebSocket-Version", false);
                 if(!webVersionField.isValid()){
-                    hclient->send_error(protocol, HS_BAD_REQUEST, NULL, "Bad Request", notClose, info());
+                    common::Error err = hclient->send_error(protocol, HS_BAD_REQUEST, NULL, "Bad Request", notClose, info());
+                    if(err && err->isError()){
+                        DEBUG_MSG_ERROR(err);
+                    }
                     return;
                 }
 
@@ -258,7 +273,10 @@ namespace fasto
                 common::buffer_type enc_accept = common::utils::base64::encode64(bin_sha1);
                 const std::string header_up = common::MemSPrintf("Upgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: %s",
                                                                  common::convertToString(enc_accept));
-                hclient->send_headers(protocol, HS_SWITCH_PROTOCOL, header_up.c_str(), NULL, NULL, NULL, notClose, info());
+                common::Error err = hclient->send_headers(protocol, HS_SWITCH_PROTOCOL, header_up.c_str(), NULL, NULL, NULL, notClose, info());
+                if(err && err->isError()){
+                    DEBUG_MSG_ERROR(err);
+                }
             }
         }
     }

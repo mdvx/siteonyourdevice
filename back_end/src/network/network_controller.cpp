@@ -113,7 +113,7 @@ namespace fasto
             {
             public:
                 ServerControllerBase(const HttpConfig& config, const UserAuthInfo& ainfo)
-                    : config_(config), authChecker_(NULL), ainfo_(ainfo)
+                    : config_(config), ainfo_(ainfo), authChecker_(NULL)
                 {
 
                 }
