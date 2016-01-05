@@ -79,6 +79,7 @@ SET(HEADERS_INNER
     inner/inner_server_command_seq_parser.h
     inner/inner_relay_client.h
     inner/inner_client.h
+    inner/inner_server_handler.h
 )
 SET(SOURCES_INNER
     inner/http_inner_server_handler.cpp
@@ -86,6 +87,7 @@ SET(SOURCES_INNER
     inner/inner_server_command_seq_parser.cpp
     inner/inner_relay_client.cpp
     inner/inner_client.cpp
+    inner/inner_server_handler.cpp
 )
 
 SET(HEADERS_HTTP_CALLBACKS

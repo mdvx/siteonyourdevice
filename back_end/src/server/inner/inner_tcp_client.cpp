@@ -326,7 +326,7 @@ namespace fasto
                     hinfo_ = info;
                 }
 
-                const UserAuthInfo &InnerTcpClient::serverHostInfo() const
+                UserAuthInfo InnerTcpClient::serverHostInfo() const
                 {
                     return hinfo_;
                 }

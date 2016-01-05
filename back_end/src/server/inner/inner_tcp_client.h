@@ -2,7 +2,7 @@
 
 #include "infos.h"
 
-#include "inner/inner_server_command_seq_parser.h"
+#include "inner/inner_client.h"
 
 #include "loop_controller.h"
 
@@ -13,6 +13,11 @@ namespace fasto
         namespace tcp
         {
             class TcpServer;
+        }
+
+        namespace inner
+        {
+            class InnerServerCommandSeqParser;
         }
 
         namespace server
@@ -53,7 +58,7 @@ namespace fasto
                     virtual const char* className() const;
 
                     void setServerHostInfo(const UserAuthInfo& info);
-                    const UserAuthInfo& serverHostInfo() const;
+                    UserAuthInfo serverHostInfo() const;
 
                     void addHttpRelayClient(InnerServerHandlerHost* handler, tcp::TcpClient* client, const common::buffer_type& request); //move ovnerships
                     void addWebsocketRelayClient(InnerServerHandlerHost* handler, tcp::TcpClient* client, const common::buffer_type& request,
