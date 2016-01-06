@@ -34,10 +34,8 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
 
-#ifndef COMPILER_MSVC
 /* Define to 1 if you have the `nanosleep' function. */
 #define HAVE_NANOSLEEP 1
-#endif
 
 /* Define to 1 if you have the `poll' function. */
 /* #undef HAVE_POLL */
@@ -52,6 +50,7 @@
 /* #undef HAVE_PORT_H */
 
 /* Define to 1 if you have the `select' function. */
+/* #undef HAVE_SELECT */
 #define HAVE_SELECT 1
 
 /* Define to 1 if you have the `signalfd' function. */
@@ -82,6 +81,7 @@
 /* #undef HAVE_SYS_INOTIFY_H */
 
 /* Define to 1 if you have the <sys/select.h> header file. */
+/* #undef HAVE_SYS_SELECT_H */
 #define HAVE_SYS_SELECT_H 1
 
 /* Define to 1 if you have the <sys/signalfd.h> header file. */
@@ -125,4 +125,4 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "4.19"
+#define VERSION "4.22"
