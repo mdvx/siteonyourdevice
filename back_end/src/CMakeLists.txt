@@ -165,7 +165,6 @@ ENDIF(USE_PTHREAD)
 ADD_SUBDIRECTORY(common)
 ADD_SUBDIRECTORY(third-party/libev)
 ADD_SUBDIRECTORY(third-party/ini)
-ADD_SUBDIRECTORY(third-party/redis)
 SET(INCLUDE_DIRS ${INCLUDE_DIRS} ${CMAKE_CURRENT_LIST_DIR} third-party/libev/src third-party/ini third-party/sds)
 INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
@@ -225,7 +224,26 @@ IF(OS_MACOSX)
 ENDIF(OS_MACOSX)
 
 IF(BUILD_SERVER)
-    ADD_SUBDIRECTORY(server)
+    SET(PROJECT_SERVER_NAME ${PROJECT_NAME_LOWERCASE}_server)
+
+    ADD_DEFINITIONS(-DCONFIG_FILE_PATH="/etc/${PROJECT_SERVER_NAME}.conf")
+    ADD_DEFINITIONS(-DPROJECT_NAME_SERVER_TITLE="${PROJECT_NAME}")
+    ADD_DEFINITIONS(-DPROJECT_NAME_SERVER="${PROJECT_NAME_LOWERCASE}")
+
+    ADD_SUBDIRECTORY(third-party/redis)
+    INCLUDE_DIRECTORIES(third-party/redis/deps)
+
+    ADD_EXECUTABLE(${PROJECT_SERVER_NAME}
+                    server/main.cpp
+                    server/http_server_host.h server/http_server_host.cpp
+                    server/inner/inner_tcp_server.h server/inner/inner_tcp_server.cpp
+                    server/inner/inner_tcp_client.h server/inner/inner_tcp_client.cpp
+                    server/websocket/websocket_server.h server/websocket/websocket_server.cpp
+                    server/websocket/websocket_client.h server/websocket/websocket_client.cpp
+                    server/redis_helpers.h server/redis_helpers.cpp
+                    server/server_commands.h
+    )
+    TARGET_LINK_LIBRARIES(${PROJECT_SERVER_NAME} ${PROJECT_CORE_LIBRARY} hiredis)
 ENDIF(BUILD_SERVER)
 
 # Start to install
