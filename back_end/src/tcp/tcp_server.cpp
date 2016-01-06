@@ -33,7 +33,7 @@ namespace
         #elif defined(COMPILER_MSVC)
         #else
             if(signal(SIGPIPE, SIG_IGN) == SIG_ERR){
-                DEBUG_MSG_PERROR("signal", errno)
+                DEBUG_MSG_PERROR("signal", errno);
                 exit(EXIT_FAILURE);
             }
         #endif
