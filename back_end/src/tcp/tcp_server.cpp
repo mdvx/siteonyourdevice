@@ -13,11 +13,16 @@ namespace
             WinsockInit()
             {
                 WSADATA d;
-                if ( WSAStartup(MAKEWORD(2,2), &d) != 0 ) {
-                    _exit(1);
+                int res = WSAStartup(MAKEWORD(2,2), &d);
+                if (res != 0) {
+                    DEBUG_MSG_PERROR("WSAStartup", res);
+                    exit(EXIT_FAILURE);
                 }
             }
-            ~WinsockInit(){ WSACleanup(); }
+            ~WinsockInit()
+            {
+                WSACleanup();
+            }
     } winsock_init;
 #endif
     struct SigIgnInit
@@ -25,10 +30,12 @@ namespace
         SigIgnInit()
         {
         #if defined(COMPILER_MINGW)
-            signal(13, SIG_IGN);
         #elif defined(COMPILER_MSVC)
         #else
-            signal(SIGPIPE, SIG_IGN);
+            if(signal(SIGPIPE, SIG_IGN) == SIG_ERR){
+                DEBUG_MSG_PERROR("signal", errno)
+                exit(EXIT_FAILURE);
+            }
         #endif
         }
     } sig_init;
