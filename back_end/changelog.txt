@@ -4,6 +4,7 @@
 - [client] Ping server every 30 sec
 - [client/server] IPV6 support
 - [client] Get config remotely
+- [client/server] Up libev version to 4.22
 
 0.2.2 / December 28, 2015
 [Alexandr Topilski]

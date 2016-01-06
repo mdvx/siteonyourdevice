@@ -81,13 +81,12 @@ select_modify (EV_P_ int fd, int oev, int nev)
     #else
     int handle = fd;
     #endif
-#ifndef FASTO
+
     assert (("libev: fd >= FD_SETSIZE passed to fd_set-based select backend", fd < FD_SETSIZE));
 
     /* FD_SET is broken on windows (it adds the fd to a set twice or more,
      * which eventually leads to overflows). Need to call it only on changes.
      */
-#endif
     #if EV_SELECT_IS_WINSOCKET
     if ((oev ^ nev) & EV_READ)
     #endif
