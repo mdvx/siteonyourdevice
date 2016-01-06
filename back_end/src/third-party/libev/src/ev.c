@@ -1561,6 +1561,7 @@ static EV_ATOMIC_T have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? 
 #endif
 
 #ifdef FASTO
+#ifdef OS_WIN
     #ifndef EV_FD_TO_WIN32_HANDLE
     # define EV_FD_TO_WIN32_HANDLE(fd) fd
     #endif
@@ -1570,6 +1571,17 @@ static EV_ATOMIC_T have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? 
     #ifndef EV_WIN32_CLOSE_FD
     # define EV_WIN32_CLOSE_FD(fd) closesocket (fd)
     #endif
+#else
+    #ifndef EV_FD_TO_WIN32_HANDLE
+    # define EV_FD_TO_WIN32_HANDLE(fd) _get_osfhandle (fd)
+    #endif
+    #ifndef EV_WIN32_HANDLE_TO_FD
+    # define EV_WIN32_HANDLE_TO_FD(handle) _open_osfhandle (handle, 0)
+    #endif
+    #ifndef EV_WIN32_CLOSE_FD
+    # define EV_WIN32_CLOSE_FD(fd) close (fd)
+    #endif
+#endif
 #else
     #ifndef EV_FD_TO_WIN32_HANDLE
     # define EV_FD_TO_WIN32_HANDLE(fd) _get_osfhandle (fd)
