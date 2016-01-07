@@ -31,7 +31,7 @@ namespace fasto
 
             UserAuthInfo InnerServerHandler::authInfo() const
             {
-                return UserAuthInfo(config_.login_, config_.password_, config_.local_host_);
+                return UserAuthInfo(config_.login, config_.password, config_.local_host);
             }
 
             void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_seq_type id, int argc, char *argv[])
@@ -81,13 +81,13 @@ namespace fasto
                             CHECK(server);
 
                             RelayClient *relayConnection = NULL;
-                            if(config_.server_type_ == EXTERNAL_SERVER){
-                                relayConnection = new RelayClientEx(server, rinfo, config_.external_host_);
+                            if(config_.server_type == EXTERNAL_SERVER){
+                                relayConnection = new RelayClientEx(server, rinfo, config_.external_host);
                             }
                             else{
                                 relayConnection = new RelayClient(server, rinfo);
                             }
-                            relayConnection->setIsAuthenticated(!config_.is_private_site_);
+                            relayConnection->setIsAuthenticated(!config_.is_private_site);
                             server->registerClient(relayConnection);
                         }
                         else{
@@ -129,7 +129,7 @@ namespace fasto
                                 return;
                             }
 
-                            if(config_.server_type_ == EXTERNAL_SERVER){
+                            if(config_.server_type == EXTERNAL_SERVER){
                                 tcp::ITcpLoop* server = connection->server();
                                 CHECK(server);
 
@@ -205,19 +205,19 @@ namespace fasto
                 }
                 else if(IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONFIG_COMMAND)){
                     json_object * config_json = json_object_new_object();
-                    const std::string local_host_str = common::convertToString(config_.local_host_);
+                    const std::string local_host_str = common::convertToString(config_.local_host);
                     json_object_object_add(config_json, LOCAL_HOST_SETTING_LABEL, json_object_new_string(local_host_str.c_str()));
                     //json_object_object_add(config_json, LOGIN_SETTING_LABEL, json_object_new_string(config_.login_.c_str()));
                     //json_object_object_add(config_json, PASSWORD_SETTING_LABEL, json_object_new_string(config_.password_.c_str()));
-                    json_object_object_add(config_json, CONTENT_PATH_SETTING_LABEL, json_object_new_string(config_.content_path_.c_str()));
-                    json_object_object_add(config_json, PRIVATE_SITE_SETTING_LABEL, json_object_new_boolean(config_.is_private_site_));
-                    const std::string external_host_str = common::convertToString(config_.external_host_);
+                    json_object_object_add(config_json, CONTENT_PATH_SETTING_LABEL, json_object_new_string(config_.content_path.c_str()));
+                    json_object_object_add(config_json, PRIVATE_SITE_SETTING_LABEL, json_object_new_boolean(config_.is_private_site));
+                    const std::string external_host_str = common::convertToString(config_.external_host);
                     json_object_object_add(config_json, EXTERNAL_HOST_SETTING_LABEL, json_object_new_string(external_host_str.c_str()));
-                    json_object_object_add(config_json, SERVER_TYPE_SETTING_LABEL, json_object_new_int(config_.server_type_));
+                    json_object_object_add(config_json, SERVER_TYPE_SETTING_LABEL, json_object_new_int(config_.server_type));
 
                     json_object* jhttp_urls = json_object_new_array();
-                    for(size_t i = 0; i < config_.handlers_urls_.size(); ++i){
-                        HttpConfig::handlers_urls_t url = config_.handlers_urls_[i];
+                    for(size_t i = 0; i < config_.handlers_urls.size(); ++i){
+                        HttpConfig::handlers_urls_t url = config_.handlers_urls[i];
                         json_object* jhttp_url = json_object_new_object();
                         json_object_object_add(jhttp_url, "url", json_object_new_string(url.first.c_str()));
                         json_object_object_add(jhttp_url, "handler", json_object_new_string(url.second.c_str()));
@@ -226,8 +226,8 @@ namespace fasto
                     json_object_object_add(config_json, HANDLERS_URLS_SECTION_LABEL, jhttp_urls);
 
                     json_object* jsockets_urls = json_object_new_array();
-                    for(size_t i = 0; i < config_.server_sockets_urls_.size(); ++i){
-                        HttpConfig::server_sockets_urls_t url = config_.server_sockets_urls_[i];
+                    for(size_t i = 0; i < config_.server_sockets_urls.size(); ++i){
+                        HttpConfig::server_sockets_urls_t url = config_.server_sockets_urls[i];
                         json_object* jsocket_url = json_object_new_object();
                         json_object_object_add(jsocket_url, "type", json_object_new_string(url.first.c_str()));
                         const std::string surl = url.second.get_url();

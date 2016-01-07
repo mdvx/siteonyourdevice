@@ -28,40 +28,40 @@ namespace
         #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
         if (MATCH(SERVER_SETTINGS_SECTION_LABEL, CONTENT_PATH_SETTING_LABEL)) {
             const std::string contentPath = value;
-            pconfig->content_path_ = common::file_system::stable_dir_path(contentPath);
+            pconfig->content_path = common::file_system::stable_dir_path(contentPath);
             return 1;
         }
         else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, LOCAL_HOST_SETTING_LABEL)) {
-            pconfig->local_host_ = common::convertFromString<common::net::hostAndPort>(value);
+            pconfig->local_host = common::convertFromString<common::net::hostAndPort>(value);
             return 1;
         }
         else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, LOGIN_SETTING_LABEL)) {
-            pconfig->login_ = value;
+            pconfig->login = value;
             return 1;
         }
         else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, PASSWORD_SETTING_LABEL)) {
-            pconfig->password_ = value;
+            pconfig->password = value;
             return 1;
         }
         else if(MATCH(SERVER_SETTINGS_SECTION_LABEL, PRIVATE_SITE_SETTING_LABEL)){
-            pconfig->is_private_site_ = atoi(value);
+            pconfig->is_private_site = atoi(value);
             return 1;
         }
         else if(MATCH(SERVER_SETTINGS_SECTION_LABEL, EXTERNAL_HOST_SETTING_LABEL)){
-            pconfig->external_host_ = common::convertFromString<common::net::hostAndPort>(value);
+            pconfig->external_host = common::convertFromString<common::net::hostAndPort>(value);
             return 1;
         }
         else if(MATCH(SERVER_SETTINGS_SECTION_LABEL, SERVER_TYPE_SETTING_LABEL)){
-            pconfig->server_type_ = (http_server_type)atoi(value);
+            pconfig->server_type = (http_server_type)atoi(value);
             return 1;
         }
         else if(strcmp(section, HANDLERS_URLS_SECTION_LABEL) == 0){
-            pconfig->handlers_urls_.push_back(std::make_pair(name, value));
+            pconfig->handlers_urls.push_back(std::make_pair(name, value));
             return 1;
         }
         else if(strcmp(section, SERVER_SOCKETS_SECTION_LABEL) == 0){
             common::uri::Uri uri = common::uri::Uri(value);
-            pconfig->server_sockets_urls_.push_back(std::make_pair(name, uri));
+            pconfig->server_sockets_urls.push_back(std::make_pair(name, uri));
             return 1;
         }
         else {
@@ -99,7 +99,7 @@ namespace fasto
                     return false;
                 }
 
-                return ainf.login_ == user && ainf.password_ == password;
+                return ainf.login == user && ainf.password == password;
             }
 
         private:
@@ -136,8 +136,8 @@ namespace fasto
                     handler->setAuthChecker(authChecker_);
 
                     // handler prepare
-                    for(size_t i = 0; i < config_.handlers_urls_.size(); ++i){
-                        HttpConfig::handlers_urls_t handurl = config_.handlers_urls_[i];
+                    for(size_t i = 0; i < config_.handlers_urls.size(); ++i){
+                        HttpConfig::handlers_urls_t handurl = config_.handlers_urls[i];
                         const std::string httpcallbackstr = handurl.second;
                         std::string httpcallback_ns = handurl.second;
                         std::string httpcallback_name;
@@ -153,8 +153,8 @@ namespace fasto
                         }
                     }
 
-                    for(size_t i = 0; i < config_.server_sockets_urls_.size(); ++i){
-                        HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls_[i];
+                    for(size_t i = 0; i < config_.server_sockets_urls.size(); ++i){
+                        HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls[i];
                         const common::uri::Uri url = sock_url.second;
                         handler->registerSocketUrl(url);
                     }
@@ -173,7 +173,7 @@ namespace fasto
                 LocalHttpServerController(const HttpConfig& config, const UserAuthInfo& ainfo)
                     : ServerControllerBase(config, ainfo)
                 {
-                    const std::string contentPath = config.content_path_;
+                    const std::string contentPath = config.content_path;
                     common::Error err = common::file_system::change_directory(contentPath);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
@@ -309,8 +309,8 @@ namespace fasto
                     return;
                 }
 
-                const http_server_type server_type = config_.server_type_;
-                const common::net::hostAndPort externalHost = config_.external_host_;
+                const http_server_type server_type = config_.server_type;
+                const common::net::hostAndPort externalHost = config_.external_host;
                 if(server_type == FASTO_SERVER){
                     server_ = new LocalHttpServerController(config_, authInfo());
                     server_->start();
@@ -343,7 +343,7 @@ namespace fasto
 
             UserAuthInfo NetworkController::authInfo() const
             {
-                return UserAuthInfo(config_.login_, config_.password_, config_.local_host_);
+                return UserAuthInfo(config_.login, config_.password, config_.local_host);
             }
 
             HttpConfig NetworkController::config() const
@@ -365,21 +365,21 @@ namespace fasto
                 }
 
                 configSave.write("[" SERVER_SETTINGS_SECTION_LABEL "]\n");
-                configSave.writeFormated(LOCAL_HOST_SETTING_LABEL "=%s\n", common::convertToString(config_.local_host_));
-                configSave.writeFormated(LOGIN_SETTING_LABEL "=%s\n", config_.login_);
-                configSave.writeFormated(PASSWORD_SETTING_LABEL "=%s\n", config_.password_);
-                configSave.writeFormated(CONTENT_PATH_SETTING_LABEL "=%s\n", config_.content_path_);
-                configSave.writeFormated(PRIVATE_SITE_SETTING_LABEL "=%u\n", config_.is_private_site_);
-                configSave.writeFormated(EXTERNAL_HOST_SETTING_LABEL "=%s\n", common::convertToString(config_.external_host_));
-                configSave.writeFormated(SERVER_TYPE_SETTING_LABEL "=%u\n", config_.server_type_);
+                configSave.writeFormated(LOCAL_HOST_SETTING_LABEL "=%s\n", common::convertToString(config_.local_host));
+                configSave.writeFormated(LOGIN_SETTING_LABEL "=%s\n", config_.login);
+                configSave.writeFormated(PASSWORD_SETTING_LABEL "=%s\n", config_.password);
+                configSave.writeFormated(CONTENT_PATH_SETTING_LABEL "=%s\n", config_.content_path);
+                configSave.writeFormated(PRIVATE_SITE_SETTING_LABEL "=%u\n", config_.is_private_site);
+                configSave.writeFormated(EXTERNAL_HOST_SETTING_LABEL "=%s\n", common::convertToString(config_.external_host));
+                configSave.writeFormated(SERVER_TYPE_SETTING_LABEL "=%u\n", config_.server_type);
                 configSave.write("[" HANDLERS_URLS_SECTION_LABEL "]\n");
-                for(size_t i = 0; i < config_.handlers_urls_.size(); ++i){
-                    HttpConfig::handlers_urls_t handurl = config_.handlers_urls_[i];
+                for(size_t i = 0; i < config_.handlers_urls.size(); ++i){
+                    HttpConfig::handlers_urls_t handurl = config_.handlers_urls[i];
                     configSave.writeFormated("%s=%s\n", handurl.first, handurl.second);
                 }
                 configSave.write("[" SERVER_SOCKETS_SECTION_LABEL "]\n");
-                for(size_t i = 0; i < config_.server_sockets_urls_.size(); ++i){
-                    HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls_[i];
+                for(size_t i = 0; i < config_.server_sockets_urls.size(); ++i){
+                    HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls[i];
                     const std::string url = sock_url.second.get_url();
                     configSave.writeFormated("%s=%s\n", sock_url.first, url);
                 }
@@ -397,13 +397,13 @@ namespace fasto
 
                 HttpConfig config;
                 //default settings
-                config.local_host_ = common::net::hostAndPort(USER_SPECIFIC_DEFAULT_DOMAIN, USER_SPECIFIC_DEFAULT_PORT);
-                config.content_path_ = fApp->appDir();
-                config.login_ = USER_SPECIFIC_DEFAULT_LOGIN;
-                config.password_ = USER_SPECIFIC_DEFAULT_PASSWORD;
-                config.is_private_site_ = USER_SPECIFIC_DEFAULT_PRIVATE_SITE;
-                config.external_host_ = common::net::hostAndPort("localhost", 80);
-                config.server_type_ = FASTO_SERVER;
+                config.local_host = common::net::hostAndPort(USER_SPECIFIC_DEFAULT_DOMAIN, USER_SPECIFIC_DEFAULT_PORT);
+                config.content_path = fApp->appDir();
+                config.login = USER_SPECIFIC_DEFAULT_LOGIN;
+                config.password = USER_SPECIFIC_DEFAULT_PASSWORD;
+                config.is_private_site = USER_SPECIFIC_DEFAULT_PRIVATE_SITE;
+                config.external_host = common::net::hostAndPort("localhost", 80);
+                config.server_type = FASTO_SERVER;
 
                 //try to parse settings file
                 if (ini_parse(path, ini_handler_fasto, &config) < 0) {

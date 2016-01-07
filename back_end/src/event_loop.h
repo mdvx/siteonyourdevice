@@ -1,3 +1,21 @@
+/*  Copyright (C) 2014-2016 FastoGT. All right reserved.
+
+    This file is part of SiteOnYourDevice.
+
+    SiteOnYourDevice is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SiteOnYourDevice is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SiteOnYourDevice.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #pragma once
 
 #include <ev.h>
@@ -6,50 +24,49 @@
 
 #include "common/thread/platform_thread.h"
 
-namespace fasto
-{
-    namespace siteonyourdevice
-    {
-        typedef std::function<void()> async_loop_exec_function_type;
+namespace fasto {
+namespace siteonyourdevice {
 
-        class EvLoopObserver
-        {
-        public:
-            virtual ~EvLoopObserver();
+typedef std::function<void()> async_loop_exec_function_type;
 
-            virtual void preLooped(class LibEvLoop* loop) = 0;
-            virtual void stoped(class LibEvLoop* loop) = 0;
-            virtual void postLooped(class LibEvLoop* loop) = 0;
-        };
+class EvLoopObserver {
+ public:
+  virtual ~EvLoopObserver();
 
-        class LibEvLoop
-        {
-        public:
-            LibEvLoop();
-            ~LibEvLoop();
+  virtual void preLooped(class LibEvLoop* loop) = 0;
+  virtual void stoped(class LibEvLoop* loop) = 0;
+  virtual void postLooped(class LibEvLoop* loop) = 0;
+};
 
-            void setObserver(EvLoopObserver* observer);
+class LibEvLoop {
+ public:
+  LibEvLoop();
+  ~LibEvLoop();
 
-            void start_io(ev_io *io);
-            void stop_io(ev_io *io);
+  void setObserver(EvLoopObserver* observer);
 
-            void start_timer(ev_timer * timer);
-            void stop_timer(ev_timer * timer);
+  void start_io(ev_io *io);
+  void stop_io(ev_io *io);
 
-            void execInLoopThread(async_loop_exec_function_type async_cb);
+  void start_timer(ev_timer * timer);
+  void stop_timer(ev_timer * timer);
 
-            int exec();
-            void stop();
+  void execInLoopThread(async_loop_exec_function_type async_cb);
 
-            bool isLoopThread() const;
+  int exec();
+  void stop();
 
-        private:
-            static void stop_cb(struct ev_loop* loop, struct ev_async* watcher, int revents);
+  bool isLoopThread() const;
 
-            struct ev_loop * const loop_;
-            EvLoopObserver * observer_;
-            common::thread::platform_threadid_type exec_id_;
-            ev_async * async_stop_;
-        };
-    }
-}
+ private:
+  static void stop_cb(struct ev_loop* loop,
+                      struct ev_async* watcher, int revents);
+
+  struct ev_loop * const loop_;
+  EvLoopObserver * observer_;
+  common::thread::platform_threadid_type exec_id_;
+  ev_async * async_stop_;
+};
+
+}  // namespace siteonyourdevice
+}  // namespace fasto

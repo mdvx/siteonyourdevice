@@ -25,7 +25,7 @@ namespace fasto
             }
 
             Http2InnerServer::Http2InnerServer(tcp::ITcpLoopObserver * observer, const HttpConfig& config)
-                : Http2Server(config.local_host_, observer), config_(config)
+                : Http2Server(config.local_host, observer), config_(config)
             {
 
             }
@@ -38,7 +38,7 @@ namespace fasto
             tcp::TcpClient * Http2InnerServer::createClient(const common::net::socket_info &info)
             {
                 http::Http2Client *cl = new http::Http2Client(this, info);
-                cl->setIsAuthenticated(!config_.is_private_site_);
+                cl->setIsAuthenticated(!config_.is_private_site);
                 return cl;
             }
         }

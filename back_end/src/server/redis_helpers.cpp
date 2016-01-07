@@ -56,7 +56,7 @@ namespace fasto
                     json_object* jpass = NULL;
                     json_object_object_get_ex(obj, "password", &jpass);
                     if(jpass){
-                        info.password_ = json_object_get_string(jpass);
+                        info.password = json_object_get_string(jpass);
                     }
 
                     json_object* jhosts = NULL;
@@ -70,7 +70,7 @@ namespace fasto
                         }
                     }
 
-                    info.login_ = login;
+                    info.login = login;
 
                     json_object_put(obj);
                     return true;
@@ -99,7 +99,7 @@ namespace fasto
                     return false;
                 }
 
-                const std::string login = user.login_;
+                const std::string login = user.login;
                 redisReply* reply = (redisReply*)redisCommand(redis, GET_USER_1S, login.c_str());
                 if(!reply){
                     redisFree(redis);
@@ -111,7 +111,7 @@ namespace fasto
                 hosts_names_t hosts;
                 if(parse_user_json(login, userJson, info, hosts)){
                     for(int j = 0; j < hosts.size(); ++j){
-                        if(hosts[j] == user.host_.host_ && user.password_ == info.password_){
+                        if(hosts[j] == user.host.host_ && user.password == info.password){
                             freeReplyObject(reply);
                             redisFree(redis);
                             return true;

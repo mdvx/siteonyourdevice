@@ -2,8 +2,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
 ###################### Branding ##########################
 
 SET(BRANDING_PROJECT_NAME "SiteOnYourDevice" CACHE STRING "Branding for ${BRANDING_PROJECT_NAME}") #default
-SET(BRANDING_PROJECT_VERSION "0.3.0.0" CACHE STRING "Branding version for ${BRANDING_PROJECT_NAME}") #default
-SET(BRANDING_PROJECT_BUILD_TYPE_VERSION "release" CACHE STRING "Build version type for ${BRANDING_PROJECT_NAME}") #default
+SET(BRANDING_PROJECT_VERSION "0.4.0.0" CACHE STRING "Branding version for ${BRANDING_PROJECT_NAME}") #default
+SET(BRANDING_PROJECT_BUILD_TYPE_VERSION "alfa" CACHE STRING "Build version type for ${BRANDING_PROJECT_NAME}") #default
     #posible variables: alfa, beta, rc, release
 
 SET(BRANDING_PROJECT_DOMAIN "http://www.siteonyourdevice.com" CACHE STRING "Branding domain url for ${BRANDING_PROJECT_NAME}") #default
@@ -22,7 +22,7 @@ SET(BRANDING_PROJECT_GITHUB_LINK "https://www.github.com/fastogt/siteonyourdevic
 
 SET(BRANDING_PROJECT_BREF_DESCRIPTION "Cross-platform open source http server."
     CACHE STRING "Bref description for ${BRANDING_PROJECT_NAME}")
-SET(BRANDING_PROJECT_COPYRIGHT "Copyright (C) 2014-2016 ${BRANDING_PROJECT_COMPANYNAME} All Rights Reserved."
+SET(BRANDING_PROJECT_COPYRIGHT "Copyright (C) 2014-2016 ${BRANDING_PROJECT_COMPANYNAME}. All Rights Reserved."
     CACHE STRING "Copyright notice for ${BRANDING_PROJECT_NAME}") #default
 SET(BRANDING_PROJECT_CHANGELOG_FILE changelog.txt
     CACHE STRING "Branding for changelog file ${BRANDING_PROJECT_NAME}

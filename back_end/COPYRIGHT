@@ -1,11 +1,11 @@
-FastoRemote, cross-platform remote http server.
+SiteOnYourDevice, cross-platform remote http server.
 
-Copyright 2015, FastoGT.
+Copyright (C) 2014-2016 FastoGT. All right reserved.
 
-The FastoRemote is released under the terms of the GNU General Public
+The SiteOnYourDevice is released under the terms of the GNU General Public
 License, version 3.
 
-The FastoRedis Project includes files written by third parties
+The SiteOnYourDevice Project includes files written by third parties
 and used with permission or subject to their respective license
 agreements.
 

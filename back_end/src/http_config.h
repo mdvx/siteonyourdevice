@@ -1,4 +1,26 @@
+/*  Copyright (C) 2014-2016 FastoGT. All right reserved.
+
+    This file is part of SiteOnYourDevice.
+
+    SiteOnYourDevice is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SiteOnYourDevice is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SiteOnYourDevice.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #pragma once
+
+#include <utility>
+#include <vector>
+#include <string>
 
 #include "common/net/types.h"
 #include "common/url.h"
@@ -21,32 +43,28 @@
 
 #define SERVER_SOCKETS_SECTION_LABEL "http_server_sockets"
 
-namespace fasto
-{
-    namespace siteonyourdevice
-    {
-        enum http_server_type
-        {
-            FASTO_SERVER = 0,
-            EXTERNAL_SERVER = 1
-        };
+namespace fasto {
+namespace siteonyourdevice {
+enum http_server_type {
+  FASTO_SERVER = 0,
+  EXTERNAL_SERVER = 1
+};
 
-        struct HttpConfig
-        {
-            std::string content_path_;
-            common::net::hostAndPort local_host_;
-            std::string login_;
-            std::string password_;
-            bool is_private_site_;
+struct HttpConfig {
+  std::string content_path;
+  common::net::hostAndPort local_host;
+  std::string login;
+  std::string password;
+  bool is_private_site;
 
-            common::net::hostAndPort external_host_;
-            http_server_type server_type_;
+  common::net::hostAndPort external_host;
+  http_server_type server_type;
 
-            typedef std::pair<std::string, std::string>  handlers_urls_t;
-            std::vector<handlers_urls_t> handlers_urls_;
+  typedef std::pair<std::string, std::string>  handlers_urls_t;
+  std::vector<handlers_urls_t> handlers_urls;
 
-            typedef std::pair<std::string, common::uri::Uri> server_sockets_urls_t;
-            std::vector<server_sockets_urls_t> server_sockets_urls_;
-        };
-    }
-}
+  typedef std::pair<std::string, common::uri::Uri> server_sockets_urls_t;
+  std::vector<server_sockets_urls_t> server_sockets_urls;
+};
+}  // namespace siteonyourdevice
+}  // namespace fasto

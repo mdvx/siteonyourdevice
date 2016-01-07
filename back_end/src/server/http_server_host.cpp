@@ -204,7 +204,7 @@ namespace fasto
                     return false;
                 }
 
-                const std::string host = hinf.host_.host_;
+                const std::string host = hinf.host.host_;
                 connections_.erase(host);
                 return true;
             }
@@ -219,7 +219,7 @@ namespace fasto
 
                 iconnection->setServerHostInfo(user);
 
-                const std::string host = user.host_.host_;
+                const std::string host = user.host.host_;
                 connections_[host] = iconnection;
                 return true;
             }

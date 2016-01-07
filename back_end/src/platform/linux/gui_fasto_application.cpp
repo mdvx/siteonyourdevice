@@ -261,19 +261,19 @@ namespace fasto
             {
                 HttpConfig cur_config = controller_->config();
 
-                const std::string loc_host = cur_config.local_host_.host_;
+                const std::string loc_host = cur_config.local_host.host_;
                 gtk_entry_set_text(GTK_ENTRY(domain_text_), loc_host.c_str());
-                const std::string loc_portstr = common::convertToString(cur_config.local_host_.port_);
+                const std::string loc_portstr = common::convertToString(cur_config.local_host.port_);
                 gtk_entry_set_text(GTK_ENTRY(port_text_), loc_portstr.c_str());
-                gtk_entry_set_text(GTK_ENTRY(login_text_), cur_config.login_.c_str());
-                gtk_entry_set_text(GTK_ENTRY(password_text_), cur_config.password_.c_str());
-                gtk_entry_set_text(GTK_ENTRY(content_path_text_), cur_config.content_path_.c_str());
-                gtk_toggle_button_set_state(GTK_TOGGLE_BUTTON(is_private_site_), cur_config.is_private_site_);
-                gtk_toggle_button_set_state(GTK_TOGGLE_BUTTON(is_external_domain_), cur_config.server_type_ ==  EXTERNAL_SERVER);
+                gtk_entry_set_text(GTK_ENTRY(login_text_), cur_config.login.c_str());
+                gtk_entry_set_text(GTK_ENTRY(password_text_), cur_config.password.c_str());
+                gtk_entry_set_text(GTK_ENTRY(content_path_text_), cur_config.content_path.c_str());
+                gtk_toggle_button_set_state(GTK_TOGGLE_BUTTON(is_private_site_), cur_config.is_private_site);
+                gtk_toggle_button_set_state(GTK_TOGGLE_BUTTON(is_external_domain_), cur_config.server_type ==  EXTERNAL_SERVER);
 
-                const std::string ex_host = cur_config.external_host_.host_;
+                const std::string ex_host = cur_config.external_host.host_;
                 gtk_entry_set_text(GTK_ENTRY(external_host_), ex_host.c_str());
-                const std::string exportstr = common::convertToString(cur_config.external_host_.port_);
+                const std::string exportstr = common::convertToString(cur_config.external_host.port_);
                 gtk_entry_set_text(GTK_ENTRY(external_port_), exportstr.c_str());
 
                 gtk_widget_show_all(window_);
@@ -285,17 +285,17 @@ namespace fasto
 
                 const std::string loc_host = gtk_entry_get_text(GTK_ENTRY(domain_text_));
                 const uint16_t loc_port = common::convertFromString<uint16_t>(gtk_entry_get_text(GTK_ENTRY(port_text_)));
-                old_config.local_host_ = common::net::hostAndPort(loc_host, loc_port);
+                old_config.local_host = common::net::hostAndPort(loc_host, loc_port);
 
-                old_config.login_ = gtk_entry_get_text(GTK_ENTRY(login_text_));
-                old_config.password_ = gtk_entry_get_text(GTK_ENTRY(password_text_));
-                old_config.content_path_ = gtk_entry_get_text(GTK_ENTRY(content_path_text_));
-                old_config.is_private_site_ = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(is_private_site_));
-                old_config.server_type_ = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(is_external_domain_)) ? EXTERNAL_SERVER : FASTO_SERVER;
+                old_config.login = gtk_entry_get_text(GTK_ENTRY(login_text_));
+                old_config.password = gtk_entry_get_text(GTK_ENTRY(password_text_));
+                old_config.content_path = gtk_entry_get_text(GTK_ENTRY(content_path_text_));
+                old_config.is_private_site = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(is_private_site_));
+                old_config.server_type = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(is_external_domain_)) ? EXTERNAL_SERVER : FASTO_SERVER;
 
                 const std::string exhoststr = gtk_entry_get_text(GTK_ENTRY(external_host_));
                 const uint16_t ex_port = common::convertFromString<uint16_t>(gtk_entry_get_text(GTK_ENTRY(external_port_)));
-                old_config.external_host_ = common::net::hostAndPort(exhoststr, ex_port);
+                old_config.external_host = common::net::hostAndPort(exhoststr, ex_port);
                 GuiNetworkEventHandler::onConnectClicked(old_config);
             }
 

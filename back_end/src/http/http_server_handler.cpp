@@ -79,7 +79,7 @@ namespace fasto
 
             void HttpServerHandler::preLooped(tcp::ITcpLoop *server)
             {
-                for(int i = 0; i < sockets_urls_.size(); ++i){
+                for(size_t i = 0; i < sockets_urls_.size(); ++i){
                     socket_url_t url = sockets_urls_[i];
                     CHECK(url.second == NULL);
 
@@ -96,8 +96,12 @@ namespace fasto
 
             void HttpServerHandler::postLooped(tcp::ITcpLoop *server)
             {
-                for(int i = 0; i < sockets_urls_.size(); ++i){
+                for(size_t i = 0; i < sockets_urls_.size(); ++i){
                     socket_url_t url = sockets_urls_[i];
+
+                    if(!url.second){
+                        continue;
+                    }
 
                     url.second->stop();
                     delete url.second;

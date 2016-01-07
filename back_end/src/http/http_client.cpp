@@ -60,7 +60,7 @@ namespace fasto
                         "<hr>\n\
                         <address><a href=\"%s\">%s</a></address>\n\
                         </body>\n\
-                        </html>\n", status, title, status, title, text, info.serverUrl_, info.serverName_);
+                        </html>\n", status, title, status, title, text, info.server_url, info.server_name);
                 common::Error err = send_headers(protocol, status, extra_header, "text/html", &err_len, NULL, is_keep_alive, info);
                 if(err && err->isError()){
                     DEBUG_MSG_ERROR(err);
@@ -92,7 +92,7 @@ namespace fasto
                 char header_data[1024] = {0};
                 int cur_pos = common::SPrintf(header_data,
                                               protocol == common::http::HP_2_0 ? HTTP_2_0_PROTOCOL_NAME " %d %s\r\nServer: %s\r\nDate: %s\r\n" : HTTP_1_1_PROTOCOL_NAME " %d %s\r\nServer: %s\r\nDate: %s\r\n",
-                                              status, title, info.serverName_, timebuf);
+                                              status, title, info.server_name, timebuf);
 
                 if (extra_header){
                     int exlen = common::SPrintf(header_data + cur_pos, "%s\r\n", extra_header);
@@ -166,7 +166,7 @@ namespace fasto
                             "<hr>\n\
                             <address><a href=\"%s\">%s</a></address>\n\
                             </body>\n\
-                            </html>\n", status, title, status, title, text, info.serverUrl_, info.serverName_);
+                            </html>\n", status, title, status, title, text, info.server_url, info.server_name);
                     common::Error err = send_headers(protocol, status, extra_header, "text/html", &err_len, NULL, is_keep_alive, info);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
@@ -271,7 +271,7 @@ namespace fasto
 
                     common::http2::http2_nv nvserver;
                     nvserver.name = MAKE_BUFFER_TYPE("server");
-                    nvserver.value = common::convertToBytes(info.serverName_);
+                    nvserver.value = common::convertToBytes(info.server_name);
                     nvs.push_back(nvserver);
 
                     /*http2::http2_nv nvenc;

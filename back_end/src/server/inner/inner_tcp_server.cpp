@@ -199,7 +199,7 @@ namespace fasto
                         InnerTcpClient * iconnection = dynamic_cast<InnerTcpClient *>(client);
                         if(iconnection){
                             UserAuthInfo hinf = iconnection->serverHostInfo();
-                            const std::string hoststr = hinf.host_.host_;
+                            const std::string hoststr = hinf.host.host_;
                             const std::string connected_resp = common::MemSPrintf(SERVER_NOTIFY_CLIENT_DISCONNECTED_1S, hoststr);
                             bool res = sub_commands_in_->publish_clients_state(connected_resp);
                             if(!res){
@@ -297,12 +297,12 @@ namespace fasto
 
                                 MD5_CTX ctx;
                                 MD5_Init(&ctx);
-                                const char * passwordstr = uauth.password_.c_str();
-                                unsigned long len = uauth.password_.size();
+                                const char * passwordstr = uauth.password.c_str();
+                                unsigned long len = uauth.password.size();
                                 MD5_Update(&ctx, passwordstr, len);
                                 unsigned char digest[16];
                                 MD5_Final(digest, &ctx);
-                                uauth.password_ = common::HexEncode(digest, sizeof(digest), true);
+                                uauth.password = common::HexEncode(digest, sizeof(digest), true);
 
                                 bool isOk = parent_->findUser(uauth);
                                 if(!isOk){
@@ -311,7 +311,7 @@ namespace fasto
                                     goto fail;
                                 }
 
-                                const std::string hoststr = uauth.host_.host_;
+                                const std::string hoststr = uauth.host.host_;
                                 InnerTcpClient* fclient = parent_->findInnerConnectionByHost(hoststr);
                                 if(fclient){
                                     const cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_DOUBLE_CONNECTION_HOST);
