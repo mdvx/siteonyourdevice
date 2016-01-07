@@ -115,19 +115,19 @@ namespace fasto
 
                 HttpConfig cur_config = controller_->config();
 
-                const std::string loc_host = cur_config.local_host_.host_;
+                const std::string loc_host = cur_config.local_host.host_;
                 SetWindowText(hwndDomainTextBox_, loc_host.c_str());
-                const std::string loc_port = common::convertToString(cur_config.local_host_.port_);
+                const std::string loc_port = common::convertToString(cur_config.local_host.port_);
                 SetWindowText(hwndPortTextBox_, loc_port.c_str());
-                SetWindowText(hwndLoginTextBox_, cur_config.login_.c_str());
-                SetWindowText(hwndPasswordTextBox_, cur_config.password_.c_str());
-                SetWindowText(hwndContentPathTextBox_, cur_config.content_path_.c_str());
+                SetWindowText(hwndLoginTextBox_, cur_config.login.c_str());
+                SetWindowText(hwndPasswordTextBox_, cur_config.password.c_str());
+                SetWindowText(hwndContentPathTextBox_, cur_config.content_path.c_str());
 
-                setExternalChekboxState(cur_config.server_type_ == EXTERNAL_SERVER ? BST_CHECKED : BST_UNCHECKED);
-                SendMessage(hwndIsPrivateSiteCheckbox_, BM_SETCHECK, cur_config.is_private_site_ ? BST_CHECKED : BST_UNCHECKED, 0);
-                const std::string ex_host = cur_config.external_host_.host_;
+                setExternalChekboxState(cur_config.server_type == EXTERNAL_SERVER ? BST_CHECKED : BST_UNCHECKED);
+                SendMessage(hwndIsPrivateSiteCheckbox_, BM_SETCHECK, cur_config.is_private_site ? BST_CHECKED : BST_UNCHECKED, 0);
+                const std::string ex_host = cur_config.external_host.host_;
                 SetWindowText(hwndExternalHostTextBox_, ex_host.c_str());
-                const std::string ex_portstr = common::convertToString(cur_config.external_host_.port_);
+                const std::string ex_portstr = common::convertToString(cur_config.external_host.port_);
                 SetWindowText(hwndExternalPortTextBox_, ex_portstr.c_str());
             }
 
@@ -544,22 +544,22 @@ namespace fasto
                 GetWindowText(hwndPortTextBox_, lbl, sizeof(lbl));
                 uint16_t loc_port = common::convertFromString<uint16_t>(lbl);
 
-                old_config.local_host_ = common::net::hostAndPort(loc_host, loc_port);
+                old_config.local_host = common::net::hostAndPort(loc_host, loc_port);
 
                 GetWindowText(hwndLoginTextBox_, lbl, sizeof(lbl));
-                old_config.login_ = lbl;
+                old_config.login = lbl;
 
                 GetWindowText(hwndPasswordTextBox_, lbl, sizeof(lbl));
-                old_config.password_ = lbl;
+                old_config.password = lbl;
 
                 GetWindowText(hwndContentPathTextBox_, lbl, sizeof(lbl));
-                old_config.content_path_ = lbl;
+                old_config.content_path = lbl;
 
                 LRESULT res = SendMessage(hwndExternalServerCheckbox_, BM_GETCHECK, 0, 0);
-                old_config.server_type_ = res == BST_CHECKED ? EXTERNAL_SERVER : FASTO_SERVER;
+                old_config.server_type = res == BST_CHECKED ? EXTERNAL_SERVER : FASTO_SERVER;
 
                 res = SendMessage(hwndIsPrivateSiteCheckbox_, BM_GETCHECK, 0, 0);
-                old_config.is_private_site_ = res == BST_CHECKED;
+                old_config.is_private_site = res == BST_CHECKED;
 
                 GetWindowText(hwndExternalHostTextBox_, lbl, sizeof(lbl));
                 std::string ex_host = lbl;
@@ -567,7 +567,7 @@ namespace fasto
                 GetWindowText(hwndExternalPortTextBox_, lbl, sizeof(lbl));
                 uint16_t ex_port = common::convertFromString<uint16_t>(lbl);
 
-                old_config.external_host_ = common::net::hostAndPort(ex_host, ex_port);
+                old_config.external_host = common::net::hostAndPort(ex_host, ex_port);
 
                 GuiNetworkEventHandler::onConnectClicked(old_config);
             }
