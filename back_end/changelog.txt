@@ -1,4 +1,4 @@
-0.3.0 / January 7, 2015
+0.3.0 / January 7, 2016
 [Alexandr Topilski]
 - [server] Ping inner clients every 60 sec
 - [client] Ping server every 30 sec
