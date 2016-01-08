@@ -1,65 +1,79 @@
+/*  Copyright (C) 2014-2016 FastoGT. All right reserved.
+
+    This file is part of SiteOnYourDevice.
+
+    SiteOnYourDevice is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SiteOnYourDevice is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SiteOnYourDevice.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #pragma once
+
+#include <string>
 
 #include "common/net/types.h"
 
 #include "infos.h"
 
-namespace fasto
-{
-    namespace siteonyourdevice
-    {
-        namespace server
-        {
-            struct redis_configuration_t
-            {
-                common::net::hostAndPort redisHost_;
-                std::string redisUnixSock_;
-            };
+namespace fasto {
+namespace siteonyourdevice {
+namespace server {
 
-            struct redis_sub_configuration_t
-                    : public redis_configuration_t
-            {
-                std::string channel_in_;
-                std::string channel_out_;
-                std::string channel_clients_state_;
-            };
+struct redis_configuration_t {
+    common::net::hostAndPort redis_host;
+    std::string redis_unix_socket;
+};
 
-            class RedisStorage
-            {
-            public:
-                RedisStorage();
-                void setConfig(const redis_configuration_t& config);
+struct redis_sub_configuration_t
+        : public redis_configuration_t {
+    std::string channel_in;
+    std::string channel_out;
+    std::string channel_clients_state;
+};
 
-                bool findUser(const UserAuthInfo& user) const WARN_UNUSED_RESULT;
+class RedisStorage {
+ public:
+  RedisStorage();
+  void setConfig(const redis_configuration_t& config);
 
-            private:
-                redis_configuration_t config_;
-            };
+  bool findUser(const UserAuthInfo& user) const WARN_UNUSED_RESULT;
 
-            class RedisSubHandler
-            {
-            public:
-                virtual void handleMessage(char* channel, size_t channel_len, char* msg, size_t msg_len) = 0;
-            };
+ private:
+  redis_configuration_t config_;
+};
 
-            class RedisSub
-            {
-            public:
-                RedisSub(RedisSubHandler * handler);
+class RedisSubHandler {
+ public:
+  virtual void handleMessage(char* channel, size_t channel_len, char* msg, size_t msg_len) = 0;
+};
 
-                void setConfig(const redis_sub_configuration_t& config);
-                void listen();
-                void stop();
+class RedisSub {
+ public:
+  explicit RedisSub(RedisSubHandler * handler);
 
-                bool publish_clients_state(const std::string& msg) WARN_UNUSED_RESULT;
-                bool publish_command_out(const char* msg, size_t msg_len) WARN_UNUSED_RESULT;
-                bool publish(const char* chn, size_t chn_len, const char* msg, size_t msg_len) WARN_UNUSED_RESULT;
+  void setConfig(const redis_sub_configuration_t& config);
+  void listen();
+  void stop();
 
-            private:
-                RedisSubHandler * const handler_;
-                redis_sub_configuration_t config_;
-                bool stop_;
-            };
-        }
-    }
-}
+  bool publish_clients_state(const std::string& msg) WARN_UNUSED_RESULT;
+  bool publish_command_out(const char* msg, size_t msg_len) WARN_UNUSED_RESULT;
+  bool publish(const char* chn, size_t chn_len, const char* msg, size_t msg_len) WARN_UNUSED_RESULT;
+
+ private:
+  RedisSubHandler * const handler_;
+  redis_sub_configuration_t config_;
+  bool stop_;
+};
+
+}  // namespace server
+}  // namespace siteonyourdevice
+}  // namespace fasto

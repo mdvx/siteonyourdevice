@@ -77,4 +77,6 @@ Compare with standard internet domains:
   ```
   After that all connection to domain available only after passing phase of authentication.
 
-// cpplint --linelength=100 --filter=-build/header_guard
+
+**Style**<br/>
+cpplint --linelength=100 --filter=-build/header_guard

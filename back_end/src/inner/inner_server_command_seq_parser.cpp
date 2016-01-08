@@ -89,7 +89,7 @@ namespace fasto
                 if (!end) {
                     DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN SEQUENCE: %s", buff);
                     const cmd_responce_t resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
-                    common::Error err = connection->write(resp, nwrite);
+                    common::Error err = connection->write(resp, &nwrite);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                     }
@@ -105,7 +105,7 @@ namespace fasto
                 if (*star_seq != ' ') {
                     DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "PROBLEM EXTRACTING SEQUENCE: %s", buff);
                     const cmd_responce_t resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
-                    common::Error err = connection->write(resp, nwrite);
+                    common::Error err = connection->write(resp, &nwrite);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                     }
@@ -118,7 +118,7 @@ namespace fasto
                 if (!id_ptr) {
                     DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "PROBLEM EXTRACTING ID: %s", buff);
                     const cmd_responce_t resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
-                    common::Error err = connection->write(resp, nwrite);
+                    common::Error err = connection->write(resp, &nwrite);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                     }
@@ -137,7 +137,7 @@ namespace fasto
                 if (argv == NULL) {
                     DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "PROBLEM PARSING INNER COMMAND: %s", buff);
                     const cmd_responce_t resp = make_responce(id, STATE_COMMAND_RESP_FAIL_1S, buff);
-                    common::Error err = connection->write(resp, nwrite);
+                    common::Error err = connection->write(resp, &nwrite);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                     }

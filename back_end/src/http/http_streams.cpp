@@ -36,7 +36,7 @@ namespace fasto
             common::ErrnoError IStream::sendData(const common::buffer_type& buff)
             {
                 ssize_t nwrite = 0;
-                return sock_.write((const char*)buff.data(), buff.size(), nwrite);
+                return sock_.write((const char*)buff.data(), buff.size(), &nwrite);
             }
 
             common::ErrnoError IStream::sendFrame(const common::http2::frame_base& frame)

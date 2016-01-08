@@ -86,7 +86,7 @@ namespace fasto
                     const cmd_request_t ping_request = make_request(PING_COMMAND_REQ);
                     ssize_t nwrite = 0;
                     InnerClient* client = innerConnection_;
-                    common::Error err = client->write(ping_request, nwrite);
+                    common::Error err = client->write(ping_request, &nwrite);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                         client->close();
@@ -99,7 +99,7 @@ namespace fasto
             {
                 char buff[MAX_COMMAND_SIZE] = {0};
                 ssize_t nread = 0;
-                common::Error err = iclient->read(buff, MAX_COMMAND_SIZE, nread);
+                common::Error err = iclient->read(buff, MAX_COMMAND_SIZE, &nread);
                 if((err && err->isError()) || nread == 0){
                     DEBUG_MSG_ERROR(err);
                     iclient->close();
@@ -114,7 +114,7 @@ namespace fasto
             {
                 char buff[BUF_SIZE] = {0};
                 ssize_t nread = 0;
-                common::Error err = rclient->read(buff, BUF_SIZE, nread);
+                common::Error err = rclient->read(buff, BUF_SIZE, &nread);
                 if((err && err->isError()) || nread == 0){
                     rclient->close();
                     delete rclient;
@@ -128,7 +128,7 @@ namespace fasto
             {
                 char buff[BUF_SIZE] = {0};
                 ssize_t nread = 0;
-                common::Error err = rclient->read(buff, BUF_SIZE, nread);
+                common::Error err = rclient->read(buff, BUF_SIZE, &nread);
                 if((err && err->isError()) || nread == 0){
                     rclient->close();
                     delete rclient;
@@ -169,7 +169,7 @@ namespace fasto
                     CHECK(eclient);
 
                     ssize_t nwrite = 0;
-                    err = eclient->write(buff, nread, nwrite);
+                    err = eclient->write(buff, nread, &nwrite);
                     if(err && err->isError()){
                         DEBUG_MSG_ERROR(err);
                         const std::string error_text = err->description();
@@ -192,7 +192,7 @@ namespace fasto
             {
                 char buff[BUF_SIZE] = {0};
                 ssize_t nread = 0;
-                common::Error err = prclient->read(buff, BUF_SIZE, nread);
+                common::Error err = prclient->read(buff, BUF_SIZE, &nread);
                 if((err && err->isError()) || nread == 0){
                     prclient->close();
                     delete prclient;
@@ -201,7 +201,7 @@ namespace fasto
 
                 RelayClient * rclient = prclient->relay();
                 ssize_t nwrite = 0;
-                err = rclient->TcpClient::write(buff, nread, nwrite);
+                err = rclient->TcpClient::write(buff, nread, &nwrite);
                 if(err && err->isError()){
                     DEBUG_MSG_ERROR(err);
                 }

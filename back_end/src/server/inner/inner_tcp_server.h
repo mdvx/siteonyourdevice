@@ -1,3 +1,21 @@
+/*  Copyright (C) 2014-2016 FastoGT. All right reserved.
+
+    This file is part of SiteOnYourDevice.
+
+    SiteOnYourDevice is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SiteOnYourDevice is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SiteOnYourDevice.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #pragma once
 
 #include "common/thread/thread.h"
@@ -10,68 +28,66 @@
 
 #include "infos.h"
 
-namespace fasto
-{
-    namespace siteonyourdevice
-    {
-        namespace server
-        {
-            class HttpServerHost;
+namespace fasto {
+namespace siteonyourdevice {
+namespace server {
+class HttpServerHost;
+namespace inner {
 
-            namespace inner
-            {
-                class InnerServerHandlerHost
-                        : public fasto::siteonyourdevice::inner::InnerServerCommandSeqParser, public tcp::ITcpLoopObserver
-                {
-                public:
-                    enum
-                    {
-                        ping_timeout_clients = 60 //sec
-                    };
+class InnerServerHandlerHost
+        : public fasto::siteonyourdevice::inner::InnerServerCommandSeqParser,
+        public tcp::ITcpLoopObserver {
+ public:
+  enum {
+    ping_timeout_clients = 60  // sec
+  };
 
-                    InnerServerHandlerHost(HttpServerHost * parent);
+  explicit InnerServerHandlerHost(HttpServerHost * parent);
 
-                    virtual void preLooped(tcp::ITcpLoop* server);
+  virtual void preLooped(tcp::ITcpLoop* server);
 
-                    virtual void accepted(tcp::TcpClient* client);
-                    virtual void moved(tcp::TcpClient* client);
-                    virtual void closed(tcp::TcpClient* client);
+  virtual void accepted(tcp::TcpClient* client);
+  virtual void moved(tcp::TcpClient* client);
+  virtual void closed(tcp::TcpClient* client);
 
-                    virtual void dataReceived(tcp::TcpClient* client);
-                    virtual void dataReadyToWrite(tcp::TcpClient* client);
-                    virtual void postLooped(tcp::ITcpLoop* server);
-                    virtual void timerEmited(tcp::ITcpLoop* server, timer_id_type id);
+  virtual void dataReceived(tcp::TcpClient* client);
+  virtual void dataReadyToWrite(tcp::TcpClient* client);
+  virtual void postLooped(tcp::ITcpLoop* server);
+  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_type id);
 
-                    virtual ~InnerServerHandlerHost();
+  virtual ~InnerServerHandlerHost();
 
-                    void setStorageConfig(const redis_sub_configuration_t &config);
+  void setStorageConfig(const redis_sub_configuration_t &config);
 
-                private:
-                    virtual void handleInnerRequestCommand(fasto::siteonyourdevice::inner::InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
-                    virtual void handleInnerResponceCommand(fasto::siteonyourdevice::inner::InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
-                    virtual void handleInnerApproveCommand(fasto::siteonyourdevice::inner::InnerClient *connection, cmd_seq_type id, int argc, char *argv[]);
+ private:
+  virtual void handleInnerRequestCommand(siteonyourdevice::inner::InnerClient *connection,
+                                         cmd_seq_type id, int argc, char *argv[]);
+  virtual void handleInnerResponceCommand(siteonyourdevice::inner::InnerClient *connection,
+                                          cmd_seq_type id, int argc, char *argv[]);
+  virtual void handleInnerApproveCommand(siteonyourdevice::inner::InnerClient *connection,
+                                         cmd_seq_type id, int argc, char *argv[]);
 
-                    HttpServerHost* const parent_;
+  HttpServerHost* const parent_;
 
-                    class InnerSubHandler;
-                    RedisSub *sub_commands_in_;
-                    InnerSubHandler *handler_;
-                    std::shared_ptr<common::thread::Thread<void> > redis_subscribe_command_in_thread_;
-                    timer_id_type ping_client_id_timer_;
-                };
+  class InnerSubHandler;
+  RedisSub *sub_commands_in_;
+  InnerSubHandler *handler_;
+  std::shared_ptr<common::thread::Thread<void> > redis_subscribe_command_in_thread_;
+  timer_id_type ping_client_id_timer_;
+};
 
-                class InnerTcpServer
-                        : public tcp::TcpServer
-                {
-                public:
-                    InnerTcpServer(const common::net::hostAndPort& host, tcp::ITcpLoopObserver* observer);
+class InnerTcpServer
+        : public tcp::TcpServer {
+ public:
+  InnerTcpServer(const common::net::hostAndPort& host, tcp::ITcpLoopObserver* observer);
 
-                    virtual const char* className() const;
+  virtual const char* className() const;
 
-                private:
-                    virtual tcp::TcpClient * createClient(const common::net::socket_info& info);
-                };
-            }
-        }
-    }
-}
+ private:
+  virtual tcp::TcpClient * createClient(const common::net::socket_info& info);
+};
+
+}  // namespace inner
+}  // namespace server
+}  // namespace siteonyourdevice
+}  // namespace fasto

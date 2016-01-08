@@ -67,7 +67,7 @@ namespace fasto
                 }
 
                 ssize_t nwrite = 0;
-                err = write(err_data, err_len, nwrite);
+                err = write(err_data, err_len, &nwrite);
                 if(err && err->isError()){
                     DEBUG_MSG_ERROR(err);
                 }
@@ -127,7 +127,7 @@ namespace fasto
 
                 DCHECK(strlen(header_data) == cur_pos);
                 ssize_t nwrite = 0;
-                common::Error err = write(header_data, cur_pos, nwrite);
+                common::Error err = write(header_data, cur_pos, &nwrite);
                 DCHECK(!err);
                 return err;
             }

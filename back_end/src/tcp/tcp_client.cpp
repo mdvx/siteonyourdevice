@@ -20,6 +20,8 @@
 
 #include <inttypes.h>
 
+#include <string>
+
 #include "common/logger.h"
 
 #include "tcp/tcp_server.h"
@@ -42,11 +44,11 @@ int TcpClient::fd() const {
     return sock_.fd();
 }
 
-common::Error TcpClient::write(const char* data, uint16_t size, ssize_t &nwrite) {
+common::Error TcpClient::write(const char* data, uint16_t size, ssize_t* nwrite) {
     return sock_.write(data, size, nwrite);
 }
 
-common::Error TcpClient::read(char* out, uint16_t max_size, ssize_t &nread) {
+common::Error TcpClient::read(char* out, uint16_t max_size, ssize_t* nread) {
     return sock_.read(out, max_size, nread);
 }
 
@@ -101,4 +103,4 @@ std::string TcpClient::formatedName() const {
 
 }  // namespace tcp
 }  // namespace siteonyourdevice
-}  // namespace fas
+}  // namespace fasto
