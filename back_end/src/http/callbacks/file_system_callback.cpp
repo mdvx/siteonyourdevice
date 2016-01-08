@@ -26,7 +26,7 @@ namespace fasto
             DEBUG_MSG_FORMAT<1024>(common::logging::L_INFO, "handleRequest:\n%s", requeststr);
             using namespace common::http;
             //keep alive
-            http_request::header_t connectionField = request.findHeaderByKey("Connection",false);
+            header_t connectionField = request.findHeaderByKey("Connection",false);
             bool isKeepAlive = EqualsASCII(connectionField.value_, "Keep-Alive", false);
             const http_protocols protocol = request.protocol();
 
@@ -85,7 +85,7 @@ namespace fasto
                 return true;
             }
             else{
-                http_request::header_t contentTypeField = request.findHeaderByKey("Content-Type", false);
+                header_t contentTypeField = request.findHeaderByKey("Content-Type", false);
                 if(!contentTypeField.isValid()){
                     common::Error err = hclient->send_error(protocol, HS_NOT_ALLOWED, NULL, "Unsupported request.", isKeepAlive, info);
                     if(err && err->isError()){

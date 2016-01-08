@@ -76,7 +76,7 @@ namespace fasto
 
                 inner::InnerTcpClient * innerConnection = parent_->findInnerConnectionByHost(hpath);
                 if(!innerConnection){
-                    common::http::http_request::header_t refererField = hrequest.findHeaderByKey("Referer", false);
+                    common::http::header_t refererField = hrequest.findHeaderByKey("Referer", false);
                     if(refererField.isValid()){
                         common::uri::Uri refpath(refererField.value_);
                         common::uri::Upath rpath = refpath.path();

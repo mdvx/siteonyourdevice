@@ -76,3 +76,5 @@ Compare with standard internet domains:
   private_site = 1
   ```
   After that all connection to domain available only after passing phase of authentication.
+
+// cpplint --linelength=100 --filter=-build/header_guard

@@ -53,7 +53,7 @@ namespace fasto
         {
             using namespace common::http;
             //keep alive
-            http_request::header_t connectionField = request.findHeaderByKey("Connection",false);
+            header_t connectionField = request.findHeaderByKey("Connection",false);
             bool isKeepAlive = EqualsASCII(connectionField.value_, "Keep-Alive", false);
             const http_protocols protocol = request.protocol();
 

@@ -196,7 +196,7 @@ namespace fasto
                     return false;
                 }
 
-                common::http::http_request::header_t authField = request.findHeaderByKey("Authorization", false);
+                common::http::header_t authField = request.findHeaderByKey("Authorization", false);
                 if(authField.isValid()){
                     std::string auth = authField.value_;
                     size_t delem_method = auth.find_first_of(' ');
@@ -250,10 +250,10 @@ namespace fasto
                 }
 
                 //keep alive
-                common::http::http_request::header_t connectionField = hrequest.findHeaderByKey("Connection", false);
+                common::http::header_t connectionField = hrequest.findHeaderByKey("Connection", false);
                 bool isKeepAlive = EqualsASCII(connectionField.value_, "Keep-Alive", false);
 
-                common::http::http_request::header_t hostField = hrequest.findHeaderByKey("Host", false);
+                common::http::header_t hostField = hrequest.findHeaderByKey("Host", false);
                 bool isProxy = EqualsASCII(hostField.value_, HTTP_PROXY_HOST_NAME, false);
 
                 handleRequest(hclient, hrequest, isKeepAlive | isProxy);
