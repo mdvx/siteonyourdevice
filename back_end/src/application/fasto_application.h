@@ -1,51 +1,68 @@
+/*  Copyright (C) 2014-2016 FastoGT. All right reserved.
+
+    This file is part of SiteOnYourDevice.
+
+    SiteOnYourDevice is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SiteOnYourDevice is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SiteOnYourDevice.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #pragma once
+
+#include <string>
 
 #include "common/smart_ptr.h"
 
-namespace fasto
-{
-    namespace siteonyourdevice
-    {
-        namespace application
-        {
-            class IFastoApplicationImpl
-            {
-            public:
-                IFastoApplicationImpl(int argc, char *argv[]);
-                virtual int preExec() = 0; //EXIT_FAILURE, EXIT_SUCCESS
-                virtual int exec() = 0; //EXIT_FAILURE, EXIT_SUCCESS
-                virtual int postExec() = 0; //EXIT_FAILURE, EXIT_SUCCESS
+namespace fasto {
+namespace siteonyourdevice {
+namespace application {
 
-                virtual void exit(int result) = 0;
-                virtual ~IFastoApplicationImpl();
-            };
+class IFastoApplicationImpl {
+ public:
+  IFastoApplicationImpl(int argc, char *argv[]);
+  virtual int preExec() = 0;  // EXIT_FAILURE, EXIT_SUCCESS
+  virtual int exec() = 0;  // EXIT_FAILURE, EXIT_SUCCESS
+  virtual int postExec() = 0;  // EXIT_FAILURE, EXIT_SUCCESS
 
-            class FastoApplication
-            {
-            public:
-                FastoApplication(int argc, char *argv[]);
-                ~FastoApplication();
+  virtual void exit(int result) = 0;
+  virtual ~IFastoApplicationImpl();
+};
 
-                std::string appPath() const;
-                std::string appDir() const;
-                int argc() const;
-                char **argv() const;
+class FastoApplication {
+ public:
+  FastoApplication(int argc, char *argv[]);
+  ~FastoApplication();
 
-                static FastoApplication * instance();
+  std::string appPath() const;
+  std::string appDir() const;
+  int argc() const;
+  char **argv() const;
 
-                int exec(); //EXIT_FAILURE, EXIT_SUCCESS
-                static void exit(int result);
+  static FastoApplication * instance();
 
-            private:
-                static FastoApplication * self_;
+  int exec();  // EXIT_FAILURE, EXIT_SUCCESS
+  static void exit(int result);
 
-                int argc_;
-                char **argv_;
+ private:
+  static FastoApplication * self_;
 
-                const common::scoped_ptr<IFastoApplicationImpl> impl_;
-            };
-        }
-    }
-}
+  int argc_;
+  char **argv_;
+
+  const common::scoped_ptr<IFastoApplicationImpl> impl_;
+};
+
+}  // namespace application
+}  // namespace siteonyourdevice
+}  // namespace fasto
 
 #define fApp fasto::siteonyourdevice::application::FastoApplication::instance()

@@ -1,4 +1,24 @@
+/*  Copyright (C) 2014-2016 FastoGT. All right reserved.
+
+    This file is part of SiteOnYourDevice.
+
+    SiteOnYourDevice is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SiteOnYourDevice is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SiteOnYourDevice.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #pragma once
+
+#include <string>
 
 #include "common/sprintf.h"
 
@@ -50,64 +70,56 @@
 
 #define SERVER_PLEASE_CONFIG_COMMAND "plz_config"
 
-//request
-//[size_t](0) [hex_string]seq [std::string]command args ...
+// request
+// [size_t](0) [hex_string]seq [std::string]command args ...
 
-//responce
-//[size_t](1) [hex_string]seq [OK|FAIL] [std::string]command args ...
+// responce
+// [size_t](1) [hex_string]seq [OK|FAIL] [std::string]command args ...
 
-//approve
-//[size_t](2) [hex_string]seq [OK|FAIL] [std::string]command args ...
+// approve
+// [size_t](2) [hex_string]seq [OK|FAIL] [std::string]command args ...
 
-namespace fasto
-{
-    namespace siteonyourdevice
-    {
-        typedef std::string cmd_seq_type;
-        typedef uint8_t cmd_id_type;
+namespace fasto {
+namespace siteonyourdevice {
 
-        template<cmd_id_type cmd_id>
-        class InnerCmd
-        {
-        public:
-            InnerCmd(cmd_seq_type id, const std::string& cmd)
-                : id_(id), cmd_(cmd)
-            {
+typedef std::string cmd_seq_type;
+typedef uint8_t cmd_id_type;
 
-            }
+template<cmd_id_type cmd_id>
+class InnerCmd {
+ public:
+  InnerCmd(cmd_seq_type id, const std::string& cmd)
+      : id_(id), cmd_(cmd) {
+  }
 
-            static cmd_id_type type()
-            {
-                return cmd_id;
-            }
+  static cmd_id_type type() {
+      return cmd_id;
+  }
 
-            cmd_seq_type id() const
-            {
-                return id_;
-            }
+  cmd_seq_type id() const {
+      return id_;
+  }
 
-            const std::string& cmd() const
-            {
-                return cmd_;
-            }
+  const std::string& cmd() const {
+      return cmd_;
+  }
 
-            const char * data() const
-            {
-                return cmd_.c_str();
-            }
+  const char * data() const {
+      return cmd_.c_str();
+  }
 
-            size_t size() const
-            {
-                return cmd_.size();
-            }
+  size_t size() const {
+      return cmd_.size();
+  }
 
-        private:
-            cmd_seq_type id_;
-            std::string cmd_;
-        };
+ private:
+  cmd_seq_type id_;
+  std::string cmd_;
+};
 
-        typedef InnerCmd<REQUEST_COMMAND> cmd_request_t;
-        typedef InnerCmd<RESPONCE_COMMAND> cmd_responce_t;
-        typedef InnerCmd<APPROVE_COMMAND> cmd_approve_t;
-    }
-}
+typedef InnerCmd<REQUEST_COMMAND> cmd_request_t;
+typedef InnerCmd<RESPONCE_COMMAND> cmd_responce_t;
+typedef InnerCmd<APPROVE_COMMAND> cmd_approve_t;
+
+}  // namespace siteonyourdevice
+}  // namespace fasto

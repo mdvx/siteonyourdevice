@@ -43,7 +43,7 @@ namespace {
 typedef common::multi_threading::unique_lock<common::multi_threading::mutex_t> lock_t;
 
 int ini_handler_fasto(void* user, const char* section, const char* name, const char* value) {
-    fasto::siteonyourdevice* pconfig = reinterpret_cast<fasto::siteonyourdevice::HttpConfig*>(user);
+    fasto::siteonyourdevice::HttpConfig* pconfig = reinterpret_cast<fasto::siteonyourdevice::HttpConfig*>(user);
 
     #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
     if (MATCH(SERVER_SETTINGS_SECTION_LABEL, CONTENT_PATH_SETTING_LABEL)) {
@@ -66,7 +66,7 @@ int ini_handler_fasto(void* user, const char* section, const char* name, const c
         pconfig->external_host = common::convertFromString<common::net::hostAndPort>(value);
         return 1;
     } else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, SERVER_TYPE_SETTING_LABEL)) {
-        pconfig->server_type = (http_server_type)atoi(value);
+        pconfig->server_type = (fasto::siteonyourdevice::http_server_type)atoi(value);
         return 1;
     } else if (strcmp(section, HANDLERS_URLS_SECTION_LABEL) == 0) {
         pconfig->handlers_urls.push_back(std::make_pair(name, value));

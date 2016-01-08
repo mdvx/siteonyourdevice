@@ -20,36 +20,33 @@
 
 #include "tcp/tcp_server.h"
 
-namespace fasto
-{
-    namespace siteonyourdevice
-    {
-        namespace http
-        {
-            class HttpServer
-                    : public tcp::TcpServer
-            {
-            public:
-                HttpServer(const common::net::hostAndPort& host, tcp::ITcpLoopObserver *observer);
-                ~HttpServer();
+namespace fasto {
+namespace siteonyourdevice {
+namespace http {
 
-                virtual const char* className() const;
+class HttpServer
+        : public tcp::TcpServer {
+ public:
+  HttpServer(const common::net::hostAndPort& host, tcp::ITcpLoopObserver *observer);
+  ~HttpServer();
 
-            protected:
-                virtual tcp::TcpClient * createClient(const common::net::socket_info &info);
-            };
+  virtual const char* className() const;
 
-            class Http2Server
-                    : public HttpServer
-            {
-            public:
-                Http2Server(const common::net::hostAndPort& host, tcp::ITcpLoopObserver *observer);
+ protected:
+  virtual tcp::TcpClient * createClient(const common::net::socket_info &info);
+};
 
-                virtual const char* className() const;
+class Http2Server
+        : public HttpServer {
+ public:
+  Http2Server(const common::net::hostAndPort& host, tcp::ITcpLoopObserver *observer);
 
-            protected:
-                virtual tcp::TcpClient * createClient(const common::net::socket_info &info);
-            };
-        }
-    }
-}
+  virtual const char* className() const;
+
+ protected:
+  virtual tcp::TcpClient * createClient(const common::net::socket_info &info);
+};
+
+}  // namespace http
+}  // namespace siteonyourdevice
+}  // namespace fasto

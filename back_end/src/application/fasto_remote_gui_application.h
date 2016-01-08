@@ -1,3 +1,21 @@
+/*  Copyright (C) 2014-2016 FastoGT. All right reserved.
+
+    This file is part of SiteOnYourDevice.
+
+    SiteOnYourDevice is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SiteOnYourDevice is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SiteOnYourDevice.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #pragma once
 
 #include "fasto_remote_application.h"
@@ -37,45 +55,41 @@
     "INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A "\
     "PARTICULAR PURPOSE.<br/>"
 
-namespace fasto
-{
-    namespace siteonyourdevice
-    {
-        namespace application
-        {
-            class GuiNetworkEventHandler
-                    : public network::NetworkEventHandler
-            {
-            public:
-                enum
-                {
-                    height = 240,
-                    width = 320,
-                    login_max_length = 32,
-                    domain_max_length = 32,
-                    port_max_length = 6
-                };
+namespace fasto {
+namespace siteonyourdevice {
+namespace application {
 
-                GuiNetworkEventHandler(network::NetworkController *controller);
-                ~GuiNetworkEventHandler();
+class GuiNetworkEventHandler
+        : public network::NetworkEventHandler {
+ public:
+    enum {
+      height = 240,
+      width = 320,
+      login_max_length = 32,
+      domain_max_length = 32,
+      port_max_length = 6
+  };
 
-                virtual void start() final;
+  explicit GuiNetworkEventHandler(network::NetworkController *controller);
+  ~GuiNetworkEventHandler();
 
-            protected:
-                void onConnectClicked(const HttpConfig &config); //with config
-                void onDisconnectClicked();
+  void start() final;
 
-            private:
-                virtual void showImpl() = 0;
-            };
+ protected:
+  void onConnectClicked(const HttpConfig &config);  // with config
+  void onDisconnectClicked();
 
-            class FastoRemoteGuiApplication
-                    : public FastoRemoteApplication
-            {
-            public:
-                FastoRemoteGuiApplication(int argc, char *argv[]);
-                ~FastoRemoteGuiApplication();
-            };
-        }
-    }
-}
+ private:
+  virtual void showImpl() = 0;
+};
+
+class FastoRemoteGuiApplication
+        : public FastoRemoteApplication {
+ public:
+  FastoRemoteGuiApplication(int argc, char *argv[]);
+  ~FastoRemoteGuiApplication();
+};
+
+}  // namespace application
+}  // namespace siteonyourdevice
+}  // namespace fasto

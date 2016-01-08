@@ -1,51 +1,69 @@
+/*  Copyright (C) 2014-2016 FastoGT. All right reserved.
+
+    This file is part of SiteOnYourDevice.
+
+    SiteOnYourDevice is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SiteOnYourDevice is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SiteOnYourDevice.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #pragma once
+
+#include <string>
 
 #include "common/http/http.h"
 
 #include "infos.h"
 
-namespace fasto
-{
-    namespace siteonyourdevice
-    {
-        namespace http
-        {
-            class HttpClient;
-        }
+namespace fasto {
+namespace siteonyourdevice {
 
-        enum HCTypes
-        {
-            system,
-            file_system //handle all requests
-        };
+namespace http {
+class HttpClient;
+}  // namespace http
 
-        const std::string HCallbackTypes[] = { "system", "file_system" };
+enum HCTypes {
+  system,
+  file_system  // handle all requests
+};
 
-        class IHttpCallback
-        {
-        public:
-            IHttpCallback();
-            virtual ~IHttpCallback();
-            virtual bool handleRequest(http::HttpClient* hclient, const char* extra_header, const common::http::http_request& request, const HttpServerInfo& info) = 0;
+const std::string HCallbackTypes[] = { "system", "file_system" };
 
-            static common::shared_ptr<IHttpCallback> createHttpCallback(HCTypes type);
-            static common::shared_ptr<IHttpCallback> createHttpCallback(const std::string& ns_name, const std::string& name);
-        };
+class IHttpCallback {
+ public:
+  IHttpCallback();
+  virtual ~IHttpCallback();
+  virtual bool handleRequest(http::HttpClient* hclient, const char* extra_header,
+                             const common::http::http_request& request,
+                             const HttpServerInfo& info) = 0;
 
-        class HttpCallbackUrl
-                : public IHttpCallback
-        {
-        public:
-            HttpCallbackUrl(HCTypes type);
-            HCTypes type() const;
+  static common::shared_ptr<IHttpCallback> createHttpCallback(HCTypes type);
+  static common::shared_ptr<IHttpCallback> createHttpCallback(const std::string& ns_name,
+                                                              const std::string& name);
+};
 
-        private:
-            const HCTypes type_;
-        };
-    }
-}
+class HttpCallbackUrl
+        : public IHttpCallback {
+ public:
+  explicit HttpCallbackUrl(HCTypes type);
+  HCTypes type() const;
 
-namespace common
-{
+ private:
+  const HCTypes type_;
+};
+
+}  // namespace siteonyourdevice
+}  // namespace fasto
+
+namespace common {
     std::string convertToString(fasto::siteonyourdevice::HCTypes t);
-}
+}  // namespace common
