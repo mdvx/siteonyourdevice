@@ -27,7 +27,7 @@
 #include "common/http/http.h"
 #include "common/string_util.h"
 #include "common/sprintf.h"
-#include "common/sha1.h"
+#include "common/hash/sha1.h"
 #include "common/utils.h"
 #include "common/logger.h"
 

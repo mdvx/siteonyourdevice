@@ -89,7 +89,7 @@ void TcpClient::setFlags(flags_type flags) {
     server_->changeFlags(this);
 }
 
-common::id_counter<TcpClient>::type_t TcpClient::id() const {
+common::patterns::id_counter<TcpClient>::type_t TcpClient::id() const {
     return id_.id();
 }
 

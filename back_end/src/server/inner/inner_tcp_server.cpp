@@ -23,7 +23,7 @@
 
 #include "common/net/net.h"
 #include "common/logger.h"
-#include "common/md5.h"
+#include "common/hash/md5.h"
 #include "common/thread/thread_manager.h"
 
 #include "server/http_server_host.h"

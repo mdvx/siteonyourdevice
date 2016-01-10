@@ -55,7 +55,7 @@ class TcpClient
   flags_type flags() const;
   void setFlags(flags_type flags);
 
-  common::id_counter<TcpClient>::type_t id() const;
+  common::patterns::id_counter<TcpClient>::type_t id() const;
   virtual const char *className() const;
   std::string formatedName() const;
 
@@ -66,7 +66,7 @@ class TcpClient
 
   common::net::SocketHolder sock_;
   std::string name_;
-  const common::id_counter<TcpClient> id_;
+  const common::patterns::id_counter<TcpClient> id_;
 };
 
 }  // namespace tcp

@@ -59,7 +59,7 @@ class ITcpLoop
 
   void changeFlags(TcpClient *client);
 
-  common::id_counter<ITcpLoop>::type_t id() const;
+  common::patterns::id_counter<ITcpLoop>::type_t id() const;
 
   void setName(const std::string& name);
   std::string name() const;
@@ -90,7 +90,7 @@ class ITcpLoop
 
   std::vector<TcpClient *> clients_;
   std::vector<LoopTimer *> timers_;
-  const common::id_counter<ITcpLoop> id_;
+  const common::patterns::id_counter<ITcpLoop> id_;
 
   std::string name_;
 };

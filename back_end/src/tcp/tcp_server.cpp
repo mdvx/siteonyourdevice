@@ -67,7 +67,7 @@ namespace siteonyourdevice {
 namespace tcp {
 
 class LoopTimer
-        : public common::id_counter<LoopTimer, timer_id_type> {
+        : public common::patterns::id_counter<LoopTimer, timer_id_type> {
  public:
   explicit LoopTimer(ITcpLoop * server)
       : server_(server), timer_((struct ev_timer*)calloc(1, sizeof(struct ev_timer))) {
@@ -180,7 +180,7 @@ void ITcpLoop::removeTimer(timer_id_type id) {
     }
 }
 
-common::id_counter<ITcpLoop>::type_t ITcpLoop::id() const {
+common::patterns::id_counter<ITcpLoop>::type_t ITcpLoop::id() const {
     return id_.id();
 }
 

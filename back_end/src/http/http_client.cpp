@@ -105,7 +105,7 @@ common::Error HttpClient::send_error(common::http::http_protocols protocol,
     const std::string title = common::convertToString(status);
 
     char err_data[1024] = {0};
-    off_t err_len = common::SPrintf(err_data, HTML_PATTERN_ISISSSS7,
+    off_t err_len = common::SNPrintf(err_data, sizeof(err_data), HTML_PATTERN_ISISSSS7,
                                     status, title, status, title, text,
                                     info.server_url, info.server_name);
     common::Error err = send_headers(protocol, status, extra_header,
@@ -140,7 +140,7 @@ common::Error HttpClient::send_headers(common::http::http_protocols protocol,
     strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime( &now ));
 
     char header_data[1024] = {0};
-    int cur_pos = common::SPrintf(header_data,
+    int cur_pos = common::SNPrintf(header_data, sizeof(header_data),
                                   protocol == common::http::HP_2_0 ?
                                       HTTP_2_0_PROTOCOL_NAME " %d %s\r\n"
                                                              "Server: %s\r\n"
@@ -151,21 +151,24 @@ common::Error HttpClient::send_headers(common::http::http_protocols protocol,
                                   info.server_name, timebuf);
 
     if (extra_header) {
-        int exlen = common::SPrintf(header_data + cur_pos, "%s\r\n", extra_header);
+        int exlen = common::SNPrintf(header_data + cur_pos, sizeof(header_data) - cur_pos,
+                                    "%s\r\n", extra_header);
         cur_pos += exlen;
     }
     if (mime_type) {
-        int mim_t = common::SPrintf(header_data + cur_pos, "Content-Type: %s\r\n", mime_type);
+        int mim_t = common::SNPrintf(header_data + cur_pos, sizeof(header_data) - cur_pos,
+                                    "Content-Type: %s\r\n", mime_type);
         cur_pos += mim_t;
     }
     if (length) {
-        int len = common::SPrintf(header_data + cur_pos,
+        int len = common::SNPrintf(header_data + cur_pos, sizeof(header_data) - cur_pos,
                                   "Content-Length: %" PRId32 "\r\n", *length);
         cur_pos += len;
     }
     if (mod) {
         strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime(mod));
-        int mlen = common::SPrintf(header_data + cur_pos, "Last-Modified: %s\r\n", timebuf);
+        int mlen = common::SNPrintf(header_data + cur_pos, sizeof(header_data) - cur_pos,
+                                   "Last-Modified: %s\r\n", timebuf);
         cur_pos += mlen;
     }
 
@@ -208,7 +211,7 @@ common::Error Http2Client::send_error(common::http::http_protocols protocol,
     if (is_http2() && protocol == common::http::HP_2_0) {
         const std::string title = common::convertToString(status);
         char err_data[1024] = {0};
-        off_t err_len = common::SPrintf(err_data, HTML_PATTERN_ISISSSS7,
+        off_t err_len = common::SNPrintf(err_data, sizeof(err_data), HTML_PATTERN_ISISSSS7,
                                         status, title, status, title,
                                         text, info.server_url, info.server_name);
         common::Error err = send_headers(protocol, status, extra_header,
