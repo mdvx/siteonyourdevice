@@ -75,7 +75,7 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
                 common::net::hostAndPort host = common::convertFromString<common::net::hostAndPort>(hostandport);
                 common::net::socket_info rinfo;
                 common::Error err = common::net::connect(host, common::net::ST_SOCK_STREAM,
-                                                         NULL, rinfo);
+                                                         NULL, &rinfo);
                 if (err && err->isError()) {
                     cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S,
                                                         CAUSE_CONNECT_FAILED);
@@ -134,7 +134,8 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
 
                 common::net::hostAndPort host = common::convertFromString<common::net::hostAndPort>(hostandport);
                 common::net::socket_info rinfo;
-                common::Error err = common::net::connect(host, common::net::ST_SOCK_STREAM, NULL, rinfo);
+                common::Error err = common::net::connect(host,
+                                                         common::net::ST_SOCK_STREAM, NULL, &rinfo);
                 if (err && err->isError()) {
                     cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S,
                                                         CAUSE_CONNECT_FAILED);

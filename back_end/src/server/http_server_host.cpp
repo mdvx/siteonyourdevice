@@ -116,7 +116,7 @@ void HttpInnerServerHandlerHost::dataReceived(tcp::TcpClient* client) {
 
     std::string request(buff, nread);
     common::http::http_request hrequest;
-    auto result = parse_http_request(request, hrequest);
+    auto result = parse_http_request(request, &hrequest);
 
     if (result.second && result.second->isError()) {
         const std::string error_text = result.second->description();
@@ -133,7 +133,7 @@ void HttpInnerServerHandlerHost::dataReceived(tcp::TcpClient* client) {
 void HttpInnerServerHandlerHost::processHttpRequest(http::HttpClient *hclient,
                                                     const common::http::http_request& hrequest) {
     const common::http::http_protocols protocol = hrequest.protocol();
-    common::uri::Upath path = hrequest.path_;
+    common::uri::Upath path = hrequest.path();
     std::string hpath = path.hpath();
     std::string fpath = path.fpath();
 
@@ -141,7 +141,7 @@ void HttpInnerServerHandlerHost::processHttpRequest(http::HttpClient *hclient,
     if (!innerConnection) {
         common::http::header_t refererField = hrequest.findHeaderByKey("Referer", false);
         if (refererField.isValid()) {
-            common::uri::Uri refpath(refererField.value_);
+            common::uri::Uri refpath(refererField.value);
             common::uri::Upath rpath = refpath.path();
             DEBUG_MSG_FORMAT<512>(common::logging::L_INFO,
                                   "hpath: %s, fpath %s", hpath, fpath);
@@ -166,8 +166,10 @@ void HttpInnerServerHandlerHost::processHttpRequest(http::HttpClient *hclient,
     }
 
     hclient->setName(hpath);
+
     common::http::http_request chrequest = hrequest;
-    chrequest.path_.setPath(fpath);
+    path.setPath(fpath);
+    chrequest.setPath(path);
 
     tcp::ITcpLoop *server = hclient->server();
     server->unregisterClient(hclient);

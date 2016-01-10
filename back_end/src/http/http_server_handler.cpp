@@ -193,7 +193,7 @@ bool HttpServerHandler::tryAuthenticateIfNeeded(HttpClient* hclient, const char*
 
     common::http::header_t authField = request.findHeaderByKey("Authorization", false);
     if (authField.isValid()) {
-        std::string auth = authField.value_;
+        std::string auth = authField.value;
         size_t delem_method = auth.find_first_of(' ');
         if (delem_method != std::string::npos) {
             const std::string method = auth.substr(0, delem_method);
@@ -233,7 +233,9 @@ bool HttpServerHandler::tryAuthenticateIfNeeded(HttpClient* hclient, const char*
 
 void HttpServerHandler::processReceived(HttpClient *hclient, const char* request, size_t req_len) {
     common::http::http_request hrequest;
-    std::pair<common::http::http_status, common::Error> result = common::http::parse_http_request(std::string(request, req_len), hrequest);
+    std::string request_str(request, req_len);
+    std::pair<common::http::http_status, common::Error> result =
+        common::http::parse_http_request(request_str, &hrequest);
 
     if (result.second && result.second->isError()) {
         const std::string error_text = result.second->description();
@@ -250,17 +252,17 @@ void HttpServerHandler::processReceived(HttpClient *hclient, const char* request
 
     // keep alive
     common::http::header_t connectionField = hrequest.findHeaderByKey("Connection", false);
-    bool isKeepAlive = EqualsASCII(connectionField.value_, "Keep-Alive", false);
+    bool isKeepAlive = EqualsASCII(connectionField.value, "Keep-Alive", false);
 
     common::http::header_t hostField = hrequest.findHeaderByKey("Host", false);
-    bool isProxy = EqualsASCII(hostField.value_, HTTP_PROXY_HOST_NAME, false);
+    bool isProxy = EqualsASCII(hostField.value, HTTP_PROXY_HOST_NAME, false);
 
     handleRequest(hclient, hrequest, isKeepAlive | isProxy);
 }
 
 void HttpServerHandler::handleRequest(HttpClient *hclient,
                                       const common::http::http_request& hrequest, bool notClose) {
-    common::uri::Upath path = hrequest.path_;
+    common::uri::Upath path = hrequest.path();
 
     if (tryAuthenticateIfNeeded(hclient, NULL, hrequest)) {
         goto cleanup;
@@ -326,7 +328,7 @@ void Http2ServerHandler::handleHttp2Request(Http2Client* h2client, const char* r
     for (int i = 0; i < headers_frames.size(); ++i) {
         common::http2::frame_headers* head = (common::http2::frame_headers*)(&headers_frames[i]);
         common::http::http_request request;
-        auto result = common::http2::parse_http_request(*head, request);
+        auto result = common::http2::parse_http_request(*head, &request);
         if (result.second && result.second->isError()) {
             const std::string error_text = result.second->description();
             DEBUG_MSG_ERROR(result.second);

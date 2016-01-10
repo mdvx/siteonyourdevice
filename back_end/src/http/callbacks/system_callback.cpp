@@ -69,7 +69,7 @@ bool HttpSystemShutdownCallback::handleRequest(http::HttpClient* hclient, const 
                                                const HttpServerInfo& info) {
     // keep alive
     common::http::header_t connectionField = request.findHeaderByKey("Connection", false);
-    bool isKeepAlive = EqualsASCII(connectionField.value_, "Keep-Alive", false);
+    bool isKeepAlive = EqualsASCII(connectionField.value, "Keep-Alive", false);
     const common::http::http_protocols protocol = request.protocol();
 
     common::system::shutdown_types sh_type;

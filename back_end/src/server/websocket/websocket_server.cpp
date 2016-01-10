@@ -66,7 +66,7 @@ void WebSocketServerHandlerHost::dataReceived(tcp::TcpClient* client) {
 
     std::string request(buff, nread);
     common::http::http_request hrequest;
-    auto result = parse_http_request(request, hrequest);
+    auto result = parse_http_request(request, &hrequest);
 
     if (result.second && result.second->isError()) {
         const std::string error_text = result.second->description();
@@ -83,7 +83,7 @@ void WebSocketServerHandlerHost::dataReceived(tcp::TcpClient* client) {
 void WebSocketServerHandlerHost::processWebsocketRequest(http::HttpClient *hclient,
                                                          const common::http::http_request& hrequest) {
     const common::http::http_protocols protocol = hrequest.protocol();
-    common::uri::Upath path = hrequest.path_;
+    common::uri::Upath path = hrequest.path();
     std::string hpath = path.hpath();
     std::string fpath = path.fpath();
     common::net::hostAndPort host = common::convertFromString<common::net::hostAndPort>(hpath);
@@ -102,8 +102,10 @@ void WebSocketServerHandlerHost::processWebsocketRequest(http::HttpClient *hclie
     }
 
     hclient->setName(common::convertToString(host));
+
     common::http::http_request chrequest = hrequest;
-    chrequest.path_.setPath(fpath);
+    path.setPath(fpath);
+    chrequest.setPath(path);
 
     common::buffer_type res = common::convertToBytes(chrequest);
 

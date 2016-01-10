@@ -54,7 +54,7 @@ void Http2InnerServerHandler::preLooped(tcp::ITcpLoop* server) {
 
     common::net::socket_info client_info;
     common::ErrnoError err = common::net::connect(innerHost_, common::net::ST_SOCK_STREAM,
-                                                  0, client_info);
+                                                  0, &client_info);
     if (err && err->isError()) {
         DEBUG_MSG_ERROR(err);
         auto ex_event = make_exception_event(new network::InnerClientConnectedEvent(this, authInfo()), err);
@@ -160,7 +160,8 @@ void Http2InnerServerHandler::relayExDataReceived(inner::RelayClientEx* rclient)
     if (externalHost.isValid()) {
         ProxyRelayClient* eclient = rclient->eclient();
         if (!eclient) {
-            common::Error err = common::net::connect(externalHost, common::net::ST_SOCK_STREAM, 0, client_info);
+            common::Error err = common::net::connect(externalHost,
+                                                     common::net::ST_SOCK_STREAM, 0, &client_info);
             if (err && err->isError()) {
                 DEBUG_MSG_ERROR(err);
                 const std::string error_text = err->description();

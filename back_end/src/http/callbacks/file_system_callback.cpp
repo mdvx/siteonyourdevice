@@ -45,12 +45,12 @@ bool HttpFileSystemCallback::handleRequest(http::HttpClient* hclient, const char
 
     // keep alive
     common::http::header_t connectionField = request.findHeaderByKey("Connection", false);
-    bool isKeepAlive = EqualsASCII(connectionField.value_, "Keep-Alive", false);
+    bool isKeepAlive = EqualsASCII(connectionField.value, "Keep-Alive", false);
     const common::http::http_protocols protocol = request.protocol();
 
-    if (request.method_ == common::http::http_method::HM_GET ||
-            request.method_ == common::http::http_method::HM_HEAD) {
-        common::uri::Upath path = request.path_;
+    if (request.method() == common::http::http_method::HM_GET ||
+            request.method() == common::http::http_method::HM_HEAD) {
+        common::uri::Upath path = request.path();
         if (!path.isValid() || path.isRoot()) {
             path = common::uri::Upath("index.html");
         }
@@ -100,7 +100,7 @@ bool HttpFileSystemCallback::handleRequest(http::HttpClient* hclient, const char
             return true;
         }
 
-        if (request.method_ == common::http::http_method::HM_GET) {
+        if (request.method() == common::http::http_method::HM_GET) {
             common::Error err = hclient->send_file_by_fd(protocol, file, sb.st_size);
             if (err && err->isError()) {
                 DEBUG_MSG_ERROR(err);
@@ -119,7 +119,7 @@ bool HttpFileSystemCallback::handleRequest(http::HttpClient* hclient, const char
             return true;
         }
 
-        const std::string contentTypeValue = contentTypeField.value_;
+        const std::string contentTypeValue = contentTypeField.value;
         if (contentTypeValue == "application/json") {
             return true;
         } else if (contentTypeValue == "application/x-www-form-urlencoded") {

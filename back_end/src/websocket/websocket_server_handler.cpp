@@ -227,7 +227,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient *hclient,
     */
 
     const common::http::http_protocols protocol = request.protocol();
-    if (request.method_ != common::http::http_method::HM_GET) {
+    if (request.method() != common::http::http_method::HM_GET) {
         common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST, NULL,
                                                 "Bad Request", notClose, info());
         if (err && err->isError()) {
@@ -237,7 +237,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient *hclient,
     }
 
     common::http::header_t connectionField = request.findHeaderByKey("Connection", false);
-    const std::string lconnectionField = common::StringToLowerASCII(connectionField.value_);
+    const std::string lconnectionField = common::StringToLowerASCII(connectionField.value);
     bool isUpgrade = lconnectionField.find_first_of("upgrade") != std::string::npos;
     if (!isUpgrade) {
         common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST,
@@ -250,7 +250,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient *hclient,
     }
 
     common::http::header_t upgradeField = request.findHeaderByKey("Upgrade", false);
-    bool isWebSocket = EqualsASCII(upgradeField.value_, "websocket", false);
+    bool isWebSocket = EqualsASCII(upgradeField.value, "websocket", false);
     if (!isWebSocket) {
         common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST,
                                                 NULL, "Bad Request",
@@ -283,7 +283,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient *hclient,
         return;
     }
 
-    const std::string sec_key = key_field.value_ + WEBSOCK_GUID;
+    const std::string sec_key = key_field.value + WEBSOCK_GUID;
 
     sha1nfo s;
 
