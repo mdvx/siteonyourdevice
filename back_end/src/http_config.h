@@ -45,6 +45,7 @@
 
 namespace fasto {
 namespace siteonyourdevice {
+
 enum http_server_type {
   FASTO_SERVER = 0,
   EXTERNAL_SERVER = 1
@@ -66,5 +67,6 @@ struct HttpConfig {
   typedef std::pair<std::string, common::uri::Uri> server_sockets_urls_t;
   std::vector<server_sockets_urls_t> server_sockets_urls;
 };
+
 }  // namespace siteonyourdevice
 }  // namespace fasto

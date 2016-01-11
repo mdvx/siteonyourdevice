@@ -25,27 +25,27 @@ namespace siteonyourdevice {
 namespace application {
 
 GuiNetworkEventHandler::GuiNetworkEventHandler(network::NetworkController *controller)
-    : NetworkEventHandler(controller) {
+  : NetworkEventHandler(controller) {
 }
 
 GuiNetworkEventHandler::~GuiNetworkEventHandler() {
 }
 
 void GuiNetworkEventHandler::start() {
-    showImpl();
+  showImpl();
 }
 
 void GuiNetworkEventHandler::onConnectClicked(const HttpConfig& config) {
-    controller_->setConfig(config);
-    controller_->connect();
+  controller_->setConfig(config);
+  controller_->connect();
 }
 
 void GuiNetworkEventHandler::onDisconnectClicked() {
-    controller_->disConnect();
+  controller_->disConnect();
 }
 
 FastoRemoteGuiApplication::FastoRemoteGuiApplication(int argc, char *argv[])
-    : FastoRemoteApplication(argc, argv) {
+  : FastoRemoteApplication(argc, argv) {
 }
 
 FastoRemoteGuiApplication::~FastoRemoteGuiApplication() {

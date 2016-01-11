@@ -28,19 +28,18 @@ namespace siteonyourdevice {
 namespace network {
 
 void NetworkEventHandler::handleEvent(NetworkEvent *event) {
-    if (event->eventType() == InnerClientConnectedEvent::EventType) {
-        // InnerClientConnectedEvent * ev = static_cast<InnerClientConnectedEvent*>(event);
-    } else if (event->eventType() == InnerClientDisconnectedEvent::EventType) {
-        // InnerClientDisconnectedEvent * ev = static_cast<InnerClientDisconnectedEvent*>(event);
-        controller_->disConnect();
-    } else {
-    }
+  if (event->eventType() == InnerClientConnectedEvent::EventType) {
+      // InnerClientConnectedEvent * ev = static_cast<InnerClientConnectedEvent*>(event);
+  } else if (event->eventType() == InnerClientDisconnectedEvent::EventType) {
+      // InnerClientDisconnectedEvent * ev = static_cast<InnerClientDisconnectedEvent*>(event);
+      controller_->disConnect();
+  }
 }
 
 void NetworkEventHandler::handleExceptionEvent(NetworkEvent* event, common::Error err) {
-    DEBUG_MSG_FORMAT<512>(common::logging::L_WARNING,
-                          "Exception event %s, %s",
-                          common::convertToString(event->eventType()), err->description());
+  DEBUG_MSG_FORMAT<512>(common::logging::L_WARNING,
+                        "Exception event %s, %s",
+                        common::convertToString(event->eventType()), err->description());
 }
 
 class NetworkEventHandler::NetworkListener
@@ -49,35 +48,35 @@ class NetworkEventHandler::NetworkListener
  public:
   explicit NetworkListener(NetworkEventHandler * app)
     : common::IListener<NetworkEventTypes>(), app_(app) {
-      EVENT_BUS()->subscribe<InnerClientConnectedEvent>(this);
-      EVENT_BUS()->subscribe<InnerClientDisconnectedEvent>(this);
+    EVENT_BUS()->subscribe<InnerClientConnectedEvent>(this);
+    EVENT_BUS()->subscribe<InnerClientDisconnectedEvent>(this);
   }
 
   ~NetworkListener() {
-      EVENT_BUS()->unsubscribe<InnerClientDisconnectedEvent>(this);
-      EVENT_BUS()->unsubscribe<InnerClientConnectedEvent>(this);
+    EVENT_BUS()->unsubscribe<InnerClientDisconnectedEvent>(this);
+    EVENT_BUS()->unsubscribe<InnerClientConnectedEvent>(this);
   }
 
   virtual void handleEvent(event_t* event) {
-      app_->handleEvent(event);
+    app_->handleEvent(event);
   }
 
   virtual void handleExceptionEvent(event_t* event, common::Error err) {
-      app_->handleExceptionEvent(event, err);
+    app_->handleExceptionEvent(event, err);
   }
 };
 
 NetworkEventHandler::NetworkEventHandler(NetworkController *controller)
-    : controller_(controller) {
-    networkListener_ = new NetworkListener(this);
+  : controller_(controller) {
+  networkListener_ = new NetworkListener(this);
 }
 
 NetworkEventHandler::~NetworkEventHandler() {
-    delete networkListener_;
+  delete networkListener_;
 }
 
 void NetworkEventHandler::start() {
-    controller_->connect();
+  controller_->connect();
 }
 
 }  // namespace network

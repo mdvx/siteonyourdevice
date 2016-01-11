@@ -38,6 +38,7 @@ const std::string SNetworkEventTypes[] = {
 };
 
 namespace common {
+
 template<>
 struct event_traits<NetworkEventTypes> {
   typedef IEvent<NetworkEventTypes> event_t;
@@ -48,4 +49,5 @@ struct event_traits<NetworkEventTypes> {
 };
 
 std::string convertToString(NetworkEventTypes net);
+
 }  // namespace common

@@ -389,27 +389,22 @@ BOOL Win32MainWindow::showPopupMenu(POINT *curpos, int wDefaultItem) {
 
 LRESULT Win32MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-  switch (uMsg)
-  {
-    case WM_CREATE:
-    {
+  switch (uMsg) {
+    case WM_CREATE: {
       return onCreate();
     }
-    case WM_DESTROY:
-    {
+    case WM_DESTROY: {
       onDestroy();
       ::PostQuitMessage(0);
       return 0;
     }
-    case WM_COMMAND:
-    {
+    case WM_COMMAND: {
       if (isMessageBoxShown_) {
           return 1;
       }
-      switch (LOWORD(wParam))
-      {
-        case ID_BROWSE_BUTTON:
-        {
+
+      switch (LOWORD(wParam)) {
+        case ID_BROWSE_BUTTON: {
           if(BN_CLICKED == HIWORD(wParam)){
             TCHAR szDir[MAX_PATH];
             BROWSEINFO bInfo = {0};
@@ -429,63 +424,54 @@ LRESULT Win32MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
           }
           return 0;
-       }
-       case ID_PRIVATE_SITE_CHECKBOX:
-       {
-         LRESULT res = SendMessage(hwndIsPrivateSiteCheckbox_, BM_GETCHECK, 0, 0);
-         if(res == BST_CHECKED){
-             SendMessage(hwndIsPrivateSiteCheckbox_, BM_SETCHECK, BST_UNCHECKED, 0);
-         }
-         else if(res == BST_UNCHECKED){
+        }
+        case ID_PRIVATE_SITE_CHECKBOX: {
+          LRESULT res = SendMessage(hwndIsPrivateSiteCheckbox_, BM_GETCHECK, 0, 0);
+          if(res == BST_CHECKED){
+              SendMessage(hwndIsPrivateSiteCheckbox_, BM_SETCHECK, BST_UNCHECKED, 0);
+          } else if (res == BST_UNCHECKED){
              SendMessage(hwndIsPrivateSiteCheckbox_, BM_SETCHECK, BST_CHECKED, 0);
-         }
+          }
          return 0;
-       }
-       case ID_EXTERNAL_SITE_CHECKBOX:
-       {
-         LRESULT res = SendMessage(hwndExternalServerCheckbox_, BM_GETCHECK, 0, 0);
-         if(res == BST_CHECKED){
-             setExternalChekboxState(BST_UNCHECKED);
-         }
-         else if(res == BST_UNCHECKED){
+        }
+        case ID_EXTERNAL_SITE_CHECKBOX: {
+          LRESULT res = SendMessage(hwndExternalServerCheckbox_, BM_GETCHECK, 0, 0);
+          if(res == BST_CHECKED){
+              setExternalChekboxState(BST_UNCHECKED);
+          } else if (res == BST_UNCHECKED){
              setExternalChekboxState(BST_CHECKED);
-         }
-         return 0;
-       }
-       case ID_CONNECT_BUTTON:
-       {
-           if(BN_CLICKED == HIWORD(wParam)){
-               char lbl[1024] = {0};
-               GetWindowText(hwndConnectButton_, lbl, sizeof(lbl));
-               if(strcmp(lbl, CONNECT_LABEL) == 0){
-                   onConnectClicked();
-               }
-               else{
-                   onDisconnectClicked();
-               }
-           }
-           return 0;
-       }
-       case ID_ABOUT:
-       {
-           isMessageBoxShown_ = TRUE;
-           MessageBox(hwnd_, ABOUT_DIALOG_MSG, PROJECT_NAME_TITLE, MB_ICONINFORMATION | MB_OK );
-           isMessageBoxShown_ = FALSE;
-           return 0;
-       }
-       case ID_EXIT:
-       {
-           PostMessage(hwnd_, WM_CLOSE, 0, 0 );
-           return 0;
-       }
-       default:
-       {
-           return 0;
-       }
-     }
+          }
+          return 0;
+        }
+        case ID_CONNECT_BUTTON: {
+          if(BN_CLICKED == HIWORD(wParam)){
+            char lbl[1024] = {0};
+            GetWindowText(hwndConnectButton_, lbl, sizeof(lbl));
+            if(strcmp(lbl, CONNECT_LABEL) == 0){
+              onConnectClicked();
+             } else {
+               onDisconnectClicked();
+            }
+          }
+
+          return 0;
+        }
+        case ID_ABOUT: {
+          isMessageBoxShown_ = TRUE;
+          MessageBox(hwnd_, ABOUT_DIALOG_MSG, PROJECT_NAME_TITLE, MB_ICONINFORMATION | MB_OK );
+          isMessageBoxShown_ = FALSE;
+          return 0;
+        }
+        case ID_EXIT: {
+          PostMessage(hwnd_, WM_CLOSE, 0, 0 );
+          return 0;
+        }
+        default: {
+          return 0;
+        }
+      }
     }
-    case WM_APP:
-    {
+    case WM_APP: {
       switch (lParam) {
         case WM_LBUTTONDBLCLK:
             ShowWindow(hwnd_, SW_RESTORE);
@@ -500,6 +486,7 @@ LRESULT Win32MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
       return 0;
     }
   }
+
   return DefWindowProc(hwnd_, uMsg, wParam, lParam );
 }
 
@@ -523,13 +510,11 @@ LRESULT CALLBACK Win32MainWindow::wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 
 void Win32MainWindow::handleEvent(network::NetworkEvent* event) {
   if (event->eventType() == network::InnerClientConnectedEvent::EventType) {
-      network::InnerClientConnectedEvent * ev = static_cast<network::InnerClientConnectedEvent*>(event);
-      SendMessage(hwndConnectButton_, WM_SETTEXT, 0, (LPARAM)DISCONNECT_LABEL);
+    network::InnerClientConnectedEvent * ev = static_cast<network::InnerClientConnectedEvent*>(event);
+    SendMessage(hwndConnectButton_, WM_SETTEXT, 0, (LPARAM)DISCONNECT_LABEL);
   } else if (event->eventType() == network::InnerClientDisconnectedEvent::EventType) {
-      network::InnerClientDisconnectedEvent * ev = static_cast<network::InnerClientDisconnectedEvent*>(event);
-      SendMessage(hwndConnectButton_, WM_SETTEXT, 0, (LPARAM)CONNECT_LABEL);
-  } else {
-
+    network::InnerClientDisconnectedEvent * ev = static_cast<network::InnerClientDisconnectedEvent*>(event);
+    SendMessage(hwndConnectButton_, WM_SETTEXT, 0, (LPARAM)CONNECT_LABEL);
   }
 
   GuiNetworkEventHandler::handleEvent(event);
@@ -577,10 +562,10 @@ int WinGuiFastoRemoteApplication::exec() {
   HWND hwnd = FindWindow(PROJECT_NAME_TITLE, PROJECT_NAME_TITLE);
   MSG msg;
   while(GetMessage(&msg, NULL, 0, 0)) {
-      if (IsDialogMessage(hwnd, &msg) == 0){
-          TranslateMessage(&msg);
-          DispatchMessage(&msg);
-      }
+    if (IsDialogMessage(hwnd, &msg) == 0){
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
   }
   int res = msg.wParam;
 

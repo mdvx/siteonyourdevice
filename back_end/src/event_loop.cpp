@@ -26,6 +26,7 @@
 #define ev_async_cb_send_fasto(loop, ev) ev_async_send(loop, &(ev->async))
 
 namespace {
+
 struct fasto_async_cb {
   ev_async async;
   fasto::siteonyourdevice::async_loop_exec_function_type func;
@@ -38,6 +39,7 @@ void async_exec_cb(struct ev_loop* loop,
   ioclient->func();
   free(ioclient);
 }
+
 }  // namespace
 
 namespace fasto {
@@ -47,86 +49,86 @@ EvLoopObserver::~EvLoopObserver() {
 }
 
 LibEvLoop::LibEvLoop()
-    : loop_(ev_loop_new(0)), observer_(NULL), exec_id_(),
-      async_stop_((struct ev_async*)calloc(1, sizeof(struct ev_async))) {
-    ev_async_init(async_stop_, stop_cb);
-    ev_set_userdata(loop_, this);
+  : loop_(ev_loop_new(0)), observer_(NULL), exec_id_(),
+    async_stop_((struct ev_async*)calloc(1, sizeof(struct ev_async))) {
+  ev_async_init(async_stop_, stop_cb);
+  ev_set_userdata(loop_, this);
 }
 
 LibEvLoop::~LibEvLoop() {
-    ev_loop_destroy(loop_);
+  ev_loop_destroy(loop_);
 
-    free(async_stop_);
-    async_stop_ = NULL;
+  free(async_stop_);
+  async_stop_ = NULL;
 }
 
 void LibEvLoop::setObserver(EvLoopObserver* observer) {
-    observer_ = observer;
+  observer_ = observer;
 }
 
 void LibEvLoop::start_io(ev_io *io) {
-    CHECK(isLoopThread());
-    ev_io_start(loop_, io);
+  CHECK(isLoopThread());
+  ev_io_start(loop_, io);
 }
 
 void LibEvLoop::stop_io(ev_io *io) {
-    CHECK(isLoopThread());
-    ev_io_stop(loop_, io);
+  CHECK(isLoopThread());
+  ev_io_stop(loop_, io);
 }
 
 void LibEvLoop::start_timer(ev_timer * timer) {
-    CHECK(isLoopThread());
-    ev_timer_start(loop_, timer);
+  CHECK(isLoopThread());
+  ev_timer_start(loop_, timer);
 }
 
 void LibEvLoop::stop_timer(ev_timer * timer) {
-    CHECK(isLoopThread());
-    ev_timer_stop(loop_, timer);
+  CHECK(isLoopThread());
+  ev_timer_stop(loop_, timer);
 }
 
 void LibEvLoop::execInLoopThread(async_loop_exec_function_type async_cb) {
-    if (isLoopThread()) {
-        async_cb();
-    } else {
-        fasto_async_cb* cb = (struct fasto_async_cb*)calloc(1, sizeof(struct fasto_async_cb));
-        cb->func = async_cb;
+  if (isLoopThread()) {
+      async_cb();
+  } else {
+      fasto_async_cb* cb = (struct fasto_async_cb*)calloc(1, sizeof(struct fasto_async_cb));
+      cb->func = async_cb;
 
-        ev_async_cb_init_fasto(cb, async_exec_cb);
-        ev_async_cb_start_fasto(loop_, cb);
-        ev_async_cb_send_fasto(loop_, cb);
-    }
+      ev_async_cb_init_fasto(cb, async_exec_cb);
+      ev_async_cb_start_fasto(loop_, cb);
+      ev_async_cb_send_fasto(loop_, cb);
+  }
 }
 
 int LibEvLoop::exec() {
-    exec_id_ = common::thread::PlatformThread::currentId();
+  exec_id_ = common::thread::PlatformThread::currentId();
 
-    ev_async_start(loop_, async_stop_);
-    if (observer_) {
-        observer_->preLooped(this);
-    }
-    ev_loop(loop_, 0);
-    if (observer_) {
-        observer_->postLooped(this);
-    }
-    return EXIT_SUCCESS;
+  ev_async_start(loop_, async_stop_);
+  if (observer_) {
+      observer_->preLooped(this);
+  }
+  ev_loop(loop_, 0);
+  if (observer_) {
+      observer_->postLooped(this);
+  }
+  return EXIT_SUCCESS;
 }
 
 bool LibEvLoop::isLoopThread() const {
-    return exec_id_ == common::thread::PlatformThread::currentId();
+  return exec_id_ == common::thread::PlatformThread::currentId();
 }
 
 void LibEvLoop::stop() {
-    ev_async_send(loop_, async_stop_);
+  ev_async_send(loop_, async_stop_);
 }
 
 void LibEvLoop::stop_cb(struct ev_loop* loop,
                         struct ev_async* watcher, int revents) {
-    LibEvLoop* evloop = reinterpret_cast<LibEvLoop *>(ev_userdata(loop));
-    ev_async_stop(loop, evloop->async_stop_);
-    if (evloop->observer_) {
-        evloop->observer_->stoped(evloop);
-    }
-    ev_unloop(loop, EVUNLOOP_ONE);
+  LibEvLoop* evloop = reinterpret_cast<LibEvLoop *>(ev_userdata(loop));
+  ev_async_stop(loop, evloop->async_stop_);
+  if (evloop->observer_) {
+      evloop->observer_->stoped(evloop);
+  }
+  ev_unloop(loop, EVUNLOOP_ONE);
 }
 
 }  // namespace siteonyourdevice

@@ -26,15 +26,15 @@ namespace websocket {
 
 WebSocketServer::WebSocketServer(const common::net::hostAndPort& host,
                                  tcp::ITcpLoopObserver* observer)
-    : TcpServer(host, observer) {
+  : TcpServer(host, observer) {
 }
 
 const char* WebSocketServer::className() const {
-    return "WebSocketServer";
+  return "WebSocketServer";
 }
 
 tcp::TcpClient * WebSocketServer::createClient(const common::net::socket_info& info) {
-    return new WebSocketClient(this, info);
+  return new WebSocketClient(this, info);
 }
 
 }  // namespace websocket
