@@ -277,9 +277,9 @@ void GtkMainWindow::handleEvent(network::NetworkEvent* event) {
 void GtkMainWindow::showImpl() {
     HttpConfig cur_config = controller_->config();
 
-    std::string loc_host = cur_config.local_host.host_;
+    std::string loc_host = cur_config.local_host.host;
     gtk_entry_set_text(GTK_ENTRY(domain_text_), loc_host.c_str());
-    std::string loc_portstr = common::convertToString(cur_config.local_host.port_);
+    std::string loc_portstr = common::convertToString(cur_config.local_host.port);
     gtk_entry_set_text(GTK_ENTRY(port_text_), loc_portstr.c_str());
     gtk_entry_set_text(GTK_ENTRY(login_text_), cur_config.login.c_str());
     gtk_entry_set_text(GTK_ENTRY(password_text_), cur_config.password.c_str());
@@ -288,9 +288,9 @@ void GtkMainWindow::showImpl() {
     gtk_toggle_button_set_state(GTK_TOGGLE_BUTTON(is_external_domain_),
                                 cur_config.server_type ==  EXTERNAL_SERVER);
 
-    std::string ex_host = cur_config.external_host.host_;
+    std::string ex_host = cur_config.external_host.host;
     gtk_entry_set_text(GTK_ENTRY(external_host_), ex_host.c_str());
-    std::string exportstr = common::convertToString(cur_config.external_host.port_);
+    std::string exportstr = common::convertToString(cur_config.external_host.port);
     gtk_entry_set_text(GTK_ENTRY(external_port_), exportstr.c_str());
 
     gtk_widget_show_all(window_);

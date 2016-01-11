@@ -217,7 +217,7 @@ bool HttpServerHost::unRegisterInnerConnectionByHost(tcp::TcpClient* connection)
         return false;
     }
 
-    const std::string host = hinf.host.host_;
+    const std::string host = hinf.host.host;
     connections_.erase(host);
     return true;
 }
@@ -232,7 +232,7 @@ bool HttpServerHost::registerInnerConnectionByUser(const UserAuthInfo& user,
 
     iconnection->setServerHostInfo(user);
 
-    const std::string host = user.host.host_;
+    const std::string host = user.host.host;
     connections_[host] = iconnection;
     return true;
 }

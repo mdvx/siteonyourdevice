@@ -39,7 +39,7 @@ redisContext * redis_connect(const fasto::siteonyourdevice::server::redis_config
 
     redisContext * redis = NULL;
     if (unixPath.empty()) {
-        redis = redisConnect(redisHost.host_.c_str(), redisHost.port_);
+        redis = redisConnect(redisHost.host.c_str(), redisHost.port);
     } else {
         redis = redisConnectUnix(unixPath.c_str());
     }
@@ -126,7 +126,7 @@ bool RedisStorage::findUser(const UserAuthInfo& user) const {
     hosts_names_t hosts;
     if (parse_user_json(login, userJson, &info, &hosts)) {
         for (int j = 0; j < hosts.size(); ++j) {
-            if (hosts[j] == user.host.host_ && user.password == info.password) {
+            if (hosts[j] == user.host.host && user.password == info.password) {
                 freeReplyObject(reply);
                 redisFree(redis);
                 return true;

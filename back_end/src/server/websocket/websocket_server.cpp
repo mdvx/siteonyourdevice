@@ -87,7 +87,7 @@ void WebSocketServerHandlerHost::processWebsocketRequest(http::HttpClient *hclie
     std::string hpath = path.hpath();
     std::string fpath = path.fpath();
     common::net::hostAndPort host = common::convertFromString<common::net::hostAndPort>(hpath);
-    std::string hpath_without_port = host.host_;
+    std::string hpath_without_port = host.host;
 
     inner::InnerTcpServerClient * innerConnection = parent_->findInnerConnectionByHost(hpath_without_port);
     if (!innerConnection) {
@@ -112,7 +112,7 @@ void WebSocketServerHandlerHost::processWebsocketRequest(http::HttpClient *hclie
     tcp::ITcpLoop *server = hclient->server();
     server->unregisterClient(hclient);
     innerConnection->addWebsocketRelayClient(parent_->innerHandler(), hclient, res,
-                                             common::net::hostAndPort("localhost", host.port_));
+                                             common::net::hostAndPort("localhost", host.port));
 }
 
 }  // namespace websocket

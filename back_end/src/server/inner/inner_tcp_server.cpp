@@ -207,7 +207,7 @@ void InnerServerHandlerHost::closed(tcp::TcpClient* client) {
         InnerTcpServerClient * iconnection = dynamic_cast<InnerTcpServerClient *>(client);
         if (iconnection) {
             UserAuthInfo hinf = iconnection->serverHostInfo();
-            std::string hoststr = hinf.host.host_;
+            std::string hoststr = hinf.host.host;
             std::string connected_resp = common::MemSPrintf(SERVER_NOTIFY_CLIENT_DISCONNECTED_1S, hoststr);
             bool res = sub_commands_in_->publish_clients_state(connected_resp);
             if (!res) {
@@ -315,7 +315,7 @@ void InnerServerHandlerHost::handleInnerResponceCommand(siteonyourdevice::inner:
                     goto fail;
                 }
 
-                std::string hoststr = uauth.host.host_;
+                std::string hoststr = uauth.host.host;
                 InnerTcpServerClient* fclient = parent_->findInnerConnectionByHost(hoststr);
                 if (fclient) {
                     cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_DOUBLE_CONNECTION_HOST);
