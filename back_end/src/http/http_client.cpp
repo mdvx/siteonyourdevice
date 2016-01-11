@@ -33,20 +33,21 @@
 namespace {
 
 const char* HTML_PATTERN_ISISSSS7 =
-        R"(<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n"
-        "<html>\n<head>\n"
-        "<meta http-equiv=\"Content-type\" content=\"text/html;charset=UTF-8\">\n"
-        "<title>%d %s</title>\n</head>\n<body bgcolor=\"#cc9999\">\n"
-        "<h4>%d %s</h4>\n%s\n<hr>\n<address><a href=\"%s\">%s</a></address>\n</body>\n</html>\n)";
+  R"(<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"
+  "http://www.w3.org/TR/html4/loose.dtd\">\n"
+  "<html>\n<head>\n"
+  "<meta http-equiv=\"Content-type\" content=\"text/html;charset=UTF-8\">\n"
+  "<title>%d %s</title>\n</head>\n<body bgcolor=\"#cc9999\">\n"
+  "<h4>%d %s</h4>\n%s\n<hr>\n<address><a href=\"%s\">%s</a></address>\n</body>\n</html>\n)";
 
-struct send_data_helper {
+struct SendDataHelper {
     fasto::siteonyourdevice::http::StreamSPtr header_stream;
     uint32_t all_size;
 };
 
 common::Error send_data_frame(const char* buff,
                               uint32_t buff_len, void *user_data, uint32_t *processed) {
-    send_data_helper *helper = reinterpret_cast<send_data_helper*>(user_data);
+    SendDataHelper *helper = reinterpret_cast<SendDataHelper*>(user_data);
     fasto::siteonyourdevice::http::StreamSPtr header_stream = helper->header_stream;
 
     uint8_t flags = 0;
@@ -242,7 +243,7 @@ common::Error Http2Client::send_file_by_fd(common::http::http_protocols protocol
             return DEBUG_MSG_PERROR("findStreamByType", EAGAIN);
         }
 
-        send_data_helper help;
+        SendDataHelper help;
         help.header_stream = header_stream;
         help.all_size = size;
 
