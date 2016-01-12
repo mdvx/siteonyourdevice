@@ -168,7 +168,7 @@
     [domainLabel_ setSelectable:NO];
     [window.contentView addSubview:domainLabel_];
     
-    NSString *loc_host = [NSString stringWithCString:config.local_host_.host_.c_str()
+    NSString *loc_host = [NSString stringWithCString:config.local_host.host.c_str()
                                                 encoding:[NSString defaultCStringEncoding]];
     [domainTextBox_ setStringValue: loc_host];
     [window.contentView addSubview:domainTextBox_];
@@ -180,7 +180,7 @@
     [portLabel_ setSelectable:NO];
     [window.contentView addSubview:portLabel_];
     
-    const uint16 loc_port = config.local_host_.port_;
+    const uint16 loc_port = config.local_host.port;
     [portTextBox_ setIntValue: loc_port];
     OnlyIntegerValueFormatter * formatter = [[OnlyIntegerValueFormatter alloc] init];
     [portTextBox_ setFormatter: formatter];
@@ -193,7 +193,7 @@
     [loginLabel_ setSelectable:NO];
     [window.contentView addSubview:loginLabel_];
     
-    NSString *login = [NSString stringWithCString:config.login_.c_str()
+    NSString *login = [NSString stringWithCString:config.login.c_str()
                                           encoding:[NSString defaultCStringEncoding]];
     [loginTextBox_ setStringValue: login];
     [window.contentView addSubview:loginTextBox_];
@@ -205,7 +205,7 @@
     [passwordLabel_ setSelectable:NO];
     [window.contentView addSubview:passwordLabel_];
     
-    NSString *password = [NSString stringWithCString:config.password_.c_str()
+    NSString *password = [NSString stringWithCString:config.password.c_str()
                                          encoding:[NSString defaultCStringEncoding]];
     [passwordTextBox_ setStringValue: password];
     [window.contentView addSubview:passwordTextBox_];
@@ -217,7 +217,7 @@
     [contentPathLabel_ setSelectable:NO];
     [window.contentView addSubview:contentPathLabel_];
     
-    NSString *cpath = [NSString stringWithCString:config.content_path_.c_str()
+    NSString *cpath = [NSString stringWithCString:config.content_path.c_str()
                                             encoding:[NSString defaultCStringEncoding]];
     [contentPathTextBox_ setStringValue: cpath];
     [window.contentView addSubview:contentPathTextBox_];
@@ -229,23 +229,23 @@
 
     [isExternalSiteCheckBox_ setButtonType:NSSwitchButton];
     [isExternalSiteCheckBox_ setTitle:@ EXTERNAL_SITE_LABEL];
-    [isExternalSiteCheckBox_ setState:config.server_type_ == EXTERNAL_SERVER ? NSOnState : NSOffState];
+    [isExternalSiteCheckBox_ setState:config.server_type == EXTERNAL_SERVER ? NSOnState : NSOffState];
     [isExternalSiteCheckBox_ setAction:@selector(externalSiteChangeAction:)];
     [window.contentView addSubview:isExternalSiteCheckBox_];
 
-    NSString *ex_domain = [NSString stringWithCString:config.external_host_.host_.c_str()
+    NSString *ex_domain = [NSString stringWithCString:config.external_host.host.c_str()
                                                 encoding:[NSString defaultCStringEncoding]];
     [externalHostTextBox_ setStringValue: ex_domain];
     [window.contentView addSubview:externalHostTextBox_];
 
-    const uint16 ex_port = config.external_host_.port_;
+    const uint16 ex_port = config.external_host.port;
     [externalPortTextBox_ setIntValue: ex_port];
     [externalPortTextBox_ setFormatter: formatter];
     [window.contentView addSubview:externalPortTextBox_];
 
     [isPrivateSiteCheckBox_ setButtonType:NSSwitchButton];
     [isPrivateSiteCheckBox_ setTitle:@ PRIVATE_SITE_LABEL];
-    [isPrivateSiteCheckBox_ setState:config.is_private_site_ ? NSOnState : NSOffState];
+    [isPrivateSiteCheckBox_ setState:config.is_private_site ? NSOnState : NSOffState];
     [self externalSiteChangeAction: nil];
     [window.contentView addSubview:isPrivateSiteCheckBox_];
 
@@ -271,22 +271,22 @@
     NSString *loc_domain = [domainTextBox_ stringValue];
     const std::string loc_domain_str = [loc_domain UTF8String];
     int loc_port = [portTextBox_ intValue];
-    config.local_host_ = common::net::hostAndPort(loc_domain_str, loc_port);
+    config.local_host = common::net::hostAndPort(loc_domain_str, loc_port);
 
     NSString *login = [loginTextBox_ stringValue];
-    config.login_ = [login UTF8String];
+    config.login = [login UTF8String];
     NSString *password = [passwordTextBox_ stringValue];
-    config.password_ = [password UTF8String];
+    config.password = [password UTF8String];
     NSString *contentPath = [contentPathTextBox_ stringValue];
-    config.content_path_ = [contentPath UTF8String];
+    config.content_path = [contentPath UTF8String];
 
-    config.is_private_site_ = [isPrivateSiteCheckBox_ state] == NSOnState;
-    config.server_type_ = [isExternalSiteCheckBox_ state] == NSOnState ? EXTERNAL_SERVER : FASTO_SERVER;
+    config.is_private_site = [isPrivateSiteCheckBox_ state] == NSOnState;
+    config.server_type = [isExternalSiteCheckBox_ state] == NSOnState ? EXTERNAL_SERVER : FASTO_SERVER;
 
     NSString *ex_domain = [externalHostTextBox_ stringValue];
     const std::string ex_domain_str = [ex_domain UTF8String];
     int ex_port = [portTextBox_ intValue];
-    config.external_host_ = common::net::hostAndPort(ex_domain_str, ex_port);
+    config.external_host = common::net::hostAndPort(ex_domain_str, ex_port);
 
     cxx_window_->onConnectClicked(config);
 }
