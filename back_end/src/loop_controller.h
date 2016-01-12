@@ -65,7 +65,7 @@ class ILoopThreadController
   virtual void started();
   virtual void stoped();
 
-  std::shared_ptr<common::thread::Thread<int> > loop_thread_;
+  common::shared_ptr<common::thread::Thread<int> > loop_thread_;
 };
 
 }  // namespace siteonyourdevice

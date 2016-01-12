@@ -141,7 +141,7 @@ void HttpServerHandler::dataReceived(tcp::TcpClient* client) {
     return;
   }
 
-  http::HttpClient* hclient = dynamic_cast<http::HttpClient*>(client);
+  HttpClient* hclient = dynamic_cast<HttpClient*>(client);
   CHECK(hclient);
   processReceived(hclient, buff, nread);
 }

@@ -20,6 +20,7 @@
 
 #include "common/http/http2.h"
 #include "common/net/socket_tcp.h"
+#include "common/smart_ptr.h"
 
 namespace fasto {
 namespace siteonyourdevice {
@@ -53,7 +54,7 @@ class IStream {
   const common::http2::frame_base init_frame_;
 };
 
-typedef std::shared_ptr<IStream> StreamSPtr;
+typedef common::shared_ptr<IStream> StreamSPtr;
 
 class HTTP2DataStream
         : public IStream {
@@ -64,7 +65,7 @@ class HTTP2DataStream
   virtual bool processFrameImpl(const common::http2::frame_base& frame);
 };
 
-typedef std::shared_ptr<HTTP2DataStream> HTTP2DataStreamSPtr;
+typedef common::shared_ptr<HTTP2DataStream> HTTP2DataStreamSPtr;
 
 class HTTP2PriorityStream
         : public IStream {
@@ -76,7 +77,7 @@ class HTTP2PriorityStream
   virtual bool processFrameImpl(const common::http2::frame_base& frame);
 };
 
-typedef std::shared_ptr<HTTP2PriorityStream> HTTP2PriorityStreamSPtr;
+typedef common::shared_ptr<HTTP2PriorityStream> HTTP2PriorityStreamSPtr;
 
 class HTTP2SettingsStream
         : public IStream {
@@ -89,7 +90,7 @@ class HTTP2SettingsStream
   bool negotiated_;
 };
 
-typedef std::shared_ptr<HTTP2SettingsStream> HTTP2SettingsStreamSPtr;
+typedef common::shared_ptr<HTTP2SettingsStream> HTTP2SettingsStreamSPtr;
 
 class HTTP2HeadersStream
         : public IStream {
@@ -100,7 +101,7 @@ class HTTP2HeadersStream
   virtual bool processFrameImpl(const common::http2::frame_base& frame);
 };
 
-typedef std::shared_ptr<HTTP2HeadersStream> HTTP2HeadersStreamSPtr;
+typedef common::shared_ptr<HTTP2HeadersStream> HTTP2HeadersStreamSPtr;
 
 }  // namespace http
 }  // namespace siteonyourdevice

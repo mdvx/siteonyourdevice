@@ -358,7 +358,7 @@ bool Http2Client::isSettingNegotiated() const {
     return false;
   }
 
-  HTTP2SettingsStream* rsettings = dynamic_cast<HTTP2SettingsStream*>(settings.get());
+  HTTP2SettingsStreamSPtr rsettings = std::dynamic_pointer_cast<HTTP2SettingsStream>(settings);
   CHECK(rsettings);
   return rsettings->isNegotiated();
 }
