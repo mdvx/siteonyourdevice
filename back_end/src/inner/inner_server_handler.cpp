@@ -373,9 +373,79 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
 
     json_object_put(config_json);
   } else if (IS_EQUAL_COMMAND(command, SERVER_PLEASE_SET_CONFIG_COMMAND)) {
-    const char* config_json_str = argv[1];
-    if (config_json_str) {
+    if (argc > 1) {
+       const char* config_json_str = argv[1];
+       json_object * config_json = json_tokener_parse(config_json_str);
+       if (!config_json) {
+           cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S,
+                                               CAUSE_INVALID_ARGS);
+           common::Error err = connection->write(resp, &nwrite);
+           if (err && err->isError()) {
+             DEBUG_MSG_ERROR(err);
+           }
+           return;
+       }
 
+       HttpConfig new_config = config_;
+
+       json_object* jlocal_host = NULL;
+       json_object_object_get_ex(config_json, LOCAL_HOST_SETTING_LABEL, &jlocal_host);
+       if (jlocal_host) {
+         const char * lhost_str = json_object_get_string(jlocal_host);
+         new_config.local_host = common::convertFromString<common::net::hostAndPort>(lhost_str);
+       }
+
+       json_object* jexternal_host = NULL;
+       json_object_object_get_ex(config_json, EXTERNAL_HOST_SETTING_LABEL, &jexternal_host);
+       if (jexternal_host) {
+         const char * ehost_str = json_object_get_string(jexternal_host);
+         new_config.external_host = common::convertFromString<common::net::hostAndPort>(ehost_str);
+       }
+
+       json_object* jcontent_path = NULL;
+       json_object_object_get_ex(config_json, CONTENT_PATH_SETTING_LABEL, &jcontent_path);
+       if (jcontent_path) {
+         new_config.content_path = json_object_get_string(jcontent_path);
+       }
+
+       json_object* jprivate_site = NULL;
+       json_object_object_get_ex(config_json, PRIVATE_SITE_SETTING_LABEL, &jprivate_site);
+       if (jprivate_site) {
+         new_config.is_private_site = json_object_get_boolean(jprivate_site);
+       }
+
+       json_object* jserver_type = NULL;
+       json_object_object_get_ex(config_json, SERVER_TYPE_SETTING_LABEL, &jserver_type);
+       if (jserver_type) {
+         new_config.server_type = static_cast<http_server_type>(json_object_get_int(jserver_type));
+       }
+
+       json_object* jhandler_urls = NULL;
+       json_object_object_get_ex(config_json, HANDLERS_URLS_SECTION_LABEL, &jhandler_urls);
+       if (jhandler_urls) {
+          int urls_count = json_object_array_length(jhandler_urls);
+          for(int i = 0; i < urls_count; ++i){
+
+          }
+       }
+
+       json_object* jsockets_section = NULL;
+       json_object_object_get_ex(config_json, SERVER_SOCKETS_SECTION_LABEL, &jsockets_section);
+       if (jsockets_section) {
+          int sockets_count = json_object_array_length(jsockets_section);
+          for(int i = 0; i < sockets_count; ++i){
+
+          }
+       }
+
+       json_object_put(config_json);
+    } else {
+      cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S,
+                                          CAUSE_INVALID_ARGS);
+      common::Error err = connection->write(resp, &nwrite);
+      if (err && err->isError()) {
+        DEBUG_MSG_ERROR(err);
+      }
     }
   } else {
       DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING,
