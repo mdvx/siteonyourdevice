@@ -29,8 +29,7 @@
 
 #include "inner/http_inner_server.h"
 #include "inner/http_inner_server_handler.h"
-
-#include "loop_controller.h"
+#include "inner/inner_server_handler.h"
 
 #include "application/fasto_application.h"
 
@@ -39,8 +38,6 @@
 #include "network/network_events.h"
 
 namespace {
-
-typedef common::multi_threading::unique_lock<common::multi_threading::mutex_t> lock_t;
 
 int ini_handler_fasto(void* user, const char* section, const char* name, const char* value) {
   fasto::siteonyourdevice::HttpConfig* pconfig = reinterpret_cast<fasto::siteonyourdevice::HttpConfig*>(user);
@@ -79,11 +76,18 @@ int ini_handler_fasto(void* user, const char* section, const char* name, const c
     return 0;  /* unknown section/name, error */
   }
 }
+}  // namespace
+
+namespace fasto {
+namespace siteonyourdevice {
+namespace network {
+
+namespace {
 
 class HttpAuthObserver
-  : public fasto::siteonyourdevice::http::IHttpAuthObserver {
+  : public http::IHttpAuthObserver {
  public:
-  explicit HttpAuthObserver(fasto::siteonyourdevice::inner::Http2InnerServerHandler* servh)
+  explicit HttpAuthObserver(inner::InnerServerHandler* servh)
     : servh_(servh) {
   }
 
@@ -96,7 +100,7 @@ class HttpAuthObserver
         return false;
     }
 
-    const fasto::siteonyourdevice::UserAuthInfo& ainf = servh_->authInfo();
+    const UserAuthInfo& ainf = servh_->authInfo();
     if (!ainf.isValid()) {
        return false;
     }
@@ -105,35 +109,32 @@ class HttpAuthObserver
   }
 
  private:
-  fasto::siteonyourdevice::inner::Http2InnerServerHandler* const servh_;
+  inner::InnerServerHandler* const servh_;
 };
 
 class ServerControllerBase
-  : public fasto::siteonyourdevice::ILoopThreadController {
+  : public ILoopThreadController {
  public:
-  ServerControllerBase(const fasto::siteonyourdevice::HttpConfig& config,
-                       const fasto::siteonyourdevice::UserAuthInfo& ainfo)
-    : config_(config), ainfo_(ainfo), authChecker_(NULL) {
+  ServerControllerBase(http::IHttpAuthObserver* auth_checker, const HttpConfig& config)
+    : auth_checker_(auth_checker), config_(config) {
   }
 
-  ~ServerControllerBase() {
-    delete authChecker_;
+  ~ServerControllerBase() {  
   }
 
  protected:
-  const fasto::siteonyourdevice::HttpConfig config_;
-  const fasto::siteonyourdevice::UserAuthInfo ainfo_;
+  const HttpConfig config_;
+  http::IHttpAuthObserver* const auth_checker_;
 
  private:
-  fasto::siteonyourdevice::tcp::ITcpLoopObserver * createHandler() {
-    fasto::siteonyourdevice::HttpServerInfo hs(PROJECT_NAME_TITLE, PROJECT_DOMAIN);
-    fasto::siteonyourdevice::inner::Http2InnerServerHandler* handler = new fasto::siteonyourdevice::inner::Http2InnerServerHandler(hs, g_inner_host, config_);
-    authChecker_ = new HttpAuthObserver(handler);
-    handler->setAuthChecker(authChecker_);
+  tcp::ITcpLoopObserver * createHandler() {
+    HttpServerInfo hs(PROJECT_NAME_TITLE, PROJECT_DOMAIN);
+    inner::Http2ClientServerHandler* handler = new inner::Http2ClientServerHandler(hs);
+    handler->setAuthChecker(auth_checker_);
 
     // handler prepare
     for (size_t i = 0; i < config_.handlers_urls.size(); ++i) {
-      fasto::siteonyourdevice::HttpConfig::handlers_urls_t handurl = config_.handlers_urls[i];
+      HttpConfig::handlers_urls_t handurl = config_.handlers_urls[i];
       const std::string httpcallbackstr = handurl.second;
       std::string httpcallback_ns = handurl.second;
       std::string httpcallback_name;
@@ -143,14 +144,14 @@ class ServerControllerBase
         httpcallback_name = httpcallbackstr.substr(ns_del + 2);
       }
 
-      common::shared_ptr<fasto::siteonyourdevice::IHttpCallback> hhandler = fasto::siteonyourdevice::IHttpCallback::createHttpCallback(httpcallback_ns, httpcallback_name);
+      common::shared_ptr<IHttpCallback> hhandler = IHttpCallback::createHttpCallback(httpcallback_ns, httpcallback_name);
       if (hhandler) {
         handler->registerHttpCallback(handurl.first, hhandler);
       }
     }
 
     for (size_t i = 0; i < config_.server_sockets_urls.size(); ++i) {
-      fasto::siteonyourdevice::HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls[i];
+      HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls[i];
       const common::uri::Uri url = sock_url.second;
       handler->registerSocketUrl(url);
     }
@@ -158,16 +159,13 @@ class ServerControllerBase
     // handler prepare
     return handler;
   }
-
-  HttpAuthObserver* authChecker_;
 };
 
 class LocalHttpServerController
         : public ServerControllerBase {
  public:
-  LocalHttpServerController(const fasto::siteonyourdevice::HttpConfig& config,
-                            const fasto::siteonyourdevice::UserAuthInfo& ainfo)
-    : ServerControllerBase(config, ainfo) {
+  LocalHttpServerController(http::IHttpAuthObserver* auth_checker, const HttpConfig& config)
+    : ServerControllerBase(auth_checker, config) {
     common::Error err = common::file_system::change_directory(config.content_path);
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
@@ -183,15 +181,13 @@ class LocalHttpServerController
   }
 
  private:
-  fasto::siteonyourdevice::tcp::ITcpLoop * createServer(fasto::siteonyourdevice::tcp::ITcpLoopObserver * handler) {
-    fasto::siteonyourdevice::inner::Http2InnerServer* serv = new fasto::siteonyourdevice::inner::Http2InnerServer(handler, config_);
+  tcp::ITcpLoop * createServer(tcp::ITcpLoopObserver * handler) {
+    inner::Http2InnerServer* serv = new inner::Http2InnerServer(handler, config_);
     serv->setName("local_http_server");
 
     common::Error err = serv->bind();
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
-      auto ex_event = make_exception_event(new fasto::siteonyourdevice::network::InnerClientConnectedEvent(this, ainfo_), err);
-      EVENT_BUS()->postEvent(ex_event);
       delete serv;
       return NULL;
     }
@@ -199,8 +195,6 @@ class LocalHttpServerController
     err = serv->listen(5);
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
-      auto ex_event = make_exception_event(new fasto::siteonyourdevice::network::InnerClientConnectedEvent(this, ainfo_), err);
-      EVENT_BUS()->postEvent(ex_event);
       delete serv;
       return NULL;
     }
@@ -212,26 +206,21 @@ class LocalHttpServerController
 class ExternalHttpServerController
   : public ServerControllerBase {
  public:
-  ExternalHttpServerController(const fasto::siteonyourdevice::HttpConfig& config,
-                               const fasto::siteonyourdevice::UserAuthInfo& ainfo)
-    : ServerControllerBase(config, ainfo) {
+  ExternalHttpServerController(http::IHttpAuthObserver* auth_checker, const HttpConfig& config)
+    : ServerControllerBase(auth_checker, config) {
   }
 
  private:
-  fasto::siteonyourdevice::tcp::ITcpLoop * createServer(fasto::siteonyourdevice::tcp::ITcpLoopObserver * handler) {
-    fasto::siteonyourdevice::inner::ProxyInnerServer* serv = new fasto::siteonyourdevice::inner::ProxyInnerServer(handler);
+  tcp::ITcpLoop * createServer(tcp::ITcpLoopObserver * handler) {
+    inner::ProxyInnerServer* serv = new inner::ProxyInnerServer(handler);
     serv->setName("proxy_http_server");
     return serv;
   }
 };
 }  // namespace
 
-namespace fasto {
-namespace siteonyourdevice {
-namespace network {
-
 NetworkController::NetworkController(int argc, char *argv[])
-  : server_mutex_(), server_(NULL), config_(),
+  : ILoopThreadController(), auth_checker_(NULL), server_(NULL), config_(),
     thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>()) {
   bool daemon_mode = false;
 #ifdef OS_MACOSX
@@ -248,12 +237,14 @@ NetworkController::NetworkController(int argc, char *argv[])
   }
 
   config_path_ = config_path;
-#if defined(BUILD_CONSOLE) && defined(OS_POSIX)
+#if defined(OS_POSIX)
   if (daemon_mode) {
     common::create_as_daemon();
   }
 #endif
   readConfig();
+
+  ILoopThreadController::start();
 }
 
 NetworkController::~NetworkController() {
@@ -261,13 +252,12 @@ NetworkController::~NetworkController() {
   EVENT_BUS()->stop();
 
   delete server_;
+  delete auth_checker_;
 
   saveConfig();
 }
 
 int NetworkController::exec() {
-  lock_t lock(server_mutex_);
-
   if (server_) {  // if connect dosen't clicked
       return server_->join();
   }
@@ -276,8 +266,6 @@ int NetworkController::exec() {
 }
 
 void NetworkController::exit(int result) {
-  lock_t lock(server_mutex_);
-
   if (!server_) {  // if connect dosen't clicked
       return;
   }
@@ -286,41 +274,24 @@ void NetworkController::exit(int result) {
 }
 
 void NetworkController::connect() {
-  lock_t lock(server_mutex_);
-
   if (server_) {  // if connected
-    common::Error err = common::make_error_value("Failed, double connection!",
-                                                 common::Value::E_ERROR, common::logging::L_ERR);
-    auto ex_event = make_exception_event(new InnerClientConnectedEvent(this, authInfo()), err);
-    EVENT_BUS()->postEvent(ex_event);
     return;
   }
 
   const http_server_type server_type = config_.server_type;
   const common::net::hostAndPort externalHost = config_.external_host;
   if (server_type == FASTO_SERVER) {
-     server_ = new LocalHttpServerController(config_, authInfo());
+     server_ = new LocalHttpServerController(auth_checker_, config_);
      server_->start();
   } else if (server_type == EXTERNAL_SERVER && externalHost.isValid()) {
-     server_ = new ExternalHttpServerController(config_, authInfo());
+     server_ = new ExternalHttpServerController(auth_checker_, config_);
      server_->start();
   } else {
-     common::Error err = common::make_error_value("Invalid https server settings!",
-                                                     common::Value::E_ERROR, common::logging::L_ERR);
-      auto ex_event = make_exception_event(new InnerClientConnectedEvent(this, authInfo()), err);
-      EVENT_BUS()->postEvent(ex_event);
   }
 }
 
 void NetworkController::disConnect() {
-  lock_t lock(server_mutex_);
-
   if (!server_) {  // if connect dosen't clicked
-    common::Error err = common::make_error_value("Failed, not connected!",
-                                                 common::Value::E_ERROR,
-                                                 common::logging::L_ERR);
-    auto ex_event = make_exception_event(new InnerClientDisconnectedEvent(this, authInfo()), err);
-      EVENT_BUS()->postEvent(ex_event);
       return;
   }
 
@@ -398,6 +369,18 @@ void NetworkController::readConfig() {
   }
 
   config_ = config;
+}
+
+tcp::ITcpLoopObserver * NetworkController::createHandler(){
+  inner::InnerServerHandler* handler = new inner::InnerServerHandler(g_inner_host, config_);
+  auth_checker_ = new HttpAuthObserver(handler);
+  return handler;
+}
+
+tcp::ITcpLoop * NetworkController::createServer(tcp::ITcpLoopObserver * handler){
+  inner::ProxyInnerServer* serv = new inner::ProxyInnerServer(handler);
+  serv->setName("local_inner_server");
+  return serv;
 }
 
 }  // namespace network

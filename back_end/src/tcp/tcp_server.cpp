@@ -57,8 +57,8 @@ SigIgnInit() {
 } sig_init;
 
 typedef common::multi_threading::unique_lock<common::multi_threading::mutex_t> lock_t;
-common::multi_threading::mutex_t g_exists_servers_mutex_;
-std::vector<fasto::siteonyourdevice::tcp::TcpServer*> g_exists_servers_;
+common::multi_threading::mutex_t g_exists_loops_mutex_;
+std::vector<fasto::siteonyourdevice::tcp::ITcpLoop*> g_exists_loops_;
 
 }  // namespace
 
@@ -200,6 +200,22 @@ void ITcpLoop::changeFlags(TcpClient *client) {
   }
 }
 
+ITcpLoop* ITcpLoop::findExistLoopByPredicate(std::function<bool(ITcpLoop*)> pred){
+  if(!pred){
+    return nullptr;
+  }
+
+  lock_t loc(g_exists_loops_mutex_);
+  for(size_t i = 0; i < g_exists_loops_.size(); ++i){
+    ITcpLoop * loop = g_exists_loops_[i];
+    if(loop && pred(loop)){
+       return loop;
+    }
+  }
+
+  return nullptr;
+}
+
 std::vector<TcpClient *> ITcpLoop::clients() const {
   return clients_;
 }
@@ -258,6 +274,11 @@ void ITcpLoop::timer_cb(struct ev_loop* loop, struct ev_timer* timer, int revent
 }
 
 void ITcpLoop::preLooped(LibEvLoop* loop) {
+  {
+    lock_t loc(g_exists_loops_mutex_);
+    g_exists_loops_.push_back(this);
+  }
+
   if (observer_) {
     observer_->preLooped(this);
   }
@@ -280,6 +301,13 @@ void ITcpLoop::stoped(LibEvLoop* loop) {
 }
 
 void ITcpLoop::postLooped(LibEvLoop* loop) {
+  {
+    lock_t loc(g_exists_loops_mutex_);
+    g_exists_loops_.erase(
+          std::remove(g_exists_loops_.begin(), g_exists_loops_.end(), this),
+          g_exists_loops_.end());
+  }
+
   if (observer_) {
     observer_->postLooped(this);
   }
@@ -296,19 +324,21 @@ TcpServer::~TcpServer() {
   accept_io_ = NULL;
 }
 
-TcpServer* TcpServer::findExistServerByHost(const common::net::hostAndPort& host) {
+ITcpLoop* TcpServer::findExistServerByHost(const common::net::hostAndPort& host) {
   if (!host.isValid()) {
-    return NULL;
+    return nullptr;
   }
 
-  lock_t loc(g_exists_servers_mutex_);
-  for (size_t i = 0; i < g_exists_servers_.size(); ++i) {
-    TcpServer* server = g_exists_servers_[i];
-    if (server && server->host() == host) {
-      return server;
+  auto find_by_host = [host](ITcpLoop * loop) -> bool {
+    TcpServer* server = dynamic_cast<TcpServer*>(loop);
+    if(!server){
+        return false;
     }
-  }
-  return NULL;
+
+    return server->host() == host;
+  };
+
+  return findExistLoopByPredicate(find_by_host);
 }
 
 TcpClient * TcpServer::createClient(const common::net::socket_info& info) {
@@ -319,21 +349,10 @@ void TcpServer::preLooped(LibEvLoop* loop) {
   int fd = sock_.fd();
   ev_io_init(accept_io_, accept_cb, fd, EV_READ);
   loop->start_io(accept_io_);
-
-  {
-    lock_t loc(g_exists_servers_mutex_);
-    g_exists_servers_.push_back(this);
-  }
   ITcpLoop::preLooped(loop);
 }
 
 void TcpServer::postLooped(LibEvLoop* loop) {
-  {
-    lock_t loc(g_exists_servers_mutex_);
-    g_exists_servers_.erase(
-          std::remove(g_exists_servers_.begin(), g_exists_servers_.end(), this),
-          g_exists_servers_.end());
-  }
   ITcpLoop::postLooped(loop);
 }
 

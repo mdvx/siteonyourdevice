@@ -105,55 +105,30 @@ SET(SOURCES_SDS
     third-party/sds/sds.c
 )
 
-IF(NOT BUILD_CONSOLE)
-    SET(HEADERS_APPLICATION ${HEADERS_APPLICATION}
-        application/fasto_remote_gui_application.h
-    )
-    SET(SOURCES_APPLICATION ${SOURCES_APPLICATION}
-        application/fasto_remote_gui_application.cpp
-    )
-    SET_DESKTOP_TARGET()
-    ADD_DEFINITIONS(-DLOG_TO_FILE)
-ENDIF(NOT BUILD_CONSOLE)
-
 #RESOURCE_APP resources of application
 IF(OS_WINDOWS)
     SET(PLATFORM_LIBRARIES ws2_32)
 
-    IF(NOT BUILD_CONSOLE)
-        SET(PLATFORM_HDRS ${PLATFORM_HDRS} platform/windows/gui_fasto_application.h)
-        SET(PLATFORM_SRCS ${PLATFORM_SRCS} platform/windows/gui_fasto_application.cpp)
-        SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES})
-        SET(RESOURCE_APP "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/winapp.rc")
-        SET(RESOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}/resources/${PROJECT_NAME_LOWERCASE}")
-        CONFIGURE_FILE(resources/win.rc.in ${RESOURCE_APP} @ONLY IMMEDIATE)
-    ENDIF(NOT BUILD_CONSOLE)
+    SET(PLATFORM_HDRS ${PLATFORM_HDRS})
+    SET(PLATFORM_SRCS ${PLATFORM_SRCS})
+    SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES})
+    SET(RESOURCE_APP "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/winapp.rc")
+    SET(RESOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}/resources/${PROJECT_NAME_LOWERCASE}")
+    CONFIGURE_FILE(resources/win.rc.in ${RESOURCE_APP} @ONLY IMMEDIATE)
 ELSEIF(OS_MACOSX)
-    IF(NOT BUILD_CONSOLE)
-        FIND_LIBRARY(COCOA_LIBRARY Cocoa)
+    FIND_LIBRARY(COCOA_LIBRARY Cocoa)
 
-        SET(PLATFORM_HDRS ${PLATFORM_HDRS} platform/macosx/AppDelegate.h
-            platform/macosx/gui_fasto_application.h)
-        SET(PLATFORM_SRCS ${PLATFORM_SRCS} platform/macosx/AppDelegate.mm
-            platform/macosx/gui_fasto_application.mm)
-        SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES} ${COCOA_LIBRARY})
-    ENDIF(NOT BUILD_CONSOLE)
+    SET(PLATFORM_HDRS ${PLATFORM_HDRS})
+    SET(PLATFORM_SRCS ${PLATFORM_SRCS})
+    SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES})
 ELSEIF(OS_LINUX OR OS_FREEBSD)
     IF(OS_LINUX)
         SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES} rt)
     ENDIF(OS_LINUX)
 
-    IF(NOT BUILD_CONSOLE)
-        FIND_PACKAGE(PkgConfig REQUIRED)
-        PKG_CHECK_MODULES(GTK2 REQUIRED gtk+-2.0)
-        # Setup CMake to use GTK+, tell the compiler where to look for headers
-        # and to the linker where to look for libraries
-        SET(INCLUDE_DIRS ${INCLUDE_DIRS} ${GTK2_INCLUDE_DIRS})
-
-        SET(PLATFORM_HDRS ${PLATFORM_HDRS} platform/linux/gui_fasto_application.h)
-        SET(PLATFORM_SRCS ${PLATFORM_SRCS} platform/linux/gui_fasto_application.cpp)
-        SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES} ${GTK2_LIBRARIES})
-    ENDIF(NOT BUILD_CONSOLE)
+    SET(PLATFORM_HDRS ${PLATFORM_HDRS})
+    SET(PLATFORM_SRCS ${PLATFORM_SRCS})
+    SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES})
 ELSEIF(OS_ANDROID)
 
 ENDIF(OS_WINDOWS)

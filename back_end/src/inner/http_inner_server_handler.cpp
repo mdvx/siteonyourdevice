@@ -36,49 +36,21 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-Http2InnerServerHandler::Http2InnerServerHandler(const HttpServerInfo& info,
-                                                 const common::net::hostAndPort& innerHost,
-                                                 const HttpConfig &config)
-  : InnerServerHandler(config), Http2ServerHandler(info, NULL),
-  innerConnection_(NULL), ping_server_id_timer_(INVALID_TIMER_ID), innerHost_(innerHost) {
+Http2ClientServerHandler::Http2ClientServerHandler(const HttpServerInfo& info)
+  : Http2ServerHandler(info, NULL) {
 }
 
-Http2InnerServerHandler::~Http2InnerServerHandler() {
-  delete innerConnection_;
-  innerConnection_ = NULL;
+Http2ClientServerHandler::~Http2ClientServerHandler() {
 }
 
-void Http2InnerServerHandler::preLooped(tcp::ITcpLoop* server) {
-  ping_server_id_timer_ = server->createTimer(ping_timeout_server, ping_timeout_server);
-  CHECK(!innerConnection_);
-
-  common::net::socket_info client_info;
-  common::ErrnoError err = common::net::connect(innerHost_, common::net::ST_SOCK_STREAM,
-                                                  0, &client_info);
-  if (err && err->isError()) {
-    DEBUG_MSG_ERROR(err);
-    auto ex_event = make_exception_event(new network::InnerClientConnectedEvent(this, authInfo()), err);
-    EVENT_BUS()->postEvent(ex_event);
-    return;
-  }
-
-  InnerClient* connection = new InnerClient(server, client_info);
-  innerConnection_ = connection;
-  server->registerClient(connection);
-
+void Http2ClientServerHandler::preLooped(tcp::ITcpLoop* server) {
   Http2ServerHandler::preLooped(server);
 }
 
-void Http2InnerServerHandler::accepted(tcp::TcpClient* client) {
+void Http2ClientServerHandler::accepted(tcp::TcpClient* client) {
 }
 
-void Http2InnerServerHandler::closed(tcp::TcpClient* client) {
-  if (client == innerConnection_) {
-    EVENT_BUS()->postEvent(new network::InnerClientDisconnectedEvent(this, authInfo()));
-    innerConnection_ = NULL;
-    return;
-  }
-
+void Http2ClientServerHandler::closed(tcp::TcpClient* client) {
   ProxyRelayClient * prclient = dynamic_cast<ProxyRelayClient*>(client);  // proxyrelay connection
   if (prclient) {
     RelayClientEx * rclient = prclient->relay();
@@ -86,45 +58,15 @@ void Http2InnerServerHandler::closed(tcp::TcpClient* client) {
   }
 }
 
-void Http2InnerServerHandler::postLooped(tcp::ITcpLoop* server) {
-  if (innerConnection_) {
-    InnerClient* connection = innerConnection_;
-    connection->close();
-    delete connection;
-  }
-
+void Http2ClientServerHandler::postLooped(tcp::ITcpLoop* server) {
   Http2ServerHandler::postLooped(server);
 }
 
-void Http2InnerServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_type id) {
-  if (id == ping_server_id_timer_ && innerConnection_) {
-    const cmd_request_t ping_request = make_request(PING_COMMAND_REQ);
-    ssize_t nwrite = 0;
-    InnerClient* client = innerConnection_;
-    common::Error err = client->write(ping_request, &nwrite);
-    if (err && err->isError()) {
-      DEBUG_MSG_ERROR(err);
-      client->close();
-      delete client;
-    }
-  }
+void Http2ClientServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_type id) {
+
 }
 
-void Http2InnerServerHandler::innerDataReceived(InnerClient* iclient) {
-  char buff[MAX_COMMAND_SIZE] = {0};
-  ssize_t nread = 0;
-  common::Error err = iclient->read(buff, MAX_COMMAND_SIZE, &nread);
-  if ((err && err->isError()) || nread == 0) {
-    DEBUG_MSG_ERROR(err);
-    iclient->close();
-    delete iclient;
-    return;
-  }
-
-  handleInnerDataReceived(iclient, buff, nread);
-}
-
-void Http2InnerServerHandler::relayDataReceived(inner::RelayClient* rclient) {
+void Http2ClientServerHandler::relayDataReceived(inner::RelayClient* rclient) {
   char buff[BUF_SIZE] = {0};
   ssize_t nread = 0;
   common::Error err = rclient->read(buff, BUF_SIZE, &nread);
@@ -137,7 +79,7 @@ void Http2InnerServerHandler::relayDataReceived(inner::RelayClient* rclient) {
   Http2ServerHandler::processReceived(rclient, buff, nread);
 }
 
-void Http2InnerServerHandler::relayExDataReceived(inner::RelayClientEx* rclient) {
+void Http2ClientServerHandler::relayExDataReceived(inner::RelayClientEx* rclient) {
   char buff[BUF_SIZE] = {0};
   ssize_t nread = 0;
   common::Error err = rclient->read(buff, BUF_SIZE, &nread);
@@ -202,7 +144,7 @@ void Http2InnerServerHandler::relayExDataReceived(inner::RelayClientEx* rclient)
   }
 }
 
-void Http2InnerServerHandler::proxyDataReceived(ProxyRelayClient* prclient) {
+void Http2ClientServerHandler::proxyDataReceived(ProxyRelayClient* prclient) {
   char buff[BUF_SIZE] = {0};
   ssize_t nread = 0;
   common::Error err = prclient->read(buff, BUF_SIZE, &nread);
@@ -222,12 +164,7 @@ void Http2InnerServerHandler::proxyDataReceived(ProxyRelayClient* prclient) {
   return;
 }
 
-void Http2InnerServerHandler::dataReceived(tcp::TcpClient* client) {
-  if (client == innerConnection_) {
-    innerDataReceived(innerConnection_);
-    return;
-  }
-
+void Http2ClientServerHandler::dataReceived(tcp::TcpClient* client) {
   RelayClientEx * rexclient = dynamic_cast<RelayClientEx*>(client);  // relay external connection
   if (rexclient) {
     relayExDataReceived(rexclient);
@@ -249,7 +186,7 @@ void Http2InnerServerHandler::dataReceived(tcp::TcpClient* client) {
   Http2ServerHandler::dataReceived(client);  // direct connection
 }
 
-void Http2InnerServerHandler::dataReadyToWrite(tcp::TcpClient* client) {
+void Http2ClientServerHandler::dataReadyToWrite(tcp::TcpClient* client) {
 }
 
 }  // namespace inner

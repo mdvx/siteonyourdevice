@@ -32,7 +32,6 @@ void NetworkEventHandler::handleEvent(NetworkEvent *event) {
       // InnerClientConnectedEvent * ev = static_cast<InnerClientConnectedEvent*>(event);
   } else if (event->eventType() == InnerClientDisconnectedEvent::EventType) {
       // InnerClientDisconnectedEvent * ev = static_cast<InnerClientDisconnectedEvent*>(event);
-      controller_->disConnect();
   }
 }
 

@@ -26,6 +26,8 @@
 #include "http_config.h"
 #include "infos.h"
 
+#include "loop_controller.h"
+
 namespace common {
 namespace thread {
 template<typename type_t>
@@ -35,19 +37,24 @@ class EventThread;
 
 namespace fasto {
 namespace siteonyourdevice {
-class ILoopThreadController;
+
+namespace http {
+  class IHttpAuthObserver;
+}  // namespace http
+
 namespace network {
 
-class NetworkController {
+class NetworkController
+    : private ILoopThreadController {
  public:
   NetworkController(int argc, char *argv[]);
   ~NetworkController();
 
-  int exec() SYNC_CALL();
-  void exit(int result) SYNC_CALL();
+  int exec();
+  void exit(int result);
 
-  void connect() ASYNC_CALL(InnerClientConnectedEvent);
-  void disConnect() ASYNC_CALL(InnerClientDisconnectedEvent);
+  void connect();
+  void disConnect();
 
   UserAuthInfo authInfo() const;
   HttpConfig config() const;
@@ -57,8 +64,11 @@ class NetworkController {
   void readConfig();
   void saveConfig();
 
-  common::multi_threading::mutex_t server_mutex_;
-  ILoopThreadController * server_;
+  virtual tcp::ITcpLoopObserver* createHandler();
+  virtual tcp::ITcpLoop* createServer(tcp::ITcpLoopObserver* handler);
+
+  http::IHttpAuthObserver* auth_checker_;
+  ILoopThreadController* server_;
 
   std::string config_path_;
   HttpConfig config_;

@@ -31,7 +31,7 @@ class NetworkEventHandler {
   explicit NetworkEventHandler(NetworkController *controller);
   virtual ~NetworkEventHandler();
 
-  virtual void start() ASYNC_CALL(InnerClientConnectedEvent);  // connect
+  virtual void start();  // connect
 
  protected:
   NetworkController * controller_;

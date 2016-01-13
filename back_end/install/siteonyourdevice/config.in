@@ -1,10 +1,13 @@
 [http_server]
-domain=@USER_SPECIFIC_DEFAULT_DOMAIN@
-port=@USER_SPECIFIC_DEFAULT_PORT@
-content_path=content
 login=@USER_SPECIFIC_DEFAULT_LOGIN@
 password=@USER_SPECIFIC_DEFAULT_PASSWORD@
-private_site=@USER_SPECIFIC_DEFAULT_PRIVATE_SITE@
+
+local_host=@USER_SPECIFIC_DEFAULT_DOMAIN@:@USER_SPECIFIC_DEFAULT_PORT@
+content_path=content
+
 external_host=localhost:80
+
+private_site=@USER_SPECIFIC_DEFAULT_PRIVATE_SITE@
+
 server_type=0
 [http_handlers_utls]

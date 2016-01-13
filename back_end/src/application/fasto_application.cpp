@@ -24,36 +24,12 @@
 
 #include "common/file_system.h"
 
-#if defined(BUILD_CONSOLE)
-  #include "fasto_remote_application.h"
-#else
-  #if defined(OS_WIN)
-      #include "platform/windows/gui_fasto_application.h"
-  #elif defined(OS_MACOSX)
-      #include "platform/macosx/gui_fasto_application.h"
-  #elif defined(OS_ANDROID)
-      #include "fasto_remote_application.h"
-  #else
-      #include "platform/linux/gui_fasto_application.h"
-  #endif
-#endif
+#include "fasto_remote_application.h"
 
 namespace {
 
 fasto::siteonyourdevice::application::IFastoApplicationImpl* createImpl(int argc, char *argv[]) {
-#if defined(BUILD_CONSOLE)
   return new fasto::siteonyourdevice::application::FastoRemoteApplication(argc, argv);
-#else
-#if defined(OS_WIN)
-  return new fasto::siteonyourdevice::application::WinGuiFastoRemoteApplication(argc, argv);
-#elif defined(OS_MACOSX)
-  return new fasto::siteonyourdevice::application::MacOSXGuiFastoRemoteApplication(argc, argv);
-#elif defined(OS_ANDROID)
-  return new fasto::siteonyourdevice::application::FastoRemoteApplication(argc, argv);
-#else
-  return new fasto::siteonyourdevice::application::GtkGuiFastoRemoteApplication(argc, argv);
-#endif
-#endif
 }
 
 }  // namespace

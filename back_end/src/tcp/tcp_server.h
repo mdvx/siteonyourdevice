@@ -20,6 +20,7 @@
 
 #include <vector>
 #include <string>
+#include <functional>
 
 #include "common/patterns/crtp_pattern.h"
 
@@ -73,6 +74,8 @@ class ITcpLoop
 
   std::vector<TcpClient *> clients() const;
 
+  static ITcpLoop* findExistLoopByPredicate(std::function<bool(ITcpLoop*)> pred);
+
  protected:
   virtual TcpClient * createClient(const common::net::socket_info& info) = 0;
 
@@ -124,7 +127,7 @@ class TcpServer
   const char* className() const;
   common::net::hostAndPort host() const;
 
-  static TcpServer* findExistServerByHost(const common::net::hostAndPort& host);
+  static ITcpLoop *findExistServerByHost(const common::net::hostAndPort& host);
 
  private:
   TcpClient * createClient(const common::net::socket_info& info);

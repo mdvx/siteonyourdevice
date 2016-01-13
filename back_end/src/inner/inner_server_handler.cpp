@@ -41,8 +41,90 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-InnerServerHandler::InnerServerHandler(const HttpConfig& config)
-  : config_(config) {
+InnerServerHandler::InnerServerHandler(const common::net::hostAndPort& innerHost,
+                                           const HttpConfig& config) :
+  config_(config), inner_connection_(nullptr),
+  ping_server_id_timer_(INVALID_TIMER_ID), innerHost_(innerHost) {
+}
+
+InnerServerHandler::~InnerServerHandler(){
+  delete inner_connection_;
+  inner_connection_ = nullptr;
+}
+
+void InnerServerHandler::preLooped(tcp::ITcpLoop* server){
+  ping_server_id_timer_ = server->createTimer(ping_timeout_server, ping_timeout_server);
+  CHECK(!inner_connection_);
+
+  common::net::socket_info client_info;
+  common::ErrnoError err = common::net::connect(innerHost_, common::net::ST_SOCK_STREAM,
+                                                  0, &client_info);
+  if (err && err->isError()) {
+    DEBUG_MSG_ERROR(err);
+    auto ex_event = make_exception_event(new network::InnerClientConnectedEvent(this, authInfo()), err);
+    EVENT_BUS()->postEvent(ex_event);
+    return;
+  }
+
+  InnerClient* connection = new InnerClient(server, client_info);
+  inner_connection_ = connection;
+  server->registerClient(connection);
+}
+
+void InnerServerHandler::accepted(tcp::TcpClient* client){
+
+}
+
+void InnerServerHandler::moved(tcp::TcpClient* client){
+
+}
+
+void InnerServerHandler::closed(tcp::TcpClient* client){
+  if (client == inner_connection_) {
+    EVENT_BUS()->postEvent(new network::InnerClientDisconnectedEvent(this, authInfo()));
+    inner_connection_ = nullptr;
+    return;
+  }
+}
+
+void InnerServerHandler::dataReceived(tcp::TcpClient* client){
+  char buff[MAX_COMMAND_SIZE] = {0};
+  ssize_t nread = 0;
+  common::Error err = client->read(buff, MAX_COMMAND_SIZE, &nread);
+  if ((err && err->isError()) || nread == 0) {
+    DEBUG_MSG_ERROR(err);
+    client->close();
+    delete client;
+    return;
+  }
+
+  handleInnerDataReceived(dynamic_cast<InnerClient*>(client), buff, nread);
+}
+
+void InnerServerHandler::dataReadyToWrite(tcp::TcpClient* client){
+
+}
+
+void InnerServerHandler::postLooped(tcp::ITcpLoop* server){
+  if (inner_connection_) {
+    InnerClient* connection = inner_connection_;
+    connection->close();
+    delete connection;
+  }
+}
+
+void InnerServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_type id){
+  if (id == ping_server_id_timer_ && inner_connection_) {
+    const cmd_request_t ping_request = make_request(PING_COMMAND_REQ);
+    ssize_t nwrite = 0;
+    InnerClient* client = inner_connection_;
+    common::Error err = client->write(ping_request, &nwrite);
+    if (err && err->isError()) {
+      DEBUG_MSG_ERROR(err);
+      client->close();
+      delete client;
+    }
+  }
 }
 
 UserAuthInfo InnerServerHandler::authInfo() const {
@@ -86,6 +168,21 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
           return;
         }
 
+        auto find_by_name = [](tcp::ITcpLoop * loop) -> bool {
+          return loop->name() == "local_http_server";  // hardcode
+        };
+
+        tcp::ITcpLoop* server = tcp::ITcpLoop::findExistLoopByPredicate(find_by_name);
+        if(!server){
+            cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S,
+                                                CAUSE_CONNECT_FAILED);
+            err = connection->write(resp, &nwrite);
+            if (err && err->isError()) {
+              DEBUG_MSG_ERROR(err);
+            }
+            return;
+        }
+
         cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_SUCCSESS_1S,
                                                     hostandport);
         err = connection->write(resp, &nwrite);
@@ -94,9 +191,6 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
           return;
         }
 
-        tcp::ITcpLoop* server = connection->server();
-        CHECK(server);
-
         RelayClient *relayConnection = NULL;
         if (config_.server_type == EXTERNAL_SERVER) {
           relayConnection = new RelayClientEx(server, rinfo, config_.external_host);
@@ -104,7 +198,11 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
           relayConnection = new RelayClient(server, rinfo);
         }
         relayConnection->setIsAuthenticated(!config_.is_private_site);
-        server->registerClient(relayConnection);
+
+        auto cb = [server, relayConnection]() {
+          server->registerClient(relayConnection);
+        };
+        server->execInLoopThread(cb);
       } else {
         NOTREACHED();
       }
@@ -148,31 +246,39 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
             return;
         }
 
+        tcp::ITcpLoop * server = nullptr;
+
         if (config_.server_type == EXTERNAL_SERVER) {
-          tcp::ITcpLoop* server = connection->server();
-          CHECK(server);
-
-          RelayClientEx* relayConnection = new RelayClientEx(server, rinfo, host_src);
-          server->registerClient(relayConnection);
-        } else {
-          tcp::TcpServer * existWebServer = tcp::TcpServer::findExistServerByHost(host_src);
-          if (!existWebServer) {
-            cmd_responce_t resp = make_responce(id,
-                                                CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S,
-                                                CAUSE_INVALID_ARGS);
-            common::Error err = connection->write(resp, &nwrite);
-            if (err && err->isError()) {
-              DEBUG_MSG_ERROR(err);
-            }
-              return;
-          }
-
-          RelayClient* relayConnection = new RelayClient(existWebServer, rinfo);
-          auto cb = [existWebServer, relayConnection]() {
-            existWebServer->registerClient(relayConnection);
+          auto find_by_name = [](tcp::ITcpLoop * loop) -> bool {
+            return loop->name() == "proxy_http_server";  // hardcode
           };
-          existWebServer->execInLoopThread(cb);
+
+          server = tcp::TcpServer::findExistLoopByPredicate(find_by_name);
+        } else {
+          server = tcp::TcpServer::findExistServerByHost(host_src);
         }
+
+        if (!server) {
+          cmd_responce_t resp = make_responce(id,
+                                              CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S,
+                                              CAUSE_INVALID_ARGS);
+          common::Error err = connection->write(resp, &nwrite);
+          if (err && err->isError()) {
+            DEBUG_MSG_ERROR(err);
+          }
+          return;
+        }
+
+        RelayClient* relay_connection = nullptr;
+        if (config_.server_type == EXTERNAL_SERVER) {
+          relay_connection = new RelayClientEx(server, rinfo, host_src);
+        } else {
+          relay_connection = new RelayClient(server, rinfo);
+        }
+        auto cb = [server, relay_connection]() {
+          server->registerClient(relay_connection);
+        };
+        server->execInLoopThread(cb);
 
         cmd_responce_t resp = make_responce(id,
                                             CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_SUCCSESS_1S,
