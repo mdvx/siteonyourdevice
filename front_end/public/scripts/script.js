@@ -40,6 +40,7 @@ var COMMANDS = {
     PING : "ping", //+
     INFO : "plz_system_info", //+
     CONFIG : "plz_config",
+    SET_CONFIG : "plz_set_config"
 }
 
 // state parse
@@ -67,6 +68,10 @@ function is_info_command(msgObj)
 function is_config_command(msgObj)
 {
     return msgObj.command === COMMANDS.CONFIG;    
+}
+function is_set_config_command(msgObj)
+{
+    return msgObj.command === COMMANDS.SET_CONFIG;    
 }
 // status off command
 function is_failed_command(msgObj)
@@ -158,6 +163,15 @@ function sync_server_config(id, name, socket)
     
     var msg = name + " " + id + " " + COMMANDS.CONFIG;
     socket.emit('publish', msg);
+}
+
+function set_server_config(id, name, config, socket){
+  if(name === undefined){
+    return;
+  } 
+  
+  var msg = name + " " + id + " " + COMMANDS.SET_CONFIG + " " + config;
+  socket.emit('publish', msg);
 }
 
 //// server_details constant

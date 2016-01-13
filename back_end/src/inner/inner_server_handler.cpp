@@ -372,6 +372,11 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
     }
 
     json_object_put(config_json);
+  } else if (IS_EQUAL_COMMAND(command, SERVER_PLEASE_SET_CONFIG_COMMAND)) {
+    const char* config_json_str = argv[1];
+    if (config_json_str) {
+
+    }
   } else {
       DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING,
                                          "UNKNOWN REQUEST COMMAND: %s", command);

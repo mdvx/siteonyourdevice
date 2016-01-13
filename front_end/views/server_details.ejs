@@ -18,6 +18,26 @@
             //var io = require('socket.io');
             var socket = io.connect('http://siteonyourdevice.com:3000');
             
+            function setSettings(id, name, socket) {
+              var content_path = $('#server_setting_content_path_label').val();
+              var private_site = $('#server_setting_private_site_label').html() == SERVER_SETTING_ACCSESS_SITE.PRIVATE;
+              var server_type = SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER;
+              
+              var external_host = $('#server_setting_ex_host_label').html();
+              var local_host = $('#server_setting_local_host_label').html();
+              var http_handlers_utls = [];
+              var http_server_sockets = [];
+              var config = { "local_host": local_host, 
+                             "content_path": content_path, 
+                             "private_site": private_site, 
+                             "external_host": external_host, 
+                             "server_type": server_type, 
+                             "http_handlers_utls": http_handlers_utls, 
+                             "http_server_sockets": http_server_sockets 
+                           };
+              return set_server_config(id, name, ' + config + ', socket);
+            }
+            
             function setServerType(type)
             {
                 if(type == SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER){
@@ -51,12 +71,14 @@
                     $('#status_img').attr("src", SERVER_STATUS_IMG.ONLINE);
                     $('#info_button').prop('disabled', false);
                     $('#get_config_button').prop('disabled', false);
+                    $('#set_config_button').prop('disabled', false);
                 }
                 else{
                     $('#status_label').html(SERVER_STATUS.OFFLINE);
                     $('#status_img').attr("src", SERVER_STATUS_IMG.OFFLINE);
                     $('#info_button').prop('disabled', true);
                     $('#get_config_button').prop('disabled', true);
+                    $('#set_config_button').prop('disabled', true);
                     
                     $('#os_label').html(SERVER_OS_DEFAULT_LABEL);
                     $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
@@ -252,6 +274,7 @@
                             </div>
                     </div>
                     <button id="get_config_button" disabled onclick="sync_server_config('<%- user._id %>', '<%- domain_name %>', socket)">Get settings</button>
+                    <button id="set_config_button" disabled onclick="setSettings('<%- user._id %>', '<%- domain_name %>', socket)">Apply settings</button>
                 </div>
             </div>
         </div>

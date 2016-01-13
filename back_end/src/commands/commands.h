@@ -70,6 +70,8 @@
 
 #define SERVER_PLEASE_CONFIG_COMMAND "plz_config"
 
+#define SERVER_PLEASE_SET_CONFIG_COMMAND "plz_set_config"
+
 // request
 // [size_t](0) [hex_string]seq [std::string]command args ...
 
