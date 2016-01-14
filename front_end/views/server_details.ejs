@@ -25,8 +25,23 @@
               
               var external_host = $('#server_setting_ex_host_label').html();
               var local_host = $('#server_setting_local_host_label').html();
-              var http_handlers_utls = [];
+              
+              var http_handlers_utls = [];              
+              var urls_handlers_table = document.getElementById('urls_handlers_table');
+              for (var i = 0, row; row = urls_handlers_table.rows[i]; i++) {
+                 var url = { url : row.cells[1].firstChild.nodeValue,   
+                             handler : row.cells[2].firstChild.nodeValue };
+                http_handlers_utls.push(url);
+              }
+              
               var http_server_sockets = [];
+              var socket_urls_table = document.getElementById('socket_urls_table');
+              for (var i = 0, row; row = socket_urls_table.rows[i]; i++) {
+                 var url = { type : row.cells[1].firstChild.nodeValue,   
+                             path : row.cells[2].firstChild.nodeValue };
+                http_server_sockets.push(url);
+              }
+              
               var config = { "local_host": local_host, 
                              "content_path": content_path, 
                              "private_site": private_site, 
@@ -50,17 +65,17 @@
             
             function drawUrlHandlersTable(urls)
             {
-                $('#urls_handlers_table td').remove();
+                $('#urls_handlers_table tr').remove();
                 for(var i = 0; i < urls.length; i++){
-                    $('#urls_handlers_table').append('<td>' + (i + 1) + '</td>' + '<td>' + urls[i].url + '</td>' + '<td>' + urls[i].handler + '</td>');
+                    $('#urls_handlers_table').append('<tr><td>' + (i + 1) + '</td>' + '<td>' + urls[i].url + '</td>' + '<td>' + urls[i].handler + '</td></tr>');
                 }
             }
             
             function drawSocketsPathTable(sockets)
             {
-                $('#socket_urls_table td').remove();
+                $('#socket_urls_table tr').remove();
                 for(var i = 0; i < sockets.length; i++){
-                    $('#socket_urls_table').append('<td>' + (i + 1) + '</td>' + '<td>' + sockets[i].type + '</td>' + '<td>' + sockets[i].path + '</td>');
+                    $('#socket_urls_table').append('<tr><td>' + (i + 1) + '</td>' + '<td>' + sockets[i].type + '</td>' + '<td>' + sockets[i].path + '</td></tr>');
                 }
             }
             

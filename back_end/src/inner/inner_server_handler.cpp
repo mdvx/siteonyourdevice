@@ -386,7 +386,9 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
            return;
        }
 
-       HttpConfig new_config = config_;
+       HttpConfig new_config;
+       new_config.login = config_.login;
+       new_config.password = config_.password;
 
        json_object* jlocal_host = NULL;
        json_object_object_get_ex(config_json, LOCAL_HOST_SETTING_LABEL, &jlocal_host);
@@ -425,7 +427,18 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
        if (jhandler_urls) {
           int urls_count = json_object_array_length(jhandler_urls);
           for(int i = 0; i < urls_count; ++i){
+            json_object *jurlh = json_object_array_get_idx(jhandler_urls, i);
 
+            json_object* jurl = NULL;
+            json_object_object_get_ex(jurlh, "url", &jurl);
+
+            json_object* jhandler = NULL;
+            json_object_object_get_ex(jurlh, "handler", &jhandler);
+            if(jurl && jhandler){
+              std::string url_str = json_object_get_string(jurl);
+              std::string handler_str = json_object_get_string(jhandler);
+              new_config.handlers_urls.push_back(std::make_pair(url_str, handler_str));
+            }
           }
        }
 
@@ -434,7 +447,19 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
        if (jsockets_section) {
           int sockets_count = json_object_array_length(jsockets_section);
           for(int i = 0; i < sockets_count; ++i){
+            json_object *jtsocket = json_object_array_get_idx(jsockets_section, i);
 
+            json_object* jtype = NULL;
+            json_object_object_get_ex(jtsocket, "type", &jtype);
+
+            json_object* jpath = NULL;
+            json_object_object_get_ex(jtsocket, "path", &jpath);
+            if(jtype && jpath){
+              std::string type_str = json_object_get_string(jtype);
+              std::string path_str = json_object_get_string(jpath);
+              new_config.server_sockets_urls.push_back(std::make_pair(type_str,
+                                                                      common::uri::Uri(path_str)));
+            }
           }
        }
 
