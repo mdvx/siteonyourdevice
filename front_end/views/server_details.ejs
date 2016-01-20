@@ -23,7 +23,7 @@
               var private_site = $('#server_setting_private_site_label').html() == SERVER_SETTING_ACCSESS_SITE.PRIVATE;
               var server_type = document.forms["server_type"]["server_type_local"].checked == true ? SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER : SERVER_SETTING_HTTP_SERVER_TYPE.EXTERNAL_SERVER;
               
-              var external_host = $('#server_setting_ex_host_label').html();
+              var external_host = $('#server_setting_ex_host_label').val();
               var local_host = $('#server_setting_local_host_label').html();
               
               var http_handlers_utls = [];              
@@ -102,8 +102,9 @@
                     $('#server_setting_content_path_label').val(SERVER_SETTING_CONTENT_PATH_LABEL);
                     $('#server_setting_private_site_label').html(SERVER_SETTING_ACCSESS_SITE.PUBLIC);
                     
-                    setServerType(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
-                    $('#server_setting_ex_host_label').html(SERVER_SETTING_EXTERNAL_HOST_LABEL);
+                    //setServerType(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
+                    document.forms["server_type"]["server_type_local"].checked = true;
+                    $('#server_setting_ex_host_label').val(SERVER_SETTING_EXTERNAL_HOST_LABEL);
                     $('#server_setting_local_host_label').html(SERVER_SETTING_LOCAL_HOST_LABEL);
                     
                     drawUrlHandlersTable([]);
@@ -153,18 +154,20 @@
                         $('#server_setting_private_site_label').html(config.private_site ? SERVER_SETTING_ACCSESS_SITE.PRIVATE : SERVER_SETTING_ACCSESS_SITE.PUBLIC);
                         
                         setServerType(config.server_type);
-                        $('#server_setting_ex_host_label').html(config.external_host);
+                        $('#server_setting_ex_host_label').val(config.external_host);
                         $('#server_setting_local_host_label').html(config.local_host);
                         
                         drawUrlHandlersTable(config.http_handlers_utls);
                         drawSocketsPathTable(config.http_server_sockets);
+                        
                     }
                     else{
                         $('#server_setting_content_path_label').val(SERVER_SETTING_CONTENT_PATH_LABEL);
                         $('#server_setting_private_site_label').html(SERVER_SETTING_ACCSESS_SITE.PUBLIC);
                         
-                        setServerType(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
-                        $('#server_setting_ex_host_label').html(SERVER_SETTING_EXTERNAL_HOST_LABEL);
+                        //setServerType(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
+                        document.forms["server_type"]["server_type_local"].checked = true;
+                        $('#server_setting_ex_host_label').val(SERVER_SETTING_EXTERNAL_HOST_LABEL);
                         $('#server_setting_local_host_label').html(SERVER_SETTING_LOCAL_HOST_LABEL);
                         
                         drawUrlHandlersTable([]);
@@ -217,8 +220,9 @@
                 $('#server_setting_content_path_label').val(SERVER_SETTING_CONTENT_PATH_LABEL);
                 $('#server_setting_private_site_label').html(SERVER_SETTING_ACCSESS_SITE.PUBLIC);
                 
-                setServerType(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
-                $('#server_setting_ex_host_label').html(SERVER_SETTING_EXTERNAL_HOST_LABEL);
+                //setServerType(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
+                document.forms["server_type"]["server_type_local"].checked = true;
+                $('#server_setting_ex_host_label').val(SERVER_SETTING_EXTERNAL_HOST_LABEL);
                 $('#server_setting_local_host_label').html(SERVER_SETTING_LOCAL_HOST_LABEL);
             }
         </script>
@@ -245,20 +249,20 @@
                                     <div>Server type:</div>
                                     <form role="form" id="server_type">
                                         <label class="radio-inline">
-                                            <input type="radio" name="server_t" id="server_type_local" disabled>Local
+                                            <input type="radio" name="server_t" id="server_type_local">Local
                                         </label>
                                         <label class="radio-inline">
-                                            <input type="radio" name="server_t" id="server_type_external" disabled>External
+                                            <input type="radio" name="server_t" id="server_type_external">External
                                         </label>
                                     </form>
                                     <div>Private site: <label id="server_setting_private_site_label"></label></div>
                                 </div>
                                 
                                 <div class="col-sm-6">
-                                    External server: <label id="server_setting_ex_host_label"></label><br>
+                                    External server: <input id="server_setting_ex_host_label"></input><br>
                                     
                                     Local server: <label id="server_setting_local_host_label"></label><br>
-                                    Content path: <input id="server_setting_content_path_label" disabled></input>
+                                    Content path: <input id="server_setting_content_path_label"></input>
                                 </div>
                             </div>
                             <div>
