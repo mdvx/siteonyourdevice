@@ -22,18 +22,10 @@
 
 #include <string>
 
-#include "globals.h"
 #include "http_config.h"
 #include "infos.h"
 
 #include "loop_controller.h"
-
-namespace common {
-namespace thread {
-template<typename type_t>
-class EventThread;
-}
-}
 
 namespace fasto {
 namespace siteonyourdevice {
@@ -50,7 +42,6 @@ class NetworkController
   NetworkController(int argc, char *argv[]);
   ~NetworkController();
 
-  int exec();
   void exit(int result);
 
   void connect();
@@ -72,8 +63,6 @@ class NetworkController
 
   std::string config_path_;
   HttpConfig config_;
-
-  common::thread::EventThread<NetworkEventTypes>* const thread_;  // event thread handle
 };
 
 }  // namespace network

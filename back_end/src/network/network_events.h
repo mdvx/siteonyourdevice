@@ -21,6 +21,7 @@
 #include "globals.h"
 
 #include "infos.h"
+#include "http_config.h"
 
 namespace fasto {
 namespace siteonyourdevice {
@@ -65,6 +66,7 @@ class NetworkEventBaseInfo<event_t, void>
 
 typedef NetworkEventBaseInfo<InnerClientConnected, UserAuthInfo> InnerClientConnectedEvent;
 typedef NetworkEventBaseInfo<InnerClientDisconnected, UserAuthInfo> InnerClientDisconnectedEvent;
+typedef NetworkEventBaseInfo<ConfigChanged, HttpConfig> ConfigChangedEvent;
 
 }  // namespace network
 }  // namespace siteonyourdevice

@@ -18,10 +18,20 @@
 
 #pragma once
 
+#include "globals.h"
+
 #include "application/fasto_application.h"
+
+namespace common {
+namespace thread {
+template<typename type_t>
+class EventThread;
+}
+}
 
 namespace fasto {
 namespace siteonyourdevice {
+
 namespace network {
 class NetworkEventHandler;
 class NetworkController;
@@ -44,6 +54,7 @@ class FastoRemoteApplication
  protected:
   network::NetworkController * controller_;
   network::NetworkEventHandler * network_handler_;
+  common::thread::EventThread<NetworkEventTypes>* const thread_;  // event thread handle
 };
 
 }  // namespace application

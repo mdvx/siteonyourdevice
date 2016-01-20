@@ -463,7 +463,25 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
           }
        }
 
+       if(new_config.local_host.host != config_.local_host.host){
+           cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S,
+                                               CAUSE_INVALID_ARGS);
+           common::Error err = connection->write(resp, &nwrite);
+           if (err && err->isError()) {
+             DEBUG_MSG_ERROR(err);
+           }
+           json_object_put(config_json);
+           return;
+       }
+
+       cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_SUCCSESS);
+       common::Error err = connection->write(resp, &nwrite);
+       if (err && err->isError()) {
+         DEBUG_MSG_ERROR(err);
+       }
        json_object_put(config_json);
+
+       EVENT_BUS()->postEvent(new network::ConfigChangedEvent(this, new_config));
     } else {
       cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S,
                                           CAUSE_INVALID_ARGS);

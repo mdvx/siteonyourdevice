@@ -25,7 +25,6 @@
 #include "common/file_system.h"
 #include "common/logger.h"
 #include "common/utils.h"
-#include "common/thread/event_bus.h"
 
 #include "inner/http_inner_server.h"
 #include "inner/http_inner_server_handler.h"
@@ -220,8 +219,7 @@ class ExternalHttpServerController
 }  // namespace
 
 NetworkController::NetworkController(int argc, char *argv[])
-  : ILoopThreadController(), auth_checker_(NULL), server_(NULL), config_(),
-    thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>()) {
+  : ILoopThreadController(), auth_checker_(NULL), server_(NULL), config_() {
   bool daemon_mode = false;
 #ifdef OS_MACOSX
   std::string config_path = PROJECT_NAME ".app/Contents/Resources/" CONFIG_FILE_NAME;
@@ -248,29 +246,14 @@ NetworkController::NetworkController(int argc, char *argv[])
 }
 
 NetworkController::~NetworkController() {
-  EVENT_BUS()->destroyEventThread(thread_);
-  EVENT_BUS()->stop();
-
   delete server_;
   delete auth_checker_;
 
   saveConfig();
 }
 
-int NetworkController::exec() {
-  if (server_) {  // if connect dosen't clicked
-      return server_->join();
-  }
-
-  return EXIT_SUCCESS;
-}
-
 void NetworkController::exit(int result) {
-  if (!server_) {  // if connect dosen't clicked
-      return;
-  }
-
-  server_->stop();
+  disConnect();
 }
 
 void NetworkController::connect() {
@@ -287,6 +270,7 @@ void NetworkController::connect() {
      server_ = new ExternalHttpServerController(auth_checker_, config_);
      server_->start();
   } else {
+    NOTREACHED();
   }
 }
 
@@ -296,6 +280,7 @@ void NetworkController::disConnect() {
   }
 
   server_->stop();
+  server_->join();
   delete server_;
   server_ = NULL;
 }

@@ -20,6 +20,8 @@
 
 #include <stdlib.h>
 
+#include "common/thread/event_bus.h"
+
 #include "network/network_controller.h"
 #include "network/network_event_handler.h"
 
@@ -29,26 +31,25 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace application {
 
-network::NetworkEventHandler* createHandlerImpl(network::NetworkController * controler) {
-  return new fasto::siteonyourdevice::network::NetworkEventHandler(controler);
-}
-
 FastoRemoteApplication::FastoRemoteApplication(int argc, char *argv[])
-    : IFastoApplicationImpl(argc, argv), controller_(NULL), network_handler_(NULL) {
+    : IFastoApplicationImpl(argc, argv), controller_(NULL), network_handler_(NULL),
+    thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>()) {
 }
 
 FastoRemoteApplication::~FastoRemoteApplication() {
+  EVENT_BUS()->stop();
 }
 
 int FastoRemoteApplication::preExec() {
   controller_ = new network::NetworkController(fApp->argc(), fApp->argv());
-  network_handler_ = createHandlerImpl(controller_);
-  network_handler_->start();
+  network_handler_ = new network::NetworkEventHandler(controller_);
+  controller_->connect();
   return EXIT_SUCCESS;
 }
 
 int FastoRemoteApplication::exec() {
-  return controller_->exec();
+  EVENT_BUS()->joinEventThread(thread_);
+  return EXIT_SUCCESS;
 }
 
 int FastoRemoteApplication::postExec() {
@@ -59,6 +60,7 @@ int FastoRemoteApplication::postExec() {
 
 void FastoRemoteApplication::exit(int result) {
   controller_->exit(result);
+  EVENT_BUS()->stopEventThread(thread_);
 }
 
 }  // namespace application

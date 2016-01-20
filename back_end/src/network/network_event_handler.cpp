@@ -27,31 +27,19 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace network {
 
-void NetworkEventHandler::handleEvent(NetworkEvent *event) {
-  if (event->eventType() == InnerClientConnectedEvent::EventType) {
-      // InnerClientConnectedEvent * ev = static_cast<InnerClientConnectedEvent*>(event);
-  } else if (event->eventType() == InnerClientDisconnectedEvent::EventType) {
-      // InnerClientDisconnectedEvent * ev = static_cast<InnerClientDisconnectedEvent*>(event);
-  }
-}
-
-void NetworkEventHandler::handleExceptionEvent(NetworkEvent* event, common::Error err) {
-  DEBUG_MSG_FORMAT<512>(common::logging::L_WARNING,
-                        "Exception event %s, %s",
-                        common::convertToString(event->eventType()), err->description());
-}
-
 class NetworkEventHandler::NetworkListener
         : public common::IListener<NetworkEventTypes> {
-  NetworkEventHandler * const app_;
+  NetworkEventHandler* const app_;
  public:
-  explicit NetworkListener(NetworkEventHandler * app)
+  explicit NetworkListener(NetworkEventHandler* app)
     : common::IListener<NetworkEventTypes>(), app_(app) {
     EVENT_BUS()->subscribe<InnerClientConnectedEvent>(this);
     EVENT_BUS()->subscribe<InnerClientDisconnectedEvent>(this);
+    EVENT_BUS()->subscribe<ConfigChangedEvent>(this);
   }
 
   ~NetworkListener() {
+    EVENT_BUS()->unsubscribe<ConfigChangedEvent>(this);
     EVENT_BUS()->unsubscribe<InnerClientDisconnectedEvent>(this);
     EVENT_BUS()->unsubscribe<InnerClientConnectedEvent>(this);
   }
@@ -65,17 +53,31 @@ class NetworkEventHandler::NetworkListener
   }
 };
 
-NetworkEventHandler::NetworkEventHandler(NetworkController *controller)
-  : controller_(controller) {
-  networkListener_ = new NetworkListener(this);
+NetworkEventHandler::NetworkEventHandler(NetworkController* controller)
+  : network_listener_(NULL), controller_(controller) {
+  network_listener_ = new NetworkListener(this);
 }
 
 NetworkEventHandler::~NetworkEventHandler() {
-  delete networkListener_;
+  delete network_listener_;
 }
 
-void NetworkEventHandler::start() {
-  controller_->connect();
+void NetworkEventHandler::handleEvent(NetworkEvent *event) {
+  if (event->eventType() == InnerClientConnectedEvent::EventType) {
+  } else if (event->eventType() == InnerClientDisconnectedEvent::EventType) {
+  } else if (event->eventType() == ConfigChangedEvent::EventType) {
+      ConfigChangedEvent* new_config_event = static_cast<ConfigChangedEvent*>(event);
+      HttpConfig config = new_config_event->info();
+      controller_->disConnect();
+      controller_->setConfig(config);
+      controller_->connect();
+  }
+}
+
+void NetworkEventHandler::handleExceptionEvent(NetworkEvent* event, common::Error err) {
+  DEBUG_MSG_FORMAT<512>(common::logging::L_WARNING,
+                        "Exception event %s, %s",
+                        common::convertToString(event->eventType()), err->description());
 }
 
 }  // namespace network
