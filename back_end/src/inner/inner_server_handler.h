@@ -41,6 +41,7 @@ class InnerServerHandler
   ~InnerServerHandler();
 
   UserAuthInfo authInfo() const;
+  void setConfig(const HttpConfig& config);
 
   virtual void preLooped(tcp::ITcpLoop* server);
   virtual void accepted(tcp::TcpClient* client);
@@ -59,7 +60,7 @@ class InnerServerHandler
   virtual void handleInnerApproveCommand(InnerClient *connection,
                                          cmd_seq_type id, int argc, char *argv[]);
 
-  const HttpConfig config_;
+  HttpConfig config_;
   InnerClient* inner_connection_;
   timer_id_type ping_server_id_timer_;
 

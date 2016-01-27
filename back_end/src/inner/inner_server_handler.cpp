@@ -131,6 +131,10 @@ UserAuthInfo InnerServerHandler::authInfo() const {
   return UserAuthInfo(config_.login, config_.password, config_.local_host);
 }
 
+void InnerServerHandler::setConfig(const HttpConfig& config){
+  config_ = config;
+}
+
 void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_seq_type id,
                                                    int argc, char *argv[]) {
   ssize_t nwrite = 0;

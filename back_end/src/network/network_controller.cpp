@@ -212,7 +212,7 @@ class ExternalHttpServerController
  private:
   tcp::ITcpLoop * createServer(tcp::ITcpLoopObserver * handler) {
     inner::ProxyInnerServer* serv = new inner::ProxyInnerServer(handler);
-    serv->setName("proxy_http_server");
+    serv->setName("local_http_server");
     return serv;
   }
 };
@@ -295,6 +295,10 @@ HttpConfig NetworkController::config() const {
 
 void NetworkController::setConfig(const HttpConfig& config) {
   config_ = config;
+  inner::InnerServerHandler* handler = dynamic_cast<inner::InnerServerHandler*>(handler_);
+  if (handler) {
+    handler->setConfig(config);
+  }
 }
 
 void NetworkController::saveConfig() {
@@ -353,7 +357,7 @@ void NetworkController::readConfig() {
                           "Can't load config '%s', use default settings.", path);
   }
 
-  config_ = config;
+  setConfig(config);
 }
 
 tcp::ITcpLoopObserver * NetworkController::createHandler(){
