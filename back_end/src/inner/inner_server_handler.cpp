@@ -173,7 +173,8 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
         }
 
         auto find_by_name = [](tcp::ITcpLoop * loop) -> bool {
-          return loop->name() == "local_http_server";  // hardcode
+          return loop->name() == "local_http_server" ||
+              loop->name() == "proxy_http_server";  // hardcode
         };
 
         tcp::ITcpLoop* server = tcp::ITcpLoop::findExistLoopByPredicate(find_by_name);

@@ -212,7 +212,7 @@ class ExternalHttpServerController
  private:
   tcp::ITcpLoop * createServer(tcp::ITcpLoopObserver * handler) {
     inner::ProxyInnerServer* serv = new inner::ProxyInnerServer(handler);
-    serv->setName("local_http_server");
+    serv->setName("proxy_http_server");
     return serv;
   }
 };
