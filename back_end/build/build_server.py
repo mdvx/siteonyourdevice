@@ -21,64 +21,75 @@ def run_command(cmd):
     else:
         return base.Error()
 
+class BuildRpcServer(object):
+    def __init__(self, platform):
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.HOST))
+        self.channel = self.connection.channel()
+        self.channel.queue_declare(queue = platform)
+        self.channel.basic_qos(prefetch_count = 1)
+        self.channel.basic_consume(self.on_request, queue = platform)
 
-def build_package(op_id, platform, arch, branding_variables, package_type):
+    def start(self):
+        print("Awaiting RPC build requests")
+        self.channel.start_consuming()
 
-    platform_or_none = base.get_supported_platform_by_name(platform)
+    def build_package(self, op_id, platform, arch, branding_variables, package_type):
 
-    if platform_or_none == None:
-        return 'invalid platform'
+        platform_or_none = base.get_supported_platform_by_name(platform)
 
-    if not arch in platform_or_none.archs:
-        return 'invalid arch'
-    if not package_type in platform_or_none.package_types:
-        return 'invalid package_type'
+        if platform_or_none == None:
+            return 'invalid platform'
 
-    pwd = os.getcwd()
-    dir_name = 'build_{0}_for_{1}'.format(platform, op_id)
-    if os.path.exists(dir_name):
-        shutil.rmtree(dir_name)
+        if not arch in platform_or_none.archs:
+            return 'invalid arch'
+        if not package_type in platform_or_none.package_types:
+            return 'invalid package_type'
 
-    os.mkdir(dir_name)
-    os.chdir(dir_name)
+        pwd = os.getcwd()
+        dir_name = 'build_{0}_for_{1}'.format(platform, op_id)
+        if os.path.exists(dir_name):
+            shutil.rmtree(dir_name)
 
-    arch_args = '-DOS_ARCH={0}'.format(arch)
-    generator_args = '-DCPACK_GENERATOR={0}'.format(package_type)
-    branding_variables_list = shlex.split(branding_variables)
-    cmake_line = ['cmake', '../../', '-GUnix Makefiles', '-DCMAKE_BUILD_TYPE=RELEASE', generator_args, arch_args]
-    cmake_line.extend(branding_variables_list)
-    err = run_command(cmake_line)
-    if err.isError():
+        os.mkdir(dir_name)
+        os.chdir(dir_name)
+
+        arch_args = '-DOS_ARCH={0}'.format(arch)
+        generator_args = '-DCPACK_GENERATOR={0}'.format(package_type)
+        branding_variables_list = shlex.split(branding_variables)
+        cmake_line = ['cmake', '../../', '-GUnix Makefiles', '-DCMAKE_BUILD_TYPE=RELEASE', generator_args, arch_args]
+        cmake_line.extend(branding_variables_list)
+        err = run_command(cmake_line)
+        if err.isError():
+            os.chdir(pwd)
+            return err.description()
+
+        make_line = ['make', 'package', '-j2']
+        err = run_command(make_line)
+        if err.isError():
+            os.chdir(pwd)
+            return err.description()
+
         os.chdir(pwd)
-        return err.description()
+        return 'done'
 
-    make_line = ['make', 'package', '-j2']
-    err = run_command(make_line)
-    if err.isError():
-        os.chdir(pwd)
-        return err.description()
+    def on_request(self, ch, method, props, body):
+        data = json.loads(body)
 
-    os.chdir(pwd)
-    return 'done'
+        branding_variables = data.get('branding_variables')
+        platform = data.get('platform')
+        arch = data.get('arch')
+        package_type = data.get('package_type')
+        op_id = props.correlation_id
 
-def on_request(ch, method, props, body):
-    data = json.loads(body)
+        print('build started for: {0}, platform: {1}_{2}'.format(op_id, platform, arch))
+        response = self.build_package(props.correlation_id, platform, arch, branding_variables, package_type)
+        print('build finished for: {0}, platform: {1}_{2}, responce: {3}'.format(op_id, platform, arch, response))
 
-    branding_variables = data.get('branding_variables')
-    platform = data.get('platform')
-    arch = data.get('arch')
-    package_type = data.get('package_type')
-    op_id = props.correlation_id
-
-    print('build started for: {0}, platform: {1}_{2}'.format(op_id, platform, arch))
-    response = build_package(props.correlation_id, platform, arch, branding_variables, package_type)
-    print('build finished for: {0}, platform: {1}_{2}, responce: {3}'.format(op_id, platform, arch, response))
-
-    ch.basic_publish(exchange = '',
-                     routing_key = props.reply_to,
-                     properties = pika.BasicProperties(correlation_id = props.correlation_id),
-                     body = response)
-    ch.basic_ack(delivery_tag = method.delivery_tag)
+        ch.basic_publish(exchange = '',
+                         routing_key = props.reply_to,
+                         properties = pika.BasicProperties(correlation_id = props.correlation_id),
+                         body = response)
+        ch.basic_ack(delivery_tag = method.delivery_tag)
 
 # argv[1] build platform
 
@@ -89,12 +100,5 @@ if argc > 1:
 else:
     platform_str = base.get_os()
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.HOST))
-
-channel = connection.channel()
-channel.queue_declare(queue=platform_str)
-channel.basic_qos(prefetch_count=1)
-channel.basic_consume(on_request, queue=platform_str)
-
-print("Awaiting RPC build requests for platform: %s" % platform_str)
-channel.start_consuming()
+server = BuildRpcServer(platform_str)
+server.start()
