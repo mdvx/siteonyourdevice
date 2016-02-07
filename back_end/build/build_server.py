@@ -3,25 +3,12 @@ import pika
 import json
 import subprocess
 import os
+import sys
+import base
 
-class Platform(object):
-    def __init__(self, platform, archs, package_types):
-        self.platform = platform
-        self.archs = archs
-        self.package_types = package_types
-
-HOST = 'localhost'
-SUPPORTED_PLATFORMS = [Platform('linux', [32, 64], ['DEB', 'RPM', 'TGZ']),
-                       Platform('windows', [32, 64], ['NSIS', 'ZIP']),
-                       Platform('macosx', [64], ['DragNDrop', 'ZIP']),
-                       Platform('freebsd', [64], ['TGZ']) ]
-
-connection = pika.BlockingConnection(pika.ConnectionParameters(
-        host=HOST))
-
-channel = connection.channel()
-
-channel.queue_declare(queue='rpc_queue')
+def print_usage():
+    print("Usage:\n"
+        "[optional] argv[1] platform\n")
 
 def run_command(cmd):
     output = subprocess.Popen(cmd, stdout=subprocess.PIPE,
@@ -31,7 +18,7 @@ def run_command(cmd):
 
 def build_package(op_id, platform, arch, branding_variables, package_type):
 
-    platform_or_none = next((x for x in SUPPORTED_PLATFORMS if x.platform == platform), None)
+    platform_or_none = base.get_supported_platform_by_name(platform)
 
     if platform_or_none == None:
         return 'invalid platform'
@@ -74,14 +61,27 @@ def on_request(ch, method, props, body):
 
     response = build_package(props.correlation_id, platform, arch, branding_variables, package_type)
 
-    ch.basic_publish(exchange='',
-                     routing_key=props.reply_to,
-                     properties=pika.BasicProperties(correlation_id = props.correlation_id),
-                     body=response)
+    ch.basic_publish(exchange = '',
+                     routing_key = props.reply_to,
+                     properties = pika.BasicProperties(correlation_id = props.correlation_id),
+                     body = response)
     ch.basic_ack(delivery_tag = method.delivery_tag)
 
-channel.basic_qos(prefetch_count=1)
-channel.basic_consume(on_request, queue='rpc_queue')
+# argv[1] build platform
 
-print(" [x] Awaiting RPC build requests")
+argc = len(sys.argv)
+
+if argc > 1:
+    platform_str = sys.argv[1]
+else:
+    platform_str = base.get_os()
+
+connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.HOST))
+
+channel = connection.channel()
+channel.queue_declare(queue=platform_str)
+channel.basic_qos(prefetch_count=1)
+channel.basic_consume(on_request, queue=platform_str)
+
+print("Awaiting RPC build requests for platform: %s" % platform_str)
 channel.start_consuming()
