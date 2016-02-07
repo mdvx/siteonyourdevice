@@ -3,7 +3,7 @@ login=@USER_SPECIFIC_DEFAULT_LOGIN@
 password=@USER_SPECIFIC_DEFAULT_PASSWORD@
 
 local_host=@USER_SPECIFIC_DEFAULT_DOMAIN@:@USER_SPECIFIC_DEFAULT_PORT@
-content_path=content
+content_path=@USER_SPECIFIC_CONTENT_PATH@
 
 external_host=localhost:80
 

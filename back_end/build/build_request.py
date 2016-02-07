@@ -75,7 +75,7 @@ else:
 if argc > 4:
     args = sys.argv[4]
 else:
-    args = None
+    args = ''
 
 if argc > 5:
     package_type = sys.argv[5]

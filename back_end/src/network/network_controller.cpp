@@ -347,6 +347,7 @@ void NetworkController::readConfig() {
   config.content_path = fApp->appDir();
   config.login = USER_SPECIFIC_DEFAULT_LOGIN;
   config.password = USER_SPECIFIC_DEFAULT_PASSWORD;
+  config.content_path = USER_SPECIFIC_CONTENT_PATH;
   config.is_private_site = USER_SPECIFIC_DEFAULT_PRIVATE_SITE;
   config.external_host = common::net::hostAndPort("localhost", 80);
   config.server_type = FASTO_SERVER;

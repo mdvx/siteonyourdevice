@@ -3,6 +3,20 @@
 import platform
 import re
 
+NO_ERROR = 0
+ERROR = -1
+
+class Error:
+    def __init__(self, error = NO_ERROR, description = 'No error'):
+        self.error = error
+        self.descr = description
+
+    def isError(self):
+        return self.error == ERROR
+
+    def description(self):
+        return self.descr
+
 class Platform(object):
     def __init__(self, platform, archs, package_types):
         self.platform = platform
