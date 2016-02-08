@@ -101,7 +101,7 @@ function parse_command_out(msg)
         if(c === ' '){
             if(pos === 0){
                 //id = parseInt(data, 10);
-		id = data;
+                id = data;
             }
             else if(pos === 1){
                 if(data === "ok"){

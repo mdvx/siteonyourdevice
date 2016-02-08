@@ -58,8 +58,20 @@ listener.on('connection', function (socket) {
         redis_pub.publish(config_settings.pub_sub_channel_in, msg);
     });
     
-    socket.on('publish_rabbitmq', function (msg) {
-        console.log("publish_rabbitmq : " + msg);
+    socket.on('publish_rabbitmq', function (msg) {        
+        var exchange = rabbit_connection.exchange('');
+        var in_json = JSON.parse(msg);
+        var branding_variables = '-DUSER_SPECIFIC_DEFAULT_LOGIN=' + in_json.email + ' -DUSER_SPECIFIC_DEFAULT_PASSWORD' + in_json.password
+        + ' -DUSER_SPECIFIC_DEFAULT_DOMAIN' + in_json.domain + ' -DUSER_SPECIFIC_CONTENT_PATH' + in_json.content_path;
+        
+        var request_data_json = {
+            'branding_variables': branding_variables,
+            'platform': in_json.platform,
+            'arch': in_json.arch,
+            'package_type' : in_json.package_type
+        }
+        console.log("request_data_json : " + request_data_json);
+        exchange.publish(in_json.platform, request_data_json)
     });
 });
 

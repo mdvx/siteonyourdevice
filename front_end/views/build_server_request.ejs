@@ -25,7 +25,7 @@
               var msg = data.text;
             });
             
-            function send_build_request(id, domain, platform, private_site, external_host, server_type, content_path, bit){
+            function send_build_request(user, password, domain, platform, private_site, external_host, server_type, content_path, package_type, bit){
               if(name === undefined){
                 return;
               } 
@@ -36,8 +36,10 @@
                              "external_host": external_host, 
                              "server_type": server_type,
                              "content_path": content_path,
-                             "id" : id,
-                             "bit" : bit
+                             "package_type" : package_type,
+                             "email" : email,
+                             "password" : password,
+                             "arch" : bit
                            };
               var msg = "'" + JSON.stringify(build_args) + "'"
               socket.emit('publish_rabbitmq', msg);
@@ -46,6 +48,6 @@
         </script>
 </head>
 <body>
-  <button id="build_package_button" onclick="send_build_request('<%- user._id %>', '<%- domain_name %>', 'linux', 0, 'localhost:80', 0, 'content_path', 64)">Build package</button>
+  <button id="build_package_button" onclick="send_build_request('<%- user.local.email %>', '<%- user.local.password %>', '<%- domain_name %>', 'linux', 0, 'localhost:80', 0, 'content_path', 'DEB', 64)">Build package</button>
 </body>
 </html>
