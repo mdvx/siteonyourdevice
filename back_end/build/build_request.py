@@ -7,12 +7,11 @@ import config
 
 def print_usage():
     print("Usage:\n"
-        "[required] argv[1] queue_name\n"
-        "[required] argv[2] operation id\n"
-        "[optional] argv[3] platform\n"
-        "[optional] argv[4] architecture\n"
-        "[optional] argv[5] build args\n"
-        "[optional] argv[6] package_type\n")
+        "[required] argv[1] operation id\n"
+        "[optional] argv[2] platform\n"
+        "[optional] argv[3] architecture\n"
+        "[optional] argv[4] build args\n"
+        "[optional] argv[5] package_type\n")
 
 
 class ResponceHander(object):
@@ -64,21 +63,14 @@ if __name__ == "__main__":
     argc = len(sys.argv)
 
     if argc > 1:
-        queue_name = sys.argv[1]
-    else:
-        print("Queue name not passed!")
-        print_usage()
-        quit()
-
-    if argc > 2:
-        op_id = sys.argv[2]
+        op_id = sys.argv[1]
     else:
         print("Operation id not passed!")
         print_usage()
         quit()
 
-    if argc > 3:
-        platform_str = sys.argv[3]
+    if argc > 2:
+        platform_str = sys.argv[2]
     else:
         platform_str = base.get_os()
 
@@ -88,21 +80,21 @@ if __name__ == "__main__":
         print_usage()
         quit()
 
-    if argc > 4:
-        arch_str = sys.argv[4]
+    if argc > 3:
+        arch_str = sys.argv[3]
     else:
         arch_str = base.get_arch()
 
-    if argc > 5:
-        args = sys.argv[5]
+    if argc > 4:
+        args = sys.argv[4]
     else:
         args = ''
 
-    if argc > 6:
-        package_type = sys.argv[6]
+    if argc > 5:
+        package_type = sys.argv[5]
     else:
         package_type = platform_or_none.package_types[0]
 
     build_rpc = BuildRpcClient()
-    response = build_rpc.build_request(queue_name, op_id, platform_str, int(arch_str), args, package_type)
+    response = build_rpc.build_request(op_id, platform_str, int(arch_str), args, package_type)
     print("responce: %r" % response)
