@@ -24,7 +24,7 @@ class OutBuildRpcServer(object):
         self.exists_channels[platform] = channel
 
     def on_request(self, ch, method, props, body):
-        print("Received request %r" % body)
+        print("Received request %r\n" % body)
         data = json.loads(body)
         platform = data.get('platform')
         op_id = props.correlation_id
@@ -68,6 +68,7 @@ class ProxyBuildRpcServer(object):
         self.channel.basic_consume(self.on_request, queue = rpc_queue_name_out, no_ack=True)
 
         self.listener_thread = ThreadedProxyBuildInListener(rpc_queue_name_in)
+        self.listener_thread.setDaemon(True);
 
     def start(self):
         print("Awaiting proxy RPC build requests")

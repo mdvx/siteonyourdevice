@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import pika
 import sys
-import threading
 from build_server import BuildRpcServer
 import base
 import config
@@ -9,14 +8,6 @@ import config
 def print_usage():
     print("Usage:\n"
         "[optional] argv[1] platform\n")
-
-class ThreadedBuildRpcServer(threading.Thread):
-    def __init__(self, platform):
-        threading.Thread.__init__(self)
-        self.server = BuildRpcServer(platform)
-
-    def run(self):
-        self.server.start()
 
 class ProxyConnector(object):
     def __init__(self, platform):
@@ -26,11 +17,8 @@ class ProxyConnector(object):
         self.channel.queue_declare(queue = config.RPC_BUILD_SERVER_QUEUE)
         self.channel.basic_publish(exchange = '', routing_key = config.RPC_BUILD_SERVER_QUEUE, body = platform)
 
-        self.server_listener = ThreadedBuildRpcServer(platform)
-
     def start(self):
         print('Proxy connector started')
-        self.server_listener.start()
         return
 
 if __name__ == "__main__":
@@ -43,3 +31,6 @@ if __name__ == "__main__":
 
     proxy = ProxyConnector(platform_str)
     proxy.start()
+
+    server = BuildRpcServer(platform_str)
+    server.start()
