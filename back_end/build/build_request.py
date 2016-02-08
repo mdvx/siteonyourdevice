@@ -14,7 +14,8 @@ def print_usage():
 
 class BuildRpcClient(object):
     def __init__(self):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=base.SERVER_HOST))
+        credentials = pika.PlainCredentials(base.USER_NAME, base.PASSWORD)
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=base.SERVER_HOST, credentials = credentials))
         self.channel = self.connection.channel()
         result = self.channel.queue_declare(exclusive=True)
         self.callback_queue = result.method.queue

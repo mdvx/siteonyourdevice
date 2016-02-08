@@ -6,7 +6,8 @@ import base
 
 class OutBuildRpcServer(object):
     def __init__(self, rpc_queue_name):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.SERVER_HOST))
+        credentials = pika.PlainCredentials(base.USER_NAME, base.PASSWORD)
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.SERVER_HOST, credentials = credentials))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue = rpc_queue_name)
         self.channel.basic_qos(prefetch_count = 1)
@@ -45,7 +46,8 @@ class ThreadedProxyBuildInListener(threading.Thread):
 
 class ProxyBuildRpcServer(object):
     def __init__(self, rpc_queue_name_in, rpc_queue_name_out):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.SERVER_HOST))
+        credentials = pika.PlainCredentials(base.USER_NAME, base.PASSWORD)
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.SERVER_HOST, credentials = credentials))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue = rpc_queue_name_out)
         self.channel.basic_consume(self.on_request, queue = rpc_queue_name_out, no_ack=True)

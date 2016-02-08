@@ -2,13 +2,13 @@
 import pika
 import sys
 import threading
-import build_server
+from build_server import BuildRpcServer
 import base
 
 class ThreadedBuildRpcServer(threading.Thread):
     def __init__(self, platform):
         threading.Thread.__init__(self)
-        self.server = build_server.BuildRpcServer(platform)
+        self.server = BuildRpcServer(platform)
 
     def run(self):
         self.server.start()
@@ -17,7 +17,8 @@ class ThreadedBuildRpcServer(threading.Thread):
 
 class ProxyConnector(object):
     def __init__(self, platform):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.REMOTE_HOST))
+        credentials = pika.PlainCredentials(base.USER_NAME, base.PASSWORD)
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.REMOTE_HOST, credentials = credentials))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue = base.RPC_BUILD_SERVER_QUEUE)
         self.channel.basic_publish(exchange = '', routing_key = base.RPC_BUILD_SERVER_QUEUE, body = platform)

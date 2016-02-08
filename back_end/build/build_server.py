@@ -23,7 +23,8 @@ def run_command(cmd):
 
 class BuildRpcServer(object):
     def __init__(self, platform):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.REMOTE_HOST))
+        credentials = pika.PlainCredentials(base.USER_NAME, base.PASSWORD)
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.REMOTE_HOST, credentials = credentials))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue = platform)
         self.channel.basic_qos(prefetch_count = 1)
@@ -93,12 +94,13 @@ class BuildRpcServer(object):
 
 # argv[1] build platform
 
-argc = len(sys.argv)
+if __name__ == "__main__":
+    argc = len(sys.argv)
 
-if argc > 1:
-    platform_str = sys.argv[1]
-else:
-    platform_str = base.get_os()
+    if argc > 1:
+        platform_str = sys.argv[1]
+    else:
+        platform_str = base.get_os()
 
-server = BuildRpcServer(platform_str)
-server.start()
+    server = BuildRpcServer(platform_str)
+    server.start()
