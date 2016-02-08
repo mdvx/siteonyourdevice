@@ -75,7 +75,7 @@ class ProxyBuildRpcServer(object):
         self.channel.start_consuming()
 
     def on_request(self, ch, method, props, body):
-        print("Received %r" % body)
+        print("Received build system machine %r" % body)
         self.listener_thread.server.add_channel(body, ch)
 
 if __name__ == "__main__":
