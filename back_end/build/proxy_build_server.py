@@ -45,7 +45,7 @@ class ThreadedProxyBuildInListener(threading.Thread):
 
 class ProxyBuildRpcServer(object):
     def __init__(self, rpc_queue_name_in, rpc_queue_name_out):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.HOST))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.SERVER_HOST))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue = rpc_queue_name_out)
         self.channel.basic_consume(self.on_request, queue = rpc_queue_name_out, no_ack=True)
