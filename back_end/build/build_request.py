@@ -44,7 +44,7 @@ class BuildRpcClient(object):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=config.SERVER_HOST, credentials = credentials))
         self.channel = self.connection.channel()
 
-    def build_request(self, channel, op_id, platform, arch, branding_variables, package_type):
+    def build_request(self, op_id, platform, arch, branding_variables, package_type):
         self.response = None
         self.corr_id = op_id
         request_data_json = {
