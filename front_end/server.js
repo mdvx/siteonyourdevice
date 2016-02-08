@@ -37,13 +37,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
 
-var redis_client = redis.createClient();
-redis_client.on("error", function (err) {
-    console.log("redis_client error" + err);
-});
-
-redis_client.on("error", function (err) {
-    console.log("redis_client error " + err);
+app.redis_connection = redis.createClient();
+app.redis_connection.on("error", function (err) {
+    console.log("redis_client error: " + err);
 });
 
 // app_r
@@ -67,11 +63,11 @@ var redis_sub = redis.createClient();
 var redis_pub = redis.createClient();
 
 redis_sub.on("error", function (err) {
-    console.log("redis_sub error" + err);
+    console.log("redis_sub error: " + err);
 });
 
 redis_pub.on("error", function (err) {
-    console.log("redis_pub error " + err);
+    console.log("redis_pub error: " + err);
 });
 
 redis_sub.on('ready', function() {
@@ -84,8 +80,8 @@ redis_sub.on("message", function(channel, message){
 });
 
 app.rabbit_connection = amqp.createConnection({ host: config_settings.rabbitmq_host });
-app.rabbit_connection.on('ready', function () {
-    console.log("rabbitmq connected");
+app.rabbit_connection.on('error', function (err) {
+    console.log("rabbit_connection error: " + err);
 });
 
 // configuration ===============================================================
@@ -109,7 +105,7 @@ app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 
 // routes ======================================================================
-require('./app/routes.js')(app, passport, redis_client, config_settings); // load our routes and pass in our app and fully configured passport
+require('./app/routes.js')(app, passport, config_settings); // load our routes and pass in our app and fully configured passport
 
 // launch ======================================================================
 app.listen(port);

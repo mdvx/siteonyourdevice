@@ -6,7 +6,7 @@ function checkIsValidDomain(domain) {
     return domain.match(re);
 } 
 
-module.exports = function(app, passport, redis, settings_config) {
+module.exports = function(app, passport, settings_config) {
 
 // normal routes ===============================================================
 
@@ -18,7 +18,7 @@ module.exports = function(app, passport, redis, settings_config) {
     });
 
     app.get('/templates', function(req, res) {
-        redis.hgetall('templates', function(err, result) {
+        app.redis_connection.hgetall('templates', function(err, result) {
             if (err) {
                 console.log(err);
             } 
@@ -73,13 +73,13 @@ module.exports = function(app, passport, redis, settings_config) {
         }
         
         User.findOne({'domains.name': new_domain}, function(err, fuser) {
-            if (err){
+            if (err) {
                 req.flash('statusProfileMessage', err);
                 res.redirect('/profile');
                 return;
             }
             
-            if(fuser){
+            if (fuser) {
                 req.flash('statusProfileMessage', 'Sorry, ' + new_domain + ' isn’t available.');
                 res.redirect('/profile');
                 return;
@@ -87,20 +87,29 @@ module.exports = function(app, passport, redis, settings_config) {
             
             user.domains.push({name : new_domain, created_date : Date() });
             user.save(function(err) {
-                if(err){
+                if (err) {
                     req.flash('statusProfileMessage', err);
-                }
-                else{
+                } else {
                     var redis_hosts = []; // Create a new empty array.
                     for (var i = 0; i < user.domains.length; i++) {
                         redis_hosts[i] = user.domains[i].name;
                     }
                     var needed_val = { name : user.local.email, password : user.local.password, hosts : redis_hosts};
                     var needed_val_str = JSON.stringify(needed_val);
-                    redis.hset("users", user.local.email, needed_val_str);
+                    app.redis_connection.hset("users", user.local.email, needed_val_str);
                 }
                 res.redirect('/profile');
             });
+        });
+    });
+    
+    app.post('/build_server_request', function(req, res) {
+        var user = req.user;        
+        var domain = req.body.domain_name;
+        
+        res.render('build_server_request.ejs', {
+            user : user,
+            domain_name: domain_name
         });
     });
     
@@ -111,17 +120,16 @@ module.exports = function(app, passport, redis, settings_config) {
         
         user.domains.pull({_id : remove_domain_id });
         user.save(function(err) {
-            if(err){
+            if (err) {
                 req.flash('statusProfileMessage', err);
-            }
-            else{
+            } else {
                 var redis_hosts = []; // Create a new empty array.
                 for (var i = 0; i < user.domains.length; i++) {
                     redis_hosts[i] = user.domains[i].name;
                 }
                 var needed_val = { name : user.local.email, password : user.local.password, hosts : redis_hosts};
                 var needed_val_str = JSON.stringify(needed_val);
-                redis.hset("users", user.local.email, needed_val_str);   
+                app.redis_connection.hset("users", user.local.email, needed_val_str);   
             }
             res.redirect('/profile');
         });

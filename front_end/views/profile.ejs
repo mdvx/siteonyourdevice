@@ -121,19 +121,21 @@
                         <td><%= user.domains[i].name %></td>
                         <td><%= user.domains[i].created_date %></td>
                         <td>                            
-                        <form action="/remove_domain" method="post">
-                            <input type="hidden" class="form-control" name="domain_id" value="<%= user.domains[i]._id %>">
-                            <button type="submit" class="btn btn-danger btn-xs">Remove</button>
-                        </form>
-                        <div>
-                            <a href="http://proxy.siteonyourdevice.com/<%= user.domains[i].name %>" class="btn btn-primary btn-xs">Hot link</a>
-                        </div>
-                        <div>
-                            <form action="/server_details" method="post">
-                                <input type="hidden" class="form-control" name="domain_name" value="<%= user.domains[i].name %>">
-                                <button type="submit" class="btn btn-info btn-xs">Details</button>
-                            </form>
-                        </div>
+                          <form action="/remove_domain" method="post">
+                              <input type="hidden" class="form-control" name="domain_id" value="<%= user.domains[i]._id %>">
+                              <button type="submit" class="btn btn-danger btn-xs">Remove</button>
+                          </form>
+                          <div>
+                              <a href="http://proxy.siteonyourdevice.com/<%= user.domains[i].name %>" class="btn btn-primary btn-xs">Hot link</a>
+                          </div>
+                          <form action="/server_details" method="post">
+                              <input type="hidden" class="form-control" name="domain_name" value="<%= user.domains[i].name %>">
+                              <button type="submit" class="btn btn-info btn-xs">Details</button>
+                          </form>
+                          <form action="/build_server_request" method="post">
+                              <input type="hidden" class="form-control" name="domain_name" value="<%= user.domains[i].name %>">
+                              <button type="submit" class="btn btn-primary btn-xs">Build server installer</button>
+                          </form>
                         </td>
                     </tr>
                 <% } %>
