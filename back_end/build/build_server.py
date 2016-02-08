@@ -7,6 +7,7 @@ import shutil
 import sys
 import shlex
 import base
+import config
 
 def print_usage():
     print("Usage:\n"
@@ -23,8 +24,8 @@ def run_command(cmd):
 
 class BuildRpcServer(object):
     def __init__(self, platform):
-        credentials = pika.PlainCredentials(base.USER_NAME, base.PASSWORD)
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.REMOTE_HOST, credentials = credentials))
+        credentials = pika.PlainCredentials(config.USER_NAME, config.PASSWORD)
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = config.REMOTE_HOST, credentials = credentials))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue = platform)
         self.channel.basic_qos(prefetch_count = 1)
@@ -91,8 +92,6 @@ class BuildRpcServer(object):
                          properties = pika.BasicProperties(correlation_id = props.correlation_id),
                          body = response)
         ch.basic_ack(delivery_tag = method.delivery_tag)
-
-# argv[1] build platform
 
 if __name__ == "__main__":
     argc = len(sys.argv)

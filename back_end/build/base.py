@@ -23,12 +23,6 @@ class Platform(object):
         self.archs = archs
         self.package_types = package_types
 
-RPC_QUEUE = 'rpc_queue'
-RPC_BUILD_SERVER_QUEUE = 'rpc_build_queue'
-USER_NAME = 'test'
-PASSWORD = 'test'
-SERVER_HOST = 'localhost'
-REMOTE_HOST = 'siteonyourdevice.com'
 SUPPORTED_PLATFORMS = [Platform('linux', [32, 64], ['DEB', 'RPM', 'TGZ']),
                        Platform('windows', [32, 64], ['NSIS', 'ZIP']),
                        Platform('macosx', [64], ['DragNDrop', 'ZIP']),

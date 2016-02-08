@@ -2,12 +2,36 @@
 import pika
 import threading
 import json
-import base
+import sys
+import config
+
+def print_usage():
+    print("Usage:\n"
+        "[required] argv[1] queue_name\n")
+
+class ResponceHander(object):
+    def __init__(self, op_id, channel, body):
+        self.channel = channel
+        self.corr_id = op_id
+        self.connection = channel.connection()
+        self.channel.basic_consume(self.on_response, no_ack=True, queue=self.callback_queue)
+        self.channel.basic_publish(exchange = '',
+                                   routing_key = channel,
+                                   properties = pika.BasicProperties(reply_to = self.callback_queue, correlation_id = self.corr_id),
+                                   body = body)
+    def execute(self):
+        self.response = None
+        while self.response is None:
+            self.connection.process_data_events()
+        return self.response
+
+    def on_response(self, ch, method, props, body):
+        self.response = body
 
 class OutBuildRpcServer(object):
     def __init__(self, rpc_queue_name):
-        credentials = pika.PlainCredentials(base.USER_NAME, base.PASSWORD)
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.SERVER_HOST, credentials = credentials))
+        credentials = pika.PlainCredentials(config.USER_NAME, config.PASSWORD)
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = config.SERVER_HOST, credentials = credentials))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue = rpc_queue_name)
         self.channel.basic_qos(prefetch_count = 1)
@@ -21,6 +45,7 @@ class OutBuildRpcServer(object):
         print("Received request %r" % body)
         data = json.loads(body)
         platform = data.get('platform')
+        op_id = props.correlation_id
         channel = self.exists_channels.get(platform, None)
         if channel == None:
             ch.basic_publish(exchange = '',
@@ -30,6 +55,14 @@ class OutBuildRpcServer(object):
             ch.basic_ack(delivery_tag = method.delivery_tag)
             return
 
+        handler = ResponceHander(op_id, channel, body)
+        response = handler.execute()
+
+        ch.basic_publish(exchange = '',
+                         routing_key = props.reply_to,
+                         properties = pika.BasicProperties(correlation_id = props.correlation_id),
+                         body = response)
+        ch.basic_ack(delivery_tag = method.delivery_tag)
 
 
     def start(self):
@@ -46,8 +79,8 @@ class ThreadedProxyBuildInListener(threading.Thread):
 
 class ProxyBuildRpcServer(object):
     def __init__(self, rpc_queue_name_in, rpc_queue_name_out):
-        credentials = pika.PlainCredentials(base.USER_NAME, base.PASSWORD)
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.SERVER_HOST, credentials = credentials))
+        credentials = pika.PlainCredentials(config.USER_NAME, config.PASSWORD)
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = config.SERVER_HOST, credentials = credentials))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue = rpc_queue_name_out)
         self.channel.basic_consume(self.on_request, queue = rpc_queue_name_out, no_ack=True)
@@ -63,5 +96,15 @@ class ProxyBuildRpcServer(object):
         print("Received %r" % body)
         self.listener_thread.server.add_channel(body, ch)
 
-server = ProxyBuildRpcServer(base.RPC_QUEUE, base.RPC_BUILD_SERVER_QUEUE)
-server.start()
+if __name__ == "__main__":
+    argc = len(sys.argv)
+
+    if argc > 1:
+        queue_name = sys.argv[1]
+    else:
+        print("Queue name not passed!")
+        print_usage()
+        quit()
+
+    server = ProxyBuildRpcServer(queue_name, config.RPC_BUILD_SERVER_QUEUE)
+    server.start()

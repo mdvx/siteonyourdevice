@@ -4,6 +4,11 @@ import sys
 import threading
 from build_server import BuildRpcServer
 import base
+import config
+
+def print_usage():
+    print("Usage:\n"
+        "[optional] argv[1] platform\n")
 
 class ThreadedBuildRpcServer(threading.Thread):
     def __init__(self, platform):
@@ -13,15 +18,13 @@ class ThreadedBuildRpcServer(threading.Thread):
     def run(self):
         self.server.start()
 
-# argv[1] build platform
-
 class ProxyConnector(object):
     def __init__(self, platform):
-        credentials = pika.PlainCredentials(base.USER_NAME, base.PASSWORD)
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = base.REMOTE_HOST, credentials = credentials))
+        credentials = pika.PlainCredentials(config.USER_NAME, config.PASSWORD)
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = config.REMOTE_HOST, credentials = credentials))
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue = base.RPC_BUILD_SERVER_QUEUE)
-        self.channel.basic_publish(exchange = '', routing_key = base.RPC_BUILD_SERVER_QUEUE, body = platform)
+        self.channel.queue_declare(queue = config.RPC_BUILD_SERVER_QUEUE)
+        self.channel.basic_publish(exchange = '', routing_key = config.RPC_BUILD_SERVER_QUEUE, body = platform)
 
         self.server_listener = ThreadedBuildRpcServer(platform)
 
@@ -30,12 +33,13 @@ class ProxyConnector(object):
         self.server_listener.start()
         return
 
-argc = len(sys.argv)
+if __name__ == "__main__":
+    argc = len(sys.argv)
 
-if argc > 1:
-    platform_str = sys.argv[1]
-else:
-    platform_str = base.get_os()
+    if argc > 1:
+        platform_str = sys.argv[1]
+    else:
+        platform_str = base.get_os()
 
-proxy = ProxyConnector(platform_str)
-proxy.start()
+    proxy = ProxyConnector(platform_str)
+    proxy.start()
