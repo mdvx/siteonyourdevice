@@ -84,12 +84,12 @@ class BuildRpcServer(object):
         op_id = props.correlation_id
 
         print('build started for: {0}, platform: {1}_{2}'.format(op_id, platform, arch))
-        response = self.build_package(props.correlation_id, platform, arch, branding_variables, package_type)
+        response = self.build_package(op_id, platform, arch, branding_variables, package_type)
         print('build finished for: {0}, platform: {1}_{2}, responce: {3}'.format(op_id, platform, arch, response))
 
         ch.basic_publish(exchange = '',
                          routing_key = props.reply_to,
-                         properties = pika.BasicProperties(correlation_id = props.correlation_id),
+                         properties = pika.BasicProperties(correlation_id = op_id),
                          body = response)
         ch.basic_ack(delivery_tag = method.delivery_tag)
 

@@ -14,18 +14,36 @@ def print_usage():
         "[optional] argv[5] build args\n"
         "[optional] argv[6] package_type\n")
 
+
+class ResponceHander(object):
+    def __init__(self, op_id, channel):
+        self.channel = channel
+        self.corr_id = op_id
+        self.connection = channel.connection
+
+        result = self.channel.queue_declare(exclusive=True)
+        self.callback_queue = result.method.queue
+        self.channel.basic_consume(self.on_response, no_ack=True, queue=self.callback_queue)
+
+    def execute(self, routing_key, body):
+        self.channel.basic_publish(exchange = '',
+                           routing_key = routing_key,
+                           properties = pika.BasicProperties(reply_to = self.callback_queue, correlation_id = self.corr_id),
+                           body = body)
+        self.response = None
+        while self.response is None:
+            self.connection.process_data_events()
+        return self.response
+
+    def on_response(self, ch, method, props, body):
+        self.response = body
+
+
 class BuildRpcClient(object):
     def __init__(self):
         credentials = pika.PlainCredentials(config.USER_NAME, config.PASSWORD)
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=config.SERVER_HOST, credentials = credentials))
         self.channel = self.connection.channel()
-        result = self.channel.queue_declare(exclusive=True)
-        self.callback_queue = result.method.queue
-        self.channel.basic_consume(self.on_response, no_ack=True, queue=self.callback_queue)
-
-    def on_response(self, ch, method, props, body):
-        if self.corr_id == props.correlation_id:
-            self.response = body
 
     def build_request(self, channel, op_id, platform, arch, branding_variables, package_type):
         self.response = None
@@ -38,13 +56,8 @@ class BuildRpcClient(object):
         }
         request_data_str = json.dumps(request_data_json)
         print ("build request body: %s" % request_data_str)
-        self.channel.basic_publish(exchange = '',
-                                   routing_key = channel,
-                                   properties = pika.BasicProperties(reply_to = self.callback_queue, correlation_id = self.corr_id),
-                                   body = request_data_str)
-        while self.response is None:
-            self.connection.process_data_events()
-        return self.response
+        handler = ResponceHander(self.corr_id, self.channel)
+        return handler.execute(platform, request_data_str)
 
 if __name__ == "__main__":
 

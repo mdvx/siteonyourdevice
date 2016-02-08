@@ -4,31 +4,11 @@ import threading
 import json
 import sys
 import config
+from build_request import ResponceHander
 
 def print_usage():
     print("Usage:\n"
         "[required] argv[1] queue_name\n")
-
-class ResponceHander(object):
-    def __init__(self, op_id, channel, body):
-        self.channel = channel
-        self.corr_id = op_id
-        self.connection = channel.connection
-        result = self.channel.queue_declare(exclusive=True)
-        self.callback_queue = result.method.queue
-        self.channel.basic_consume(self.on_response, no_ack=True, queue=self.callback_queue)
-        self.channel.basic_publish(exchange = '',
-                                   routing_key = channel,
-                                   properties = pika.BasicProperties(reply_to = self.callback_queue, correlation_id = self.corr_id),
-                                   body = body)
-    def execute(self):
-        self.response = None
-        while self.response is None:
-            self.connection.process_data_events()
-        return self.response
-
-    def on_response(self, ch, method, props, body):
-        self.response = body
 
 class OutBuildRpcServer(object):
     def __init__(self, rpc_queue_name):
@@ -52,17 +32,17 @@ class OutBuildRpcServer(object):
         if channel == None:
             ch.basic_publish(exchange = '',
                          routing_key = props.reply_to,
-                         properties = pika.BasicProperties(correlation_id = props.correlation_id),
+                         properties = pika.BasicProperties(correlation_id = op_id),
                          body = 'Build machine not exist')
             ch.basic_ack(delivery_tag = method.delivery_tag)
             return
 
-        handler = ResponceHander(op_id, channel, body)
-        response = handler.execute()
+        handler = ResponceHander(op_id, channel)
+        response = handler.execute(platform, body)
 
         ch.basic_publish(exchange = '',
                          routing_key = props.reply_to,
-                         properties = pika.BasicProperties(correlation_id = props.correlation_id),
+                         properties = pika.BasicProperties(correlation_id = op_id),
                          body = response)
         ch.basic_ack(delivery_tag = method.delivery_tag)
 
