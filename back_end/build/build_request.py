@@ -44,6 +44,10 @@ class BuildRpcClient(object):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=config.SERVER_HOST, credentials = credentials))
         self.channel = self.connection.channel()
 
+        result = self.channel.queue_declare(exclusive=True)
+        self.callback_queue = result.method.queue
+        self.channel.basic_consume(self.on_response, no_ack=True, queue=self.callback_queue)
+
     def build_request(self, op_id, platform, arch, branding_variables, package_type):
         self.response = None
         self.corr_id = op_id
@@ -55,8 +59,17 @@ class BuildRpcClient(object):
         }
         request_data_str = json.dumps(request_data_json)
         print ("build request body: %s" % request_data_str)
-        handler = ResponceHander(self.corr_id, self.channel)
-        return handler.execute(platform, request_data_str)
+        self.channel.basic_publish(exchange = '',
+                           routing_key = platform,
+                           properties = pika.BasicProperties(reply_to = self.callback_queue, correlation_id = self.corr_id),
+                           body = request_data_str)
+        self.response = None
+        while self.response is None:
+            self.connection.process_data_events()
+        return self.response
+
+    def on_response(self, ch, method, props, body):
+        self.response = body
 
 if __name__ == "__main__":
 
