@@ -49,6 +49,11 @@ var io = require('socket.io');
 var server = http.createServer(app);
 var listener = io.listen(server);
 
+var rabbit_connection = amqp.createConnection({ host: config_settings.rabbitmq_host });
+rabbit_connection.on('error', function (err) {
+    console.log("rabbit_connection error: " + err);
+});
+
 listener.on('connection', function (socket) {
     socket.on('subscribe', function (data) {
         socket.join(data.channel);
@@ -58,19 +63,19 @@ listener.on('connection', function (socket) {
         redis_pub.publish(config_settings.pub_sub_channel_in, msg);
     });
     
-    socket.on('publish_rabbitmq', function (msg) {        
+    socket.on('publish_rabbitmq', function (msg) {
         var exchange = rabbit_connection.exchange('');
         var in_json = JSON.parse(msg);
-        var branding_variables = '-DUSER_SPECIFIC_DEFAULT_LOGIN=' + in_json.email + ' -DUSER_SPECIFIC_DEFAULT_PASSWORD' + in_json.password
-        + ' -DUSER_SPECIFIC_DEFAULT_DOMAIN' + in_json.domain + ' -DUSER_SPECIFIC_CONTENT_PATH' + in_json.content_path;
+        var branding_variables = '-DUSER_SPECIFIC_DEFAULT_LOGIN=' + in_json.email + ' -DUSER_SPECIFIC_DEFAULT_PASSWORD=' + in_json.password
+        + ' -DUSER_SPECIFIC_DEFAULT_DOMAIN=' + in_json.domain + ' -DUSER_SPECIFIC_CONTENT_PATH=' + in_json.content_path;
         
         var request_data_json = {
             'branding_variables': branding_variables,
             'platform': in_json.platform,
             'arch': in_json.arch,
             'package_type' : in_json.package_type
-        }
-        console.log("request_data_json : " + request_data_json);
+        };
+        console.log("request_data_json : " + JSON.stringify(request_data_json));
         exchange.publish(in_json.platform, request_data_json)
     });
 });
@@ -93,11 +98,6 @@ redis_sub.on('ready', function() {
 redis_sub.on("message_redis", function(channel, message){
     var resp = {'text': message, 'channel':channel}
     listener.in(channel).emit('message', resp);
-});
-
-rabbit_connection = amqp.createConnection({ host: config_settings.rabbitmq_host });
-rabbit_connection.on('error', function (err) {
-    console.log("rabbit_connection error: " + err);
 });
 
 // configuration ===============================================================

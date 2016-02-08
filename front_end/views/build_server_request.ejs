@@ -41,7 +41,7 @@
                              "password" : password,
                              "arch" : bit
                            };
-              var msg = "'" + JSON.stringify(build_args) + "'"
+              var msg = JSON.stringify(build_args);
               socket.emit('publish_rabbitmq', msg);
             }
             
