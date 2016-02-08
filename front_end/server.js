@@ -54,8 +54,12 @@ listener.on('connection', function (socket) {
         socket.join(data.channel);
     });
 
-    socket.on('publish', function (msg) {
+    socket.on('publish_redis', function (msg) {
         redis_pub.publish(config_settings.pub_sub_channel_in, msg);
+    });
+    
+    socket.on('publish_rabbitmq', function (msg) {
+        console.log("publish_rabbitmq : " + msg);
     });
 });
 
@@ -74,13 +78,13 @@ redis_sub.on('ready', function() {
     redis_sub.subscribe(config_settings.pub_sub_channel_out, config_settings.pub_sub_channel_client_state);
 });
 
-redis_sub.on("message", function(channel, message){
+redis_sub.on("message_redis", function(channel, message){
     var resp = {'text': message, 'channel':channel}
     listener.in(channel).emit('message', resp);
 });
 
-app.rabbit_connection = amqp.createConnection({ host: config_settings.rabbitmq_host });
-app.rabbit_connection.on('error', function (err) {
+rabbit_connection = amqp.createConnection({ host: config_settings.rabbitmq_host });
+rabbit_connection.on('error', function (err) {
     console.log("rabbit_connection error: " + err);
 });
 

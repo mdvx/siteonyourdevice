@@ -142,7 +142,7 @@ function ping_server(id, name, socket)
     }
     
     var msg = name + " " + id + " " + COMMANDS.PING;
-    socket.emit('publish', msg);
+    socket.emit('publish_redis', msg);
 }
 
 function server_info(id, name, socket)
@@ -152,7 +152,7 @@ function server_info(id, name, socket)
     }
     
     var msg = name + " " + id + " " + COMMANDS.INFO;
-    socket.emit('publish', msg);
+    socket.emit('publish_redis', msg);
 }
 
 function sync_server_config(id, name, socket)
@@ -162,7 +162,7 @@ function sync_server_config(id, name, socket)
     }
     
     var msg = name + " " + id + " " + COMMANDS.CONFIG;
-    socket.emit('publish', msg);
+    socket.emit('publish_redis', msg);
 }
 
 function set_server_config(id, name, config, socket){
@@ -171,7 +171,7 @@ function set_server_config(id, name, config, socket){
   } 
   
   var msg = name + " " + id + " " + COMMANDS.SET_CONFIG + " " + config;
-  socket.emit('publish', msg);
+  socket.emit('publish_redis', msg);
 }
 
 //// server_details constant

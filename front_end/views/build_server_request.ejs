@@ -7,8 +7,45 @@
     <style>
         body         { padding-top:80px; }
     </style>
+    <script src="scripts/script.js" type="text/javascript"></script>
+        <script src="http://siteonyourdevice.com:3000/socket.io/socket.io.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script>
+            var socket = io.connect('http://siteonyourdevice.com:3000');
+            //on connetion, updates connection state and sends subscribe request
+            socket.on('connect', function(data){
+            });
+
+            //when reconnection is attempted, updates status 
+            socket.on('reconnecting', function(data){
+            });
+
+            //on new message adds a new message to display
+            socket.on('message_rabbitmq', function (data) {
+              var msg = data.text;
+            });
+            
+            function send_build_request(id, domain, platform, private_site, external_host, server_type, content_path, bit){
+              if(name === undefined){
+                return;
+              } 
+              
+              var build_args = { "domain": domain, 
+                             "platform": platform, 
+                             "private_site": private_site, 
+                             "external_host": external_host, 
+                             "server_type": server_type,
+                             "content_path": content_path,
+                             "id" : id,
+                             "bit" : bit
+                           };
+              var msg = "'" + JSON.stringify(build_args) + "'"
+              socket.emit('publish_rabbitmq', msg);
+            }
+            
+        </script>
 </head>
 <body>
-
+  <button id="build_package_button" onclick="send_build_request('<%- user._id %>', '<%- domain_name %>', 'linux', 0, 'localhost:80', 0, 'content_path', 64)">Build package</button>
 </body>
 </html>

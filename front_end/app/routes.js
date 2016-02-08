@@ -21,8 +21,7 @@ module.exports = function(app, passport, settings_config) {
         app.redis_connection.hgetall('templates', function(err, result) {
             if (err) {
                 console.log(err);
-            } 
-            else {
+            } else {
                 var templates = [];
                 for (i in result) {
                     templates.push(JSON.parse(result[i]));
@@ -105,11 +104,11 @@ module.exports = function(app, passport, settings_config) {
     
     app.post('/build_server_request', function(req, res) {
         var user = req.user;        
-        var domain = req.body.domain_name;
+        var domain_name = req.body.domain_name;
         
         res.render('build_server_request.ejs', {
             user : user,
-            domain_name: domain_name
+            domain_name : domain_name
         });
     });
     

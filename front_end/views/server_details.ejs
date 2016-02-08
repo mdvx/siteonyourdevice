@@ -129,10 +129,9 @@
                 
                 var is_ok = is_succsess_command(msgObj);
                 
-                if(is_ping_command(msgObj)){
+                if (is_ping_command(msgObj)) {
                     handle_onconnection_changed(is_ok);
-                }
-                else if(is_info_command(msgObj)){
+                } else if(is_info_command(msgObj)) {
                     if(is_ok){
                         var system_info = JSON.parse(msgObj.args);
                         $('#os_label').html(system_info.os);
@@ -187,7 +186,7 @@
             });
 
             //on new message adds a new message to display
-            socket.on('message', function (data) {
+            socket.on('message_redis', function (data) {
                 var msg = data.text;
                 
                 if (data.channel === CHANNEL_OUT) {
@@ -197,8 +196,7 @@
                     }
                     
                     handle_command_received(msgObj);
-                }
-                else if(data.channel === CHANNEL_CLIENTS_STATE){
+                } else if(data.channel === CHANNEL_CLIENTS_STATE) {
                     var stateObj = parse_state_msg(msg);
                     if(stateObj == undefined){
                         return;

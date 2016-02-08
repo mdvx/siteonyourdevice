@@ -40,7 +40,7 @@
             });
 
             //on new message adds a new message to display
-            socket.on('message', function (data) {
+            socket.on('message_redis', function (data) {
                 var msg = data.text;
                 
                 if(data.channel === CHANNEL_CLIENTS_STATE){
