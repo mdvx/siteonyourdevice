@@ -30,6 +30,7 @@ var mongoose = require('mongoose');
 var redis = require('redis');
 var passport = require('passport');
 var flash    = require('connect-flash');
+var amqp = require('amqp');
 
 var morgan       = require('morgan');
 var cookieParser = require('cookie-parser');
@@ -80,6 +81,11 @@ redis_sub.on('ready', function() {
 redis_sub.on("message", function(channel, message){
     var resp = {'text': message, 'channel':channel}
     listener.in(channel).emit('message', resp);
+});
+
+app.rabbit_connection = amqp.createConnection({ host: config_settings.rabbitmq_host });
+app.rabbit_connection.on('ready', function () {
+    console.log("rabbitmq connected");
 });
 
 // configuration ===============================================================

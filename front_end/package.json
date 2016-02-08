@@ -14,6 +14,7 @@
     "crypto" : "latest",
     "redis" : "latest",
     "socket.io": "latest",
+    "amqp" : latest,
 
     "morgan": "~1.0.0",
     "body-parser": "~1.0.0",
