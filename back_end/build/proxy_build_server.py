@@ -13,7 +13,9 @@ class ResponceHander(object):
     def __init__(self, op_id, channel, body):
         self.channel = channel
         self.corr_id = op_id
-        self.connection = channel.connection()
+        self.connection = channel.connection
+        result = self.channel.queue_declare(exclusive=True)
+        self.callback_queue = result.method.queue
         self.channel.basic_consume(self.on_response, no_ack=True, queue=self.callback_queue)
         self.channel.basic_publish(exchange = '',
                                    routing_key = channel,
