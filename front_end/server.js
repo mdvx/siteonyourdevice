@@ -96,7 +96,7 @@ listener.on('connection', function (socket) {
                 console.log("response", response);
               }
           });
-        }
+        });
     });
 });
 
