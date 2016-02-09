@@ -11,7 +11,8 @@ def print_usage():
         "[optional] argv[2] platform\n"
         "[optional] argv[3] architecture\n"
         "[optional] argv[4] build args\n"
-        "[optional] argv[5] package_type\n")
+        "[optional] argv[5] package_type\n"
+        "[optional] argv[6] destination\n")
 
 class BuildRpcClient(object):
     def __init__(self):
@@ -23,14 +24,15 @@ class BuildRpcClient(object):
         self.callback_queue = result.method.queue
         self.channel.basic_consume(self.on_response, no_ack = True, queue = self.callback_queue)
 
-    def build_request(self, op_id, platform, arch, branding_variables, package_type):
+    def build_request(self, op_id, platform, arch, branding_variables, package_type, destination):
         self.response = None
         self.corr_id = op_id
         request_data_json = {
             'branding_variables': branding_variables,
             'platform': platform,
             'arch': arch,
-            'package_type' : package_type
+            'package_type' : package_type,
+            'destination' : destination
         }
         request_data_str = json.dumps(request_data_json)
         print ("build request body: %s" % request_data_str)
@@ -83,6 +85,11 @@ if __name__ == "__main__":
     else:
         package_type = platform_or_none.package_types[0]
 
+    if argc > 6:
+        destination = sys.argv[6]
+    else:
+        destination = '/tmp/'
+
     build_rpc = BuildRpcClient()
-    response = build_rpc.build_request(op_id, platform_str, int(arch_str), args, package_type)
+    response = build_rpc.build_request(op_id, platform_str, int(arch_str), args, destination)
     print("responce: %r" % response)

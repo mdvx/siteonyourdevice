@@ -6,6 +6,7 @@ import os
 import shutil
 import sys
 import shlex
+import re
 import base
 import config
 
@@ -35,7 +36,7 @@ class BuildRpcServer(object):
         print("Awaiting RPC build requests")
         self.channel.start_consuming()
 
-    def build_package(self, op_id, platform, arch, branding_variables, package_type):
+    def build_package(self, op_id, platform, arch, branding_variables, package_type, destination):
 
         platform_or_none = base.get_supported_platform_by_name(platform)
 
@@ -71,8 +72,16 @@ class BuildRpcServer(object):
             os.chdir(pwd)
             return err.description()
 
+        in_file = open('CPackConfig.cmake', 'r')
+        for line in in_file.readlines():
+            res = re.search(r'SET\(CPACK_SOURCE_PACKAGE_FILE_NAME "(.+)"\)', line)
+            if res != None:
+                filename = res.group(1) + '.' + base.get_extension_by_package(package_type)
+        in_file.close()
+
+        result = config.post_install_step(filename, destination)
         os.chdir(pwd)
-        return 'done'
+        return result
 
     def on_request(self, ch, method, props, body):
         data = json.loads(body)
@@ -81,10 +90,11 @@ class BuildRpcServer(object):
         platform = data.get('platform')
         arch = data.get('arch')
         package_type = data.get('package_type')
+        destination = data.get('destination')
         op_id = props.correlation_id
 
         print('build started for: {0}, platform: {1}_{2}'.format(op_id, platform, arch))
-        response = self.build_package(op_id, platform, arch, branding_variables, package_type)
+        response = self.build_package(op_id, platform, arch, branding_variables, package_type, destination)
         print('build finished for: {0}, platform: {1}_{2}, responce: {3}'.format(op_id, platform, arch, response))
 
         ch.basic_publish(exchange = '',

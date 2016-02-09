@@ -20,7 +20,10 @@ function get_url_parameter_url(url, sParam)
 // load configs
 var configDB = require('./config/database.js');
 var config_settings = require('./config/settings.js');
-
+var root_abs_path = __dirname; 
+var public_dir_abs_path = root_abs_path + '/public';
+var public_downloads_dir_abs_path = public_dir_abs_path + '/downloads'
+var public_downloads_users_dir_abs_path = public_downloads_dir_abs_path + '/users'
 // set up ======================================================================
 // get all the tools we need
 var express  = require('express');
@@ -31,6 +34,7 @@ var redis = require('redis');
 var passport = require('passport');
 var flash    = require('connect-flash');
 var amqp = require('amqp');
+var mkdirp = require('mkdirp');
 
 var morgan       = require('morgan');
 var cookieParser = require('cookie-parser');
@@ -64,25 +68,35 @@ listener.on('connection', function (socket) {
     });
     
     socket.on('publish_rabbitmq', function (msg) {
-        var rpc = new (require('./app/amqprpc'))(rabbit_connection);
         var in_json = JSON.parse(msg);
-        var branding_variables = '-DUSER_SPECIFIC_DEFAULT_LOGIN=' + in_json.email + ' -DUSER_SPECIFIC_DEFAULT_PASSWORD=' + in_json.password
-        + ' -DUSER_SPECIFIC_DEFAULT_DOMAIN=' + in_json.domain + ' -DUSER_SPECIFIC_CONTENT_PATH=' + in_json.content_path;
-        
-        var request_data_json = {
-            'branding_variables': branding_variables,
-            'platform': in_json.platform,
-            'arch': in_json.arch,
-            'package_type' : in_json.package_type
-        };
-        console.log("request_data_json", request_data_json);
-        
-        rpc.makeRequest(in_json.platform, in_json.email, request_data_json, function response(err, response){
-                        if(err)
-                          console.error(err);
-                        else
-                          console.log("response", response);
-        });
+        var user_package_dir = public_downloads_users_dir_abs_path + in_json.email;
+        mkdirp(user_package_dir, function(err) {
+          if (err) {
+            console.error(err);
+            return;
+          }
+ 
+          var rpc = new (require('./app/amqprpc'))(rabbit_connection);
+          var branding_variables = '-DUSER_SPECIFIC_DEFAULT_LOGIN=' + in_json.email + ' -DUSER_SPECIFIC_DEFAULT_PASSWORD=' + in_json.password
+          + ' -DUSER_SPECIFIC_DEFAULT_DOMAIN=' + in_json.domain + ' -DUSER_SPECIFIC_CONTENT_PATH=' + in_json.content_path;
+          
+          var request_data_json = {
+              'branding_variables': branding_variables,
+              'platform': in_json.platform,
+              'arch': in_json.arch,
+              'package_type' : in_json.package_type,
+              'destination' : user_package_dir
+          };
+          console.log("request_data_json", request_data_json);
+          
+          rpc.makeRequest(in_json.platform, in_json.email, request_data_json, function response(err, response) {
+              if (err) {
+                console.error(err);
+              } else {
+                console.log("response", response);
+              }
+          });
+        }
     });
 });
 
@@ -112,7 +126,7 @@ mongoose.connect(configDB.url); // connect to our database
 require('./config/passport')(passport); // pass passport for configuration
 
 // set up our express application
-app.use(express.static('public'));
+app.use(express.static(public_dir_abs_path));
 app.use(morgan('dev')); // log every request to the console
 app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser.json()); // get information from html forms
