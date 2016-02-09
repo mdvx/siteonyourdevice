@@ -25,11 +25,7 @@
               var msg = data.text;
             });
             
-            function send_build_request(user, password, domain, platform, private_site, external_host, server_type, content_path, package_type, bit){
-              if(name === undefined){
-                return;
-              } 
-              
+            function send_build_request(user, password, domain, platform, private_site, external_host, server_type, content_path, package_type, bit){             
               var build_args = { "domain": domain, 
                              "platform": platform, 
                              "private_site": private_site, 

@@ -75,6 +75,8 @@ listener.on('connection', function (socket) {
             'arch': in_json.arch,
             'package_type' : in_json.package_type
         };
+        console.log("request_data_json", request_data_json);
+        
         rpc.makeRequest(in_json.platform, in_json.email, request_data_json, function response(err, response){
                         if(err)
                           console.error(err);
