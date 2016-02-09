@@ -39,7 +39,7 @@ var session      = require('express-session');
 
 app.redis_connection = redis.createClient();
 app.redis_connection.on("error", function (err) {
-    console.log("redis_client error: " + err);
+    console.error(err);
 });
 
 // app_r
@@ -51,7 +51,7 @@ var listener = io.listen(server);
 
 var rabbit_connection = amqp.createConnection({ host: config_settings.rabbitmq_host });
 rabbit_connection.on('error', function (err) {
-    console.log("rabbit_connection error: " + err);
+    console.error(err);
 });
 
 listener.on('connection', function (socket) {
@@ -64,26 +64,23 @@ listener.on('connection', function (socket) {
     });
     
     socket.on('publish_rabbitmq', function (msg) {
-        var exchange = rabbit_connection.exchange('');
+        var rpc = new (require('./app/amqprpc'))(rabbit_connection);
+        var in_json = JSON.parse(msg);
+        var branding_variables = '-DUSER_SPECIFIC_DEFAULT_LOGIN=' + in_json.email + ' -DUSER_SPECIFIC_DEFAULT_PASSWORD=' + in_json.password
+        + ' -DUSER_SPECIFIC_DEFAULT_DOMAIN=' + in_json.domain + ' -DUSER_SPECIFIC_CONTENT_PATH=' + in_json.content_path;
         
-        var queue = rabbit_connection.queue(in_json.platform, function(q) {
-          q.bind(exchange, '');
-          q.subscribe(function (message) {
-            console.log(message);
-          });
-
-          var in_json = JSON.parse(msg);
-          var branding_variables = '-DUSER_SPECIFIC_DEFAULT_LOGIN=' + in_json.email + ' -DUSER_SPECIFIC_DEFAULT_PASSWORD=' + in_json.password
-          + ' -DUSER_SPECIFIC_DEFAULT_DOMAIN=' + in_json.domain + ' -DUSER_SPECIFIC_CONTENT_PATH=' + in_json.content_path;
-          
-          var request_data_json = {
-              'branding_variables': branding_variables,
-              'platform': in_json.platform,
-              'arch': in_json.arch,
-              'package_type' : in_json.package_type
-          };
-          exchange.publish(in_json.platform, request_data_json, {contentType: 'application/json'})
-        }); 
+        var request_data_json = {
+            'branding_variables': branding_variables,
+            'platform': in_json.platform,
+            'arch': in_json.arch,
+            'package_type' : in_json.package_type
+        };
+        rpc.makeRequest(in_json.platform, in_json.email, request_data_json, function response(err, response){
+                        if(err)
+                          console.error(err);
+                        else
+                          console.log("response", response);
+        });
     });
 });
 
@@ -91,11 +88,11 @@ var redis_sub = redis.createClient();
 var redis_pub = redis.createClient();
 
 redis_sub.on("error", function (err) {
-    console.log("redis_sub error: " + err);
+    console.error(err);
 });
 
 redis_pub.on("error", function (err) {
-    console.log("redis_pub error: " + err);
+    console.error(err);
 });
 
 redis_sub.on('ready', function() {
