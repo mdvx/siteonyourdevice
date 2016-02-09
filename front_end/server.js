@@ -69,7 +69,7 @@ listener.on('connection', function (socket) {
     
     socket.on('publish_rabbitmq', function (msg) {
         var in_json = JSON.parse(msg);
-        var user_package_dir = public_downloads_users_dir_abs_path + in_json.email;
+        var user_package_dir = public_downloads_users_dir_abs_path + '/' + in_json.email;
         mkdirp(user_package_dir, function(err) {
           if (err) {
             console.error(err);
