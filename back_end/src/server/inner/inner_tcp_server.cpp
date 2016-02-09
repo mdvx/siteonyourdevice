@@ -23,7 +23,6 @@
 
 #include "common/net/net.h"
 #include "common/logger.h"
-#include "common/hash/md5.h"
 #include "common/thread/thread_manager.h"
 
 #include "server/http_server_host.h"
@@ -298,15 +297,6 @@ void InnerServerHandlerHost::handleInnerResponceCommand(siteonyourdevice::inner:
                     connection->write(resp, &nwrite);
                     goto fail;
                 }
-
-                MD5_CTX ctx;
-                MD5_Init(&ctx);
-                const char * passwordstr = uauth.password.c_str();
-                size_t len = uauth.password.size();
-                MD5_Update(&ctx, passwordstr, len);
-                unsigned char digest[16];
-                MD5_Final(digest, &ctx);
-                uauth.password = common::HexEncode(digest, sizeof(digest), true);
 
                 bool isOk = parent_->findUser(uauth);
                 if (!isOk) {
