@@ -55,7 +55,7 @@ rabbit_connection.on('error', function (err) {
 });
 
 listener.on('connection', function (socket) {
-    socket.on('subscribe', function (data) {
+    socket.on('subscribe_redis', function (data) {
         socket.join(data.channel);
     });
 
@@ -65,18 +65,25 @@ listener.on('connection', function (socket) {
     
     socket.on('publish_rabbitmq', function (msg) {
         var exchange = rabbit_connection.exchange('');
-        var in_json = JSON.parse(msg);
-        var branding_variables = '-DUSER_SPECIFIC_DEFAULT_LOGIN=' + in_json.email + ' -DUSER_SPECIFIC_DEFAULT_PASSWORD=' + in_json.password
-        + ' -DUSER_SPECIFIC_DEFAULT_DOMAIN=' + in_json.domain + ' -DUSER_SPECIFIC_CONTENT_PATH=' + in_json.content_path;
         
-        var request_data_json = {
-            'branding_variables': branding_variables,
-            'platform': in_json.platform,
-            'arch': in_json.arch,
-            'package_type' : in_json.package_type
-        };
-        console.log("request_data_json : " + JSON.stringify(request_data_json));
-        exchange.publish(in_json.platform, request_data_json)
+        var queue = rabbit_connection.queue(in_json.platform, function(q) {
+          q.bind(exchange, '');
+          q.subscribe(function (message) {
+            console.log(message);
+          });
+
+          var in_json = JSON.parse(msg);
+          var branding_variables = '-DUSER_SPECIFIC_DEFAULT_LOGIN=' + in_json.email + ' -DUSER_SPECIFIC_DEFAULT_PASSWORD=' + in_json.password
+          + ' -DUSER_SPECIFIC_DEFAULT_DOMAIN=' + in_json.domain + ' -DUSER_SPECIFIC_CONTENT_PATH=' + in_json.content_path;
+          
+          var request_data_json = {
+              'branding_variables': branding_variables,
+              'platform': in_json.platform,
+              'arch': in_json.arch,
+              'package_type' : in_json.package_type
+          };
+          exchange.publish(in_json.platform, request_data_json, {contentType: 'application/json'})
+        }); 
     });
 });
 

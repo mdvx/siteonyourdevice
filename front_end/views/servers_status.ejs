@@ -32,7 +32,7 @@
             
             //on connetion, updates connection state and sends subscribe request
             socket.on('connect', function(data){
-                socket.emit('subscribe', {channel:CHANNEL_CLIENTS_STATE});
+                socket.emit('subscribe_redis', {channel:CHANNEL_CLIENTS_STATE});
             });
 
             //when reconnection is attempted, updates status 

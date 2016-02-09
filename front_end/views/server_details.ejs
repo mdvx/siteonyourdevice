@@ -18,7 +18,7 @@
             //var io = require('socket.io');
             var socket = io.connect('http://siteonyourdevice.com:3000');
             
-            function setSettings(id, name, socket) {
+            function set_settings_local(id, name) {
               var content_path = $('#server_setting_content_path_label').val();
               var private_site = $('#server_setting_private_site_label').html() == SERVER_SETTING_ACCSESS_SITE.PRIVATE;
               var server_type = document.forms["server_type"]["server_type_local"].checked == true ? SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER : SERVER_SETTING_HTTP_SERVER_TYPE.EXTERNAL_SERVER;
@@ -81,14 +81,13 @@
             
             function handle_onconnection_changed(is_connected)
             {
-                if(is_connected){
+                if (is_connected) {
                     $('#status_label').html(SERVER_STATUS.ONLINE);
                     $('#status_img').attr("src", SERVER_STATUS_IMG.ONLINE);
                     $('#info_button').prop('disabled', false);
                     $('#get_config_button').prop('disabled', false);
                     $('#set_config_button').prop('disabled', false);
-                }
-                else{
+                } else {
                     $('#status_label').html(SERVER_STATUS.OFFLINE);
                     $('#status_img').attr("src", SERVER_STATUS_IMG.OFFLINE);
                     $('#info_button').prop('disabled', true);
@@ -145,9 +144,8 @@
                         $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
                         $('#ram_label').html(SERVER_RAM_DEFAULT_LABEL);
                     }
-                }
-                else if(is_config_command(msgObj)){
-                    if(is_ok){
+                } else if(is_config_command(msgObj)) {
+                    if (is_ok) {
                         var config = JSON.parse(msgObj.args);
                         $('#server_setting_content_path_label').val(config.content_path);
                         $('#server_setting_private_site_label').html(config.private_site ? SERVER_SETTING_ACCSESS_SITE.PRIVATE : SERVER_SETTING_ACCSESS_SITE.PUBLIC);
@@ -159,8 +157,7 @@
                         drawUrlHandlersTable(config.http_handlers_utls);
                         drawSocketsPathTable(config.http_server_sockets);
                         
-                    }
-                    else{
+                    } else {
                         $('#server_setting_content_path_label').val(SERVER_SETTING_CONTENT_PATH_LABEL);
                         $('#server_setting_private_site_label').html(SERVER_SETTING_ACCSESS_SITE.PUBLIC);
                         
@@ -177,8 +174,8 @@
             
             //on connetion, updates connection state and sends subscribe request
             socket.on('connect', function(data){
-                socket.emit('subscribe', {channel:CHANNEL_OUT});
-                socket.emit('subscribe', {channel:CHANNEL_CLIENTS_STATE});
+                socket.emit('subscribe_redis', {channel:CHANNEL_OUT});
+                socket.emit('subscribe_redis', {channel:CHANNEL_CLIENTS_STATE});
             });
 
             //when reconnection is attempted, updates status 
@@ -291,7 +288,7 @@
                             </div>
                     </div>
                     <button id="get_config_button" disabled onclick="sync_server_config('<%- user._id %>', '<%- domain_name %>', socket)">Get settings</button>
-                    <button id="set_config_button" disabled onclick="setSettings('<%- user._id %>', '<%- domain_name %>', socket)">Apply settings</button>
+                    <button id="set_config_button" disabled onclick="set_settings_local('<%- user._id %>', '<%- domain_name %>')">Apply settings</button>
                 </div>
             </div>
         </div>

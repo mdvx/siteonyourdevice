@@ -45,9 +45,13 @@
               socket.emit('publish_rabbitmq', msg);
             }
             
+            function send_build_request_local(user, password, domain) {
+              return send_build_request(user, password, domain, 'linux', platform, 0, 'localhost:80', 0, 'content_path', 'DEB', 64)
+            }
+            
         </script>
 </head>
 <body>
-  <button id="build_package_button" onclick="send_build_request('<%- user.local.email %>', '<%- user.local.password %>', '<%- domain_name %>', 'linux', 0, 'localhost:80', 0, 'content_path', 'DEB', 64)">Build package</button>
+  <button id="build_package_button" onclick="send_build_request_local('<%- user.local.email %>', '<%- user.local.password %>', '<%- domain_name %>')">Build package</button>
 </body>
 </html>

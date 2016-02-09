@@ -19,9 +19,9 @@ class BuildRpcClient(object):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=config.SERVER_HOST, credentials = credentials))
         self.channel = self.connection.channel()
 
-        result = self.channel.queue_declare(exclusive=True)
+        result = self.channel.queue_declare(exclusive = True)
         self.callback_queue = result.method.queue
-        self.channel.basic_consume(self.on_response, no_ack=True, queue=self.callback_queue)
+        self.channel.basic_consume(self.on_response, no_ack = True, queue = self.callback_queue)
 
     def build_request(self, op_id, platform, arch, branding_variables, package_type):
         self.response = None
