@@ -133,7 +133,7 @@ app.locals.site = {
 app.locals.project = {
     project_name: 'SiteOnYourDevice',
     project_name_lowercase: 'siteonyourdevice',
-    github_link: 'siteonyourdevice',
+    github_link: 'https://github.com/fastogt/siteonyourdevice',
     github_issues_link: 'https://github.com/fastogt/siteonyourdevice/issues'
 };
 app.locals.back_end = {
