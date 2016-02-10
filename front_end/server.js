@@ -127,15 +127,29 @@ require('./config/passport')(passport); // pass passport for configuration
 
 app.locals.site = {
     title: 'Site on your device',
+    domain: 'http://siteonyourdevice.com',
     description: 'Site on your device - solution which connects your device with internet.'
+};
+app.locals.project = {
+    project_name: 'SiteOnYourDevice',
+    project_name_lowercase: 'siteonyourdevice',
+    github_link: 'siteonyourdevice',
+    github_issues_link: 'https://github.com/fastogt/siteonyourdevice/issues'
 };
 app.locals.back_end = {
     version : settings_config.client_version,
-    type : settings_config.client_version_type
-}
+    type : settings_config.client_version_type,
+    domain : 'http://proxy.siteonyourdevice.com',
+};
 app.locals.author = {
     name: 'Topilski Alexandr',
     contact: 'atopilski@fastogt.com'
+};
+app.locals.company = {
+    name: 'FastoGT',
+    description: 'Fasto Great Technology',
+    domain: 'http://fastogt.com',
+    copyright: 'Copyright &copy; 2014-2016 FastoGT. All rights reserved.'
 };
 
 // set up our express application

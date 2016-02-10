@@ -74,7 +74,7 @@
                     fjs.parentNode.insertBefore(js, fjs);
                     }(document, 'script', 'facebook-jssdk'));
                 </script>
-                <div class="fb-like" data-href="http://siteonyourdevice.com" data-layout="button_count" data-action="like" data-show-faces="false" data-share="true"></div>	
+                <div class="fb-like" data-href="<%= site.domain %>" data-layout="button_count" data-action="like" data-show-faces="false" data-share="true"></div>	
             </div>
         </div>
         
@@ -101,7 +101,7 @@
                 <script src="https://apis.google.com/js/platform.js" async defer>
                     {lang: 'en-GB'}
                 </script>
-                <div class="g-plusone" data-size="medium" data-href="http://siteonyourdevice.com"></div>
+                <div class="g-plusone" data-size="medium" data-href="<%= site.domain%>"></div>
             </div>
         </div>
         
@@ -110,7 +110,7 @@
 
 <div class="container">
     <div class="text-left">
-        <h1 id="about"><%- site.description %></h1>
+        <h1 id="about"><%= site.description %></h1>
         <h3>Remote control any computer/mobile/device over the internet.</h3>
 
         <div class="well">
@@ -132,14 +132,14 @@
             - Basic & digest authentication for secure access.<br>
             - Directory index.<br>
             - Cross-platform support.<br>
-            - Open source(we only transfer web content, you can check that on next link: <a href="https://github.com/fastogt/siteonyourdevice">project sources</a>).
+            - Open source(we only transfer web content, you can check that on next link: <a href="project.github_link">project sources</a>).
         </div>
         
         <div class="well">
             <h3>Compare with standard internet domains:</h3>
             <p>
                 <b>Advantages:</b><br>
-                1) Free domain address which proxies over siteonyourdevice.com site.<br>
+                1) Free domain address which proxies over <a href="<%= site.domain %>"><%= site.project_name %></a> site.<br>
                 2) Free hosting because you use your device.<br>
                 3) Work on all devices.<br>
                 4) Remote control access to device.<br>
@@ -148,7 +148,7 @@
 
             <p>
                 <b>Disadvantages:</b><br>
-                1) It is not direct domain (proxies over siteonyourdevice.com).<br>
+                1) It is not direct domain (proxies over <a href="<%= site.domain %>"><%= site.project_name %></a>).<br>
                 2) Young solution.<br>
                 3) Support only clear html/js pages.
             </p>
@@ -156,7 +156,7 @@
         
         <p>
             In addition you are able to use our program for your own purposes, all free and we love Open source, We are waiting for your feedback!<br>
-            Please write any issues and proposals to <a href="https://github.com/fastogt/siteonyourdevice/issues">GitHub Issues.</a><br>
+            Please write any issues and proposals to <a href="project.github_issues_link">GitHub Issues.</a><br>
         </p>
     </div>
 
@@ -220,11 +220,11 @@
             <div>
                 <h4>Contribute</h4>
                     <p>Please submit any issues, bugs and proposals via GitHub Issues:<br />
-                    <a href="https://github.com/fastogt/siteonyourdevice/issues" style="font-weight: bold;">SiteOnYourDevice in GitHub</a><br />
+                    <a href="<%= project.github_issues_link %>" style="font-weight: bold;"><%= project.project_name %> in GitHub</a><br />
                     Thank you for finding time to help us!</p>
             </div>
-            <p>Copyright &copy; 2014-2016 FastoGT. All rights reserved.</p>
-            <p> Website development - <a href="http://fastogt.com">Fasto Great Technology</a></p>
+            <p><%= company.copyright %></p>
+            <p> Website development - <a href="<%= company.domain %>"><%= company.description %></a></p>
         </span>
         </div>
   </div>

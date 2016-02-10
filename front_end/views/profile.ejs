@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>Site on your device</title>
+    <title><%- site.title %></title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
     <style>
@@ -13,7 +13,7 @@
 
     <div class="page-header text-left">
         <div class="well">
-            <h1><img src="logo32x32.png"/>Siteonyourdevice<a href="/logout" class="btn btn-warning btn-md pull-right"><span class="fa fa-sign-out""</span> Sign out</a></h1>      
+            <h1><img src="logo32x32.png"/><%= project.project_name %><a href="/logout" class="btn btn-warning btn-md pull-right"><span class="fa fa-sign-out""</span> Sign out</a></h1>      
             <% if (!user.isReadOnlyMode()) { %>
                 <p>
                     <strong>id</strong>: <%= user._id %><br>
@@ -126,7 +126,7 @@
                               <button type="submit" class="btn btn-danger btn-xs">Remove</button>
                           </form>
                           <div>
-                              <a href="http://proxy.siteonyourdevice.com/<%= user.domains[i].name %>" class="btn btn-primary btn-xs">Hot link</a>
+                              <a href="<%= back_end.domain %>/<%= user.domains[i].name %>" class="btn btn-primary btn-xs">Hot link</a>
                           </div>
                           <form action="/server_details" method="post">
                               <input type="hidden" class="form-control" name="domain_name" value="<%= user.domains[i].name %>">
