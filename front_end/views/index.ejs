@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>Site on your device</title>
+    <title><%- site.title %></title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -110,7 +110,7 @@
 
 <div class="container">
     <div class="text-left">
-        <h1 id="about">Site on your device - solution which connects your device with internet.</h1>
+        <h1 id="about"><%- site.description %></h1>
         <h3>Remote control any computer/mobile/device over the internet.</h3>
 
         <div class="well">
@@ -162,7 +162,7 @@
 
     <!-- download -->
     <div class="well" id="download"> 
-        <h4>Download client. Current version: <%= version %></h4>
+        <h4>Download client. Current version: <%= back_end.version %></h4>
         <div class="panel-group" id="accordion">
 
         <div class="panel panel-default">
@@ -170,10 +170,10 @@
                 <h4 class="panel-title"> <img src="images/windows.png"> <a data-toggle="collapse" data-parent="#accordion" href="#windows">Windows client</a> </h4>
             </div>
             <div id="windows" class="panel-collapse collapse">
-                <div class="panel-body"><a href="downloads/windows/siteonyourdevice-<%= version %><%= type %>-x86_64.exe">Windows x64(.exe)</a></div>
-                <div class="panel-body"><a href="downloads/windows/siteonyourdevice-<%= version %><%= type %>-x86_64.zip">Windows x64(.zip)</a></div>
-                <div class="panel-body"><a href="downloads/windows/siteonyourdevice-<%= version %><%= type %>-i386.exe">Windows i386(.exe)</a></div>
-                <div class="panel-body"><a href="downloads/windows/siteonyourdevice-<%= version %><%= type %>-i386.zip">Windows i386(.zip)</a></div>
+                <div class="panel-body"><a href="downloads/windows/siteonyourdevice-<%= back_end.version %><%= back_end.type %>-x86_64.exe">Windows x64(.exe)</a></div>
+                <div class="panel-body"><a href="downloads/windows/siteonyourdevice-<%= back_end.version %><%= back_end.type %>-x86_64.zip">Windows x64(.zip)</a></div>
+                <div class="panel-body"><a href="downloads/windows/siteonyourdevice-<%= back_end.version %><%= back_end.type %>-i386.exe">Windows i386(.exe)</a></div>
+                <div class="panel-body"><a href="downloads/windows/siteonyourdevice-<%= back_end.version %><%= back_end.type %>-i386.zip">Windows i386(.zip)</a></div>
             </div>
         </div>
 
@@ -182,8 +182,8 @@
             <h4 class="panel-title"> <img src="images/macosx.png"> <a data-toggle="collapse" data-parent="#accordion" href="#macos">Mac OS client</a> </h4>
         </div>
         <div id="macos" class="panel-collapse collapse">
-            <div class="panel-body"><a href="downloads/macosx/siteonyourdevice-<%= version %><%= type %>-x86_64.dmg">Mac OS x64(.dmg)</a></div>
-            <div class="panel-body"><a href="downloads/macosx/siteonyourdevice-<%= version %><%= type %>-x86_64.zip">Mac OS x64(.zip)</a></div>
+            <div class="panel-body"><a href="downloads/macosx/siteonyourdevice-<%= back_end.version %><%= back_end.type %>-x86_64.dmg">Mac OS x64(.dmg)</a></div>
+            <div class="panel-body"><a href="downloads/macosx/siteonyourdevice-<%= back_end.version %><%= back_end.type %>-x86_64.zip">Mac OS x64(.zip)</a></div>
         </div>
     </div>
 
@@ -192,9 +192,9 @@
             <h4 class="panel-title"> <img src="images/linux.png"> <a data-toggle="collapse" data-parent="#accordion" href="#linux">Linux client</a> </h4>
         </div>
         <div id="linux" class="panel-collapse collapse">
-            <div class="panel-body"><a href="downloads/linux/siteonyourdevice-<%= version %><%= type %>-x86_64.deb">Linux x64(.deb)</a></div>
-            <div class="panel-body"><a href="downloads/linux/siteonyourdevice-<%= version %><%= type %>-x86_64.rpm">Linux x64(.rpm)</a></div>
-            <div class="panel-body"><a href="downloads/linux/siteonyourdevice-<%= version %><%= type %>-x86_64.tar.gz">Linux x64(.tar.gz)</a></div>
+            <div class="panel-body"><a href="downloads/linux/siteonyourdevice-<%= back_end.version %><%= back_end.type %>-x86_64.deb">Linux x64(.deb)</a></div>
+            <div class="panel-body"><a href="downloads/linux/siteonyourdevice-<%= back_end.version %><%= back_end.type %>-x86_64.rpm">Linux x64(.rpm)</a></div>
+            <div class="panel-body"><a href="downloads/linux/siteonyourdevice-<%= back_end.version %><%= back_end.type %>-x86_64.tar.gz">Linux x64(.tar.gz)</a></div>
         </div>
     </div>
 
@@ -203,7 +203,7 @@
                 <h4 class="panel-title"> <img src="images/freebsd.png"> <a data-toggle="collapse" data-parent="#accordion" href="#freebsd">Freebsd client</a> </h4>
         </div>
             <div id="freebsd" class="panel-collapse collapse">
-                <div class="panel-body"><a href="downloads/freebsd/siteonyourdevice-<%= version %><%= type %>-x86_64.tar.gz">FreeBSD x64(.tar.gz)</a></div>
+                <div class="panel-body"><a href="downloads/freebsd/siteonyourdevice-<%= back_end.version %><%= back_end.type %>-x86_64.tar.gz">FreeBSD x64(.tar.gz)</a></div>
             </div>
         </div>
     </div>  

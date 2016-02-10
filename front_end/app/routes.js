@@ -12,9 +12,7 @@ module.exports = function(app, passport, settings_config) {
 
     // show the home page (will also have our login links)
     app.get('/', function(req, res) {
-        res.render('index.ejs', {
-        version : settings_config.client_version,
-        type : settings_config.client_version_type});
+        res.render('index.ejs');
     });
 
     app.get('/templates', function(req, res) {
