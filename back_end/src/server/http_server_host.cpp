@@ -159,7 +159,7 @@ void HttpInnerServerHandlerHost::processHttpRequest(http::HttpClient *hclient,
                                "HttpInnerServerHandlerHost not found host %s, request str:\n%s",
                                hpath, common::convertToString(hrequest));
         std::string msg = common::MemSPrintf("Not registered host(%s) or it is offline.", hpath);
-        hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL, msg, false, info());
+        hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL, msg.c_str(), false, info());
         hclient->close();
         delete hclient;
         return;
