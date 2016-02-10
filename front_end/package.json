@@ -4,7 +4,7 @@
   "dependencies" : {
     "express" : "~4.0.0",
     "ejs" : "latest",
-    "ejs-locals": "latest"
+    "ejs-locals": "latest",
     "mongoose" : "~3.8.1",
     "passport" : "~0.1.17",
     "passport-local" : "~0.1.6",
