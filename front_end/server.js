@@ -19,7 +19,7 @@ function get_url_parameter_url(url, sParam)
 
 // load configs
 var configDB = require('./config/database.js');
-var config_settings = require('./config/settings.js');
+var settings_config = require('./config/settings.js');
 var root_abs_path = __dirname; 
 var public_dir_abs_path = root_abs_path + '/public';
 var public_downloads_dir_abs_path = public_dir_abs_path + '/downloads'
@@ -28,7 +28,7 @@ var public_downloads_users_dir_abs_path = public_downloads_dir_abs_path + '/user
 // get all the tools we need
 var express  = require('express');
 var app      = express();
-var port     = process.env.PORT || config_settings.http_server_port;
+var port     = process.env.PORT || settings_config.http_server_port;
 var mongoose = require('mongoose');
 var redis = require('redis');
 var passport = require('passport');
@@ -53,7 +53,7 @@ var io = require('socket.io');
 var server = http.createServer(app);
 var listener = io.listen(server);
 
-var rabbit_connection = amqp.createConnection({ host: config_settings.rabbitmq_host });
+var rabbit_connection = amqp.createConnection({ host: settings_config.rabbitmq_host });
 rabbit_connection.on('error', function (err) {
     console.error(err);
 });
@@ -64,7 +64,7 @@ listener.on('connection', function (socket) {
     });
 
     socket.on('publish_redis', function (msg) {
-        redis_pub.publish(config_settings.pub_sub_channel_in, msg);
+        redis_pub.publish(settings_config.pub_sub_channel_in, msg);
     });
     
     socket.on('publish_rabbitmq', function (msg) {
@@ -112,7 +112,7 @@ redis_pub.on("error", function (err) {
 });
 
 redis_sub.on('ready', function() {
-    redis_sub.subscribe(config_settings.pub_sub_channel_out, config_settings.pub_sub_channel_client_state);
+    redis_sub.subscribe(settings_config.pub_sub_channel_out, settings_config.pub_sub_channel_client_state);
 });
 
 redis_sub.on("message_redis", function(channel, message){
@@ -154,9 +154,9 @@ app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 
 // routes ======================================================================
-require('./app/routes.js')(app, passport, config_settings); // load our routes and pass in our app and fully configured passport
+require('./app/routes.js')(app, passport, settings_config); // load our routes and pass in our app and fully configured passport
 
 // launch ======================================================================
 app.listen(port);
 console.log('Http server ready for requests');
-server.listen(config_settings.redis_pub_sub_port);
+server.listen(settings_config.redis_pub_sub_port);
