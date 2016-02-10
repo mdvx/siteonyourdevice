@@ -38,11 +38,11 @@ const char* HTML_PATTERN_ISISSSS7 =
   <head>
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
   <title>%d %s</title>
-  </head>\n
+  </head>
   <body bgcolor="#cc9999">
-  <h4>%d %s</h4>%s<hr>\n
-  <address><a href="%s">%s</a></address>\n
-  </body>\n
+  <h4>%d %s</h4>%s<hr>
+  <address><a href="%s">%s</a></address>
+  </body>
   </html>)";
 
 struct SendDataHelper {
