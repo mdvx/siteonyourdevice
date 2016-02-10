@@ -44,8 +44,7 @@ module.exports = function(app, passport, settings_config) {
     });
     
     app.get('/servers_status', function(req, res){
-        User.find({"domains": { $exists: true, $ne: [] }} , function(err, all_users) 
-        {
+        User.find({"domains": { $exists: true, $ne: [] }} , function(err, all_users) {
             var domains = [];
             for (var i = 0; i < all_users.length; i++) {
                 var user_domains = all_users[i].domains;
@@ -65,7 +64,7 @@ module.exports = function(app, passport, settings_config) {
         var user = req.user;        
         var new_domain = req.body.domain_name;
         
-        if(!checkIsValidDomain(new_domain)){
+        if (!checkIsValidDomain(new_domain)) {
             req.flash('statusProfileMessage', new_domain + ' not valid domain name.');
             res.redirect('/profile');
             return;
