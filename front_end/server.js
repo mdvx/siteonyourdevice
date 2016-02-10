@@ -125,17 +125,6 @@ mongoose.connect(configDB.url); // connect to our database
 
 require('./config/passport')(passport); // pass passport for configuration
 
-app.locals({
-    site: {
-        title: 'Site on your device',
-        description: 'Site on your device - solution which connects your device with internet.'
-    },
-    author: {
-        name: 'Topilski Alexandr',
-        contact: 'atopilski@fastogt.com'
-    }
-});
-
 // set up our express application
 app.use(express.static(public_dir_abs_path));
 app.use(morgan('dev')); // log every request to the console
