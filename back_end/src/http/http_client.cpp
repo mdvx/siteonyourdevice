@@ -33,12 +33,17 @@
 namespace {
 
 const char* HTML_PATTERN_ISISSSS7 =
-  R"(<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"
-  "http://www.w3.org/TR/html4/loose.dtd\">\n"
-  "<html>\n<head>\n"
-  "<meta http-equiv=\"Content-type\" content=\"text/html;charset=UTF-8\">\n"
-  "<title>%d %s</title>\n</head>\n<body bgcolor=\"#cc9999\">\n"
-  "<h4>%d %s</h4>\n%s\n<hr>\n<address><a href=\"%s\">%s</a></address>\n</body>\n</html>\n)";
+  R"(<!DOCTYPE html>
+  <html>
+  <head>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <title>%d %s</title>
+  </head>\n
+  <body bgcolor="#cc9999">
+  <h4>%d %s</h4>%s<hr>\n
+  <address><a href="%s">%s</a></address>\n
+  </body>\n
+  </html>)";
 
 struct SendDataHelper {
   fasto::siteonyourdevice::http::StreamSPtr header_stream;
