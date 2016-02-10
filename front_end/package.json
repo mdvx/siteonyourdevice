@@ -4,7 +4,7 @@
   "dependencies" : {
     "express" : "~4.0.0",
     "ejs" : "latest",
-    "ejs-locals" "latest"
+    "ejs-locals": "latest"
     "mongoose" : "~3.8.1",
     "passport" : "~0.1.17",
     "passport-local" : "~0.1.6",
@@ -15,8 +15,8 @@
     "crypto" : "latest",
     "redis" : "latest",
     "socket.io": "latest",
-    "amqp" : latest,
-    "mkdirp" : latest,
+    "amqp" : "latest",
+    "mkdirp" : "latest",
 
     "morgan": "~1.0.0",
     "body-parser": "~1.0.0",
