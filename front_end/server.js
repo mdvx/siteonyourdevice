@@ -103,10 +103,10 @@ listener.on('connection', function (socket) {
           rpc.makeRequest(routing_key, in_json.email, request_data_json, function response(err, response) {
               if (err) {
                 console.error(err);
-                socket.emit('message_rabbitmq', { 'email' : in_json.email, 'response' : err, 'status', STATUS.FAIL});
+                socket.emit('message_rabbitmq', { 'email': in_json.email, 'response': err, 'status': STATUS.FAIL});
               } else {
                 console.log("response", response);
-                socket.emit('message_rabbitmq', { 'email' : in_json.email, 'response' : response, 'status', STATUS.OK});
+                socket.emit('message_rabbitmq', { 'email': in_json.email, 'response': response, 'status': STATUS.OK});
               }
           });
         });
