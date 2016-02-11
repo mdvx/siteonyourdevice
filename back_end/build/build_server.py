@@ -102,7 +102,7 @@ class BuildRpcServer(object):
         ch.basic_publish(exchange = '',
                          routing_key = props.reply_to,
                          properties = pika.BasicProperties(content_type= 'application/json', correlation_id = op_id),
-                         body = {error: err.destination(), body: responce})
+                         body = {'error': err.description(), 'body': response})
         ch.basic_ack(delivery_tag = method.delivery_tag)
 
 if __name__ == "__main__":
