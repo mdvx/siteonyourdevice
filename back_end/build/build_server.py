@@ -32,6 +32,7 @@ class BuildRpcServer(object):
         self.channel.queue_declare(queue = platform)
         self.channel.basic_qos(prefetch_count = 1)
         self.channel.basic_consume(self.on_request, queue = platform)
+        print("Build server for %s created!\n" % platform)
 
     def start(self):
         print("Awaiting RPC build requests")
