@@ -98,14 +98,14 @@ listener.on('connection', function (socket) {
           rpc.makeRequest(routing_key, in_json.email, request_data_json, function response(err, response) {
               if (err) {
                 console.error(err);
-                socket.emit('message_rabbitmq', { email: in_json.email, error: err});
+                socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': err});
               } else {
                 var responce_json = response;
                 console.log("response", responce_json);
                 if(response.hasOwnProperty('error')){
-                  socket.emit('message_rabbitmq', { email: in_json.email, error: response.error });
+                  socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': response.error });
                 } else {
-                  socket.emit('message_rabbitmq', { email: in_json.email, body: response.body } );
+                  socket.emit('message_rabbitmq', { 'email': in_json.email, 'body': response.body } );
                 }
               }
           });

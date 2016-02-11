@@ -22,10 +22,8 @@
             });
 
             //on new message adds a new message to display
-            socket.on('message_rabbitmq', function (data) {
-              var msg = data.text;
-              var build_responce = JSON.parse(msg);
-              if (build_responce.email != '<%= user.local.email %>') {
+            socket.on('message_rabbitmq', function (responce_json) {
+              if (responce_json.email != '<%= user.local.email %>') {
                 return;
               }
 
