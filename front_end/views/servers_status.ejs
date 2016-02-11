@@ -32,7 +32,7 @@
             
             //on connetion, updates connection state and sends subscribe request
             socket.on('connect', function(data){
-                socket.emit('subscribe_redis', {channel:<%= back_end.pub_sub_channel_client_state %>});
+                socket.emit('subscribe_redis', {channel:'<%= back_end.pub_sub_channel_client_state %>'});
             });
 
             //when reconnection is attempted, updates status 
@@ -43,7 +43,7 @@
             socket.on('message_redis', function (data) {
                 var msg = data.text;
                 
-                if(data.channel === <%= back_end.pub_sub_channel_client_state %>){
+                if(data.channel === '<%= back_end.pub_sub_channel_client_state %>'){
                     var stateObj = parse_state_msg(msg);
                     if(stateObj == undefined){
                         return;
