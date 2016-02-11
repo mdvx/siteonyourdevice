@@ -12,7 +12,8 @@ import config
 
 def print_usage():
     print("Usage:\n"
-        "[optional] argv[1] platform\n")
+        "[optional] argv[1] platform\n"
+        "[optional] argv[3] architecture\n")
 
 def run_command(cmd):
     """run_command(cmd) returns a error."""
@@ -111,5 +112,10 @@ if __name__ == "__main__":
     else:
         platform_str = base.get_os()
 
-    server = BuildRpcServer(platform_str)
+    if argc > 2:
+        arch_str = sys.argv[2]
+    else:
+        arch_str = base.get_arch()
+        
+    server = BuildRpcServer(base.gen_routing_key(platform_str, arch_str))
     server.start()

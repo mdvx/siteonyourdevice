@@ -37,7 +37,7 @@ class BuildRpcClient(object):
         request_data_str = json.dumps(request_data_json)
         print ("build request body: %s" % request_data_str)
         self.channel.basic_publish(exchange = '',
-                           routing_key = platform,
+                           routing_key = base.gen_routing_key(platform, str(arch)),
                            properties = pika.BasicProperties(reply_to = self.callback_queue, correlation_id = self.corr_id),
                            body = request_data_str)
         self.response = None

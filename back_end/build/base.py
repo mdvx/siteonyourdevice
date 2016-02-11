@@ -63,3 +63,6 @@ def get_arch():
 
 def get_supported_platform_by_name(platform):
     return next((x for x in SUPPORTED_PLATFORMS if x.platform == platform), None)
+    
+def gen_routing_key(platform, arch):
+    return platform + '_' + arch

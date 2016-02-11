@@ -17,6 +17,10 @@ function get_url_parameter_url(url, sParam)
     }
 }
 
+function gen_routing_key(platform, arch) {
+  return platform + '_' + arch
+}
+
 // load configs
 var configDB = require('./config/database.js');
 var settings_config = require('./config/settings.js');
@@ -87,9 +91,11 @@ listener.on('connection', function (socket) {
               'package_type' : in_json.package_type,
               'destination' : user_package_dir
           };
+          var routing_key = gen_routing_key(in_json.platform, in_json.arch);
           console.log("request_data_json", request_data_json);
+          console.log("routing_key", routing_key);
           
-          rpc.makeRequest(in_json.platform, in_json.email, request_data_json, function response(err, response) {
+          rpc.makeRequest(routing_key, in_json.email, request_data_json, function response(err, response) {
               if (err) {
                 console.error(err);
               } else {
@@ -125,6 +131,7 @@ mongoose.connect(configDB.url); // connect to our database
 
 require('./config/passport')(passport); // pass passport for configuration
 
+// settings
 app.locals.site = {
     title: 'Site on your device',
     domain: 'http://siteonyourdevice.com',
@@ -140,6 +147,7 @@ app.locals.back_end = {
     version : settings_config.client_version,
     type : settings_config.client_version_type,
     domain : 'http://proxy.siteonyourdevice.com',
+    socketio_port : settings_config.redis_pub_sub_port
 };
 app.locals.author = {
     name: 'Topilski Alexandr',
@@ -149,7 +157,7 @@ app.locals.company = {
     name: 'FastoGT',
     description: 'Fasto Great Technology',
     domain: 'http://fastogt.com',
-    copyright: 'Copyright &copy; 2014-2016 FastoGT. All rights reserved.'
+    copyright: 'Copyright © 2014-2016 FastoGT. All rights reserved.'
 };
 
 // set up our express application
