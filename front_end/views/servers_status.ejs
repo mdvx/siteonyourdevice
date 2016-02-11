@@ -40,7 +40,7 @@
             });
 
             //on new message adds a new message to display
-            socket.on('message_redis', function (data) {
+            socket.on('message', function (data) {
                 var msg = data.text;
                 
                 if(data.channel === '<%= back_end.pub_sub_channel_client_state %>'){

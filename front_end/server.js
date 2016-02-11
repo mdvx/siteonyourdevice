@@ -117,11 +117,11 @@ listener.on('connection', function (socket) {
 var redis_sub = redis.createClient();
 var redis_pub = redis.createClient();
 
-redis_sub.on("error", function (err) {
+redis_sub.on('error', function (err) {
     console.error(err);
 });
 
-redis_pub.on("error", function (err) {
+redis_pub.on('error', function (err) {
     console.error(err);
 });
 
@@ -129,7 +129,7 @@ redis_sub.on('ready', function() {
     redis_sub.subscribe(settings_config.pub_sub_channel_out, settings_config.pub_sub_channel_client_state);
 });
 
-redis_sub.on("message_redis", function(channel, message){
+redis_sub.on('message', function(channel, message){
     var resp = {'text': message, 'channel':channel}
     listener.in(channel).emit('message', resp);
 });
