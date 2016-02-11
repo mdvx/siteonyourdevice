@@ -25,11 +25,14 @@
             socket.on('message_rabbitmq', function (data) {
               var msg = data.text;
               var build_responce = JSON.parse(msg);
-              var is_ok = build_responce.error == 'None';
-              if (is_ok) {
-                console.log(received, build_responce.body);
-              } else {
+              if (build_responce.email != <%= user.local.email %>) {
+                return;
+              }
+
+              if (responce_json.hasOwnProperty('error')){
                 console.error(build_responce.error);
+              } else {
+                console.log(received, build_responce.body);
               }
             });
             

@@ -10,19 +10,20 @@ import re
 import base
 import config
 
+class BuildError(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return self.value
+
 def print_usage():
     print("Usage:\n"
         "[optional] argv[1] platform\n"
         "[optional] argv[3] architecture\n")
 
 def run_command(cmd):
-    """run_command(cmd) returns a error."""
-    try:
-        output = subprocess.check_call(cmd)
-    except subprocess.CalledProcessError as ex:
-        return base.Error(base.ERROR, str(ex))
-    else:
-        return base.Error()
+    return subprocess.check_call(cmd)
+
 
 class BuildRpcServer(object):
     def __init__(self, platform):
@@ -43,12 +44,12 @@ class BuildRpcServer(object):
         platform_or_none = base.get_supported_platform_by_name(platform)
 
         if platform_or_none == None:
-            return (base.Error(base.ERROR, 'invalid platform'), None)
+            raise BuildError('invalid platform')
 
         if not arch in platform_or_none.archs:
-            return (base.Error(base.ERROR, 'invalid arch'), None)
+            raise BuildError('invalid arch')
         if not package_type in platform_or_none.package_types:
-            return (base.Error(base.ERROR, 'invalid package_type'), None)
+            raise BuildError('invalid package_type')
 
         pwd = os.getcwd()
         dir_name = 'build_{0}_for_{1}'.format(platform, op_id)
@@ -63,16 +64,18 @@ class BuildRpcServer(object):
         branding_variables_list = shlex.split(branding_variables)
         cmake_line = ['cmake', '../../', '-GUnix Makefiles', '-DCMAKE_BUILD_TYPE=RELEASE', generator_args, arch_args]
         cmake_line.extend(branding_variables_list)
-        err = run_command(cmake_line)
-        if err.isError():
+        try:
+            run_command(cmake_line)
+        except subprocess.CalledProcessError as ex:
             os.chdir(pwd)
-            return (err, None)
+            raise ex
 
         make_line = ['make', 'package', '-j2']
-        err = run_command(make_line)
-        if err.isError():
+        try:
+            run_command(make_line)
+        except subprocess.CalledProcessError as ex:
             os.chdir(pwd)
-            return (err, None)
+            raise ex
 
         in_file = open('CPackConfig.cmake', 'r')
         for line in in_file.readlines():
@@ -81,9 +84,14 @@ class BuildRpcServer(object):
                 filename = res.group(1) + '.' + base.get_extension_by_package(package_type)
         in_file.close()
 
-        err, result = config.post_install_step(filename, destination)
+        try:
+            result = config.post_install_step(filename, destination)
+        except Exception as ex:
+            os.chdir(pwd)
+            raise ex
+
         os.chdir(pwd)
-        return (err, result)
+        return result
 
     def on_request(self, ch, method, props, body):
         data = json.loads(body)
@@ -96,13 +104,18 @@ class BuildRpcServer(object):
         op_id = props.correlation_id
 
         print('build started for: {0}, platform: {1}_{2}'.format(op_id, platform, arch))
-        err, response = self.build_package(op_id, platform, arch, branding_variables, package_type, destination)
-        print('build finished for: {0}, platform: {1}_{2}, responce: {3}'.format(op_id, platform, arch, response))
+        try:
+            response = self.build_package(op_id, platform, arch, branding_variables, package_type, destination)
+            print('build finished for: {0}, platform: {1}_{2}, responce: {3}'.format(op_id, platform, arch, response))
+            json_to_send = {'body' :response}
+        except Exception as ex:
+            print('build finished for: {0}, platform: {1}_{2}, exception: {3}'.format(op_id, platform, arch, str(ex)))
+            json_to_send = {'error': str(ex)}
 
         ch.basic_publish(exchange = '',
-                         routing_key = props.reply_to,
-                         properties = pika.BasicProperties(content_type= 'application/json', correlation_id = op_id),
-                         body = {'error': err.description(), 'body': response})
+                 routing_key = props.reply_to,
+                 properties = pika.BasicProperties(content_type= 'application/json', correlation_id = op_id),
+                 body = json_to_send)
         ch.basic_ack(delivery_tag = method.delivery_tag)
 
 if __name__ == "__main__":

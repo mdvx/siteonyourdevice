@@ -102,7 +102,11 @@ listener.on('connection', function (socket) {
               } else {
                 var responce_json = JSON.parse(response);
                 console.log("response", responce_json);
-                socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': responce_json.error, 'body': responce_json.body});
+                if(responce_json.hasOwnProperty('error')){
+                  socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': Error(responce_json.error) });
+                } else {
+                  socket.emit('message_rabbitmq', { 'email': in_json.email, 'body': responce_json.body } );
+                }
               }
           });
         });
