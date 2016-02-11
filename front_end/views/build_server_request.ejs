@@ -28,9 +28,9 @@
               }
 
               if (responce_json.hasOwnProperty('error')){
-                console.error(build_responce.error);
+                console.error(responce_json.error);
               } else {
-                console.log(received, responce_json.body);
+                console.log('received', responce_json.body);
               }
             });
             
