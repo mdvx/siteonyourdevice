@@ -57,6 +57,39 @@ var io = require('socket.io');
 var server = http.createServer(app);
 var listener = io.listen(server);
 
+// settings
+app.locals.site = {
+    title: 'Site on your device',
+    domain: 'http://siteonyourdevice.com',
+    description: 'Site on your device - solution which connects your device with internet.'
+};
+app.locals.project = {
+    project_name: 'SiteOnYourDevice',
+    project_name_lowercase: 'siteonyourdevice',
+    github_link: 'https://github.com/fastogt/siteonyourdevice',
+    github_issues_link: 'https://github.com/fastogt/siteonyourdevice/issues'
+};
+app.locals.back_end = {
+    version : settings_config.client_version,
+    type : settings_config.client_version_type,
+    domain : 'http://proxy.siteonyourdevice.com',
+    socketio_port : settings_config.redis_pub_sub_port,
+    pub_sub_channel_in : settings_config.pub_sub_channel_in,
+    pub_sub_channel_out : settings_config.pub_sub_channel_out,
+    pub_sub_channel_client_state : settings_config.pub_sub_channel_client_state
+};
+app.locals.author = {
+    name: 'Topilski Alexandr',
+    contact: 'atopilski@fastogt.com'
+};
+app.locals.company = {
+    name: 'FastoGT',
+    description: 'Fasto Great Technology',
+    domain: 'http://fastogt.com',
+    copyright: 'Copyright © 2014-2016 FastoGT. All rights reserved.'
+};
+
+// rabbitmq
 var rabbit_connection = amqp.createConnection({ host: settings_config.rabbitmq_host });
 rabbit_connection.on('error', function (err) {
     console.error(err);
@@ -69,7 +102,7 @@ listener.on('connection', function (socket) {
     });
 
     socket.on('publish_redis', function (msg) {
-        redis_pub.publish(settings_config.pub_sub_channel_in, msg);
+        redis_pub.publish(back_end.pub_sub_channel_in, msg);
     });
     
     socket.on('publish_rabbitmq', function (msg) {
@@ -126,7 +159,7 @@ redis_pub.on('error', function (err) {
 });
 
 redis_sub.on('ready', function() {
-    redis_sub.subscribe(settings_config.pub_sub_channel_out, settings_config.pub_sub_channel_client_state);
+    redis_sub.subscribe(back_end.pub_sub_channel_out, back_end.pub_sub_channel_client_state);
 });
 
 redis_sub.on('message', function(channel, message){
@@ -138,38 +171,6 @@ redis_sub.on('message', function(channel, message){
 mongoose.connect(configDB.url); // connect to our database
 
 require('./config/passport')(passport); // pass passport for configuration
-
-// settings
-app.locals.site = {
-    title: 'Site on your device',
-    domain: 'http://siteonyourdevice.com',
-    description: 'Site on your device - solution which connects your device with internet.'
-};
-app.locals.project = {
-    project_name: 'SiteOnYourDevice',
-    project_name_lowercase: 'siteonyourdevice',
-    github_link: 'https://github.com/fastogt/siteonyourdevice',
-    github_issues_link: 'https://github.com/fastogt/siteonyourdevice/issues'
-};
-app.locals.back_end = {
-    version : settings_config.client_version,
-    type : settings_config.client_version_type,
-    domain : 'http://proxy.siteonyourdevice.com',
-    socketio_port : settings_config.redis_pub_sub_port,
-    pub_sub_channel_in : settings_config.pub_sub_channel_in,
-    pub_sub_channel_out : settings_config.pub_sub_channel_out,
-    pub_sub_channel_client_state : settings_config.pub_sub_channel_client_state
-};
-app.locals.author = {
-    name: 'Topilski Alexandr',
-    contact: 'atopilski@fastogt.com'
-};
-app.locals.company = {
-    name: 'FastoGT',
-    description: 'Fasto Great Technology',
-    domain: 'http://fastogt.com',
-    copyright: 'Copyright © 2014-2016 FastoGT. All rights reserved.'
-};
 
 // set up our express application
 app.use(express.static(public_dir_abs_path));
@@ -187,7 +188,7 @@ app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 
 // routes ======================================================================
-require('./app/routes.js')(app, passport, settings_config); // load our routes and pass in our app and fully configured passport
+require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
 // launch ======================================================================
 app.listen(port);

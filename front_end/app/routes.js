@@ -6,7 +6,7 @@ function checkIsValidDomain(domain) {
     return domain.match(re);
 } 
 
-module.exports = function(app, passport, settings_config) {
+module.exports = function(app, passport) {
 
 // normal routes ===============================================================
 
