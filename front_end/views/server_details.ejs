@@ -174,8 +174,8 @@
             
             //on connetion, updates connection state and sends subscribe request
             socket.on('connect', function(data){
-                socket.emit('subscribe_redis', {channel:CHANNEL_OUT});
-                socket.emit('subscribe_redis', {channel:CHANNEL_CLIENTS_STATE});
+                socket.emit('subscribe_redis', {channel:<%= back_end.pub_sub_channel_out %>});
+                socket.emit('subscribe_redis', {channel:<%= back_end.pub_sub_channel_client_state %>});
             });
 
             //when reconnection is attempted, updates status 
@@ -186,14 +186,14 @@
             socket.on('message_redis', function (data) {
                 var msg = data.text;
                 
-                if (data.channel === CHANNEL_OUT) {
+                if (data.channel === <%= back_end.pub_sub_channel_out %>) {
                     var msgObj = parse_command_out(msg);
                     if(msgObj == undefined){
                         return;
                     }
                     
                     handle_command_received(msgObj);
-                } else if(data.channel === CHANNEL_CLIENTS_STATE) {
+                } else if(data.channel === <%= back_end.pub_sub_channel_client_state %>) {
                     var stateObj = parse_state_msg(msg);
                     if(stateObj == undefined){
                         return;

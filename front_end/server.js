@@ -154,7 +154,10 @@ app.locals.back_end = {
     version : settings_config.client_version,
     type : settings_config.client_version_type,
     domain : 'http://proxy.siteonyourdevice.com',
-    socketio_port : settings_config.redis_pub_sub_port
+    socketio_port : settings_config.redis_pub_sub_port,
+    pub_sub_channel_in : settings_config.pub_sub_channel_in,
+    pub_sub_channel_out : settings_config.pub_sub_channel_out,
+    pub_sub_channel_client_state : settings_config.pub_sub_channel_client_state
 };
 app.locals.author = {
     name: 'Topilski Alexandr',

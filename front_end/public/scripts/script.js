@@ -1,9 +1,3 @@
-// global constant
-const CHANNEL_IN = 'COMMANDS_IN';
-const CHANNEL_OUT = 'COMMANDS_OUT';
-const CHANNEL_CLIENTS_STATE = 'CLIENTS_STATE';
-const NODE_PORT = 3000;
-
 //get url field
 function get_url_parameter_url(url, sParam) 
 {
