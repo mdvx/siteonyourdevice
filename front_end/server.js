@@ -100,7 +100,7 @@ listener.on('connection', function (socket) {
                 console.error(err);
                 socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': err, 'body': 'None'});
               } else {
-                var responce_json = JSON.parse(response);
+                var responce_json = response;
                 console.log("response", responce_json);
                 if(responce_json.hasOwnProperty('error')){
                   socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': Error(responce_json.error) });
