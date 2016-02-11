@@ -73,7 +73,7 @@ app.locals.back_end = {
     version : settings_config.client_version,
     type : settings_config.client_version_type,
     domain : 'http://proxy.siteonyourdevice.com',
-    socketio_port : settings_config.redis_pub_sub_port,
+    socketio_port : settings_config.socketio_port,
     pub_sub_channel_in : settings_config.pub_sub_channel_in,
     pub_sub_channel_out : settings_config.pub_sub_channel_out,
     pub_sub_channel_client_state : settings_config.pub_sub_channel_client_state
@@ -193,4 +193,4 @@ require('./app/routes.js')(app, passport); // load our routes and pass in our ap
 // launch ======================================================================
 app.listen(port);
 console.log('Http server ready for requests');
-server.listen(settings_config.redis_pub_sub_port);
+server.listen(app.locals.back_end.socketio_port);
