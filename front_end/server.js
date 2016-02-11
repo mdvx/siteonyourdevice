@@ -102,7 +102,7 @@ listener.on('connection', function (socket) {
     });
 
     socket.on('publish_redis', function (msg) {
-        redis_pub.publish(back_end.pub_sub_channel_in, msg);
+        redis_pub.publish(app.locals.back_end.pub_sub_channel_in, msg);
     });
     
     socket.on('publish_rabbitmq', function (msg) {
@@ -159,7 +159,7 @@ redis_pub.on('error', function (err) {
 });
 
 redis_sub.on('ready', function() {
-    redis_sub.subscribe(back_end.pub_sub_channel_out, back_end.pub_sub_channel_client_state);
+    redis_sub.subscribe(app.locals.back_end.pub_sub_channel_out, app.locals.back_end.pub_sub_channel_client_state);
 });
 
 redis_sub.on('message', function(channel, message){
