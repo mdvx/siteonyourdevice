@@ -25,11 +25,11 @@
             socket.on('message_rabbitmq', function (data) {
               var msg = data.text;
               var build_responce = JSON.parse(msg);
-              var is_ok = is_succsess_command(build_responce);
+              var is_ok = build_responce.error == 'None';
               if (is_ok) {
-                console.log(received, build_responce.responce);
+                console.log(received, build_responce.body);
               } else {
-                console.error(build_responce.responce);
+                console.error(build_responce.error);
               }
             });
             

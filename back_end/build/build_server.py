@@ -43,12 +43,12 @@ class BuildRpcServer(object):
         platform_or_none = base.get_supported_platform_by_name(platform)
 
         if platform_or_none == None:
-            return 'invalid platform'
+            return (base.Error(base.ERROR, 'invalid platform'), None)
 
         if not arch in platform_or_none.archs:
-            return 'invalid arch'
+            return (base.Error(base.ERROR, 'invalid arch'), None)
         if not package_type in platform_or_none.package_types:
-            return 'invalid package_type'
+            return (base.Error(base.ERROR, 'invalid package_type'), None)
 
         pwd = os.getcwd()
         dir_name = 'build_{0}_for_{1}'.format(platform, op_id)
@@ -66,13 +66,13 @@ class BuildRpcServer(object):
         err = run_command(cmake_line)
         if err.isError():
             os.chdir(pwd)
-            return err.description()
+            return (err, None)
 
         make_line = ['make', 'package', '-j2']
         err = run_command(make_line)
         if err.isError():
             os.chdir(pwd)
-            return err.description()
+            return (err, None)
 
         in_file = open('CPackConfig.cmake', 'r')
         for line in in_file.readlines():
@@ -81,9 +81,9 @@ class BuildRpcServer(object):
                 filename = res.group(1) + '.' + base.get_extension_by_package(package_type)
         in_file.close()
 
-        result = config.post_install_step(filename, destination)
+        err, result = config.post_install_step(filename, destination)
         os.chdir(pwd)
-        return result
+        return (err, result)
 
     def on_request(self, ch, method, props, body):
         data = json.loads(body)
@@ -96,13 +96,13 @@ class BuildRpcServer(object):
         op_id = props.correlation_id
 
         print('build started for: {0}, platform: {1}_{2}'.format(op_id, platform, arch))
-        response = self.build_package(op_id, platform, arch, branding_variables, package_type, destination)
+        err, response = self.build_package(op_id, platform, arch, branding_variables, package_type, destination)
         print('build finished for: {0}, platform: {1}_{2}, responce: {3}'.format(op_id, platform, arch, response))
 
         ch.basic_publish(exchange = '',
                          routing_key = props.reply_to,
-                         properties = pika.BasicProperties(correlation_id = op_id),
-                         body = response)
+                         properties = pika.BasicProperties(content_type= 'application/json', correlation_id = op_id),
+                         body = {error: err.destination(), body: responce})
         ch.basic_ack(delivery_tag = method.delivery_tag)
 
 if __name__ == "__main__":

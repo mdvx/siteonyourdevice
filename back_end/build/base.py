@@ -7,7 +7,7 @@ NO_ERROR = 0
 ERROR = -1
 
 class Error:
-    def __init__(self, error = NO_ERROR, description = 'No error'):
+    def __init__(self, error = NO_ERROR, description = None):
         self.error = error
         self.descr = description
 

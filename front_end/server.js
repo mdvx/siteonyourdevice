@@ -1,10 +1,5 @@
 // server.js
 
-var STATUS = { 
-    OK : 1,
-    FAIL : 0
-};
-
 //get url field
 function get_url_parameter_url(url, sParam) 
 {
@@ -103,10 +98,11 @@ listener.on('connection', function (socket) {
           rpc.makeRequest(routing_key, in_json.email, request_data_json, function response(err, response) {
               if (err) {
                 console.error(err);
-                socket.emit('message_rabbitmq', { 'email': in_json.email, 'response': err, 'status': STATUS.FAIL});
+                socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': err, 'body': 'None'});
               } else {
-                console.log("response", response);
-                socket.emit('message_rabbitmq', { 'email': in_json.email, 'response': response, 'status': STATUS.OK});
+                var responce_json = JSON.parse(response);
+                console.log("response", responce_json);
+                socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': responce_json.error, 'body': responce_json.body});
               }
           });
         });
