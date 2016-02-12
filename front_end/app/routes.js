@@ -18,10 +18,10 @@ module.exports = function(app, passport) {
     app.get('/templates', function(req, res) {
         app.redis_connection.hgetall('templates', function(err, result) {
             if (err) {
-                console.log(err);
+                console.error(err);
             } else {
                 var templates = [];
-                for (i in result) {
+                for (var i in result) {
                     templates.push(JSON.parse(result[i]));
                 }
                 res.render('templates.ejs', {
@@ -43,17 +43,21 @@ module.exports = function(app, passport) {
     
     app.get('/servers_status', function(req, res){
         User.find({"domains": { $exists: true, $ne: [] }} , function(err, all_users) {
-            var domains = [];
-            for (var i = 0; i < all_users.length; i++) {
-                var user_domains = all_users[i].domains;
-                for(var j = 0; j < user_domains.length; ++j){
-                    domains.push({name : user_domains[j].name, created_date : user_domains[j].created_date} );
+            if (err) {
+                console.error(err);
+            } else {
+                var domains = [];
+                for (var i = 0; i < all_users.length; i++) {
+                    var user_domains = all_users[i].domains;
+                    for(var j = 0; j < user_domains.length; ++j){
+                        domains.push({name : user_domains[j].name, created_date : user_domains[j].created_date} );
+                    }
                 }
+    
+                res.render('servers_status.ejs', {
+                    domains: domains
+                });
             }
-
-            res.render('servers_status.ejs', {
-                domains: domains
-            });  
         } ); 
     });
     
@@ -278,6 +282,9 @@ module.exports = function(app, passport) {
         user.local.password = undefined;
         
         user.save(function(err) {
+            if (err) {
+                console.error(err);
+            }
             res.redirect('/profile');
         });
     });
@@ -288,6 +295,9 @@ module.exports = function(app, passport) {
         user.facebook.token = undefined;
         
         user.save(function(err) {
+            if (err) {
+                console.error(err);
+            }
             res.redirect('/profile');
         });
     });
@@ -298,6 +308,9 @@ module.exports = function(app, passport) {
         user.twitter.token = undefined;
         
         user.save(function(err) {
+            if (err) {
+                console.error(err);
+            }
             res.redirect('/profile');
         });
     });
@@ -308,6 +321,9 @@ module.exports = function(app, passport) {
         user.google.token = undefined;
         
         user.save(function(err) {
+            if (err) {
+                console.error(err);
+            }
             res.redirect('/profile');
         });
     });

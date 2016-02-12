@@ -14,19 +14,16 @@
         <script>
             var socket = io.connect('<%= site.domain %>:<%= back_end.socketio_port %>');
             
-            function handle_onconnection_changed(host, is_connected)
-            {
+            function handle_onconnection_changed(host, is_connected) {
                 var id_control = '#status_img' + host.replace('.', '_');
-                if(is_connected){
+                if (is_connected) {
                     $(id_control).attr("src", SERVER_STATUS_IMG.ONLINE);
-                }
-                else{
+                } else {
                     $(id_control).attr("src", SERVER_STATUS_IMG.OFFLINE);
                 }
             }
             
-            function handle_state_changed(stateObj)
-            {                
+            function handle_state_changed(stateObj) {                
                 handle_onconnection_changed(stateObj.host, stateObj.status === CONNECTED_STATUS.CONNECTED);
             }
             
@@ -43,9 +40,9 @@
             socket.on('message', function (data) {
                 var msg = data.text;
                 
-                if(data.channel === '<%= back_end.pub_sub_channel_client_state %>'){
+                if (data.channel === '<%= back_end.pub_sub_channel_client_state %>') {
                     var stateObj = parse_state_msg(msg);
-                    if(stateObj == undefined){
+                    if (stateObj == undefined) {
                         return;
                     }
                     

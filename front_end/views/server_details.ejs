@@ -53,34 +53,29 @@
               return set_server_config(id, name, "'" + JSON.stringify(config) + "'", socket);
             }
             
-            function setServerType(type)
-            {
-                if(type == SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER){
+            function setServerType(type) {
+                if (type == SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER){
                     document.forms["server_type"]["server_type_local"].checked = true;
-                }
-                else{
+                } else {
                     document.forms["server_type"]["server_type_external"].checked = true;
                 }
             }
             
-            function drawUrlHandlersTable(urls)
-            {
+            function drawUrlHandlersTable(urls) {
                 $('#urls_handlers_table tr').remove();
-                for(var i = 0; i < urls.length; i++){
+                for (var i = 0; i < urls.length; i++) {
                     $('#urls_handlers_table').append('<tr><td>' + (i + 1) + '</td>' + '<td>' + urls[i].url + '</td>' + '<td>' + urls[i].handler + '</td></tr>');
                 }
             }
             
-            function drawSocketsPathTable(sockets)
-            {
+            function drawSocketsPathTable(sockets) {
                 $('#socket_urls_table tr').remove();
-                for(var i = 0; i < sockets.length; i++){
+                for (var i = 0; i < sockets.length; i++) {
                     $('#socket_urls_table').append('<tr><td>' + (i + 1) + '</td>' + '<td>' + sockets[i].type + '</td>' + '<td>' + sockets[i].path + '</td></tr>');
                 }
             }
             
-            function handle_onconnection_changed(is_connected)
-            {
+            function handle_onconnection_changed(is_connected) {
                 if (is_connected) {
                     $('#status_label').html(SERVER_STATUS.ONLINE);
                     $('#status_img').attr("src", SERVER_STATUS_IMG.ONLINE);
@@ -111,8 +106,7 @@
                 }
             }
             
-            function handle_state_changed(stateObj)
-            {
+            function handle_state_changed(stateObj) {
                 if(stateObj.host !== '<%- domain_name %>'){
                     return;
                 }
@@ -120,9 +114,8 @@
                 handle_onconnection_changed(stateObj.status === CONNECTED_STATUS.CONNECTED);
             }
             
-            function handle_command_received(msgObj)
-            {
-                if('<%- user._id %>' !== msgObj.id){
+            function handle_command_received(msgObj) {
+                if ('<%- user._id %>' !== msgObj.id) {
                     return;
                 }
                 
@@ -131,15 +124,14 @@
                 if (is_ping_command(msgObj)) {
                     handle_onconnection_changed(is_ok);
                 } else if(is_info_command(msgObj)) {
-                    if(is_ok){
+                    if (is_ok) {
                         var system_info = JSON.parse(msgObj.args);
                         $('#os_label').html(system_info.os);
                         $('#cpu_label').html(system_info.cpu);
                         var ram_total_gb = system_info.ram_total/GB;
                         var ram_total_fr = system_info.ram_free/GB;
                         $('#ram_label').html(ram_total_gb.toFixed(2) + " GB (" + ram_total_fr.toFixed(2) + " GB free)");
-                    }
-                    else{
+                    } else {
                         $('#os_label').html(SERVER_OS_DEFAULT_LABEL);
                         $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
                         $('#ram_label').html(SERVER_RAM_DEFAULT_LABEL);
@@ -203,8 +195,7 @@
                 }
             });
             
-            function init()
-            {
+            function init() {
                 ping_server('<%- user._id %>', '<%- domain_name %>', socket);
                 $('#status_label').html(SERVER_STATUS.OFFLINE);
                 $('#status_img').attr("src", SERVER_STATUS_IMG.OFFLINE);

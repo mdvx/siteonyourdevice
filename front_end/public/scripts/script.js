@@ -1,25 +1,3 @@
-//get url field
-function get_url_parameter_url(url, sParam) 
-{
-    var sPageURL = decodeURIComponent(url),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
-
-    for (i = 0; i < sURLVariables.length; i++) {
-        sParameterName = sURLVariables[i].split('=');
-
-        if (sParameterName[0] === sParam) {
-            return sParameterName[1] === undefined ? true : sParameterName[1];
-        }
-    }
-}
-
-function get_url_parameter(sParam) 
-{
-    return get_url_parameter_url(window.location.search.substring(1), sParam);
-}
-
 var STATUS = { 
     OK : 1,
     FAIL : 0
@@ -35,52 +13,42 @@ var COMMANDS = {
     INFO : "plz_system_info", //+
     CONFIG : "plz_config",
     SET_CONFIG : "plz_set_config"
-}
+};
 
 // state parse
-function parse_state_msg(msg)
-{
-    var msg_length = msg.length;
-    var pos = 0;
+function parse_state_msg(msg) {
     var msg_host_state = msg.split(" ");
     if(msg_host_state.length === 2){
-        return {host : msg_host_state[0], status : msg_host_state[1] == "connected" ? CONNECTED_STATUS.CONNECTED : CONNECTED_STATUS.DISCONNECTED }
+        return {host : msg_host_state[0], status : msg_host_state[1] == "connected" ? CONNECTED_STATUS.CONNECTED : CONNECTED_STATUS.DISCONNECTED };
     }
     
     return undefined;
 }
 
 // is_commands
-function is_ping_command(msgObj)
-{
+function is_ping_command(msgObj) {
     return msgObj.command === COMMANDS.PING;    
 }
-function is_info_command(msgObj)
-{
+function is_info_command(msgObj) {
     return msgObj.command === COMMANDS.INFO;    
 }
-function is_config_command(msgObj)
-{
+function is_config_command(msgObj) {
     return msgObj.command === COMMANDS.CONFIG;    
 }
-function is_set_config_command(msgObj)
-{
+function is_set_config_command(msgObj) {
     return msgObj.command === COMMANDS.SET_CONFIG;    
 }
 // status off command
-function is_failed_command(msgObj)
-{
+function is_failed_command(msgObj) {
     return msgObj.status === STATUS.FAIL;    
 }
 
-function is_succsess_command(msgObj)
-{
+function is_succsess_command(msgObj) {
     return msgObj.status === STATUS.OK;    
 }
 // parse string to msgObj
 
-function parse_command_out(msg)
-{
+function parse_command_out(msg) {
     var msg_length = msg.length;
     var pos = 0;
     var data = "";
@@ -129,8 +97,7 @@ function parse_command_out(msg)
 }
 
 // server functions
-function ping_server(id, name, socket)
-{
+function ping_server(id, name, socket) {
     if(name === undefined){
         return;
     }
@@ -139,8 +106,7 @@ function ping_server(id, name, socket)
     socket.emit('publish_redis', msg);
 }
 
-function server_info(id, name, socket)
-{
+function server_info(id, name, socket) {
     if(name === undefined){
         return;
     }
@@ -149,8 +115,7 @@ function server_info(id, name, socket)
     socket.emit('publish_redis', msg);
 }
 
-function sync_server_config(id, name, socket)
-{
+function sync_server_config(id, name, socket) {
     if(name === undefined){
         return;
     }
@@ -159,7 +124,7 @@ function sync_server_config(id, name, socket)
     socket.emit('publish_redis', msg);
 }
 
-function set_server_config(id, name, config, socket){
+function set_server_config(id, name, config, socket) {
   if(name === undefined){
     return;
   } 
@@ -170,9 +135,9 @@ function set_server_config(id, name, config, socket){
 
 //// server_details constant
 const SERVER_DEFAULT_LABEL = "Unknown";
-const SERVER_CPU_DEFAULT_LABEL = "Unknown"
-const SERVER_OS_DEFAULT_LABEL = "Unknown"
-const SERVER_RAM_DEFAULT_LABEL = "Unknown"
+const SERVER_CPU_DEFAULT_LABEL = "Unknown";
+const SERVER_OS_DEFAULT_LABEL = "Unknown";
+const SERVER_RAM_DEFAULT_LABEL = "Unknown";
 var SERVER_STATUS = { 
     ONLINE : "online",
     OFFLINE : "offline"

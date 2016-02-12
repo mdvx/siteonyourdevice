@@ -1,24 +1,7 @@
 // server.js
 
-//get url field
-function get_url_parameter_url(url, sParam) 
-{
-    var sPageURL = decodeURIComponent(url),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
-
-    for (i = 0; i < sURLVariables.length; i++) {
-        sParameterName = sURLVariables[i].split('=');
-
-        if (sParameterName[0] === sParam) {
-            return sParameterName[1] === undefined ? true : sParameterName[1];
-        }
-    }
-}
-
 function gen_routing_key(platform, arch) {
-  return platform + '_' + arch
+  return platform + '_' + arch;
 }
 
 // load configs
@@ -26,8 +9,8 @@ var configDB = require('./config/database.js');
 var settings_config = require('./config/settings.js');
 var root_abs_path = __dirname; 
 var public_dir_abs_path = root_abs_path + '/public';
-var public_downloads_dir_abs_path = public_dir_abs_path + '/downloads'
-var public_downloads_users_dir_abs_path = public_downloads_dir_abs_path + '/users'
+var public_downloads_dir_abs_path = public_dir_abs_path + '/downloads';
+var public_downloads_users_dir_abs_path = public_downloads_dir_abs_path + '/users';
 // set up ======================================================================
 // get all the tools we need
 var express  = require('express');
@@ -97,7 +80,7 @@ rabbit_connection.on('error', function (err) {
 
 listener.on('connection', function (socket) {
     socket.on('subscribe_redis', function (data) {
-        console.log('subscribe_redis', data.channel)
+        console.log('subscribe_redis', data.channel);
         socket.join(data.channel);
     });
 
@@ -163,7 +146,7 @@ redis_sub.on('ready', function() {
 });
 
 redis_sub.on('message', function(channel, message){
-    var resp = {'text': message, 'channel':channel}
+    var resp = {'text': message, 'channel':channel};
     listener.in(channel).emit('message', resp);
 });
 
