@@ -109,7 +109,8 @@ module.exports = function(app, passport) {
     app.post('/build_server_request', function(req, res) {
         var user = req.user;        
         var domain_name = req.body.domain_name;        
-        var walk = function(dir, done) {          
+        var walk = function(dir, done) {   
+          var results = [];
           fs.readdir(dir, function(err, list) {
             if (err) return done(err);
             var pending = list.length;
