@@ -7,10 +7,11 @@
     <style>
         body         { padding-top:80px; }
     </style>
-    <script src="scripts/script.js" type="text/javascript"></script>
-        <script src="<%= site.domain%>:<%= back_end.socketio_port %>/socket.io/socket.io.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
         <script src="scripts/script.js" type="text/javascript"></script>
+        <script src="<%= site.domain%>:<%= back_end.socketio_port %>/socket.io/socket.io.js"></script>
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script>
             var socket = io.connect('<%= site.domain%>:<%= back_end.socketio_port %>');
             //on connetion, updates connection state and sends subscribe request
@@ -34,8 +35,12 @@
               }
             });
             
-            function send_build_request(user, password, domain, platform, private_site, external_host, server_type, content_path, package_type, bit) {             
+            function send_build_request(user, password, domain, domain_port, platform, private_site, external_host, server_type, content_path, package_type, bit) { 
+              var out_request = "user: " + user + "password: " + password + "domain: " + domain + "platform: " + platform + "private_site: " + private_site +
+                                "external_host: " + external_host + "server_type: " + server_type + "content_path: " + content_path + "package_type: " + package_type + "bit: " + bit;
+              alert(out_request);
               var build_args = { "domain": domain, 
+                             "domain_port": domain_port,
                              "platform": platform, 
                              "private_site": private_site, 
                              "external_host": external_host, 
@@ -47,16 +52,184 @@
                              "arch" : bit
                            };
               var msg = JSON.stringify(build_args);
-              socket.emit('publish_rabbitmq', msg);
+              //socket.emit('publish_rabbitmq', msg);
             }
             
-            function send_build_request_local(user, password, domain) {
-              return send_build_request(user, password, domain, 'linux', 0, 'localhost:80', 0, 'content_path', 'DEB', 64)
-            }
-            
+            function send_build_request_local(user, password) {
+              var domain = document.getElementById("localhost_host").value;
+              var domain_port = document.getElementById("localhost_port").value;
+              var platform = $('.nav-tabs .active > a').attr('aria-controls');
+              var private_site = document.getElementById('private_site').checked ? 1 : 0;
+              var external_host = document.getElementById('external_host_host').value + ':' + document.getElementById('external_host_port').value;
+              var server_type = $('#connection_settings .active > a').attr('aria-controls') == "external" ? 1 : 0;
+              var content_path = document.getElementById('localhost_content').value;
+              var os_ctrl = $('input[name=os]:checked');
+              var package_type = os_ctrl.attr('package_type');
+              var bit = os_ctrl.attr('bit');
+              return send_build_request(user, password, domain, domain_port, platform, private_site, external_host, server_type, content_path, package_type, bit);
+            }            
         </script>
 </head>
 <body>
-  <button id="build_package_button" onclick="send_build_request_local('<%- user.local.email %>', '<%- user.local.password %>', '<%- domain_name %>')">Build package</button>
+  <div class="container">
+    <div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12">
+      <h2><span class="os-icon"><i class="fa fa-television"></i></span> OS</h2>
+      <div>
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="active"><a href="#windows" aria-controls="windows" role="tab" data-toggle="tab"><i class="fa fa-windows"></i> Windows</a></li>
+          <li role="presentation"><a href="#linux" aria-controls="linux" role="tab" data-toggle="tab"><i class="fa fa-linux"></i> Linux</a></li>
+          <li role="presentation"><a href="#macosx" aria-controls="macosx" role="tab" data-toggle="tab"><i class="fa fa-apple"></i> MacOS</a></li>
+          <li role="presentation"><a href="#freebsd" aria-controls="freebsd" role="tab" data-toggle="tab"> FreeBSD</a></li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="windows">
+          <div data-toggle="buttons" class="buttons-row">
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="windows_7_x32" bit="32" package_type="NSIS" id="option1" autocomplete="off"> Windows 7 x32
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="windows_7_x64" bit="64" package_type="NSIS" id="option2" autocomplete="off"> Windows 7 x64
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="windows_10_x32" bit="32" package_type="NSIS" id="option3" autocomplete="off"> Windows 10 x32
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="windows_10_x64" bit="64" package_type="NSIS" id="option4" autocomplete="off"> Windows 10 x64
+            </label>
+          </div>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="linux">
+          <div data-toggle="buttons" class="buttons-row">
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="ubuntu_x32" bit="32" package_type="DEB" id="option5" autocomplete="off"> Ubuntu x32</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="debian_x32" bit="32" package_type="DEB" id="option6" autocomplete="off"> Debian x32</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="centos_x32" bit="32" package_type="RPM" id="option7" autocomplete="off"> CentOS x32</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="fedora_x32" bit="32" package_type="RPM" id="option8" autocomplete="off"> Fedora x32</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="arch_linux_x32" bit="32" package_type="TGZ" id="option9" autocomplete="off"> Arch Linux x32</label>
+          </br>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="ubuntu_x64" bit="64" package_type="DEB" id="option10" autocomplete="off"> Ubuntu x64</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="debian_x64" bit="64" package_type="DEB" id="option11" autocomplete="off"> Debian x64</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="centOS_x64" bit="64" package_type="RPM" id="option12" autocomplete="off"> CentOS x64</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="fedora_x64" bit="64" package_type="RPM" id="option13" autocomplete="off"> Fedora x64</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="arch_linux_x64" bit="64" package_type="TGZ" id="option14" autocomplete="off"> Arch Linux x64</label>
+          </div>
+          </div>          
+          <div role="tabpanel" class="tab-pane" id="macosx">
+          <div data-toggle="buttons" class="buttons-row">
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="macosx_10_8_x64" bit="64" package_type="DMG" id="option19" autocomplete="off"> MacOS 10.8 x64</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="macosx_10_9_x64" bit="64" package_type="DMG" id="option20" autocomplete="off"> MacOS 10.9 x64</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="macosx_10_10_x64" bit="64" package_type="DMG" id="option21" autocomplete="off"> MacOS 10.10 x64</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="macosx_10_11_x64" bit="64" package_type="DMG" id="option22" autocomplete="off"> MacOS 10.11 x64</label>
+          </div>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="freebsd">
+          <div data-toggle="buttons" class="buttons-row">
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="freebsd_10_1_x64" bit="64" package_type="TGZ" id="option15" autocomplete="off"> FreeBSD 10.1 x64</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="freebsd_10_2_x64" bit="64" package_type="TGZ" id="option16" autocomplete="off"> FreeBSD 10.2 x64</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="freebsd_10_3_x64" bit="64" package_type="TGZ" id="option17" autocomplete="off"> FreeBSD 10.3 x64</label>
+            <label class="btn btn-primary">
+              <input type="radio" name="os" value="freebsd_11_0_x64" bit="64" package_type="TGZ" id="option18" autocomplete="off"> FreeBSD 11.0 x64</label>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-sm-12 col-md-12 col-lg-12">
+        <h2><span class="os-icon"><i class="fa fa-cogs"></i></span> Connection settings:</h2>
+      <div>
+        <ul class="nav nav-tabs" role="tablist" id="connection_settings">
+          <li role="presentation" class="active">
+            <a href="#local" aria-controls="local" role="tab" data-toggle="tab">Local</a>
+          </li>
+          <li role="presentation">
+            <a href="#external" aria-controls="external" role="tab" data-toggle="tab">External</a>
+          </li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <p>&nbsp;</p>
+          <div role="tabpane2" class="tab-pane form-inline active" id="local">
+            <div>
+              <label>
+              Host: <input type="text" disabled name="Host" class="form-control" id="localhost_host" value='<%- domain_name %>'>
+              </label>
+            </div>
+            <div>
+                <label>
+                Port: <input type="number" min="1024" max="65535" name="Port" class="form-control" id="localhost_port" value=80>
+                </label>
+            </div>
+            <div>
+                <label>
+                Conten-path: <input type="text" name="Conten-path" class="form-control" id="localhost_content" value="content">
+                </label>
+            </div>
+          </div>
+          <div role="tabpane2" class="tab-pane form-inline" id="external">
+            <div>
+              <label> 
+              Host: <input type="text" name="Host-ex" class="form-control" id="external_host_host" value="localhost">
+              </label>
+            </div>
+            <div>
+              <label>
+              Port: <input type="number" min="1024" max="65535" name="Port-ex" class="form-control" id="external_host_port" value=80>
+              </label>
+            </div>          
+          </div>
+        </div>
+        
+        <div class="col-sm-12 col-md-12 col-lg-12">
+          <label>
+            <input type="checkbox" id="private_site"> Private site
+          </<label>
+        </div>
+        
+        <div class="col-sm-12 col-md-12 col-lg-12">
+          <button id="build_package_button" class="btn btn-success btn-send" data-toggle="modal" data-target="#myModal">
+            Build Package
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="myModal" class="modal fade">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title">Confirmation</h4>
+              </div>
+              <div class="modal-body">
+                  <p>Do you want to start build package?</p>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" onclick="send_build_request_local('<%- user.local.email %>', '<%- user.local.password %>')">Start build</button>
+              </div>
+          </div>
+      </div>
+  </div>
 </body>
+
 </html>
