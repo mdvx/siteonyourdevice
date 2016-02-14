@@ -122,7 +122,7 @@ module.exports = function(app, passport) {
               fs.stat(file, function(err, stat) {
                 if (stat && stat.isDirectory()) {
                 } else {
-                  var path = file.replace(app.locals.project.public_directory, '');
+                  var path = file.replace(app.locals.site.public_directory, '');
                   results.push({ 'path' : path, 'file_name' : file_name});
                   if (!--pending) done(null, results);
                 }
@@ -131,7 +131,7 @@ module.exports = function(app, passport) {
           });
         };
         
-        walk(app.locals.project.users_directory + '/' + user.local.email, function(err, results) {
+        walk(app.locals.site.users_directory + '/' + user.local.email, function(err, results) {
           if (err) 
             console.error(err);
           

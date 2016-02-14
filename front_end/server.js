@@ -44,15 +44,15 @@ var listener = io.listen(server);
 app.locals.site = {
     title: 'Site on your device',
     domain: 'http://siteonyourdevice.com',
-    description: 'Site on your device - solution which connects your device with internet.'
+    description: 'Site on your device - solution which connects your device with internet.',
+    public_directory: public_dir_abs_path,
+    users_directory: public_downloads_users_dir_abs_path
 };
 app.locals.project = {
     project_name: 'SiteOnYourDevice',
     project_name_lowercase: 'siteonyourdevice',
     github_link: 'https://github.com/fastogt/siteonyourdevice',
-    github_issues_link: 'https://github.com/fastogt/siteonyourdevice/issues',
-    public_directory: public_dir_abs_path,
-    users_directory: public_downloads_users_dir_abs_path
+    github_issues_link: 'https://github.com/fastogt/siteonyourdevice/issues'
 };
 app.locals.back_end = {
     version : settings_config.client_version,
