@@ -127,7 +127,7 @@ module.exports = function(app, passport) {
           });
         };
         
-        walk(app.locals.project.users_directory + '/' + user, function(err, results) {
+        walk(app.locals.project.users_directory + '/' + user.local.email, function(err, results) {
           if (err) 
             console.error(err);
             return;
