@@ -1,6 +1,9 @@
 // load up the user model
 var User = require('../app/models/user');
 
+var fs = require('fs');
+var path = require('path');
+
 function checkIsValidDomain(domain) { 
     var re = new RegExp(/^((?:(?:(?:\w[\.\-\+]?)*)\w)+)((?:(?:(?:\w[\.\-\+]?){0,62})\w)+)\.(\w{2,6})$/); 
     return domain.match(re);
@@ -105,12 +108,37 @@ module.exports = function(app, passport) {
     
     app.post('/build_server_request', function(req, res) {
         var user = req.user;        
-        var domain_name = req.body.domain_name;
+        var domain_name = req.body.domain_name;        
+        var walk = function(dir, done) {          
+          fs.readdir(dir, function(err, list) {
+            if (err) return done(err);
+            var pending = list.length;
+            if (!pending) return done(null, results);
+            list.forEach(function(file) {
+              file = path.resolve(dir, file);
+              fs.stat(file, function(err, stat) {
+                if (stat && stat.isDirectory()) {
+                } else {
+                  results.push(file);
+                  if (!--pending) done(null, results);
+                }
+              });
+            });
+          });
+        };
         
-        res.render('build_server_request.ejs', {
+        walk(app.locals.project.users_directory + '/' + user, function(err, results) {
+          if (err) 
+            console.error(err);
+            return;
+          
+          res.render('build_server_request.ejs', {
             user : user,
-            domain_name : domain_name
+            domain_name : domain_name,
+            builded_packages : results
+          });
         });
+        
     });
     
     // REMOVE DOMAIN 

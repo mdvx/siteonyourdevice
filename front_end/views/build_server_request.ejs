@@ -193,7 +193,7 @@
             </div>
             <div>
                 <label>
-                Port: <input type="number" min="1024" max="65535" name="Port" class="form-control" id="localhost_port" value=80>
+                Port: <input type="number" min="1024" max="65535" name="Port" class="form-control" id="localhost_port" value=8080>
                 </label>
             </div>
             <div>
@@ -254,6 +254,13 @@
           </div>
       </div>
   </div>
+  
+  <% if (builded_packages.length > 0) { %>
+      <h2>Ready to use builds:</h2>
+      <% for (var i = 0; i < builded_packages.length; ++i) { %>
+        <a href="<%= builded_packages[i] %>"><%= builded_packages[i] %></a>
+      <% } %>
+  <% } %> 
 </body>
 
 </html>
