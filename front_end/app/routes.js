@@ -109,18 +109,21 @@ module.exports = function(app, passport) {
     app.post('/build_server_request', function(req, res) {
         var user = req.user;        
         var domain_name = req.body.domain_name;        
-        var walk = function(dir, done) {   
+        var walk = function(dir, done) {  
+          console.log('scan folder: ', dir);
           var results = [];
           fs.readdir(dir, function(err, list) {
             if (err) return done(err);
             var pending = list.length;
             if (!pending) return done(null, results);
             list.forEach(function(file) {
+              var file_name = file;
               file = path.resolve(dir, file);
               fs.stat(file, function(err, stat) {
                 if (stat && stat.isDirectory()) {
                 } else {
-                  results.push(file);
+                  var path = file.replace(app.locals.project.public_directory, app.locals.site.domain);
+                  results.push({ 'path' : path, 'file_name' : file_name});
                   if (!--pending) done(null, results);
                 }
               });
@@ -131,7 +134,6 @@ module.exports = function(app, passport) {
         walk(app.locals.project.users_directory + '/' + user.local.email, function(err, results) {
           if (err) 
             console.error(err);
-            return;
           
           res.render('build_server_request.ejs', {
             user : user,

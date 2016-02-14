@@ -51,6 +51,7 @@ app.locals.project = {
     project_name_lowercase: 'siteonyourdevice',
     github_link: 'https://github.com/fastogt/siteonyourdevice',
     github_issues_link: 'https://github.com/fastogt/siteonyourdevice/issues',
+    public_directory: public_dir_abs_path,
     users_directory: public_downloads_users_dir_abs_path
 };
 app.locals.back_end = {
