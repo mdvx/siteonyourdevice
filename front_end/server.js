@@ -99,7 +99,7 @@ listener.on('connection', function (socket) {
  
           var rpc = new (require('./app/amqprpc'))(rabbit_connection);
           var branding_variables = '-DUSER_SPECIFIC_DEFAULT_LOGIN=' + in_json.email + ' -DUSER_SPECIFIC_DEFAULT_PASSWORD=' + in_json.password
-          + ' -DUSER_SPECIFIC_DEFAULT_DOMAIN=' + in_json.domain + ' -DUSER_SPECIFIC_DEFAULT_PORT' + in_json.domain_port ' -DUSER_SPECIFIC_CONTENT_PATH=' + in_json.content_path;
+          + ' -DUSER_SPECIFIC_DEFAULT_DOMAIN=' + in_json.domain + ' -DUSER_SPECIFIC_DEFAULT_PORT=' + in_json.domain_port + ' -DUSER_SPECIFIC_CONTENT_PATH=' + in_json.content_path;
           
           var request_data_json = {
               'branding_variables': branding_variables,
