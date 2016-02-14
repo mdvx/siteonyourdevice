@@ -38,7 +38,6 @@
             function send_build_request(user, password, domain, domain_port, platform, private_site, external_host, server_type, content_path, package_type, bit) { 
               var out_request = "user: " + user + "password: " + password + "domain: " + domain + "platform: " + platform + "private_site: " + private_site +
                                 "external_host: " + external_host + "server_type: " + server_type + "content_path: " + content_path + "package_type: " + package_type + "bit: " + bit;
-              alert(out_request);
               var build_args = { "domain": domain, 
                              "domain_port": domain_port,
                              "platform": platform, 
@@ -52,7 +51,7 @@
                              "arch" : bit
                            };
               var msg = JSON.stringify(build_args);
-              //socket.emit('publish_rabbitmq', msg);
+              socket.emit('publish_rabbitmq', msg);
             }
             
             function send_build_request_local(user, password) {
