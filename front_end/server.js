@@ -124,7 +124,7 @@ listener.on('connection', function (socket) {
                 if(response.hasOwnProperty('error')){
                   socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': response.error });
                 } else {
-                  var public_path = response.body.replace(public_dir_abs_path, app.locals.site.domain);
+                  var public_path = response.body.replace(public_dir_abs_path, '');
                   socket.emit('message_rabbitmq', { 'email': in_json.email, 'body': public_path } );
                 }
               }

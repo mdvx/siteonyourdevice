@@ -122,7 +122,7 @@ module.exports = function(app, passport) {
               fs.stat(file, function(err, stat) {
                 if (stat && stat.isDirectory()) {
                 } else {
-                  var path = file.replace(app.locals.project.public_directory, app.locals.site.domain);
+                  var path = file.replace(app.locals.project.public_directory, '');
                   results.push({ 'path' : path, 'file_name' : file_name});
                   if (!--pending) done(null, results);
                 }
