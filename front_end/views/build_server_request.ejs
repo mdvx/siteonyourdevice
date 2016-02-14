@@ -33,6 +33,7 @@
               } else {
                 console.log('received', responce_json.body);
               }
+              $('#loading-indicator').hide();
             });
             
             function send_build_request(user, password, domain, domain_port, platform, private_site, external_host, server_type, content_path, package_type, bit) { 
@@ -52,6 +53,7 @@
                            };
               var msg = JSON.stringify(build_args);
               socket.emit('publish_rabbitmq', msg);
+              $('#loading-indicator').show();
             }
             
             function send_build_request_local(user, password) {
@@ -64,7 +66,7 @@
               var content_path = document.getElementById('localhost_content').value;
               var os_ctrl = $('input[name=os]:checked');
               var package_type = os_ctrl.attr('package_type');
-              var bit = os_ctrl.attr('bit');
+              var bit = parseInt(os_ctrl.attr('bit'));
               return send_build_request(user, password, domain, domain_port, platform, private_site, external_host, server_type, content_path, package_type, bit);
             }            
         </script>
@@ -211,7 +213,9 @@
       </div>
     </div>
   </div>
-
+  
+  <img src="/images/loading.gif" id="loading-indicator" style="display:none" />
+  
   <div id="myModal" class="modal fade">
       <div class="modal-dialog">
           <div class="modal-content">
@@ -224,7 +228,7 @@
               </div>
               <div class="modal-footer">
                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary" onclick="send_build_request_local('<%- user.local.email %>', '<%- user.local.password %>')">Start build</button>
+                  <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="send_build_request_local('<%- user.local.email %>', '<%- user.local.password %>')">Start build</button>
               </div>
           </div>
       </div>
