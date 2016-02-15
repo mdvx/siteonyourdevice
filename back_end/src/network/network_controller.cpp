@@ -342,15 +342,14 @@ void NetworkController::readConfig() {
 
   HttpConfig config;
   // default settings
-  config.local_host = common::net::hostAndPort(USER_SPECIFIC_DEFAULT_DOMAIN,
-                                               USER_SPECIFIC_DEFAULT_PORT);
-  config.content_path = fApp->appDir();
+  config.local_host = common::convertFromString<common::net::hostAndPort>(USER_SPECIFIC_DEFAULT_LOCAL_DOMAIN);
+  config.content_path = USER_SPECIFIC_CONTENT_PATH;
   config.login = USER_SPECIFIC_DEFAULT_LOGIN;
   config.password = USER_SPECIFIC_DEFAULT_PASSWORD;
   config.content_path = USER_SPECIFIC_CONTENT_PATH;
   config.is_private_site = USER_SPECIFIC_DEFAULT_PRIVATE_SITE;
-  config.external_host = common::net::hostAndPort("localhost", 80);
-  config.server_type = FASTO_SERVER;
+  config.external_host = common::convertFromString<common::net::hostAndPort>(USER_SPECIFIC_DEFAULT_EXTERNAL_DOMAIN);
+  config.server_type = static_cast<http_server_type>(USER_SPECIFIC_SERVER_TYPE);
 
   // try to parse settings file
   if (ini_parse(path, ini_handler_fasto, &config) < 0) {
