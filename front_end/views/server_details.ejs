@@ -9,8 +9,10 @@
         </style>
         
         <script src="scripts/script.js" type="text/javascript"></script>
-        <script src="<%= site.domain %>:<%= back_end.socketio_port %>/socket.io/socket.io.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script src="<%= site.domain%>:<%= back_end.socketio_port %>/socket.io/socket.io.js"></script>
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script>
             const GB = (1024*1024*1024)
             
@@ -18,13 +20,22 @@
             //var io = require('socket.io');
             var socket = io.connect('<%= site.domain %>:<%= back_end.socketio_port %>');
             
-            function set_settings_local(id, name) {
-              var content_path = $('#server_setting_content_path_label').val();
-              var private_site = $('#server_setting_private_site_label').html() == SERVER_SETTING_ACCSESS_SITE.PRIVATE;
-              var server_type = document.forms["server_type"]["server_type_local"].checked == true ? SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER : SERVER_SETTING_HTTP_SERVER_TYPE.EXTERNAL_SERVER;
+            function sync_server_config_local(id) {
+              var local_host = document.getElementById("localhost_host").value;
+              return sync_server_config(id, local_host, socket);
+            }
+            
+            function set_settings_local(id) {
+              var server_type = $('#connection_settings .active > a').attr('aria-controls') == "external" ? 1 : 0;
               
-              var external_host = $('#server_setting_ex_host_label').val();
-              var local_host = $('#server_setting_local_host_label').html();
+              var local_host = document.getElementById("localhost_host").value;
+              var local_port = document.getElementById("localhost_port").value;              
+              var content_path = document.getElementById('localhost_content').value;
+              
+              var external_host = document.getElementById('external_host_host').value; 
+              var external_port = document.getElementById('external_host_port').value;
+              
+              var private_site = document.getElementById('private_site').checked ? 1 : 0;
               
               var http_handlers_utls = [];              
               var urls_handlers_table = document.getElementById('urls_handlers_table');
@@ -43,14 +54,16 @@
               }
               
               var config = { "local_host": local_host, 
+                             "local_port": local_port, 
                              "content_path": content_path, 
                              "private_site": private_site, 
                              "external_host": external_host, 
+                             "external_port": external_port,
                              "server_type": server_type, 
                              "http_handlers_utls": http_handlers_utls, 
                              "http_server_sockets": http_server_sockets 
                            };
-              return set_server_config(id, name, "'" + JSON.stringify(config) + "'", socket);
+              return set_server_config(id, local_host, "'" + JSON.stringify(config) + "'", socket);
             }
             
             function setServerType(type) {
@@ -92,15 +105,7 @@
                     $('#os_label').html(SERVER_OS_DEFAULT_LABEL);
                     $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
                     $('#ram_label').html(SERVER_RAM_DEFAULT_LABEL);
-                    
-                    $('#server_setting_content_path_label').val(SERVER_SETTING_CONTENT_PATH_LABEL);
-                    $('#server_setting_private_site_label').html(SERVER_SETTING_ACCSESS_SITE.PUBLIC);
-                    
-                    //setServerType(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
-                    document.forms["server_type"]["server_type_local"].checked = true;
-                    $('#server_setting_ex_host_label').val(SERVER_SETTING_EXTERNAL_HOST_LABEL);
-                    $('#server_setting_local_host_label').html(SERVER_SETTING_LOCAL_HOST_LABEL);
-                    
+                                       
                     drawUrlHandlersTable([]);
                     drawSocketsPathTable([]);
                 }
@@ -139,25 +144,11 @@
                 } else if(is_config_command(msgObj)) {
                     if (is_ok) {
                         var config = JSON.parse(msgObj.args);
-                        $('#server_setting_content_path_label').val(config.content_path);
-                        $('#server_setting_private_site_label').html(config.private_site ? SERVER_SETTING_ACCSESS_SITE.PRIVATE : SERVER_SETTING_ACCSESS_SITE.PUBLIC);
-                        
-                        setServerType(config.server_type);
-                        $('#server_setting_ex_host_label').val(config.external_host);
-                        $('#server_setting_local_host_label').html(config.local_host);
                         
                         drawUrlHandlersTable(config.http_handlers_utls);
                         drawSocketsPathTable(config.http_server_sockets);
                         
-                    } else {
-                        $('#server_setting_content_path_label').val(SERVER_SETTING_CONTENT_PATH_LABEL);
-                        $('#server_setting_private_site_label').html(SERVER_SETTING_ACCSESS_SITE.PUBLIC);
-                        
-                        //setServerType(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
-                        document.forms["server_type"]["server_type_local"].checked = true;
-                        $('#server_setting_ex_host_label').val(SERVER_SETTING_EXTERNAL_HOST_LABEL);
-                        $('#server_setting_local_host_label').html(SERVER_SETTING_LOCAL_HOST_LABEL);
-                        
+                    } else {                        
                         drawUrlHandlersTable([]);
                         drawSocketsPathTable([]);
                     }
@@ -202,14 +193,6 @@
                 $('#os_label').html(SERVER_OS_DEFAULT_LABEL);
                 $('#cpu_label').html(SERVER_CPU_DEFAULT_LABEL);
                 $('#ram_label').html(SERVER_RAM_DEFAULT_LABEL);
-                
-                $('#server_setting_content_path_label').val(SERVER_SETTING_CONTENT_PATH_LABEL);
-                $('#server_setting_private_site_label').html(SERVER_SETTING_ACCSESS_SITE.PUBLIC);
-                
-                //setServerType(SERVER_SETTING_HTTP_SERVER_TYPE.LOCAL_SERVER);
-                document.forms["server_type"]["server_type_local"].checked = true;
-                $('#server_setting_ex_host_label').val(SERVER_SETTING_EXTERNAL_HOST_LABEL);
-                $('#server_setting_local_host_label').html(SERVER_SETTING_LOCAL_HOST_LABEL);
             }
         </script>
 
@@ -231,26 +214,49 @@
                 <div class="col-sm-8">
                     <div class="well">
                             <div class="row">
-                                <div class="col-sm-6">
-                                    <div>Server type:</div>
-                                    <form role="form" id="server_type">
-                                        <label class="radio-inline">
-                                            <input type="radio" name="server_t" id="server_type_local">Local
+                                <ul class="nav nav-tabs" role="tablist" id="connection_settings">
+                                  <li role="presentation" class="active">
+                                    <a href="#local" aria-controls="local" role="tab" data-toggle="tab">Local</a>
+                                  </li>
+                                  <li role="presentation">
+                                    <a href="#external" aria-controls="external" role="tab" data-toggle="tab">External</a>
+                                  </li>
+                                </ul>
+                                <!-- Tab panes -->
+                                <div class="tab-content">
+                                  <p>&nbsp;</p>
+                                  <div role="tabpane2" class="tab-pane form-inline active" id="local">
+                                    <div>
+                                      <label>
+                                      Host: <input type="text" disabled name="Host" class="form-control" id="localhost_host" value='<%- domain_name %>'>
+                                      </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                        Port: <input type="number" min="1024" max="65535" name="Port" class="form-control" id="localhost_port" value=8080>
                                         </label>
-                                        <label class="radio-inline">
-                                            <input type="radio" name="server_t" id="server_type_external">External
+                                    </div>
+                                    <div>
+                                        <label>
+                                        Conten-path: <input type="text" name="Conten-path" class="form-control" id="localhost_content" value="content">
                                         </label>
-                                    </form>
-                                    <div>Private site: <label id="server_setting_private_site_label"></label></div>
-                                </div>
-                                
-                                <div class="col-sm-6">
-                                    External server: <input id="server_setting_ex_host_label"></input><br>
-                                    
-                                    Local server: <label id="server_setting_local_host_label"></label><br>
-                                    Content path: <input id="server_setting_content_path_label"></input>
+                                    </div>
+                                  </div>
+                                  <div role="tabpane2" class="tab-pane form-inline" id="external">
+                                    <div>
+                                      <label> 
+                                      Host: <input type="text" name="Host-ex" class="form-control" id="external_host_host" value="localhost">
+                                      </label>
+                                    </div>
+                                    <div>
+                                      <label>
+                                      Port: <input type="number" min="1024" max="65535" name="Port-ex" class="form-control" id="external_host_port" value=80>
+                                      </label>
+                                    </div>          
+                                  </div>
                                 </div>
                             </div>
+                            
                             <div>
                                 Urls handlers:
                                 <table class="table" id="urls_handlers_table">
@@ -278,8 +284,8 @@
                                 </table>
                             </div>
                     </div>
-                    <button id="get_config_button" disabled onclick="sync_server_config('<%- user._id %>', '<%- domain_name %>', socket)">Get settings</button>
-                    <button id="set_config_button" disabled onclick="set_settings_local('<%- user._id %>', '<%- domain_name %>')">Apply settings</button>
+                    <button id="get_config_button" disabled onclick="sync_server_config_local('<%- user._id %>')">Get settings</button>
+                    <button id="set_config_button" disabled onclick="set_settings_local('<%- user._id %>')">Apply settings</button>
                 </div>
             </div>
         </div>
