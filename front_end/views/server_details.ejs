@@ -32,8 +32,8 @@
               var local_port = document.getElementById("localhost_port").value;              
               var content_path = document.getElementById('localhost_content').value;
               
-              var external_host = document.getElementById('external_host_host').value; 
-              var external_port = document.getElementById('external_host_port').value;
+              var external_host = document.getElementById('external_host').value; 
+              var external_port = document.getElementById('external_port').value;
               
               var private_site = document.getElementById('private_site').checked ? 1 : 0;
               
@@ -142,6 +142,22 @@
                 } else if(is_config_command(msgObj)) {
                     if (is_ok) {
                         var config = JSON.parse(msgObj.args);
+                        var local_host_splited = config.local_host.split(':');
+                        $('#local_host').val(local_host_splited[0]);
+                        $('#localhost_port').val(local_host_splited[1]);
+                        $('#localhost_content').val(config.content_path);
+                        
+                        var external_host_splited = config.external_host.split(':');
+                        $('#external_host').val(external_host_splited[0]); 
+                        $('#external_port').val(external_host_splited[1]);
+                        
+                        $('#private_site').prop('checked', config.private_site);
+                        
+                        if (config.server_type == 0) {
+                          $('#connection_settings a[href="#local"]').tab('show');
+                        } else {
+                          $('#connection_settings a[href="#external"]').tab('show');
+                        }                        
                         
                         drawUrlHandlersTable(config.http_handlers_utls);
                         drawSocketsPathTable(config.http_server_sockets);
@@ -243,16 +259,22 @@
                                   <div role="tabpane2" class="tab-pane form-inline" id="external">
                                     <div>
                                       <label> 
-                                      Host: <input type="text" name="Host-ex" class="form-control" id="external_host_host" value="localhost">
+                                      Host: <input type="text" name="Host-ex" class="form-control" id="external_host" value="localhost">
                                       </label>
                                     </div>
                                     <div>
                                       <label>
-                                      Port: <input type="number" min="1024" max="65535" name="Port-ex" class="form-control" id="external_host_port" value=80>
+                                      Port: <input type="number" min="1024" max="65535" name="Port-ex" class="form-control" id="external_port" value=80>
                                       </label>
                                     </div>          
                                   </div>
                                 </div>
+                            </div>
+                            
+                            <div>
+                              <label>
+                                <input type="checkbox" id="private_site"> Private site
+                              </<label>
                             </div>
                             
                             <div>
