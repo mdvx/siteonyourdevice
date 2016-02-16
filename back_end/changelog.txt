@@ -1,4 +1,10 @@
+0.5.0 /
+[Alexandr Topilski]
+- [server] Build individual packages
+- [client] Stable json change config format 
+
 0.4.0 / January 27, 2016
+[Alexandr Topilski]
 - [client] Change server settings remotely
 - [client] Remove all gui clients
 
