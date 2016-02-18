@@ -21,7 +21,7 @@
 // [-c] config path [-d] run as daemon
 
 int main(int argc, char *argv[]) {
-    fasto::siteonyourdevice::application::FastoApplication app(argc, argv);
-    int res = app.exec();
-    return res;
+  fasto::siteonyourdevice::application::FastoApplication app(argc, argv);
+  int res = app.exec();
+  return res;
 }
