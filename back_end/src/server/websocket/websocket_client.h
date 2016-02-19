@@ -26,7 +26,7 @@ namespace server {
 namespace websocket {
 
 class WebSocketClientHost
-        : public http::Http2Client {
+  : public http::Http2Client {
  public:
   WebSocketClientHost(tcp::ITcpLoop* server, const common::net::socket_info& info);
 

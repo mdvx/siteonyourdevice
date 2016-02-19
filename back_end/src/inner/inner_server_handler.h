@@ -31,10 +31,10 @@ namespace siteonyourdevice {
 namespace inner {
 
 class InnerServerHandler
-        : public InnerServerCommandSeqParser, public tcp::ITcpLoopObserver  {
+  : public InnerServerCommandSeqParser, public tcp::ITcpLoopObserver  {
  public:
   enum {
-      ping_timeout_server = 30  // sec
+    ping_timeout_server = 30  // sec
   };
 
   explicit InnerServerHandler(const common::net::hostAndPort& innerHost, const HttpConfig& config);

@@ -67,7 +67,7 @@ namespace siteonyourdevice {
 namespace tcp {
 
 class LoopTimer
-        : public common::patterns::id_counter<LoopTimer, timer_id_type> {
+  : public common::patterns::id_counter<LoopTimer, timer_id_type> {
  public:
   explicit LoopTimer(ITcpLoop * server)
     : server_(server), timer_((struct ev_timer*)calloc(1, sizeof(struct ev_timer))) {
@@ -115,20 +115,18 @@ void ITcpLoop::unregisterClient(TcpClient * client) {
   loop_->stop_io(client->read_write_io_);
 
   if (observer_) {
-      observer_->moved(client);
+    observer_->moved(client);
   }
 
   client->server_ = NULL;
   clients_.erase(std::remove(clients_.begin(), clients_.end(), client), clients_.end());
-  DEBUG_MSG_FORMAT<512>(common::logging::L_INFO,
-                        "Successfully unregister client[%s], "
-                        "from server[%s], %" PRIuS " client(s) connected.",
+  DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "Successfully unregister client[%s], from server[%s], %" PRIuS " client(s) connected.",
                         client->formatedName(), formatedName(), clients_.size());
 }
 
 void ITcpLoop::registerClient(TcpClient * client) {
   if (client->server()) {
-      CHECK(client->server() == this);
+    CHECK(client->server() == this);
   }
 
   // Initialize and start watcher to read client requests
@@ -136,14 +134,12 @@ void ITcpLoop::registerClient(TcpClient * client) {
   loop_->start_io(client->read_write_io_);
 
   if (observer_) {
-      observer_->accepted(client);
+    observer_->accepted(client);
   }
 
   client->server_ = this;
   clients_.push_back(client);
-  DEBUG_MSG_FORMAT<512>(common::logging::L_INFO,
-                        "Successfully connected with client[%s], "
-                        "from server[%s], %" PRIuS " client(s) connected.",
+  DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "Successfully connected with client[%s], from server[%s], %" PRIuS " client(s) connected.",
                         client->formatedName(), formatedName(), clients_.size());
 }
 
@@ -156,8 +152,7 @@ void ITcpLoop::closeClient(TcpClient *client) {
   }
   clients_.erase(std::remove(clients_.begin(), clients_.end(), client), clients_.end());
   DEBUG_MSG_FORMAT<512>(common::logging::L_INFO,
-                        "Successfully disconnected client[%s], "
-                        "from server[%s], %" PRIuS " client(s) connected.",
+                        "Successfully disconnected client[%s], from server[%s], %" PRIuS " client(s) connected.",
                         client->formatedName(), formatedName(), clients_.size());
 }
 
@@ -171,12 +166,12 @@ timer_id_type ITcpLoop::createTimer(double sec, double repeat) {
 
 void ITcpLoop::removeTimer(timer_id_type id) {
   for (std::vector<LoopTimer *>::iterator it = timers_.begin(); it != timers_.end(); ++it) {
-      LoopTimer * timer = *it;
-      if (timer->id() == id) {
-        timers_.erase(it);
-        delete timer;
-        return;
-      }
+    LoopTimer * timer = *it;
+    if (timer->id() == id) {
+      timers_.erase(it);
+      delete timer;
+      return;
+    }
   }
 }
 
@@ -194,9 +189,9 @@ bool ITcpLoop::isLoopThread() const {
 
 void ITcpLoop::changeFlags(TcpClient *client) {
   if (client->flags() != client->read_write_io_->events) {
-      loop_->stop_io(client->read_write_io_);
-      ev_io_set(client->read_write_io_, client->fd(), client->flags());
-      loop_->start_io(client->read_write_io_);
+    loop_->stop_io(client->read_write_io_);
+    ev_io_set(client->read_write_io_, client->fd(), client->flags());
+    loop_->start_io(client->read_write_io_);
   }
 }
 
@@ -303,9 +298,8 @@ void ITcpLoop::stoped(LibEvLoop* loop) {
 void ITcpLoop::postLooped(LibEvLoop* loop) {
   {
     lock_t loc(g_exists_loops_mutex_);
-    g_exists_loops_.erase(
-          std::remove(g_exists_loops_.begin(), g_exists_loops_.end(), this),
-          g_exists_loops_.end());
+    g_exists_loops_.erase(std::remove(g_exists_loops_.begin(), g_exists_loops_.end(), this),
+                          g_exists_loops_.end());
   }
 
   if (observer_) {

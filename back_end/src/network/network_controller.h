@@ -37,7 +37,7 @@ namespace http {
 namespace network {
 
 class NetworkController
-    : private ILoopThreadController {
+  : private ILoopThreadController {
  public:
   NetworkController(int argc, char *argv[]);
   ~NetworkController();

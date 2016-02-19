@@ -91,27 +91,27 @@ template<cmd_id_type cmd_id>
 class InnerCmd {
  public:
   InnerCmd(cmd_seq_type id, const std::string& cmd)
-      : id_(id), cmd_(cmd) {
+    : id_(id), cmd_(cmd) {
   }
 
   static cmd_id_type type() {
-      return cmd_id;
+    return cmd_id;
   }
 
   cmd_seq_type id() const {
-      return id_;
+    return id_;
   }
 
   const std::string& cmd() const {
-      return cmd_;
+    return cmd_;
   }
 
   const char * data() const {
-      return cmd_.c_str();
+    return cmd_.c_str();
   }
 
   size_t size() const {
-      return cmd_.size();
+    return cmd_.size();
   }
 
  private:

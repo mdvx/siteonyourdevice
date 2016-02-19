@@ -42,7 +42,7 @@ class TcpClient;
 class LoopTimer;
 
 class ITcpLoop
-        : public EvLoopObserver, common::IMetaClassInfo {
+  : public EvLoopObserver, common::IMetaClassInfo {
  public:
   explicit ITcpLoop(ITcpLoopObserver* observer = NULL);
   virtual ~ITcpLoop();
@@ -51,14 +51,14 @@ class ITcpLoop
   virtual void stop();
 
   void registerClient(const common::net::socket_info& info);
-  void registerClient(TcpClient * client);
-  void unregisterClient(TcpClient * client);
-  virtual void closeClient(TcpClient *client);
+  void registerClient(TcpClient* client);
+  void unregisterClient(TcpClient* client);
+  virtual void closeClient(TcpClient* client);
 
   timer_id_type createTimer(double sec, double repeat);
   void removeTimer(timer_id_type id);
 
-  void changeFlags(TcpClient *client);
+  void changeFlags(TcpClient* client);
 
   common::patterns::id_counter<ITcpLoop>::type_t id() const;
 
@@ -77,7 +77,7 @@ class ITcpLoop
   static ITcpLoop* findExistLoopByPredicate(std::function<bool(ITcpLoop*)> pred);
 
  protected:
-  virtual TcpClient * createClient(const common::net::socket_info& info) = 0;
+  virtual TcpClient* createClient(const common::net::socket_info& info) = 0;
 
   virtual void preLooped(LibEvLoop* loop);
   virtual void stoped(LibEvLoop* loop);
@@ -116,7 +116,7 @@ class ITcpLoopObserver {
 };
 
 class TcpServer
-        : public ITcpLoop {
+  : public ITcpLoop {
  public:
   explicit TcpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer = NULL);
   virtual ~TcpServer();
@@ -130,7 +130,7 @@ class TcpServer
   static ITcpLoop *findExistServerByHost(const common::net::hostAndPort& host);
 
  private:
-  TcpClient * createClient(const common::net::socket_info& info);
+  TcpClient* createClient(const common::net::socket_info& info);
   virtual void preLooped(LibEvLoop* loop);
   virtual void postLooped(LibEvLoop* loop);
 
@@ -141,7 +141,7 @@ class TcpServer
   common::Error accept(common::net::socket_info* info) WARN_UNUSED_RESULT;
 
   common::net::ServerSocketTcp sock_;
-  ev_io * accept_io_;
+  ev_io* accept_io_;
 };
 
 }  // namespace tcp

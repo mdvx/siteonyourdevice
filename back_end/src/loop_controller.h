@@ -38,12 +38,12 @@ class ILoopController {
   void stop();
 
  protected:
-  tcp::ITcpLoop * loop_;
-  tcp::ITcpLoopObserver * handler_;
+  tcp::ITcpLoop* loop_;
+  tcp::ITcpLoopObserver* handler_;
 
  private:
-  virtual tcp::ITcpLoopObserver * createHandler() = 0;
-  virtual tcp::ITcpLoop * createServer(tcp::ITcpLoopObserver * handler) = 0;
+  virtual tcp::ITcpLoopObserver* createHandler() = 0;
+  virtual tcp::ITcpLoop* createServer(tcp::ITcpLoopObserver* handler) = 0;
   virtual void started() = 0;
   virtual void stoped() = 0;
 };
@@ -59,8 +59,8 @@ class ILoopThreadController
  private:
   using ILoopController::exec;
 
-  virtual tcp::ITcpLoopObserver * createHandler() = 0;
-  virtual tcp::ITcpLoop * createServer(tcp::ITcpLoopObserver * handler) = 0;
+  virtual tcp::ITcpLoopObserver* createHandler() = 0;
+  virtual tcp::ITcpLoop* createServer(tcp::ITcpLoopObserver* handler) = 0;
 
   virtual void started();
   virtual void stoped();

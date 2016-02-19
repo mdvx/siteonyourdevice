@@ -37,14 +37,14 @@ int ILoopController::exec() {
 
   handler_ = createHandler();
   if (!handler_) {
-      return EXIT_FAILURE;
+    return EXIT_FAILURE;
   }
 
   loop_ = createServer(handler_);
   if (!loop_) {
-      delete handler_;
-      handler_ = NULL;
-      return EXIT_FAILURE;
+    delete handler_;
+    handler_ = NULL;
+    return EXIT_FAILURE;
   }
 
   return loop_->exec();
@@ -56,7 +56,7 @@ void ILoopController::start() {
 
 void ILoopController::stop() {
   if (loop_) {
-      loop_->stop();
+    loop_->stop();
   }
 
   stoped();

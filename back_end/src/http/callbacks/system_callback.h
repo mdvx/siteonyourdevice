@@ -34,7 +34,7 @@ enum HSCTypes {
 const std::string HSystemCallbackTypes[] = { "shutdown", "logout", "reboot" };
 
 class HttpSystemCallback
-        : public HttpCallbackUrl {
+  : public HttpCallbackUrl {
  public:
   HttpSystemCallback();
   virtual bool handleRequest(http::HttpClient* hclient, const char* extra_header,
@@ -43,7 +43,7 @@ class HttpSystemCallback
 };
 
 class HttpSystemShutdownCallback
-        : public HttpCallbackUrl {
+  : public HttpCallbackUrl {
  public:
   explicit HttpSystemShutdownCallback(HSCTypes type);
   virtual bool handleRequest(http::HttpClient* hclient, const char* extra_header,

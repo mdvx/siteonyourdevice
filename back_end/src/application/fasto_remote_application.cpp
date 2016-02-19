@@ -32,8 +32,8 @@ namespace siteonyourdevice {
 namespace application {
 
 FastoRemoteApplication::FastoRemoteApplication(int argc, char *argv[])
-    : IFastoApplicationImpl(argc, argv), controller_(NULL), network_handler_(NULL),
-    thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>()) {
+  : IFastoApplicationImpl(argc, argv), controller_(NULL), network_handler_(NULL),
+  thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>()) {
 }
 
 FastoRemoteApplication::~FastoRemoteApplication() {

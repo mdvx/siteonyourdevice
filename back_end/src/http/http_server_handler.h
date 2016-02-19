@@ -44,7 +44,7 @@ class IHttpAuthObserver {
 };
 
 class HttpServerHandler
-        : public tcp::ITcpLoopObserver {
+  : public tcp::ITcpLoopObserver {
  public:
   typedef common::shared_ptr<IHttpCallback> http_callback_t;
   typedef std::map<std::string, http_callback_t> http_callbacks_t;
@@ -93,7 +93,7 @@ class HttpServerHandler
 };
 
 class Http2ServerHandler
-        : public HttpServerHandler {
+  : public HttpServerHandler {
  public:
   Http2ServerHandler(const HttpServerInfo &info, IHttpAuthObserver * observer);
 

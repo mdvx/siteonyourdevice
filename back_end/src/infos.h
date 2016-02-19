@@ -24,10 +24,11 @@
 
 namespace fasto {
 namespace siteonyourdevice {
+
 struct UserAuthInfo {
   UserAuthInfo();
   UserAuthInfo(const std::string& login, const std::string& password,
-             const common::net::hostAndPort& host);
+               const common::net::hostAndPort& host);
 
   bool isValid() const;
 
@@ -37,12 +38,11 @@ struct UserAuthInfo {
 };
 
 inline bool operator == (const UserAuthInfo& lhs, const UserAuthInfo& rhs) {
-    return lhs.login == rhs.login && lhs.password == rhs.password
-            && lhs.host == rhs.host;
+  return lhs.login == rhs.login && lhs.password == rhs.password && lhs.host == rhs.host;
 }
 
 inline bool operator !=(const UserAuthInfo& x, const UserAuthInfo& y) {
-    return !(x == y);
+  return !(x == y);
 }
 
 struct HttpServerInfo {
@@ -52,9 +52,12 @@ struct HttpServerInfo {
   std::string server_name;
   std::string server_url;
 };
+
 }  // namespace siteonyourdevice
 }  // namespace fasto
 
 namespace common {
+
 std::string convertToString(const fasto::siteonyourdevice::UserAuthInfo& uinfo);
+
 }  // namespace common

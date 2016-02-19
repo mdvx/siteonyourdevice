@@ -27,7 +27,7 @@ namespace siteonyourdevice {
 namespace inner {
 
 class InnerClient
-        : public tcp::TcpClient {
+  : public tcp::TcpClient {
  public:
   InnerClient(tcp::ITcpLoop *server, const common::net::socket_info& info);
   const char* className() const;

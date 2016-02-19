@@ -46,7 +46,7 @@ cmd_seq_type RequestCallback::request_id() const {
 
 void RequestCallback::execute(int argc, char *argv[]) {
   if (!cb_) {
-      return;
+    return;
   }
 
   return cb_(request_id_, argc, argv);

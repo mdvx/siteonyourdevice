@@ -52,7 +52,7 @@ class IHttpCallback {
 };
 
 class HttpCallbackUrl
-        : public IHttpCallback {
+  : public IHttpCallback {
  public:
   explicit HttpCallbackUrl(HCTypes type);
   HCTypes type() const;

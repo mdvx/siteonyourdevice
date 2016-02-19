@@ -32,7 +32,7 @@ namespace tcp {
 class ITcpLoop;
 
 class TcpClient
-        : common::IMetaClassInfo {
+  : common::IMetaClassInfo {
  public:
   typedef int flags_type;
   friend class ITcpLoop;

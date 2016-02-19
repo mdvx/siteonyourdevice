@@ -50,8 +50,8 @@ struct SendDataHelper {
   uint32_t all_size;
 };
 
-common::Error send_data_frame(const char* buff,
-                              uint32_t buff_len, void *user_data, uint32_t *processed) {
+common::Error send_data_frame(const char* buff, uint32_t buff_len, void *user_data,
+                              uint32_t *processed) {
   SendDataHelper *helper = reinterpret_cast<SendDataHelper*>(user_data);
   fasto::siteonyourdevice::http::StreamSPtr header_stream = helper->header_stream;
 
@@ -82,19 +82,19 @@ namespace siteonyourdevice {
 namespace http {
 
 HttpClient::HttpClient(tcp::ITcpLoop *server, const common::net::socket_info& info)
-    : TcpClient(server, info), isAuth_(false) {
+  : TcpClient(server, info), isAuth_(false) {
 }
 
 const char* HttpClient::className() const {
-    return "HttpClient";
+  return "HttpClient";
 }
 
 void HttpClient::setIsAuthenticated(bool auth) {
-    isAuth_ = auth;
+  isAuth_ = auth;
 }
 
 bool HttpClient::isAuthenticated() const {
-    return isAuth_;
+  return isAuth_;
 }
 
 common::Error HttpClient::send_ok(common::http::http_protocols protocol,
@@ -262,7 +262,7 @@ common::Error Http2Client::send_file_by_fd(common::http::http_protocols protocol
     return common::Error();
  }
 
- return HttpClient::send_file_by_fd(protocol, fdesc, size);
+  return HttpClient::send_file_by_fd(protocol, fdesc, size);
 }
 
 common::Error Http2Client::send_headers(common::http::http_protocols protocol,
@@ -319,16 +319,16 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
       nvmod.name = MAKE_BUFFER_TYPE("last-modified");
       nvmod.value = common::convertToBytes(timebuf);
       nvs.push_back(nvmod);
-   }
+    }
 
-   common::http2::http2_deflater hd;
-   common::buffer_type buff;
-   hd.http2_deflate_hd_bufs(buff, nvs);
+    common::http2::http2_deflater hd;
+    common::buffer_type buff;
+    hd.http2_deflate_hd_bufs(buff, nvs);
 
-   common::http2::frame_hdr hdr = common::http2::frame_headers::create_frame_header(common::http2::HTTP2_FLAG_END_HEADERS, header_stream->sid(), buff.size());
-   common::http2::frame_headers fhdr(hdr, buff);
+    common::http2::frame_hdr hdr = common::http2::frame_headers::create_frame_header(common::http2::HTTP2_FLAG_END_HEADERS, header_stream->sid(), buff.size());
+    common::http2::frame_headers fhdr(hdr, buff);
 
-   return header_stream->sendFrame(fhdr);
+    return header_stream->sendFrame(fhdr);
   }
 
   return HttpClient::send_headers(protocol, status, extra_header,

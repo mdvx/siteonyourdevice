@@ -45,11 +45,11 @@ class LibEvLoop {
 
   void setObserver(EvLoopObserver* observer);
 
-  void start_io(ev_io *io);
-  void stop_io(ev_io *io);
+  void start_io(ev_io* io);
+  void stop_io(ev_io* io);
 
-  void start_timer(ev_timer * timer);
-  void stop_timer(ev_timer * timer);
+  void start_timer(ev_timer* timer);
+  void stop_timer(ev_timer* timer);
 
   void execInLoopThread(async_loop_exec_function_type async_cb);
 
@@ -62,10 +62,10 @@ class LibEvLoop {
   static void stop_cb(struct ev_loop* loop,
                       struct ev_async* watcher, int revents);
 
-  struct ev_loop * const loop_;
-  EvLoopObserver * observer_;
+  struct ev_loop* const loop_;
+  EvLoopObserver* observer_;
   common::thread::platform_threadid_type exec_id_;
-  ev_async * async_stop_;
+  ev_async* async_stop_;
 };
 
 }  // namespace siteonyourdevice

@@ -28,7 +28,7 @@ namespace siteonyourdevice {
 namespace network {
 
 class NetworkEventHandler::NetworkListener
-        : public common::IListener<NetworkEventTypes> {
+  : public common::IListener<NetworkEventTypes> {
   NetworkEventHandler* const app_;
  public:
   explicit NetworkListener(NetworkEventHandler* app)

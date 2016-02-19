@@ -33,7 +33,7 @@ typedef NetworkEventTraits::listener_t NetworkEventListener;
 
 template<NetworkEventTypes event_t, typename inf_t>
 class NetworkEventBaseInfo
-        : public common::Event<NetworkEventTypes, event_t> {
+  : public common::Event<NetworkEventTypes, event_t> {
  public:
   typedef inf_t info_t;
   typedef common::Event<NetworkEventTypes, event_t> base_class_t;
@@ -53,7 +53,7 @@ class NetworkEventBaseInfo
 
 template<NetworkEventTypes event_t>
 class NetworkEventBaseInfo<event_t, void>
-        : public common::Event<NetworkEventTypes, event_t> {
+  : public common::Event<NetworkEventTypes, event_t> {
  public:
   typedef void info_t;
   typedef common::Event<NetworkEventTypes, event_t> base_class_t;

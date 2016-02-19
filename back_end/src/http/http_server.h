@@ -25,7 +25,7 @@ namespace siteonyourdevice {
 namespace http {
 
 class HttpServer
-        : public tcp::TcpServer {
+  : public tcp::TcpServer {
  public:
   HttpServer(const common::net::hostAndPort& host, tcp::ITcpLoopObserver *observer);
   ~HttpServer();
@@ -37,7 +37,7 @@ class HttpServer
 };
 
 class Http2Server
-        : public HttpServer {
+  : public HttpServer {
  public:
   Http2Server(const common::net::hostAndPort& host, tcp::ITcpLoopObserver *observer);
 

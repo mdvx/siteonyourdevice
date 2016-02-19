@@ -48,11 +48,11 @@ class InnerServerCommandSeqParser {
 
   template<typename... Args>
   cmd_request_t make_request(const char* cmd_fmt, Args... args) {
-      char buff[MAX_COMMAND_SIZE] = {0};
-      cmd_seq_type id = next_id();
-      int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, REQUEST_COMMAND, id, args...);
-      CHECK_NE(res, -1);
-      return cmd_request_t(id, buff);
+    char buff[MAX_COMMAND_SIZE] = {0};
+    cmd_seq_type id = next_id();
+    int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, REQUEST_COMMAND, id, args...);
+    CHECK_NE(res, -1);
+    return cmd_request_t(id, buff);
   }
 
   void subscribeRequest(const RequestCallback& req);
@@ -62,18 +62,18 @@ class InnerServerCommandSeqParser {
 
   template<typename... Args>
   cmd_responce_t make_responce(cmd_seq_type id, const char* cmd_fmt, Args... args) {
-      char buff[MAX_COMMAND_SIZE] = {0};
-      int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, RESPONCE_COMMAND, id, args...);
-      CHECK_NE(res, -1);
-      return cmd_responce_t(id, buff);
+    char buff[MAX_COMMAND_SIZE] = {0};
+    int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, RESPONCE_COMMAND, id, args...);
+    CHECK_NE(res, -1);
+    return cmd_responce_t(id, buff);
   }
 
   template<typename... Args>
   cmd_approve_t make_approve_responce(cmd_seq_type id, const char* cmd_fmt, Args... args) {
-      char buff[MAX_COMMAND_SIZE] = {0};
-      int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, APPROVE_COMMAND, id, args...);
-      CHECK_NE(res, -1);
-      return cmd_approve_t(id, buff);
+    char buff[MAX_COMMAND_SIZE] = {0};
+    int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, APPROVE_COMMAND, id, args...);
+    CHECK_NE(res, -1);
+    return cmd_approve_t(id, buff);
   }
 
  private:

@@ -50,103 +50,96 @@ enum wsFrameType {  // errors starting from 0xF0
   WS_CLOSING_FRAME = 0x08
 };
 
-size_t getPayloadLength(const uint8_t *inputFrame,
-                        size_t inputLength, uint8_t *payloadFieldExtraBytes,
-                        enum wsFrameType *frameType) {
+size_t getPayloadLength(const uint8_t* inputFrame,
+                        size_t inputLength, uint8_t* payloadFieldExtraBytes,
+                        enum wsFrameType* frameType) {
   size_t payloadLength = inputFrame[1] & 0x7F;
   *payloadFieldExtraBytes = 0;
-  if ((payloadLength == 0x7E && inputLength < 4)
-          || (payloadLength == 0x7F && inputLength < 10)) {
-      *frameType = WS_INCOMPLETE_FRAME;
-      return 0;
+  if ((payloadLength == 0x7E && inputLength < 4) || (payloadLength == 0x7F && inputLength < 10)) {
+    *frameType = WS_INCOMPLETE_FRAME;
+    return 0;
   }
   if (payloadLength == 0x7F && (inputFrame[3] & 0x80) != 0x0) {
-      *frameType = WS_ERROR_FRAME;
-      return 0;
+    *frameType = WS_ERROR_FRAME;
+    return 0;
   }
 
   if (payloadLength == 0x7E) {
-      uint16_t payloadLength16b = 0;
-      *payloadFieldExtraBytes = 2;
-      memcpy(&payloadLength16b, &inputFrame[2], *payloadFieldExtraBytes);
-      payloadLength = ntohs(payloadLength16b);
+    uint16_t payloadLength16b = 0;
+    *payloadFieldExtraBytes = 2;
+    memcpy(&payloadLength16b, &inputFrame[2], *payloadFieldExtraBytes);
+    payloadLength = ntohs(payloadLength16b);
   } else if (payloadLength == 0x7F) {
-      *frameType = WS_ERROR_FRAME;
-      return 0;
-      /* // implementation for 64bit systems
-      uint64_t payloadLength64b = 0;
-      *payloadFieldExtraBytes = 8;
-      memcpy(&payloadLength64b, &inputFrame[2], *payloadFieldExtraBytes);
-      if (payloadLength64b > SIZE_MAX) {
-      *frameType = WS_ERROR_FRAME;
-      return 0;
-      }
-      payloadLength = (size_t)ntohll(payloadLength64b);
-      */
+    *frameType = WS_ERROR_FRAME;
+    return 0;
+    /* // implementation for 64bit systems
+    uint64_t payloadLength64b = 0;
+    *payloadFieldExtraBytes = 8;
+    memcpy(&payloadLength64b, &inputFrame[2], *payloadFieldExtraBytes);
+    if (payloadLength64b > SIZE_MAX) {
+    *frameType = WS_ERROR_FRAME;
+    return 0;
+    }
+    payloadLength = (size_t)ntohll(payloadLength64b);
+    */
   }
   return payloadLength;
 }
 
-wsFrameType wsParseInputFrame(const uint8_t *inputFrame,
-                              size_t inputLength, uint8_t **dataPtr,
+wsFrameType wsParseInputFrame(const uint8_t *inputFrame, size_t inputLength, uint8_t **dataPtr,
                               size_t *dataLength) {
   DCHECK(inputFrame && inputLength);
   if (inputLength < 2)
-      return WS_INCOMPLETE_FRAME;
+    return WS_INCOMPLETE_FRAME;
   if ((inputFrame[0] & 0x70) != 0x0)  // checks extensions off
-      return WS_ERROR_FRAME;
+    return WS_ERROR_FRAME;
   if ((inputFrame[0] & 0x80) != 0x80)  // we haven't continuation frames
-      return WS_ERROR_FRAME;  // so, fin flag must be set
+    return WS_ERROR_FRAME;  // so, fin flag must be set
   if ((inputFrame[1] & 0x80) != 0x80)  // checks masking bit
-      return WS_ERROR_FRAME;
+    return WS_ERROR_FRAME;
   uint8_t opcode = inputFrame[0] & 0x0F;
-  if (opcode == WS_TEXT_FRAME ||
-      opcode == WS_BINARY_FRAME ||
-      opcode == WS_CLOSING_FRAME ||
-      opcode == WS_PING_FRAME ||
-      opcode == WS_PONG_FRAME) {
+  if (opcode == WS_TEXT_FRAME || opcode == WS_BINARY_FRAME || opcode == WS_CLOSING_FRAME ||
+      opcode == WS_PING_FRAME || opcode == WS_PONG_FRAME) {
       wsFrameType frameType = (wsFrameType)opcode;
       uint8_t payloadFieldExtraBytes = 0;
-      size_t payloadLength = getPayloadLength(inputFrame,
-                                              inputLength,
-                                              &payloadFieldExtraBytes,
+      size_t payloadLength = getPayloadLength(inputFrame, inputLength, &payloadFieldExtraBytes,
                                               &frameType);
-  if (payloadLength > 0) {
-    if (payloadLength + 6 + payloadFieldExtraBytes > inputLength)  // 4-maskingKey, 2-header
-      return WS_INCOMPLETE_FRAME;
+    if (payloadLength > 0) {
+      if (payloadLength + 6 + payloadFieldExtraBytes > inputLength)  // 4-maskingKey, 2-header
+        return WS_INCOMPLETE_FRAME;
 
-    uint8_t *maskingKey = const_cast<uint8_t *>(&inputFrame[2 + payloadFieldExtraBytes]);
-    DCHECK(payloadLength == inputLength - 6 - payloadFieldExtraBytes);
-    *dataPtr = const_cast<uint8_t *>(&inputFrame[2 + payloadFieldExtraBytes + 4]);
-    *dataLength = payloadLength;
-    for (size_t i = 0; i < *dataLength; i++) {
-      (*dataPtr)[i] = (*dataPtr)[i] ^ maskingKey[i%4];
+      uint8_t *maskingKey = const_cast<uint8_t *>(&inputFrame[2 + payloadFieldExtraBytes]);
+      DCHECK(payloadLength == inputLength - 6 - payloadFieldExtraBytes);
+      *dataPtr = const_cast<uint8_t *>(&inputFrame[2 + payloadFieldExtraBytes + 4]);
+      *dataLength = payloadLength;
+      for (size_t i = 0; i < *dataLength; i++) {
+        (*dataPtr)[i] = (*dataPtr)[i] ^ maskingKey[i%4];
+      }
     }
-  }
+
     return frameType;
   }
 
   return WS_ERROR_FRAME;
 }
 
-void wsMakeFrame(const uint8_t *data,
-                 size_t dataLength, uint8_t *outFrame,
-                 size_t *outLength, wsFrameType frameType) {
+void wsMakeFrame(const uint8_t* data,  size_t dataLength, uint8_t* outFrame, size_t* outLength,
+                 wsFrameType frameType) {
   DCHECK(outFrame && *outLength);
   DCHECK_LT(frameType, 0x10);
   if (dataLength > 0) {
-      DCHECK(data);
+    DCHECK(data);
   }
 
   outFrame[0] = 0x80 | frameType;
   if (dataLength <= 125) {
-      outFrame[1] = dataLength;
-      *outLength = 2;
+    outFrame[1] = dataLength;
+    *outLength = 2;
   } else if (dataLength <= 0xFFFF) {
-      outFrame[1] = 126;
-      uint16_t payloadLength16b = htons(dataLength);
-      memcpy(&outFrame[2], &payloadLength16b, 2);
-      *outLength = 4;
+    outFrame[1] = 126;
+    uint16_t payloadLength16b = htons(dataLength);
+    memcpy(&outFrame[2], &payloadLength16b, 2);
+    *outLength = 4;
   } else {
     DCHECK_LE(dataLength, 0xFFFF);
     /* implementation for 64bit systems
@@ -171,8 +164,8 @@ WebSocketServerHandler::WebSocketServerHandler(const HttpServerInfo &info)
   : Http2ServerHandler(info, NULL) {
 }
 
-void WebSocketServerHandler::processReceived(http::HttpClient *hclient,
-                                             const char* request, size_t req_len) {
+void WebSocketServerHandler::processReceived(http::HttpClient* hclient, const char* request,
+                                             size_t req_len) {
   uint8_t *data = NULL;
   size_t dataSize = 0;
   wsFrameType frame_type = wsParseInputFrame((const uint8_t *)request, req_len, &data, &dataSize);

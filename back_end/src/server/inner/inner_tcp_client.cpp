@@ -29,7 +29,7 @@
 namespace {
 
 class RelayHandler
-    : public fasto::siteonyourdevice::tcp::ITcpLoopObserver {
+  : public fasto::siteonyourdevice::tcp::ITcpLoopObserver {
   fasto::siteonyourdevice::tcp::ITcpLoop* server_;
 
   fasto::siteonyourdevice::tcp::TcpClient* client_primary_;
@@ -49,62 +49,62 @@ class RelayHandler
 
   void setClient(fasto::siteonyourdevice::tcp::TcpClient* client,
                  const common::buffer_type &request) {
-      if (client_primary_) {
-          NOTREACHED();
-          return;
+    if (client_primary_) {
+      NOTREACHED();
+      return;
+    }
+
+    client_primary_ = client;
+    client_primary_->setName("client");
+
+    auto cb = [this, request]() {
+      server_->registerClient(client_primary_);
+      if (!client_device_ || request.empty()) {
+        return;
       }
 
-      client_primary_ = client;
-      client_primary_->setName("client");
+      ssize_t nwrite = 0;
+      common::Error err = client_device_->write((const char*) request.data(),
+                                                request.size(), &nwrite);
+      if (err && err->isError()) {
+        DEBUG_MSG_ERROR(err);
+      }
+    };
 
-      auto cb = [this, request]() {
-          server_->registerClient(client_primary_);
-          if (!client_device_ || request.empty()) {
-              return;
-          }
-
-          ssize_t nwrite = 0;
-          common::Error err = client_device_->write((const char*) request.data(),
-                                                    request.size(), &nwrite);
-          if (err && err->isError()) {
-              DEBUG_MSG_ERROR(err);
-          }
-      };
-
-      server_->execInLoopThread(cb);
+    server_->execInLoopThread(cb);
   }
 
  private:
   void preLooped(fasto::siteonyourdevice::tcp::ITcpLoop* server) {
-      server_ = server;
+    server_ = server;
   }
 
   virtual void accepted(fasto::siteonyourdevice::tcp::TcpClient* client) {
-      if (client == client_primary_) {
-          return;
-      }
+    if (client == client_primary_) {
+      return;
+    }
 
-      if (!client_device_) {
-          client_device_ = client;
-          client_device_->setName("device");
+    if (!client_device_) {
+      client_device_ = client;
+      client_device_->setName("device");
 
-          setClient(request_.first, request_.second);
-      }
+      setClient(request_.first, request_.second);
+    }
   }
 
   virtual void moved(fasto::siteonyourdevice::tcp::TcpClient* client) {
   }
 
   virtual void closed(fasto::siteonyourdevice::tcp::TcpClient* client) {
-      if (client == client_primary_) {
-          client_primary_ = NULL;
-          return;
-      }
+    if (client == client_primary_) {
+      client_primary_ = NULL;
+      return;
+    }
 
-      if (client == client_device_) {
-          client_device_ = NULL;
-          return;
-      }
+    if (client == client_device_) {
+      client_device_ = NULL;
+      return;
+    }
   }
 
   virtual void timerEmited(fasto::siteonyourdevice::tcp::ITcpLoop* server,
@@ -112,35 +112,35 @@ class RelayHandler
   }
 
   void dataReceived(fasto::siteonyourdevice::tcp::TcpClient* client) {
-      char buff[BUF_SIZE] = {0};
-      ssize_t nread = 0;
-      common::Error err = client->read(buff, BUF_SIZE, &nread);
-      if ((err && err->isError()) || nread == 0) {
+    char buff[BUF_SIZE] = {0};
+    ssize_t nread = 0;
+    common::Error err = client->read(buff, BUF_SIZE, &nread);
+    if ((err && err->isError()) || nread == 0) {
+      client->close();
+      delete client;
+      return;
+    }
+
+    ssize_t nwrite = 0;
+    if (client == client_primary_) {
+      if (client_device_) {
+        err = client_device_->write(buff, nread, &nwrite);
+        if (err) {
+          DEBUG_MSG_ERROR(err);
+        }
+      }
+    } else if (client == client_device_) {
+      if (client_primary_) {
+        err = client_primary_->write(buff, nread, &nwrite);
+        if (err) {
+          DEBUG_MSG_ERROR(err);
           client->close();
           delete client;
-          return;
+        }
       }
-
-      ssize_t nwrite = 0;
-      if (client == client_primary_) {
-          if (client_device_) {
-              err = client_device_->write(buff, nread, &nwrite);
-              if (err) {
-                  DEBUG_MSG_ERROR(err);
-              }
-          }
-      } else if (client == client_device_) {
-          if (client_primary_) {
-              err = client_primary_->write(buff, nread, &nwrite);
-              if (err) {
-                  DEBUG_MSG_ERROR(err);
-                  client->close();
-                  delete client;
-              }
-          }
-      } else {
-          NOTREACHED();
-      }
+    } else {
+      NOTREACHED();
+    }
   }
 
   virtual void dataReadyToWrite(fasto::siteonyourdevice::tcp::TcpClient* client) {
@@ -156,43 +156,43 @@ class HttpRelayLoop
   HttpRelayLoop(fasto::siteonyourdevice::inner::InnerServerCommandSeqParser *handler,
                 fasto::siteonyourdevice::server::inner::InnerTcpServerClient *parent,
                 const request_t& request)
-      : IInnerRelayLoop(handler, parent, request) {
+    : IInnerRelayLoop(handler, parent, request) {
   }
 
  private:
   virtual fasto::siteonyourdevice::tcp::ITcpLoopObserver * createHandler() {
-      return new RelayHandler(request_);
+    return new RelayHandler(request_);
   }
 
 fasto::siteonyourdevice::tcp::ITcpLoop * createServer(fasto::siteonyourdevice::tcp::ITcpLoopObserver * handler) {
-    fasto::siteonyourdevice::tcp::TcpServer* serv = new fasto::siteonyourdevice::tcp::TcpServer(g_relay_server_host, handler);
-    serv->setName("http_proxy_relay_server");
+  fasto::siteonyourdevice::tcp::TcpServer* serv = new fasto::siteonyourdevice::tcp::TcpServer(g_relay_server_host, handler);
+  serv->setName("http_proxy_relay_server");
 
-    common::Error err = serv->bind();
-    if (err && err->isError()) {
-        DEBUG_MSG_ERROR(err);
-        delete serv;
-        return NULL;
-    }
+  common::Error err = serv->bind();
+  if (err && err->isError()) {
+    DEBUG_MSG_ERROR(err);
+    delete serv;
+    return NULL;
+  }
 
-    err = serv->listen(5);
-    if (err && err->isError()) {
-        DEBUG_MSG_ERROR(err);
-        delete serv;
-        return NULL;
-    }
+  err = serv->listen(5);
+  if (err && err->isError()) {
+    DEBUG_MSG_ERROR(err);
+    delete serv;
+    return NULL;
+  }
 
-    ssize_t nwrite = 0;
-    fasto::siteonyourdevice::cmd_request_t createConnection = ihandler_->make_request(SERVER_PLEASE_CONNECT_HTTP_COMMAND_REQ_1S,
-                                                                                      common::convertToString(serv->host()));
-    err = parent_->write(createConnection, &nwrite);  // inner command write
-    if (err && err->isError()) {;
-        DEBUG_MSG_ERROR(err);
-        delete serv;
-        return NULL;
-    }
+  ssize_t nwrite = 0;
+  fasto::siteonyourdevice::cmd_request_t createConnection = ihandler_->make_request(SERVER_PLEASE_CONNECT_HTTP_COMMAND_REQ_1S,
+                                                                                    common::convertToString(serv->host()));
+  err = parent_->write(createConnection, &nwrite);  // inner command write
+  if (err && err->isError()) {;
+    DEBUG_MSG_ERROR(err);
+    delete serv;
+    return NULL;
+  }
 
-    return serv;
+  return serv;
 }
 };
 
@@ -203,44 +203,44 @@ class WebSocketRelayLoop
   WebSocketRelayLoop(fasto::siteonyourdevice::inner::InnerServerCommandSeqParser *handler,
                      fasto::siteonyourdevice::server::inner::InnerTcpServerClient *parent,
                      const request_t& request, const common::net::hostAndPort& srcHost)
-      : IInnerRelayLoop(handler, parent, request), srcHost_(srcHost) {
+    : IInnerRelayLoop(handler, parent, request), srcHost_(srcHost) {
   }
 
  private:
   virtual fasto::siteonyourdevice::tcp::ITcpLoopObserver * createHandler() {
-      return new RelayHandler(request_);
+    return new RelayHandler(request_);
   }
 
   fasto::siteonyourdevice::tcp::ITcpLoop * createServer(fasto::siteonyourdevice::tcp::ITcpLoopObserver * handler) {
-      fasto::siteonyourdevice::tcp::TcpServer* serv = new fasto::siteonyourdevice::tcp::TcpServer(g_relay_server_host, handler);
-      serv->setName("websockets_proxy_relay_server");
+    fasto::siteonyourdevice::tcp::TcpServer* serv = new fasto::siteonyourdevice::tcp::TcpServer(g_relay_server_host, handler);
+    serv->setName("websockets_proxy_relay_server");
 
-      common::Error err = serv->bind();
-      if (err && err->isError()) {
-          DEBUG_MSG_ERROR(err);
-          delete serv;
-          return NULL;
-      }
+    common::Error err = serv->bind();
+    if (err && err->isError()) {
+      DEBUG_MSG_ERROR(err);
+      delete serv;
+      return NULL;
+    }
 
-      err = serv->listen(5);
-      if (err && err->isError()) {
-          DEBUG_MSG_ERROR(err);
-          delete serv;
-          return NULL;
-      }
+    err = serv->listen(5);
+    if (err && err->isError()) {
+      DEBUG_MSG_ERROR(err);
+      delete serv;
+      return NULL;
+    }
 
-      ssize_t nwrite = 0;
-      fasto::siteonyourdevice::cmd_request_t createConnection = ihandler_->make_request(SERVER_PLEASE_CONNECT_WEBSOCKET_COMMAND_REQ_2SS,
-                                                                                        common::convertToString(serv->host()),
-                                                                                        common::convertToString(srcHost_));
-      err = parent_->write(createConnection, &nwrite);  // inner command write
-      if (err && err->isError()) {;
-          DEBUG_MSG_ERROR(err);
-          delete serv;
-          return NULL;
-      }
+    ssize_t nwrite = 0;
+    fasto::siteonyourdevice::cmd_request_t createConnection = ihandler_->make_request(SERVER_PLEASE_CONNECT_WEBSOCKET_COMMAND_REQ_2SS,
+                                                                                      common::convertToString(serv->host()),
+                                                                                      common::convertToString(srcHost_));
+    err = parent_->write(createConnection, &nwrite);  // inner command write
+    if (err && err->isError()) {;
+      DEBUG_MSG_ERROR(err);
+      delete serv;
+      return NULL;
+    }
 
-      return serv;
+    return serv;
   }
 };
 }  // namespace
@@ -252,72 +252,72 @@ namespace inner {
 
 IInnerRelayLoop::IInnerRelayLoop(siteonyourdevice::inner::InnerServerCommandSeqParser *handler,
                                  InnerTcpServerClient *parent, const request_t &request)
-    : ILoopThreadController(), parent_(parent), ihandler_(handler), request_(request) {
+  : ILoopThreadController(), parent_(parent), ihandler_(handler), request_(request) {
 }
 
 bool IInnerRelayLoop::readyForRequest() const {
-    RelayHandler * hand = dynamic_cast<RelayHandler*>(handler_);
-    CHECK(hand);
+  RelayHandler * hand = dynamic_cast<RelayHandler*>(handler_);
+  CHECK(hand);
 
-    return hand->readyForRequest();
+  return hand->readyForRequest();
 }
 
 void IInnerRelayLoop::addRequest(const request_t& request) {
-    RelayHandler * hand = dynamic_cast<RelayHandler*>(handler_);
-    CHECK(hand);
+  RelayHandler * hand = dynamic_cast<RelayHandler*>(handler_);
+  CHECK(hand);
 
-    hand->setClient(request.first, request.second);
+  hand->setClient(request.first, request.second);
 }
 
 IInnerRelayLoop::~IInnerRelayLoop() {
-    stop();
-    join();
+  stop();
+  join();
 }
 
 InnerTcpServerClient::InnerTcpServerClient(tcp::TcpServer* server,
                                            const common::net::socket_info& info)
-    : InnerClient(server, info), hinfo_(), relays_http_(), relays_websockets_() {
+  : InnerClient(server, info), hinfo_(), relays_http_(), relays_websockets_() {
 }
 
 const char* InnerTcpServerClient::className() const {
-    return "InnerTcpServerClient";
+  return "InnerTcpServerClient";
 }
 
 void InnerTcpServerClient::addHttpRelayClient(InnerServerHandlerHost* handler,
                                         TcpClient *client, const common::buffer_type &request) {
-    for (size_t i = 0; i < relays_http_.size(); ++i) {
-        http_relay_loop_t loop = relays_http_[i];
-        if (loop->readyForRequest()) {
-            loop->addRequest(std::make_pair(client, request));
-            return;
-        }
+  for (size_t i = 0; i < relays_http_.size(); ++i) {
+    http_relay_loop_t loop = relays_http_[i];
+    if (loop->readyForRequest()) {
+      loop->addRequest(std::make_pair(client, request));
+      return;
     }
+  }
 
-    http_relay_loop_t tmp(new HttpRelayLoop(handler, this, std::make_pair(client, request)));
-    tmp->start();
+  http_relay_loop_t tmp(new HttpRelayLoop(handler, this, std::make_pair(client, request)));
+  tmp->start();
 
-    relays_http_.push_back(tmp);
+  relays_http_.push_back(tmp);
 }
 
 void InnerTcpServerClient::addWebsocketRelayClient(InnerServerHandlerHost* handler,
                                              TcpClient *client, const common::buffer_type& request,
                                              const common::net::hostAndPort& srcHost) {
-    websocket_relay_loop_t tmp(new WebSocketRelayLoop(handler, this,
-                                                      std::make_pair(client, request), srcHost));
-    tmp->start();
+  websocket_relay_loop_t tmp(new WebSocketRelayLoop(handler, this,
+                                                    std::make_pair(client, request), srcHost));
+  tmp->start();
 
-    relays_websockets_.push_back(tmp);
+  relays_websockets_.push_back(tmp);
 }
 
 InnerTcpServerClient::~InnerTcpServerClient() {
 }
 
 void InnerTcpServerClient::setServerHostInfo(const UserAuthInfo &info) {
-    hinfo_ = info;
+  hinfo_ = info;
 }
 
 UserAuthInfo InnerTcpServerClient::serverHostInfo() const {
-    return hinfo_;
+  return hinfo_;
 }
 
 }  // namespace inner

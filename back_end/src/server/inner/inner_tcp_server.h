@@ -35,8 +35,8 @@ class HttpServerHost;
 namespace inner {
 
 class InnerServerHandlerHost
-        : public fasto::siteonyourdevice::inner::InnerServerCommandSeqParser,
-        public tcp::ITcpLoopObserver {
+  : public fasto::siteonyourdevice::inner::InnerServerCommandSeqParser,
+    public tcp::ITcpLoopObserver {
  public:
   enum {
     ping_timeout_clients = 60  // sec
@@ -80,7 +80,6 @@ class InnerTcpServer
         : public tcp::TcpServer {
  public:
   InnerTcpServer(const common::net::hostAndPort& host, tcp::ITcpLoopObserver* observer);
-
   virtual const char* className() const;
 
  private:

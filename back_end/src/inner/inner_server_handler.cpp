@@ -42,7 +42,7 @@ namespace siteonyourdevice {
 namespace inner {
 
 InnerServerHandler::InnerServerHandler(const common::net::hostAndPort& innerHost,
-                                           const HttpConfig& config) :
+                                       const HttpConfig& config) :
   config_(config), inner_connection_(nullptr),
   ping_server_id_timer_(INVALID_TIMER_ID), innerHost_(innerHost) {
 }
@@ -72,11 +72,9 @@ void InnerServerHandler::preLooped(tcp::ITcpLoop* server){
 }
 
 void InnerServerHandler::accepted(tcp::TcpClient* client){
-
 }
 
 void InnerServerHandler::moved(tcp::TcpClient* client){
-
 }
 
 void InnerServerHandler::closed(tcp::TcpClient* client){
@@ -102,7 +100,6 @@ void InnerServerHandler::dataReceived(tcp::TcpClient* client){
 }
 
 void InnerServerHandler::dataReadyToWrite(tcp::TcpClient* client){
-
 }
 
 void InnerServerHandler::postLooped(tcp::ITcpLoop* server){

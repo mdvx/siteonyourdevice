@@ -26,7 +26,7 @@ namespace fasto {
 namespace siteonyourdevice {
 
 class HttpFileSystemCallback
-        : public HttpCallbackUrl {
+  : public HttpCallbackUrl {
  public:
   HttpFileSystemCallback();
   virtual bool handleRequest(http::HttpClient* hclient, const char* extra_header,

@@ -33,7 +33,7 @@ namespace siteonyourdevice {
 namespace http {
 
 class HttpClient
-        : public tcp::TcpClient {
+  : public tcp::TcpClient {
  public:
   HttpClient(tcp::ITcpLoop* server, const common::net::socket_info& info);
 
@@ -62,7 +62,7 @@ class HttpClient
 };
 
 class Http2Client
-        : public HttpClient {
+  : public HttpClient {
  public:
   typedef StreamSPtr stream_t;
   typedef std::vector<stream_t> streams_t;

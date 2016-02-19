@@ -29,15 +29,15 @@ namespace siteonyourdevice {
 namespace server {
 
 struct redis_configuration_t {
-    common::net::hostAndPort redis_host;
-    std::string redis_unix_socket;
+  common::net::hostAndPort redis_host;
+  std::string redis_unix_socket;
 };
 
 struct redis_sub_configuration_t
-        : public redis_configuration_t {
-    std::string channel_in;
-    std::string channel_out;
-    std::string channel_clients_state;
+  : public redis_configuration_t {
+  std::string channel_in;
+  std::string channel_out;
+  std::string channel_clients_state;
 };
 
 class RedisStorage {

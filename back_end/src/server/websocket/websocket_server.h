@@ -31,7 +31,7 @@ class HttpServerHost;
 namespace websocket {
 
 class WebSocketServerHost :
-        public http::Http2Server {
+  public http::Http2Server {
  public:
   WebSocketServerHost(const common::net::hostAndPort& host, tcp::ITcpLoopObserver *observer);
 
@@ -42,7 +42,7 @@ class WebSocketServerHost :
 };
 
 class WebSocketServerHandlerHost
-    : public http::Http2ServerHandler {
+  : public http::Http2ServerHandler {
  public:
   WebSocketServerHandlerHost(const HttpServerInfo & info, HttpServerHost * parent);
 

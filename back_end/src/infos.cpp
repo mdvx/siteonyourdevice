@@ -24,12 +24,12 @@
 
 namespace fasto {
 namespace siteonyourdevice {
+
 UserAuthInfo::UserAuthInfo()
-    : login(), password(), host() {
+  : login(), password(), host() {
 }
 
-UserAuthInfo::UserAuthInfo(const std::string& login,
-                           const std::string& password,
+UserAuthInfo::UserAuthInfo(const std::string& login, const std::string& password,
                            const common::net::hostAndPort& host)
   : login(login), password(password), host(host) {
 }
@@ -46,27 +46,26 @@ HttpServerInfo::HttpServerInfo(const std::string& server_name,
                                const std::string& server_url)
   : server_name(server_name), server_url(server_url) {
 }
+
 }  // namespace siteonyourdevice
 }  // namespace fasto
 
 namespace common {
+
 std::string convertToString(const fasto::siteonyourdevice::UserAuthInfo& uinfo) {
-  return common::MemSPrintf("%s:%s:%s",
-                            uinfo.login,
-                            uinfo.password,
-                            convertToString(uinfo.host));
+  return common::MemSPrintf("%s:%s:%s", uinfo.login, uinfo.password, convertToString(uinfo.host));
 }
 
 template<>
 fasto::siteonyourdevice::UserAuthInfo convertFromString(const std::string& uinfo_str) {
   size_t up = uinfo_str.find_first_of(':');
   if (up == std::string::npos) {
-      return fasto::siteonyourdevice::UserAuthInfo();
+    return fasto::siteonyourdevice::UserAuthInfo();
   }
 
   size_t ph = uinfo_str.find_first_of(':', up + 1);
   if (ph == std::string::npos) {
-      return fasto::siteonyourdevice::UserAuthInfo();
+    return fasto::siteonyourdevice::UserAuthInfo();
   }
 
   fasto::siteonyourdevice::UserAuthInfo uinfo;

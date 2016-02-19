@@ -27,7 +27,7 @@ namespace siteonyourdevice {
 namespace inner {
 
 class ProxyInnerServer
-        : public tcp::ITcpLoop {
+  : public tcp::ITcpLoop {
  public:
   explicit ProxyInnerServer(tcp::ITcpLoopObserver* observer);
   virtual const char* className() const;

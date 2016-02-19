@@ -41,7 +41,7 @@
 
 namespace {
 class WebSocketController
-        : public fasto::siteonyourdevice::ILoopThreadController {
+  : public fasto::siteonyourdevice::ILoopThreadController {
   const common::net::hostAndPort host_;
   const fasto::siteonyourdevice::HttpServerInfo info_;
  public:

@@ -50,7 +50,7 @@ FastoApplication::FastoApplication(int argc, char *argv[])
   : argc_(argc), argv_(argv), impl_(createImpl(argc, argv)) {
   CHECK(!self_);
   if (!self_) {
-      self_ = this;
+    self_ = this;
   }
 }
 

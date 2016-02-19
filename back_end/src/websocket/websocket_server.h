@@ -25,7 +25,7 @@ namespace siteonyourdevice {
 namespace websocket {
 
 class WebSocketServer
-        : public tcp::TcpServer {
+  : public tcp::TcpServer {
  public:
   explicit WebSocketServer(const common::net::hostAndPort& host,
                            tcp::ITcpLoopObserver* observer = NULL);

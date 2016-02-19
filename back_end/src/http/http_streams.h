@@ -57,7 +57,7 @@ class IStream {
 typedef common::shared_ptr<IStream> StreamSPtr;
 
 class HTTP2DataStream
-        : public IStream {
+  : public IStream {
  public:
   HTTP2DataStream(const common::net::socket_info& info, const common::http2::frame_base& frame);
 
@@ -68,7 +68,7 @@ class HTTP2DataStream
 typedef common::shared_ptr<HTTP2DataStream> HTTP2DataStreamSPtr;
 
 class HTTP2PriorityStream
-        : public IStream {
+  : public IStream {
  public:
   HTTP2PriorityStream(const common::net::socket_info& info, const common::http2::frame_base& frame);
   ~HTTP2PriorityStream();
@@ -80,7 +80,7 @@ class HTTP2PriorityStream
 typedef common::shared_ptr<HTTP2PriorityStream> HTTP2PriorityStreamSPtr;
 
 class HTTP2SettingsStream
-        : public IStream {
+  : public IStream {
  public:
   HTTP2SettingsStream(const common::net::socket_info& info, const common::http2::frame_base& frame);
   bool isNegotiated() const;
@@ -93,7 +93,7 @@ class HTTP2SettingsStream
 typedef common::shared_ptr<HTTP2SettingsStream> HTTP2SettingsStreamSPtr;
 
 class HTTP2HeadersStream
-        : public IStream {
+  : public IStream {
  public:
   HTTP2HeadersStream(const common::net::socket_info& info, const common::http2::frame_base& frame);
 
