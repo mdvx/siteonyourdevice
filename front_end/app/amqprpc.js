@@ -59,7 +59,6 @@ AmqpRpc.prototype.setupResponseQueue = function(next){
       //get the correlationId
       var correlationId = m.correlationId;
       var type = headers.type;
-      console.log('type', type);
               
       //is it a response to a pending request
       if(correlationId in self.requests){       
@@ -72,7 +71,7 @@ AmqpRpc.prototype.setupResponseQueue = function(next){
           delete self.requests[correlationId];
           //callback, no err
           entry.callback(null, message);
-        } else if (type == 'responce') {
+        } else if (type == 'status') {
           var entry = self.requests[correlationId];
           entry.status_callback(message);
         }
