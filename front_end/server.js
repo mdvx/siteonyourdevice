@@ -130,7 +130,12 @@ listener.on('connection', function (socket) {
                   socket.emit('message_rabbitmq', { 'email': in_json.email, 'body': public_path } );
                 }
               }
-          });
+          }, 
+          function status(responce) {
+            var responce_json = response;
+            console.log("response_status", responce_json);
+            socket.emit('status_rabbitmq', { 'email': in_json.email, 'progress': response.progress, 'message': response.status } );
+          } );
         });
     });
 });

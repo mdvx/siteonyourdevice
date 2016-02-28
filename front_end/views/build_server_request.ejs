@@ -44,13 +44,19 @@
 
               if (responce_json.hasOwnProperty('error')){
                 console.error(responce_json.error);
-                update_bar(100, "Failed");
               } else {
                 console.log('received', responce_json.body);
-                update_bar(100, "Succsess");
                 $('#package_link').attr("href", responce_json.body);
                 $('#package_link').show();
               }              
+            });
+            
+            socket.on('status_rabbitmq', function (responce_json) {
+              if (responce_json.email != '<%= user.local.email %>') {
+                return;
+              }
+
+              update_bar(responce_json.progress, responce_json.message);             
             });
             
             function send_build_request(user, password, domain_host, platform, private_site, external_host, server_type, content_path, package_type, bit) {

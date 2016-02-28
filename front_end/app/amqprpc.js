@@ -1,7 +1,7 @@
 var amqp = require('amqp')
 
-var TIMEOUT=5 * 60000; //time to wait for response in ms
-var CONTENT_TYPE='application/json';
+var TIMEOUT = 5 * 60000; //time to wait for response in ms
+var CONTENT_TYPE = 'application/json';
 
 exports = module.exports = AmqpRpc;
 
@@ -12,7 +12,7 @@ function AmqpRpc(connection){
   this.response_queue = false; //plaseholder for the future queue
 }
 
-AmqpRpc.prototype.makeRequest = function(queue_name, correlationId, content, callback){
+AmqpRpc.prototype.makeRequest = function(queue_name, correlationId, content, callback, status_callback){
   var self = this;
   //create a timeout for what should happen if we don't get a response
   var tId = setTimeout(function(corr_id){
@@ -26,11 +26,12 @@ AmqpRpc.prototype.makeRequest = function(queue_name, correlationId, content, cal
   //create a request entry to store in a hash
   var entry = {
     callback:callback,
+    status_callback : status_callback,
     timeout: tId //the id for the timeout so we can clear it
   };
 
   //put the entry in the hash so we can match the response later
-  self.requests[correlationId]=entry;
+  self.requests[correlationId] = entry;
 
   //make sure we have a response queue
   self.setupResponseQueue(function(){
@@ -48,6 +49,7 @@ AmqpRpc.prototype.setupResponseQueue = function(next){
   if(this.response_queue) return next();
 
   var self = this;
+    
   //create the queue
   self.connection.queue('', {exclusive:true}, function(q){  
     //store the name
@@ -56,16 +58,24 @@ AmqpRpc.prototype.setupResponseQueue = function(next){
     q.subscribe(function(message, headers, deliveryInfo, m){
       //get the correlationId
       var correlationId = m.correlationId;
+      var type = headers.type;
+      console.log('type', type);
+              
       //is it a response to a pending request
-      if(correlationId in self.requests){
+      if(correlationId in self.requests){       
         //retreive the request entry
-        var entry = self.requests[correlationId];
-        //make sure we don't timeout by clearing it
-        clearTimeout(entry.timeout);
-        //delete the entry from hash
-        delete self.requests[correlationId];
-        //callback, no err
-        entry.callback(null, message);
+        if (type == 'responce') {
+          var entry = self.requests[correlationId];
+          //make sure we don't timeout by clearing it
+          clearTimeout(entry.timeout);
+          //delete the entry from hash
+          delete self.requests[correlationId];
+          //callback, no err
+          entry.callback(null, message);
+        } else if (type == 'responce') {
+          var entry = self.requests[correlationId];
+          entry.status_callback(message);
+        }
       }
     });
     return next();    

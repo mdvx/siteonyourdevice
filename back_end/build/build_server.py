@@ -28,6 +28,7 @@ def run_command(cmd):
 class BuildRpcServer(object):
     def __init__(self, platform):
         credentials = pika.PlainCredentials(config.USER_NAME, config.PASSWORD)
+        self.platform = platform
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host = config.REMOTE_HOST, credentials = credentials))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue = platform)
@@ -39,7 +40,7 @@ class BuildRpcServer(object):
         print("Awaiting RPC build requests")
         self.channel.start_consuming()
 
-    def build_package(self, op_id, platform, arch, branding_variables, package_type, destination):
+    def build_package(self, op_id, platform, arch, branding_variables, package_type, destination, status_channel, routing_key):
 
         platform_or_none = base.get_supported_platform_by_name(platform)
 
@@ -69,7 +70,9 @@ class BuildRpcServer(object):
         except subprocess.CalledProcessError as ex:
             os.chdir(pwd)
             raise ex
-
+            
+        self.send_status(status_channel, routing_key, 20, 'Building package')
+                         
         make_line = ['make', 'package', '-j2']
         try:
             run_command(make_line)
@@ -77,6 +80,8 @@ class BuildRpcServer(object):
             os.chdir(pwd)
             raise ex
 
+        self.send_status(status_channel, routing_key, 70, 'Stable package')
+        
         in_file = open('CPackConfig.cmake', 'r')
         for line in in_file.readlines():
             res = re.search(r'SET\(CPACK_SOURCE_PACKAGE_FILE_NAME "(.+)"\)', line)
@@ -85,6 +90,7 @@ class BuildRpcServer(object):
         in_file.close()
 
         try:
+            self.send_status(status_channel, routing_key, 80, 'Loading package to server')
             result = config.post_install_step(filename, destination)
         except Exception as ex:
             os.chdir(pwd)
@@ -93,6 +99,13 @@ class BuildRpcServer(object):
         os.chdir(pwd)
         return result
 
+    def send_status(self, channel, routing_key, progress, status):
+        json_to_send = {'progress': progress, 'status' : status}
+        channel.basic_publish(exchange='', 
+                         routing_key=routing_key,
+                         properties = pika.BasicProperties(content_type = 'application/json', headers = {'type' : 'status'}),
+                         body=json.dumps(json_to_send))
+                         
     def on_request(self, ch, method, props, body):
         data = json.loads(body)
 
@@ -102,19 +115,23 @@ class BuildRpcServer(object):
         package_type = data.get('package_type')
         destination = data.get('destination')
         op_id = props.correlation_id
-
+        
+        self.send_status(ch, props.reply_to, 0, 'Prepare to build package')
+                              
         print('build started for: {0}, platform: {1}_{2}'.format(op_id, platform, arch))
         try:
-            response = self.build_package(op_id, platform, arch, branding_variables, package_type, destination)
+            response = self.build_package(op_id, platform, arch, branding_variables, package_type, destination, ch, props.reply_to)
             print('build finished for: {0}, platform: {1}_{2}, responce: {3}'.format(op_id, platform, arch, response))
             json_to_send = {'body' :response}
         except Exception as ex:
             print('build finished for: {0}, platform: {1}_{2}, exception: {3}'.format(op_id, platform, arch, str(ex)))
             json_to_send = {'error': str(ex)}
+        
+        self.send_status(ch, props.reply_to, 100, 'Completed')
 
         ch.basic_publish(exchange = '',
                  routing_key = props.reply_to,
-                 properties = pika.BasicProperties(content_type = 'application/json', correlation_id = op_id),
+                 properties = pika.BasicProperties(content_type = 'application/json', correlation_id = op_id, headers = {'type' : 'responce'} ),                 
                  body = json.dumps(json_to_send))
         ch.basic_ack(delivery_tag = method.delivery_tag)
 
