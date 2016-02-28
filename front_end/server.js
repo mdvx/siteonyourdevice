@@ -125,15 +125,16 @@ listener.on('connection', function (socket) {
                 console.error(err);
                 socket.emit('status_rabbitmq', { 'email': in_json.email, 'progress': 100, 'message': err } ); //
                 socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': err});
+                return;
+              }
+              
+              var responce_json = response;
+              console.log("response", responce_json);
+              if(response.hasOwnProperty('error')){
+                socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': response.error });
               } else {
-                var responce_json = response;
-                console.log("response", responce_json);
-                if(response.hasOwnProperty('error')){
-                  socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': response.error });
-                } else {
-                  var public_path = response.body.replace(public_dir_abs_path, '');
-                  socket.emit('message_rabbitmq', { 'email': in_json.email, 'body': public_path } );
-                }
+                var public_path = response.body.replace(public_dir_abs_path, '');
+                socket.emit('message_rabbitmq', { 'email': in_json.email, 'body': public_path } );
               }
           }, 
           function status(response) {
@@ -178,7 +179,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs'); // set up ejs for templating
 
 // required for passport
-app.use(session({ secret: 'siteonyourdevice' })); // session secret
+app.use(session({ secret: app.locals.project.project_name_lowercase })); // session secret
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
