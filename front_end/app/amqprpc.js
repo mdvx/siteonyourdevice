@@ -63,7 +63,6 @@ AmqpRpc.prototype.setupResponseQueue = function(next){
       //is it a response to a pending request
       if(correlationId in self.requests){       
         //retreive the request entry
-        console.log(type, message);
         if (type == 'responce') {          
           var entry = self.requests[correlationId];
           //make sure we don't timeout by clearing it

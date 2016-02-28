@@ -96,9 +96,13 @@ listener.on('connection', function (socket) {
         mkdirp(user_package_dir, function(err) {
           if (err) {
             console.error(err);
+            socket.emit('status_rabbitmq', { 'email': in_json.email, 'progress': 100, 'message': err } ); //
+            socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': err });
             return;
           }
- 
+          
+          socket.emit('status_rabbitmq', { 'email': in_json.email, 'progress': 0, 'message': 'Send request to build server' } ); //
+          
           var rpc = new (require('./app/amqprpc'))(rabbit_connection);
           var branding_variables = '-DUSER_SPECIFIC_DEFAULT_LOGIN=' + in_json.email + ' -DUSER_SPECIFIC_DEFAULT_PASSWORD=' + in_json.password
           + ' -DUSER_SPECIFIC_DEFAULT_LOCAL_DOMAIN=' + in_json.domain_host + ' -DUSER_SPECIFIC_CONTENT_PATH=' + in_json.content_path
@@ -119,6 +123,7 @@ listener.on('connection', function (socket) {
           rpc.makeRequest(routing_key, in_json.email, request_data_json, function response(err, response) {
               if (err) {
                 console.error(err);
+                socket.emit('status_rabbitmq', { 'email': in_json.email, 'progress': 100, 'message': err } ); //
                 socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': err});
               } else {
                 var responce_json = response;
@@ -132,9 +137,7 @@ listener.on('connection', function (socket) {
               }
           }, 
           function status(response) {
-            var responce_json = response;
-            console.log("response_status", responce_json);
-            socket.emit('status_rabbitmq', { 'email': in_json.email, 'progress': response.progress, 'message': response.status } );
+            socket.emit('status_rabbitmq', { 'email': in_json.email, 'progress': response.progress, 'message': response.status } ); //
           } );
         });
     });
