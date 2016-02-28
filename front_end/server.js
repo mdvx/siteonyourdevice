@@ -96,8 +96,8 @@ listener.on('connection', function (socket) {
         mkdirp(user_package_dir, function(err) {
           if (err) {
             console.error(err);
-            socket.emit('status_rabbitmq', { 'email': in_json.email, 'progress': 100, 'message': err } ); //
-            socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': err });
+            socket.emit('status_rabbitmq', { 'email': in_json.email, 'progress': 100, 'message': err.toString() } ); //
+            socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': err.toString() });
             return;
           }
           
@@ -123,8 +123,8 @@ listener.on('connection', function (socket) {
           rpc.makeRequest(routing_key, in_json.email, request_data_json, function response(err, response) {
               if (err) {
                 console.error(err);
-                socket.emit('status_rabbitmq', { 'email': in_json.email, 'progress': 100, 'message': err } ); //
-                socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': err});
+                socket.emit('status_rabbitmq', { 'email': in_json.email, 'progress': 100, 'message': err.toString() } ); //
+                socket.emit('message_rabbitmq', { 'email': in_json.email, 'error': err.toString()});
                 return;
               }
               
