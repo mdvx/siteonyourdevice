@@ -131,7 +131,7 @@ listener.on('connection', function (socket) {
                 }
               }
           }, 
-          function status(responce) {
+          function status(response) {
             var responce_json = response;
             console.log("response_status", responce_json);
             socket.emit('status_rabbitmq', { 'email': in_json.email, 'progress': response.progress, 'message': response.status } );

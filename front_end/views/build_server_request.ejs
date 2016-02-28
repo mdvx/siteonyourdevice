@@ -73,7 +73,6 @@
                            };
               var msg = JSON.stringify(build_args);
               socket.emit('publish_rabbitmq', msg);
-              update_bar(20, 'Building...');
             }
             
             function send_build_request_local(user, password) {

@@ -71,7 +71,7 @@ class BuildRpcServer(object):
             os.chdir(pwd)
             raise ex
             
-        self.send_status(status_channel, routing_key, 20, 'Building package')
+        self.send_status(status_channel, routing_key, op_id, 20, 'Building package')
                          
         make_line = ['make', 'package', '-j2']
         try:
@@ -80,7 +80,7 @@ class BuildRpcServer(object):
             os.chdir(pwd)
             raise ex
 
-        self.send_status(status_channel, routing_key, 70, 'Stable package')
+        self.send_status(status_channel, routing_key, op_id, 70, 'Stable package')
         
         in_file = open('CPackConfig.cmake', 'r')
         for line in in_file.readlines():
@@ -90,7 +90,7 @@ class BuildRpcServer(object):
         in_file.close()
 
         try:
-            self.send_status(status_channel, routing_key, 80, 'Loading package to server')
+            self.send_status(status_channel, routing_key, op_id, 80, 'Loading package to server')
             result = config.post_install_step(filename, destination)
         except Exception as ex:
             os.chdir(pwd)
@@ -99,11 +99,11 @@ class BuildRpcServer(object):
         os.chdir(pwd)
         return result
 
-    def send_status(self, channel, routing_key, progress, status):
+    def send_status(self, channel, routing_key, op_id, progress, status):
         json_to_send = {'progress': progress, 'status' : status}
         channel.basic_publish(exchange='', 
                          routing_key=routing_key,
-                         properties = pika.BasicProperties(content_type = 'application/json', headers = {'type' : 'status'}),
+                         properties = pika.BasicProperties(content_type = 'application/json', correlation_id = op_id, headers = {'type' : 'status'}),
                          body=json.dumps(json_to_send))
                          
     def on_request(self, ch, method, props, body):
@@ -116,7 +116,7 @@ class BuildRpcServer(object):
         destination = data.get('destination')
         op_id = props.correlation_id
         
-        self.send_status(ch, props.reply_to, 0, 'Prepare to build package')
+        self.send_status(ch, props.reply_to, op_id, 0, 'Prepare to build package')
                               
         print('build started for: {0}, platform: {1}_{2}'.format(op_id, platform, arch))
         try:
@@ -127,7 +127,7 @@ class BuildRpcServer(object):
             print('build finished for: {0}, platform: {1}_{2}, exception: {3}'.format(op_id, platform, arch, str(ex)))
             json_to_send = {'error': str(ex)}
         
-        self.send_status(ch, props.reply_to, 100, 'Completed')
+        self.send_status(ch, props.reply_to, op_id, 100, 'Completed')
 
         ch.basic_publish(exchange = '',
                  routing_key = props.reply_to,
