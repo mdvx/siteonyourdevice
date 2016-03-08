@@ -146,7 +146,7 @@
             <form action="/add_domain" method="post">                
                 <div class="form-group">
                 <label>Domain name:</label>
-                <input type="text" class="form-control" name="domain_name">
+                <input type="text" pattern="^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}$" class="form-control" name="domain_name">
                 </div>
                 <button type="submit" class="btn btn-warning btn-small">Add new domain</button>
             </form>
