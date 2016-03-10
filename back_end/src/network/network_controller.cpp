@@ -188,14 +188,14 @@ class LocalHttpServerController
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
       delete serv;
-      return NULL;
+      return nullptr;
     }
 
     err = serv->listen(5);
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
       delete serv;
-      return NULL;
+      return nullptr;
     }
 
     return serv;
@@ -219,7 +219,7 @@ class ExternalHttpServerController
 }  // namespace
 
 NetworkController::NetworkController(int argc, char *argv[])
-  : ILoopThreadController(), auth_checker_(NULL), server_(NULL), config_() {
+  : ILoopThreadController(), auth_checker_(nullptr), server_(nullptr), config_() {
   bool daemon_mode = false;
 #ifdef OS_MACOSX
   std::string config_path = PROJECT_NAME ".app/Contents/Resources/" CONFIG_FILE_NAME;
@@ -282,7 +282,7 @@ void NetworkController::disConnect() {
   server_->stop();
   server_->join();
   delete server_;
-  server_ = NULL;
+  server_ = nullptr;
 }
 
 UserAuthInfo NetworkController::authInfo() const {
@@ -361,7 +361,7 @@ void NetworkController::readConfig() {
 }
 
 tcp::ITcpLoopObserver * NetworkController::createHandler(){
-  inner::InnerServerHandler* handler = new inner::InnerServerHandler(g_inner_host, config_);
+  inner::InnerServerHandler* handler = new inner::InnerServerHandler(server::g_inner_host, config_);
   auth_checker_ = new HttpAuthObserver(handler);
   return handler;
 }

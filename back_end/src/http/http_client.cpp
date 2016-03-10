@@ -115,7 +115,7 @@ common::Error HttpClient::send_error(common::http::http_protocols protocol,
                                    status, title, status, title, text,
                                    info.server_url, info.server_name);
   common::Error err = send_headers(protocol, status, extra_header,
-                                   "text/html", &err_len, NULL, is_keep_alive, info);
+                                   "text/html", &err_len, nullptr, is_keep_alive, info);
   if (err && err->isError()) {
     DEBUG_MSG_ERROR(err);
   }
@@ -141,7 +141,7 @@ common::Error HttpClient::send_headers(common::http::http_protocols protocol,
   CHECK(protocol <= common::http::HP_1_1);
   const std::string title = common::convertToString(status);
 
-  time_t now = time(NULL);
+  time_t now = time(nullptr);
   char timebuf[100];
   strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime( &now ));
 
@@ -221,7 +221,7 @@ common::Error Http2Client::send_error(common::http::http_protocols protocol,
                                      status, title, status, title,
                                      text, info.server_url, info.server_name);
     common::Error err = send_headers(protocol, status, extra_header,
-                                     "text/html", &err_len, NULL, is_keep_alive, info);
+                                     "text/html", &err_len, nullptr, is_keep_alive, info);
     if (err && err->isError()) {
         DEBUG_MSG_ERROR(err);
         return err;
@@ -283,7 +283,7 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
     nvs.push_back(nvstatus);
 
     char timebuf[100];
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime(&now));
     common::http2::http2_nv nvdate;
     nvdate.name = MAKE_BUFFER_TYPE("date");

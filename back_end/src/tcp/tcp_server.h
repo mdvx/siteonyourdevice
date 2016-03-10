@@ -44,7 +44,7 @@ class LoopTimer;
 class ITcpLoop
   : public EvLoopObserver, common::IMetaClassInfo {
  public:
-  explicit ITcpLoop(ITcpLoopObserver* observer = NULL);
+  explicit ITcpLoop(ITcpLoopObserver* observer = nullptr);
   virtual ~ITcpLoop();
 
   int exec() WARN_UNUSED_RESULT;
@@ -118,7 +118,7 @@ class ITcpLoopObserver {
 class TcpServer
   : public ITcpLoop {
  public:
-  explicit TcpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer = NULL);
+  explicit TcpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer = nullptr);
   virtual ~TcpServer();
 
   common::Error bind() WARN_UNUSED_RESULT;

@@ -118,7 +118,7 @@ void ITcpLoop::unregisterClient(TcpClient * client) {
     observer_->moved(client);
   }
 
-  client->server_ = NULL;
+  client->server_ = nullptr;
   clients_.erase(std::remove(clients_.begin(), clients_.end(), client), clients_.end());
   DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "Successfully unregister client[%s], from server[%s], %" PRIuS " client(s) connected.",
                         client->formatedName(), formatedName(), clients_.size());

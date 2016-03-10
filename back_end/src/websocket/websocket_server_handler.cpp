@@ -161,12 +161,12 @@ namespace siteonyourdevice {
 namespace websocket {
 
 WebSocketServerHandler::WebSocketServerHandler(const HttpServerInfo &info)
-  : Http2ServerHandler(info, NULL) {
+  : Http2ServerHandler(info, nullptr) {
 }
 
 void WebSocketServerHandler::processReceived(http::HttpClient* hclient, const char* request,
                                              size_t req_len) {
-  uint8_t *data = NULL;
+  uint8_t *data = nullptr;
   size_t dataSize = 0;
   wsFrameType frame_type = wsParseInputFrame((const uint8_t *)request, req_len, &data, &dataSize);
 
@@ -175,7 +175,7 @@ void WebSocketServerHandler::processReceived(http::HttpClient* hclient, const ch
   } else if (frame_type == WS_INCOMPLETE_FRAME && req_len == BUF_LEN) {
     size_t frameSize = BUF_LEN;
     uint8_t odata[BUF_LEN] = {0};
-    wsMakeFrame(NULL, 0, odata, &frameSize, WS_CLOSING_FRAME);
+    wsMakeFrame(nullptr, 0, odata, &frameSize, WS_CLOSING_FRAME);
 
     ssize_t nwrite = 0;
     common::Error err = hclient->write((const char*)odata, frameSize, &nwrite);
@@ -224,7 +224,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient *hclient,
 
   const common::http::http_protocols protocol = request.protocol();
   if (request.method() != common::http::http_method::HM_GET) {
-    common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST, NULL,
+    common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST, nullptr,
                                                 "Bad Request", notClose, info());
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
@@ -237,7 +237,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient *hclient,
   bool isUpgrade = lconnectionField.find_first_of("upgrade") != std::string::npos;
   if (!isUpgrade) {
     common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST,
-                                            NULL, "Bad Request",
+                                            nullptr, "Bad Request",
                                             notClose, info());
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
@@ -249,7 +249,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient *hclient,
   bool isWebSocket = EqualsASCII(upgradeField.value, "websocket", false);
   if (!isWebSocket) {
     common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST,
-                                            NULL, "Bad Request",
+                                            nullptr, "Bad Request",
                                             notClose, info());
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
@@ -260,7 +260,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient *hclient,
   common::http::header_t key_field = request.findHeaderByKey("Sec-WebSocket-Key", false);
   if (!key_field.isValid()) {
     common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST,
-                                            NULL, "Bad Request",
+                                            nullptr, "Bad Request",
                                             notClose, info());
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
@@ -271,7 +271,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient *hclient,
   common::http::header_t web_vers_field = request.findHeaderByKey("Sec-WebSocket-Version", false);
   if (!web_vers_field.isValid()) {
     common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST,
-                                            NULL, "Bad Request",
+                                            nullptr, "Bad Request",
                                             notClose, info());
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
@@ -294,8 +294,8 @@ void WebSocketServerHandler::handleRequest(http::HttpClient *hclient,
                                              "Sec-WebSocket-Accept: %s",
                                              common::convertToString(enc_accept));
   common::Error err = hclient->send_headers(protocol, common::http::HS_SWITCH_PROTOCOL,
-                                            header_up.c_str(), NULL,
-                                            NULL, NULL,
+                                            header_up.c_str(), nullptr,
+                                            nullptr, nullptr,
                                             notClose, info());
   if (err && err->isError()) {
     DEBUG_MSG_ERROR(err);

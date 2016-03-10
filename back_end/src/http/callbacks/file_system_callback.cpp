@@ -83,7 +83,7 @@ bool HttpFileSystemCallback::handleRequest(http::HttpClient* hclient, const char
 
       int file = open(file_path.c_str(), open_flags);
       if (file == INVALID_DESCRIPTOR) {  /* open the file for reading */
-        common::Error err = hclient->send_error(protocol, common::http::HS_FORBIDDEN, NULL,
+        common::Error err = hclient->send_error(protocol, common::http::HS_FORBIDDEN, nullptr,
                                                 "File is protected.", isKeepAlive, info);
         if (err && err->isError()) {
           DEBUG_MSG_ERROR(err);
@@ -92,7 +92,7 @@ bool HttpFileSystemCallback::handleRequest(http::HttpClient* hclient, const char
       }
 
       const std::string mime = path.mime();
-      common::Error err = hclient->send_headers(protocol, common::http::HS_OK, NULL, mime.c_str(),
+      common::Error err = hclient->send_headers(protocol, common::http::HS_OK, nullptr, mime.c_str(),
                                                 &sb.st_size, &sb.st_mtime, isKeepAlive, info);
       if (err && err->isError()) {
          DEBUG_MSG_ERROR(err);
@@ -111,7 +111,7 @@ bool HttpFileSystemCallback::handleRequest(http::HttpClient* hclient, const char
   } else {
     common::http::header_t contentTypeField = request.findHeaderByKey("Content-Type", false);
     if (!contentTypeField.isValid()) {
-      common::Error err = hclient->send_error(protocol, common::http::HS_NOT_ALLOWED, NULL,
+      common::Error err = hclient->send_error(protocol, common::http::HS_NOT_ALLOWED, nullptr,
                                               "Unsupported request.", isKeepAlive, info);
       if (err && err->isError()) {
         DEBUG_MSG_ERROR(err);
@@ -127,7 +127,7 @@ bool HttpFileSystemCallback::handleRequest(http::HttpClient* hclient, const char
     } else if (contentTypeValue == "multipart/form-data") {
       return true;
     } else {
-      common::Error err = hclient->send_error(protocol, common::http::HS_NOT_ALLOWED, NULL,
+      common::Error err = hclient->send_error(protocol, common::http::HS_NOT_ALLOWED, nullptr,
                                               "Unsupported content type.", isKeepAlive, info);
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);

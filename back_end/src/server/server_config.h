@@ -33,7 +33,15 @@
 #define CHANNEL_COMMANDS_OUT_NAME "COMMANDS_OUT"
 #define CHANNEL_CLIENTS_STATE_NAME "CLIENTS_STATE"
 
+namespace fasto {
+namespace siteonyourdevice {
+namespace server {
+
 const common::net::hostAndPort g_http_host(INNER_HOST_NAME, HOST_PORT);
 const common::net::hostAndPort g_inner_host(INNER_HOST_NAME, INNER_HOST_PORT);
 const common::net::hostAndPort g_websocket_host(INNER_HOST_NAME, WEBSOCKET_PORT);
 const common::net::hostAndPort g_relay_server_host(INNER_HOST_NAME, RANDOM_PORT);
+
+}  // namespace server
+}  // namespace siteonyourdevice
+}  // namespace fasto

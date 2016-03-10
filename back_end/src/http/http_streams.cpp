@@ -67,7 +67,7 @@ IStream* IStream::createStream(const common::net::socket_info& info,
                                const common::http2::frame_base &frame) {
   if (!frame.isValid()) {
     NOTREACHED();
-    return NULL;
+    return nullptr;
   }
 
   common::http2::frame_type type = frame.type();
@@ -83,28 +83,28 @@ IStream* IStream::createStream(const common::net::socket_info& info,
   }
   case common::http2::HTTP2_RST_STREAM:
     NOTREACHED();
-    return NULL;
+    return nullptr;
   case common::http2::HTTP2_SETTINGS:
     return new HTTP2SettingsStream(info, frame);
   case common::http2::HTTP2_PUSH_PROMISE:
     NOTREACHED();
-    return NULL;
+    return nullptr;
   case common::http2::HTTP2_PING:
     NOTREACHED();
-    return NULL;
+    return nullptr;
   case common::http2::HTTP2_GOAWAY:
     NOTREACHED();
-    return NULL;
+    return nullptr;
   case common::http2::HTTP2_WINDOW_UPDATE:
     NOTREACHED();
-    return NULL;
+    return nullptr;
   case common::http2::HTTP2_CONTINUATION:
     NOTREACHED();
-    return NULL;
+    return nullptr;
 
   default:
     NOTREACHED();
-    return NULL;
+    return nullptr;
   }
 }
 

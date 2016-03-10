@@ -28,7 +28,7 @@ namespace fasto {
 namespace siteonyourdevice {
 
 ILoopController::ILoopController()
-  : loop_(NULL), handler_(NULL) {
+  : loop_(nullptr), handler_(nullptr) {
 }
 
 int ILoopController::exec() {
@@ -43,7 +43,7 @@ int ILoopController::exec() {
   loop_ = createServer(handler_);
   if (!loop_) {
     delete handler_;
-    handler_ = NULL;
+    handler_ = nullptr;
     return EXIT_FAILURE;
   }
 

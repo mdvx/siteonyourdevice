@@ -37,7 +37,7 @@ namespace siteonyourdevice {
 namespace inner {
 
 Http2ClientServerHandler::Http2ClientServerHandler(const HttpServerInfo& info)
-  : Http2ServerHandler(info, NULL) {
+  : Http2ServerHandler(info, nullptr) {
 }
 
 Http2ClientServerHandler::~Http2ClientServerHandler() {
@@ -54,7 +54,7 @@ void Http2ClientServerHandler::closed(tcp::TcpClient* client) {
   ProxyRelayClient * prclient = dynamic_cast<ProxyRelayClient*>(client);  // proxyrelay connection
   if (prclient) {
     RelayClientEx * rclient = prclient->relay();
-    rclient->setEclient(NULL);
+    rclient->setEclient(nullptr);
   }
 }
 
@@ -107,7 +107,7 @@ void Http2ClientServerHandler::relayExDataReceived(inner::RelayClientEx* rclient
       if (err && err->isError()) {
         DEBUG_MSG_ERROR(err);
         const std::string error_text = err->description();
-        err = rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL,
+        err = rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, nullptr,
                                   error_text.c_str(), false, info());
         if (err && err->isError()) {
           DEBUG_MSG_ERROR(err);
@@ -128,7 +128,7 @@ void Http2ClientServerHandler::relayExDataReceived(inner::RelayClientEx* rclient
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
       const std::string error_text = err->description();
-      err = rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL,
+      err = rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, nullptr,
                                 error_text.c_str(), false, info());
       if (err && err->isError()) {
         DEBUG_MSG_ERROR(err);
@@ -136,7 +136,7 @@ void Http2ClientServerHandler::relayExDataReceived(inner::RelayClientEx* rclient
       return;
     }
   } else {
-    err = rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, NULL,
+    err = rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, nullptr,
                               "Invalid external host!", false, info());
      if (err && err->isError()) {
        DEBUG_MSG_ERROR(err);

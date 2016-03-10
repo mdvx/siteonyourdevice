@@ -44,7 +44,7 @@ IFastoApplicationImpl::IFastoApplicationImpl(int argc, char *argv[]) {
 IFastoApplicationImpl::~IFastoApplicationImpl() {
 }
 
-FastoApplication* FastoApplication::self_ = NULL;
+FastoApplication* FastoApplication::self_ = nullptr;
 
 FastoApplication::FastoApplication(int argc, char *argv[])
   : argc_(argc), argv_(argv), impl_(createImpl(argc, argv)) {
@@ -63,7 +63,7 @@ char **FastoApplication::argv() const {
 }
 
 FastoApplication::~FastoApplication() {
-  self_ = NULL;
+  self_ = nullptr;
 }
 
 FastoApplication *FastoApplication::instance() {

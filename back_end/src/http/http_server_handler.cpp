@@ -63,14 +63,14 @@ class WebSocketController
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
       delete serv;
-      return NULL;
+      return nullptr;
     }
 
     err = serv->listen(5);
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
       delete serv;
-      return NULL;
+      return nullptr;
     }
 
     return serv;
@@ -92,7 +92,7 @@ IHttpAuthObserver::~IHttpAuthObserver() {
 void HttpServerHandler::preLooped(tcp::ITcpLoop *server) {
   for (size_t i = 0; i < sockets_urls_.size(); ++i) {
     socket_url_t url = sockets_urls_[i];
-    CHECK(url.second == NULL);
+    CHECK(url.second == nullptr);
 
     common::net::hostAndPort host = common::convertFromString<common::net::hostAndPort>(url.first.host());
     if (!host.isValid()) {
@@ -115,7 +115,7 @@ void HttpServerHandler::postLooped(tcp::ITcpLoop *server) {
 
     url.second->stop();
     delete url.second;
-    sockets_urls_[i].second =  NULL;
+    sockets_urls_[i].second =  nullptr;
   }
 }
 
@@ -178,7 +178,7 @@ bool HttpServerHandler::tryToHandleAsRegisteredCallback(HttpClient* hclient, con
     return false;
   }
 
-  return callback->handleRequest(hclient, NULL, request, info());
+  return callback->handleRequest(hclient, nullptr, request, info());
 }
 
 bool HttpServerHandler::tryAuthenticateIfNeeded(HttpClient* hclient, const char* extra_header,
@@ -214,7 +214,7 @@ bool HttpServerHandler::tryAuthenticateIfNeeded(HttpClient* hclient, const char*
 
     common::Error err = hclient->send_error(common::http::HP_1_1, common::http::HS_UNAUTHORIZED,
                                           "WWW-Authenticate: " AUTH_BASIC_METHOD " realm=User or password incorrect, try again",
-                                          NULL, true, info());
+                                          nullptr, true, info());
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
     }
@@ -223,7 +223,7 @@ bool HttpServerHandler::tryAuthenticateIfNeeded(HttpClient* hclient, const char*
 
   common::Error err = hclient->send_error(common::http::HP_1_1, common::http::HS_UNAUTHORIZED,
                                           "WWW-Authenticate: " AUTH_BASIC_METHOD " realm=Private page please authenticate",
-                                          NULL, true, info());
+                                          nullptr, true, info());
   if (err && err->isError()) {
     DEBUG_MSG_ERROR(err);
   }
@@ -240,7 +240,7 @@ void HttpServerHandler::processReceived(HttpClient *hclient, const char* request
   if (result.second && result.second->isError()) {
     const std::string error_text = result.second->description();
     DEBUG_MSG_ERROR(result.second);
-    common::Error err = hclient->send_error(common::http::HP_1_1, result.first, NULL,
+    common::Error err = hclient->send_error(common::http::HP_1_1, result.first, nullptr,
                                             error_text.c_str(), false, info());
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
@@ -264,7 +264,7 @@ void HttpServerHandler::handleRequest(HttpClient *hclient,
                                       const common::http::http_request& hrequest, bool notClose) {
   common::uri::Upath path = hrequest.path();
 
-  if (tryAuthenticateIfNeeded(hclient, NULL, hrequest)) {
+  if (tryAuthenticateIfNeeded(hclient, nullptr, hrequest)) {
       goto cleanup;
   }
 
@@ -272,7 +272,7 @@ void HttpServerHandler::handleRequest(HttpClient *hclient,
       goto cleanup;
   }
 
-  if (fshandler_->handleRequest(hclient, NULL, hrequest, info())) {
+  if (fshandler_->handleRequest(hclient, nullptr, hrequest, info())) {
       goto cleanup;
   }
 
@@ -333,7 +333,7 @@ void Http2ServerHandler::handleHttp2Request(Http2Client* h2client, const char* r
     if (result.second && result.second->isError()) {
       const std::string error_text = result.second->description();
       DEBUG_MSG_ERROR(result.second);
-      common::Error err = h2client->send_error(common::http::HP_2_0, result.first, NULL,
+      common::Error err = h2client->send_error(common::http::HP_2_0, result.first, nullptr,
                                                error_text.c_str(), false, info());
       if (err && err->isError()) {
         DEBUG_MSG_ERROR(err);

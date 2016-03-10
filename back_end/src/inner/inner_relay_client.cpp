@@ -32,7 +32,7 @@ const char* RelayClient::className() const {
 
 RelayClientEx::RelayClientEx(tcp::ITcpLoop* server, const common::net::socket_info& info,
                              const common::net::hostAndPort& externalHost)
-  : RelayClient(server, info), external_host_(externalHost), eclient_(NULL) {
+  : RelayClient(server, info), external_host_(externalHost), eclient_(nullptr) {
 }
 
 common::net::hostAndPort RelayClientEx::externalHost() const {

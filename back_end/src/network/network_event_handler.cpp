@@ -54,7 +54,7 @@ class NetworkEventHandler::NetworkListener
 };
 
 NetworkEventHandler::NetworkEventHandler(NetworkController* controller)
-  : network_listener_(NULL), controller_(controller) {
+  : network_listener_(nullptr), controller_(controller) {
   network_listener_ = new NetworkListener(this);
 }
 
