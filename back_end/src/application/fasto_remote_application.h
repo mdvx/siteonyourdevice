@@ -31,8 +31,8 @@ class EventThread;
 
 namespace fasto {
 namespace siteonyourdevice {
-
 namespace network {
+
 class NetworkEventHandler;
 class NetworkController;
 }  // namespace network
@@ -41,7 +41,7 @@ namespace application {
 class FastoRemoteApplication
         : public IFastoApplicationImpl {
  public:
-  FastoRemoteApplication(int argc, char *argv[]);
+  FastoRemoteApplication(int argc, char* argv[]);
   ~FastoRemoteApplication();
 
   virtual int exec();
@@ -52,8 +52,8 @@ class FastoRemoteApplication
   virtual int postExec();
 
  protected:
-  network::NetworkController * controller_;
-  network::NetworkEventHandler * network_handler_;
+  network::NetworkController* controller_;
+  network::NetworkEventHandler* network_handler_;
   common::thread::EventThread<NetworkEventTypes>* const thread_;  // event thread handle
 };
 

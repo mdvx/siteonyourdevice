@@ -44,6 +44,7 @@ fasto::siteonyourdevice::HCTypes convertFromString(const std::string& text) {
 
 namespace fasto {
 namespace siteonyourdevice {
+
 IHttpCallback::IHttpCallback() {
 }
 
@@ -62,7 +63,7 @@ common::shared_ptr<IHttpCallback> IHttpCallback::createHttpCallback(HCTypes type
 }
 
 common::shared_ptr<IHttpCallback> IHttpCallback::createHttpCallback(const std::string& ns_name,
-                                                                    const std::string &name) {
+                                                                    const std::string& name) {
   HCTypes htype = common::convertFromString<HCTypes>(ns_name);
   if (htype == file_system) {
     return createFileSystemHttpCallback(name);

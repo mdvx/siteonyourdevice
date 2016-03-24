@@ -28,7 +28,7 @@ class NetworkController;
 
 class NetworkEventHandler {
  public:
-  explicit NetworkEventHandler(NetworkController *controller);
+  explicit NetworkEventHandler(NetworkController* controller);
   virtual ~NetworkEventHandler();
 
  protected:

@@ -86,7 +86,7 @@ size_t getPayloadLength(const uint8_t* inputFrame,
   return payloadLength;
 }
 
-wsFrameType wsParseInputFrame(const uint8_t *inputFrame, size_t inputLength, uint8_t **dataPtr,
+wsFrameType wsParseInputFrame(const uint8_t* inputFrame, size_t inputLength, uint8_t** dataPtr,
                               size_t *dataLength) {
   DCHECK(inputFrame && inputLength);
   if (inputLength < 2)
@@ -212,7 +212,7 @@ void WebSocketServerHandler::processReceived(http::HttpClient* hclient, const ch
   }
 }
 
-void WebSocketServerHandler::handleRequest(http::HttpClient *hclient,
+void WebSocketServerHandler::handleRequest(http::HttpClient* hclient,
                                            const common::http::http_request& request,
                                            bool notClose) {
   /*

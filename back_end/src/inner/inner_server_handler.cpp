@@ -132,8 +132,8 @@ void InnerServerHandler::setConfig(const HttpConfig& config){
   config_ = config;
 }
 
-void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_seq_type id,
-                                                   int argc, char *argv[]) {
+void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_seq_type id,
+                                                   int argc, char* argv[]) {
   ssize_t nwrite = 0;
   char* command = argv[0];
 
@@ -498,8 +498,8 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient *connection, cmd_
   }
 }
 
-void InnerServerHandler::handleInnerResponceCommand(InnerClient *connection,
-                                                    cmd_seq_type id, int argc, char *argv[]) {
+void InnerServerHandler::handleInnerResponceCommand(InnerClient* connection,
+                                                    cmd_seq_type id, int argc, char* argv[]) {
   ssize_t nwrite = 0;
   char* state_command = argv[0];
 
@@ -543,8 +543,8 @@ void InnerServerHandler::handleInnerResponceCommand(InnerClient *connection,
   }
 }
 
-void InnerServerHandler::handleInnerApproveCommand(InnerClient *connection,
-                                                   cmd_seq_type id, int argc, char *argv[]) {
+void InnerServerHandler::handleInnerApproveCommand(InnerClient* connection,
+                                                   cmd_seq_type id, int argc, char* argv[]) {
   char* command = argv[0];
 
   if (IS_EQUAL_COMMAND(command, SUCCESS_COMMAND)) {

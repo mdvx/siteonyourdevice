@@ -33,7 +33,7 @@ class ProxyInnerServer
   virtual const char* className() const;
 
  protected:
-  tcp::TcpClient * createClient(const common::net::socket_info& info);
+  tcp::TcpClient* createClient(const common::net::socket_info& info);
 };
 
 class Http2InnerServer
@@ -44,7 +44,7 @@ class Http2InnerServer
   virtual const char* className() const;
 
  protected:
-  virtual tcp::TcpClient * createClient(const common::net::socket_info &info);
+  virtual tcp::TcpClient* createClient(const common::net::socket_info& info);
 
  private:
   const HttpConfig config_;

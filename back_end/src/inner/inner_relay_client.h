@@ -54,7 +54,7 @@ class ProxyRelayClient
         : public tcp::TcpClient {
  public:
   ProxyRelayClient(tcp::ITcpLoop* server, const common::net::socket_info& info,
-                   RelayClientEx * relay);
+                   RelayClientEx* relay);
   RelayClientEx * relay() const;
 
  private:

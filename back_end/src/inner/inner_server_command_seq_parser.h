@@ -31,7 +31,7 @@ class InnerClient;
 
 class RequestCallback {
  public:
-  typedef std::function<void(cmd_seq_type request_id, int argc, char *argv[])> callback_t;
+  typedef std::function<void(cmd_seq_type request_id, int argc, char* argv[])> callback_t;
   RequestCallback(cmd_seq_type request_id, callback_t cb);
   cmd_seq_type request_id() const;
   void execute(int argc, char *argv[]);
@@ -58,7 +58,7 @@ class InnerServerCommandSeqParser {
   void subscribeRequest(const RequestCallback& req);
 
  protected:
-  void handleInnerDataReceived(InnerClient *connection, char *buff, uint32_t buff_len);
+  void handleInnerDataReceived(InnerClient* connection, char* buff, uint32_t buff_len);
 
   template<typename... Args>
   cmd_responce_t make_responce(cmd_seq_type id, const char* cmd_fmt, Args... args) {

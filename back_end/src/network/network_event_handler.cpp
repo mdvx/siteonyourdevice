@@ -62,7 +62,7 @@ NetworkEventHandler::~NetworkEventHandler() {
   delete network_listener_;
 }
 
-void NetworkEventHandler::handleEvent(NetworkEvent *event) {
+void NetworkEventHandler::handleEvent(NetworkEvent* event) {
   if (event->eventType() == InnerClientConnectedEvent::EventType) {
   } else if (event->eventType() == InnerClientDisconnectedEvent::EventType) {
   } else if (event->eventType() == ConfigChangedEvent::EventType) {

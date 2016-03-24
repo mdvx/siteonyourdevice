@@ -27,7 +27,7 @@ namespace websocket {
 class WebSocketServerHandler
   : public http::Http2ServerHandler {
  public:
-  explicit WebSocketServerHandler(const HttpServerInfo &info);
+  explicit WebSocketServerHandler(const HttpServerInfo& info);
 
  protected:
   virtual void processReceived(http::HttpClient *hclient, const char* request, size_t req_len);

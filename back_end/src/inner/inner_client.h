@@ -29,7 +29,7 @@ namespace inner {
 class InnerClient
   : public tcp::TcpClient {
  public:
-  InnerClient(tcp::ITcpLoop *server, const common::net::socket_info& info);
+  InnerClient(tcp::ITcpLoop* server, const common::net::socket_info& info);
   const char* className() const;
 
   common::Error write(const cmd_request_t& request, ssize_t* nwrite) WARN_UNUSED_RESULT;

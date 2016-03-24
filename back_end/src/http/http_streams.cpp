@@ -64,7 +64,7 @@ common::ErrnoError IStream::sendCloseFrame() {
 }
 
 IStream* IStream::createStream(const common::net::socket_info& info,
-                               const common::http2::frame_base &frame) {
+                               const common::http2::frame_base& frame) {
   if (!frame.isValid()) {
     NOTREACHED();
     return nullptr;
@@ -112,7 +112,7 @@ IStream::~IStream() {
 }
 
 HTTP2DataStream::HTTP2DataStream(const common::net::socket_info& info,
-                                 const common::http2::frame_base &frame)
+                                 const common::http2::frame_base& frame)
   : IStream(info, frame) {
   CHECK(common::http2::HTTP2_DATA == frame.type());
 }
@@ -122,7 +122,7 @@ bool HTTP2DataStream::processFrameImpl(const common::http2::frame_base& frame) {
 }
 
 HTTP2PriorityStream::HTTP2PriorityStream(const common::net::socket_info& info,
-                                         const common::http2::frame_base &frame)
+                                         const common::http2::frame_base& frame)
   : IStream(info, frame) {
   CHECK(common::http2::HTTP2_PRIORITY == frame.type());
 }
@@ -136,7 +136,7 @@ bool HTTP2PriorityStream::processFrameImpl(const common::http2::frame_base& fram
 }
 
 HTTP2SettingsStream::HTTP2SettingsStream(const common::net::socket_info& info,
-                                         const common::http2::frame_base &frame)
+                                         const common::http2::frame_base& frame)
   : IStream(info, frame), negotiated_(false) {
   CHECK(common::http2::HTTP2_SETTINGS == frame.type());
 }
@@ -158,7 +158,7 @@ bool HTTP2SettingsStream::processFrameImpl(const common::http2::frame_base& fram
 }
 
 HTTP2HeadersStream::HTTP2HeadersStream(const common::net::socket_info& info,
-                                       const common::http2::frame_base &frame)
+                                       const common::http2::frame_base& frame)
   : IStream(info, frame) {
   CHECK(common::http2::HTTP2_HEADERS == frame.type());
 }

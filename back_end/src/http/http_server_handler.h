@@ -67,13 +67,13 @@ class HttpServerHandler
   void registerHttpCallback(const std::string& url, http_callback_t callback);
   void registerSocketUrl(const common::uri::Uri& url);
 
-  void setAuthChecker(IHttpAuthObserver * authChecker);
+  void setAuthChecker(IHttpAuthObserver* authChecker);
 
   const HttpServerInfo& info() const;
 
  protected:
-  virtual void processReceived(HttpClient *hclient, const char* request, size_t req_len);
-  virtual void handleRequest(HttpClient *hclient, const common::http::http_request& hrequest,
+  virtual void processReceived(HttpClient* hclient, const char* request, size_t req_len);
+  virtual void handleRequest(HttpClient* hclient, const common::http::http_request& hrequest,
                              bool notClose);
 
  private:
@@ -95,10 +95,10 @@ class HttpServerHandler
 class Http2ServerHandler
   : public HttpServerHandler {
  public:
-  Http2ServerHandler(const HttpServerInfo &info, IHttpAuthObserver * observer);
+  Http2ServerHandler(const HttpServerInfo& info, IHttpAuthObserver* observer);
 
  protected:
-  virtual void processReceived(HttpClient *hclient, const char* request, size_t req_len);
+  virtual void processReceived(HttpClient* hclient, const char* request, size_t req_len);
 
  private:
   void handleHttp2Request(Http2Client* h2client, const char* request, uint32_t req_len);

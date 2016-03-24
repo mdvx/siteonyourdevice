@@ -28,7 +28,7 @@
 
 namespace {
 
-fasto::siteonyourdevice::application::IFastoApplicationImpl* createImpl(int argc, char *argv[]) {
+fasto::siteonyourdevice::application::IFastoApplicationImpl* createImpl(int argc, char* argv[]) {
   return new fasto::siteonyourdevice::application::FastoRemoteApplication(argc, argv);
 }
 
@@ -38,7 +38,7 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace application {
 
-IFastoApplicationImpl::IFastoApplicationImpl(int argc, char *argv[]) {
+IFastoApplicationImpl::IFastoApplicationImpl(int argc, char* argv[]) {
 }
 
 IFastoApplicationImpl::~IFastoApplicationImpl() {
@@ -46,7 +46,7 @@ IFastoApplicationImpl::~IFastoApplicationImpl() {
 
 FastoApplication* FastoApplication::self_ = nullptr;
 
-FastoApplication::FastoApplication(int argc, char *argv[])
+FastoApplication::FastoApplication(int argc, char* argv[])
   : argc_(argc), argv_(argv), impl_(createImpl(argc, argv)) {
   CHECK(!self_);
   if (!self_) {
@@ -66,7 +66,7 @@ FastoApplication::~FastoApplication() {
   self_ = nullptr;
 }
 
-FastoApplication *FastoApplication::instance() {
+FastoApplication* FastoApplication::instance() {
   return self_;
 }
 
@@ -76,9 +76,9 @@ std::string FastoApplication::appPath() const {
 
 std::string FastoApplication::appDir() const {
 #ifdef OS_MACOSX
-  const std::string appP = common::file_system::pwd();
+  std::string appP = common::file_system::pwd();
 #else
-  const std::string appP = appPath();
+  std::string appP = appPath();
 #endif
   return common::file_system::get_dir_path(appP);
 }

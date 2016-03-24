@@ -50,9 +50,9 @@ struct SendDataHelper {
   uint32_t all_size;
 };
 
-common::Error send_data_frame(const char* buff, uint32_t buff_len, void *user_data,
-                              uint32_t *processed) {
-  SendDataHelper *helper = reinterpret_cast<SendDataHelper*>(user_data);
+common::Error send_data_frame(const char* buff, uint32_t buff_len, void* user_data,
+                              uint32_t* processed) {
+  SendDataHelper* helper = reinterpret_cast<SendDataHelper*>(user_data);
   fasto::siteonyourdevice::http::StreamSPtr header_stream = helper->header_stream;
 
   uint8_t flags = 0;
@@ -81,7 +81,7 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace http {
 
-HttpClient::HttpClient(tcp::ITcpLoop *server, const common::net::socket_info& info)
+HttpClient::HttpClient(tcp::ITcpLoop* server, const common::net::socket_info& info)
   : TcpClient(server, info), isAuth_(false) {
 }
 
@@ -197,7 +197,7 @@ common::Error HttpClient::send_headers(common::http::http_protocols protocol,
   return err;
 }
 
-Http2Client::Http2Client(tcp::ITcpLoop *server, const common::net::socket_info& info)
+Http2Client::Http2Client(tcp::ITcpLoop* server, const common::net::socket_info& info)
   : HttpClient(server, info), streams_() {
 }
 

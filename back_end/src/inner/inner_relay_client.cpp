@@ -22,7 +22,7 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-RelayClient::RelayClient(tcp::ITcpLoop *server, const common::net::socket_info& info)
+RelayClient::RelayClient(tcp::ITcpLoop* server, const common::net::socket_info& info)
   : Http2Client(server, info) {
 }
 
@@ -39,7 +39,7 @@ common::net::hostAndPort RelayClientEx::externalHost() const {
   return external_host_;
 }
 
-ProxyRelayClient *RelayClientEx::eclient() const {
+ProxyRelayClient* RelayClientEx::eclient() const {
   return eclient_;
 }
 
@@ -51,12 +51,12 @@ const char* RelayClientEx::className() const {
   return "RelayClientEx";
 }
 
-ProxyRelayClient::ProxyRelayClient(tcp::ITcpLoop *server, const common::net::socket_info& info,
-                                   RelayClientEx *relay)
+ProxyRelayClient::ProxyRelayClient(tcp::ITcpLoop* server, const common::net::socket_info& info,
+                                   RelayClientEx* relay)
   : TcpClient(server, info), relay_(relay) {
 }
 
-RelayClientEx *ProxyRelayClient::relay() const {
+RelayClientEx* ProxyRelayClient::relay() const {
   return relay_;
 }
 

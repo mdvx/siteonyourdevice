@@ -46,16 +46,16 @@ class WebSocketController
   const fasto::siteonyourdevice::HttpServerInfo info_;
  public:
   WebSocketController(const common::net::hostAndPort& host,
-                      const fasto::siteonyourdevice::HttpServerInfo &info)
+                      const fasto::siteonyourdevice::HttpServerInfo& info)
     : host_(host), info_(info) {
   }
 
  private:
-  fasto::siteonyourdevice::tcp::ITcpLoopObserver * createHandler() {
+  fasto::siteonyourdevice::tcp::ITcpLoopObserver* createHandler() {
     return new fasto::siteonyourdevice::websocket::WebSocketServerHandler(info_);
   }
 
-  fasto::siteonyourdevice::tcp::ITcpLoop * createServer(fasto::siteonyourdevice::tcp::ITcpLoopObserver * handler) {
+  fasto::siteonyourdevice::tcp::ITcpLoop* createServer(fasto::siteonyourdevice::tcp::ITcpLoopObserver* handler) {
     fasto::siteonyourdevice::websocket::WebSocketServer* serv = new fasto::siteonyourdevice::websocket::WebSocketServer(host_, handler);
     serv->setName("websocket_server");
 

@@ -69,7 +69,7 @@ namespace tcp {
 class LoopTimer
   : public common::patterns::id_counter<LoopTimer, timer_id_type> {
  public:
-  explicit LoopTimer(ITcpLoop * server)
+  explicit LoopTimer(ITcpLoop* server)
     : server_(server), timer_((struct ev_timer*)calloc(1, sizeof(struct ev_timer))) {
     timer_->data = this;
   }
@@ -82,7 +82,7 @@ class LoopTimer
     free(timer_);
   }
 
-  ITcpLoop * server_;
+  ITcpLoop* server_;
   struct ev_timer* const timer_;
 };
 
@@ -105,12 +105,12 @@ void ITcpLoop::stop() {
   loop_->stop();
 }
 
-void ITcpLoop::registerClient(const common::net::socket_info &info) {
+void ITcpLoop::registerClient(const common::net::socket_info& info) {
   TcpClient* client = createClient(info);
   registerClient(client);
 }
 
-void ITcpLoop::unregisterClient(TcpClient * client) {
+void ITcpLoop::unregisterClient(TcpClient* client) {
   CHECK(client->server() == this);
   loop_->stop_io(client->read_write_io_);
 
@@ -124,7 +124,7 @@ void ITcpLoop::unregisterClient(TcpClient * client) {
                         client->formatedName(), formatedName(), clients_.size());
 }
 
-void ITcpLoop::registerClient(TcpClient * client) {
+void ITcpLoop::registerClient(TcpClient* client) {
   if (client->server()) {
     CHECK(client->server() == this);
   }
@@ -143,7 +143,7 @@ void ITcpLoop::registerClient(TcpClient * client) {
                         client->formatedName(), formatedName(), clients_.size());
 }
 
-void ITcpLoop::closeClient(TcpClient *client) {
+void ITcpLoop::closeClient(TcpClient* client) {
   CHECK(client->server() == this);
   loop_->stop_io(client->read_write_io_);
 

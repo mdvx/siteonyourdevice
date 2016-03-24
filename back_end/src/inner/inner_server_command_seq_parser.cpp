@@ -44,7 +44,7 @@ cmd_seq_type RequestCallback::request_id() const {
   return request_id_;
 }
 
-void RequestCallback::execute(int argc, char *argv[]) {
+void RequestCallback::execute(int argc, char* argv[]) {
   if (!cb_) {
     return;
   }
@@ -80,7 +80,7 @@ namespace {
 
 }  // namespace
 
-void InnerServerCommandSeqParser::processRequest(cmd_seq_type request_id, int argc, char *argv[]) {
+void InnerServerCommandSeqParser::processRequest(cmd_seq_type request_id, int argc, char* argv[]) {
   subscribed_requests_.erase(std::remove_if(subscribed_requests_.begin(),
                                             subscribed_requests_.end(),
                                             std::bind(&exec_reqest, std::placeholders::_1,
@@ -91,8 +91,8 @@ void InnerServerCommandSeqParser::subscribeRequest(const RequestCallback& req) {
   subscribed_requests_.push_back(req);
 }
 
-void InnerServerCommandSeqParser::handleInnerDataReceived(InnerClient *connection,
-                                                          char *buff, uint32_t buff_len) {
+void InnerServerCommandSeqParser::handleInnerDataReceived(InnerClient* connection,
+                                                          char* buff, uint32_t buff_len) {
   ssize_t nwrite = 0;
   char *end = strstr(buff, END_OF_COMMAND);
   if (!end) {

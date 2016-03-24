@@ -218,7 +218,7 @@ class ExternalHttpServerController
 };
 }  // namespace
 
-NetworkController::NetworkController(int argc, char *argv[])
+NetworkController::NetworkController(int argc, char* argv[])
   : ILoopThreadController(), auth_checker_(nullptr), server_(nullptr), config_() {
   bool daemon_mode = false;
 #ifdef OS_MACOSX
@@ -360,7 +360,7 @@ void NetworkController::readConfig() {
   setConfig(config);
 }
 
-tcp::ITcpLoopObserver * NetworkController::createHandler(){
+tcp::ITcpLoopObserver* NetworkController::createHandler(){
   inner::InnerServerHandler* handler = new inner::InnerServerHandler(server::g_inner_host, config_);
   auth_checker_ = new HttpAuthObserver(handler);
   return handler;

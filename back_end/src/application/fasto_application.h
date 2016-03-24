@@ -28,7 +28,7 @@ namespace application {
 
 class IFastoApplicationImpl {
  public:
-  IFastoApplicationImpl(int argc, char *argv[]);
+  IFastoApplicationImpl(int argc, char* argv[]);
   virtual int preExec() = 0;  // EXIT_FAILURE, EXIT_SUCCESS
   virtual int exec() = 0;  // EXIT_FAILURE, EXIT_SUCCESS
   virtual int postExec() = 0;  // EXIT_FAILURE, EXIT_SUCCESS
@@ -39,24 +39,24 @@ class IFastoApplicationImpl {
 
 class FastoApplication {
  public:
-  FastoApplication(int argc, char *argv[]);
+  FastoApplication(int argc, char* argv[]);
   ~FastoApplication();
 
   std::string appPath() const;
   std::string appDir() const;
   int argc() const;
-  char **argv() const;
+  char** argv() const;
 
-  static FastoApplication * instance();
+  static FastoApplication* instance();
 
   int exec();  // EXIT_FAILURE, EXIT_SUCCESS
   static void exit(int result);
 
  private:
-  static FastoApplication * self_;
+  static FastoApplication* self_;
 
   int argc_;
-  char **argv_;
+  char** argv_;
 
   const common::scoped_ptr<IFastoApplicationImpl> impl_;
 };

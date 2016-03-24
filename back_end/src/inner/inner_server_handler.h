@@ -53,12 +53,12 @@ class InnerServerHandler
   virtual void timerEmited(tcp::ITcpLoop* server, timer_id_type id);
 
  private:
-  virtual void handleInnerRequestCommand(InnerClient *connection,
-                                         cmd_seq_type id, int argc, char *argv[]);
-  virtual void handleInnerResponceCommand(InnerClient *connection,
-                                          cmd_seq_type id, int argc, char *argv[]);
-  virtual void handleInnerApproveCommand(InnerClient *connection,
-                                         cmd_seq_type id, int argc, char *argv[]);
+  virtual void handleInnerRequestCommand(InnerClient* connection,
+                                         cmd_seq_type id, int argc, char* argv[]);
+  virtual void handleInnerResponceCommand(InnerClient* connection,
+                                          cmd_seq_type id, int argc, char* argv[]);
+  virtual void handleInnerApproveCommand(InnerClient* connection,
+                                         cmd_seq_type id, int argc, char* argv[]);
 
   HttpConfig config_;
   InnerClient* inner_connection_;

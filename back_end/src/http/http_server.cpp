@@ -39,11 +39,11 @@ const char* HttpServer::className() const {
   return "HttpServer";
 }
 
-Http2Server::Http2Server(const common::net::hostAndPort& host, tcp::ITcpLoopObserver *observer)
+Http2Server::Http2Server(const common::net::hostAndPort& host, tcp::ITcpLoopObserver* observer)
   : HttpServer(host, observer) {
 }
 
-tcp::TcpClient *Http2Server::createClient(const common::net::socket_info &info) {
+tcp::TcpClient *Http2Server::createClient(const common::net::socket_info& info) {
   return new Http2Client(this, info);
 }
 
