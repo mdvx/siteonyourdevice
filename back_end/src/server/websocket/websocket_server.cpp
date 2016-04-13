@@ -107,7 +107,7 @@ void WebSocketServerHandlerHost::processWebsocketRequest(http::HttpClient *hclie
   path.setPath(fpath);
   chrequest.setPath(path);
 
-  common::buffer_type res = common::convertToBytes(chrequest);
+  common::buffer_t res = common::convertToBytes(chrequest);
 
   tcp::ITcpLoop *server = hclient->server();
   server->unregisterClient(hclient);

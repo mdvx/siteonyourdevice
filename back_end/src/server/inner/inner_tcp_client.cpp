@@ -48,7 +48,7 @@ class RelayHandler
   }
 
   void setClient(fasto::siteonyourdevice::tcp::TcpClient* client,
-                 const common::buffer_type &request) {
+                 const common::buffer_t &request) {
     if (client_primary_) {
       NOTREACHED();
       return;
@@ -108,7 +108,7 @@ class RelayHandler
   }
 
   virtual void timerEmited(fasto::siteonyourdevice::tcp::ITcpLoop* server,
-                           fasto::siteonyourdevice::timer_id_type id) {
+                           fasto::siteonyourdevice::timer_id_t id) {
   }
 
   void dataReceived(fasto::siteonyourdevice::tcp::TcpClient* client) {
@@ -165,7 +165,7 @@ class HttpRelayLoop
   }
 
 fasto::siteonyourdevice::tcp::ITcpLoop * createServer(fasto::siteonyourdevice::tcp::ITcpLoopObserver * handler) {
-  fasto::siteonyourdevice::tcp::TcpServer* serv = new fasto::siteonyourdevice::tcp::TcpServer(g_relay_server_host, handler);
+  fasto::siteonyourdevice::tcp::TcpServer* serv = new fasto::siteonyourdevice::tcp::TcpServer(fasto::siteonyourdevice::server::g_relay_server_host, handler);
   serv->setName("http_proxy_relay_server");
 
   common::Error err = serv->bind();
@@ -212,7 +212,7 @@ class WebSocketRelayLoop
   }
 
   fasto::siteonyourdevice::tcp::ITcpLoop * createServer(fasto::siteonyourdevice::tcp::ITcpLoopObserver * handler) {
-    fasto::siteonyourdevice::tcp::TcpServer* serv = new fasto::siteonyourdevice::tcp::TcpServer(g_relay_server_host, handler);
+    fasto::siteonyourdevice::tcp::TcpServer* serv = new fasto::siteonyourdevice::tcp::TcpServer(fasto::siteonyourdevice::server::g_relay_server_host, handler);
     serv->setName("websockets_proxy_relay_server");
 
     common::Error err = serv->bind();
@@ -284,7 +284,7 @@ const char* InnerTcpServerClient::className() const {
 }
 
 void InnerTcpServerClient::addHttpRelayClient(InnerServerHandlerHost* handler,
-                                        TcpClient *client, const common::buffer_type &request) {
+                                        TcpClient *client, const common::buffer_t &request) {
   for (size_t i = 0; i < relays_http_.size(); ++i) {
     http_relay_loop_t loop = relays_http_[i];
     if (loop->readyForRequest()) {
@@ -300,7 +300,7 @@ void InnerTcpServerClient::addHttpRelayClient(InnerServerHandlerHost* handler,
 }
 
 void InnerTcpServerClient::addWebsocketRelayClient(InnerServerHandlerHost* handler,
-                                             TcpClient *client, const common::buffer_type& request,
+                                             TcpClient *client, const common::buffer_t& request,
                                              const common::net::hostAndPort& srcHost) {
   websocket_relay_loop_t tmp(new WebSocketRelayLoop(handler, this,
                                                     std::make_pair(client, request), srcHost));

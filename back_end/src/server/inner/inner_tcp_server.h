@@ -53,7 +53,7 @@ class InnerServerHandlerHost
   virtual void dataReceived(tcp::TcpClient* client);
   virtual void dataReadyToWrite(tcp::TcpClient* client);
   virtual void postLooped(tcp::ITcpLoop* server);
-  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_type id);
+  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_t id);
 
   virtual ~InnerServerHandlerHost();
 
@@ -61,11 +61,11 @@ class InnerServerHandlerHost
 
  private:
   virtual void handleInnerRequestCommand(siteonyourdevice::inner::InnerClient *connection,
-                                         cmd_seq_type id, int argc, char *argv[]);
+                                         cmd_seq_t id, int argc, char *argv[]);
   virtual void handleInnerResponceCommand(siteonyourdevice::inner::InnerClient *connection,
-                                          cmd_seq_type id, int argc, char *argv[]);
+                                          cmd_seq_t id, int argc, char *argv[]);
   virtual void handleInnerApproveCommand(siteonyourdevice::inner::InnerClient *connection,
-                                         cmd_seq_type id, int argc, char *argv[]);
+                                         cmd_seq_t id, int argc, char *argv[]);
 
   HttpServerHost* const parent_;
 
@@ -73,7 +73,7 @@ class InnerServerHandlerHost
   RedisSub *sub_commands_in_;
   InnerSubHandler *handler_;
   std::shared_ptr<common::thread::Thread<void> > redis_subscribe_command_in_thread_;
-  timer_id_type ping_client_id_timer_;
+  timer_id_t ping_client_id_timer_;
 };
 
 class InnerTcpServer

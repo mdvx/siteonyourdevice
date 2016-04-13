@@ -123,8 +123,9 @@ int main(int argc, char *argv[]) {
         SET_LOG_HANDLER(&app_logger_hadler);
     }
 
-    server = new fasto::siteonyourdevice::server::HttpServerHost(g_http_host,
-                                                                 g_inner_host, g_websocket_host);
+    server = new fasto::siteonyourdevice::server::HttpServerHost(fasto::siteonyourdevice::server::g_http_host,
+                                                                 fasto::siteonyourdevice::server::g_inner_host,
+                                                                 fasto::siteonyourdevice::server::g_websocket_host);
 
     sync_config();
 

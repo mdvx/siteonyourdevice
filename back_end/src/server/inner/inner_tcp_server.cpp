@@ -46,7 +46,7 @@ class InnerServerHandlerHost::InnerSubHandler
     : parent_(parent) {
   }
 
-  void processSubscribed(cmd_seq_type request_id, int argc, char *argv[]) {
+  void processSubscribed(cmd_seq_t request_id, int argc, char *argv[]) {
     sds join = sdsempty();
     join = sdscatfmt(join, "%s ", request_id.c_str());
     for (int i = 0; i < argc; ++i) {
@@ -92,7 +92,7 @@ class InnerServerHandlerHost::InnerSubHandler
                          space + 1);  // only REQUEST_COMMAND
 
     char *star_seq = NULL;
-    cmd_id_type seq = strtoul(buff, &star_seq, 10);
+    cmd_id_t seq = strtoul(buff, &star_seq, 10);
     if (*star_seq != ' ') {
       std::string resp = common::MemSPrintf("PROBLEM EXTRACTING SEQUENCE: %s", space + 1);
       DEBUG_MSG(common::logging::L_WARNING, resp);
@@ -109,7 +109,7 @@ class InnerServerHandlerHost::InnerSubHandler
     }
 
     size_t len_seq = id_ptr - (star_seq + 1);
-    cmd_seq_type id = std::string(star_seq + 1, len_seq);
+    cmd_seq_t id = std::string(star_seq + 1, len_seq);
     const char *cmd = id_ptr;
 
     InnerTcpServerClient* fclient = parent_->parent_->findInnerConnectionByHost(msg);
@@ -174,7 +174,7 @@ void InnerServerHandlerHost::moved(tcp::TcpClient* client) {
 void InnerServerHandlerHost::postLooped(tcp::ITcpLoop *server) {
 }
 
-void InnerServerHandlerHost::timerEmited(tcp::ITcpLoop* server, timer_id_type id) {
+void InnerServerHandlerHost::timerEmited(tcp::ITcpLoop* server, timer_id_t id) {
   if (ping_client_id_timer_ == id) {
     std::vector<tcp::TcpClient *> online_clients = server->clients();
     for (size_t i = 0; i < online_clients.size(); ++i) {
@@ -242,7 +242,7 @@ void InnerServerHandlerHost::setStorageConfig(const redis_sub_configuration_t& c
 }
 
 void InnerServerHandlerHost::handleInnerRequestCommand(siteonyourdevice::inner::InnerClient *connection,
-                                                       cmd_seq_type id, int argc, char *argv[]) {
+                                                       cmd_seq_t id, int argc, char *argv[]) {
   char* command = argv[0];
 
   if (IS_EQUAL_COMMAND(command, PING_COMMAND)) {
@@ -256,7 +256,7 @@ void InnerServerHandlerHost::handleInnerRequestCommand(siteonyourdevice::inner::
 }
 
 void InnerServerHandlerHost::handleInnerResponceCommand(siteonyourdevice::inner::InnerClient *connection,
-                                                        cmd_seq_type id, int argc, char *argv[]) {
+                                                        cmd_seq_t id, int argc, char *argv[]) {
   ssize_t nwrite = 0;
   char* state_command = argv[0];
 
@@ -356,7 +356,7 @@ fail:
 }
 
 void InnerServerHandlerHost::handleInnerApproveCommand(siteonyourdevice::inner::InnerClient *connection,
-                                                       cmd_seq_type id, int argc, char *argv[]) {
+                                                       cmd_seq_t id, int argc, char *argv[]) {
   char* command = argv[0];
 
   if (IS_EQUAL_COMMAND(command, SUCCESS_COMMAND)) {

@@ -45,7 +45,7 @@ class InnerTcpServerClient;
 class IInnerRelayLoop
         : public ILoopThreadController {
  public:
-  typedef std::pair<tcp::TcpClient *, common::buffer_type> request_t;
+  typedef std::pair<tcp::TcpClient *, common::buffer_t> request_t;
   IInnerRelayLoop(fasto::siteonyourdevice::inner::InnerServerCommandSeqParser *handler,
                   InnerTcpServerClient *parent, const request_t& request);
   ~IInnerRelayLoop();
@@ -75,9 +75,9 @@ class InnerTcpServerClient
   UserAuthInfo serverHostInfo() const;
 
   void addHttpRelayClient(InnerServerHandlerHost* handler, tcp::TcpClient* client,
-                          const common::buffer_type& request);  // move ovnerships
+                          const common::buffer_t& request);  // move ovnerships
   void addWebsocketRelayClient(InnerServerHandlerHost* handler, tcp::TcpClient* client,
-                               const common::buffer_type& request,
+                               const common::buffer_t& request,
                                  const common::net::hostAndPort &srcHost);  // move ovnerships
 
  private:
