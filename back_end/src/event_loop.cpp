@@ -29,7 +29,7 @@ namespace {
 
 struct fasto_async_cb {
   ev_async async;
-  fasto::siteonyourdevice::async_loop_exec_function_type func;
+  fasto::siteonyourdevice::async_loop_exec_function_t func;
 };
 
 void async_exec_cb(struct ev_loop* loop, struct ev_async* watcher, int revents) {
@@ -85,7 +85,7 @@ void LibEvLoop::stop_timer(ev_timer * timer) {
   ev_timer_stop(loop_, timer);
 }
 
-void LibEvLoop::execInLoopThread(async_loop_exec_function_type async_cb) {
+void LibEvLoop::execInLoopThread(async_loop_exec_function_t async_cb) {
   if (isLoopThread()) {
     async_cb();
   } else {

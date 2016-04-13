@@ -67,7 +67,7 @@ namespace siteonyourdevice {
 namespace tcp {
 
 class LoopTimer
-  : public common::patterns::id_counter<LoopTimer, timer_id_type> {
+  : public common::patterns::id_counter<LoopTimer, timer_id_t> {
  public:
   explicit LoopTimer(ITcpLoop* server)
     : server_(server), timer_((struct ev_timer*)calloc(1, sizeof(struct ev_timer))) {
@@ -156,7 +156,7 @@ void ITcpLoop::closeClient(TcpClient* client) {
                         client->formatedName(), formatedName(), clients_.size());
 }
 
-timer_id_type ITcpLoop::createTimer(double sec, double repeat) {
+timer_id_t ITcpLoop::createTimer(double sec, double repeat) {
   LoopTimer * timer = new LoopTimer(this);
   ev_timer_init(timer->timer_, timer_cb, sec, repeat);
   loop_->start_timer(timer->timer_);
@@ -164,7 +164,7 @@ timer_id_type ITcpLoop::createTimer(double sec, double repeat) {
   return timer->id();
 }
 
-void ITcpLoop::removeTimer(timer_id_type id) {
+void ITcpLoop::removeTimer(timer_id_t id) {
   for (std::vector<LoopTimer *>::iterator it = timers_.begin(); it != timers_.end(); ++it) {
     LoopTimer * timer = *it;
     if (timer->id() == id) {
@@ -179,7 +179,7 @@ common::patterns::id_counter<ITcpLoop>::type_t ITcpLoop::id() const {
   return id_.id();
 }
 
-void ITcpLoop::execInLoopThread(async_loop_exec_function_type func) {
+void ITcpLoop::execInLoopThread(async_loop_exec_function_t func) {
   loop_->execInLoopThread(func);
 }
 

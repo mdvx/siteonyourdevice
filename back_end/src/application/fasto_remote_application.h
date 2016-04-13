@@ -38,20 +38,20 @@ class NetworkController;
 }  // namespace network
 
 namespace application {
+
 class FastoRemoteApplication
         : public IFastoApplicationImpl {
  public:
   FastoRemoteApplication(int argc, char* argv[]);
-  ~FastoRemoteApplication();
+  virtual ~FastoRemoteApplication();
 
   virtual int exec();
   virtual void exit(int result);
 
- protected:
+ private:
   virtual int preExec();
   virtual int postExec();
 
- protected:
   network::NetworkController* controller_;
   network::NetworkEventHandler* network_handler_;
   common::thread::EventThread<NetworkEventTypes>* const thread_;  // event thread handle

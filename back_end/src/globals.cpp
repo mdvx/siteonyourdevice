@@ -22,6 +22,18 @@
 
 #include "common/convert2string.h"
 
+namespace {
+
+const std::string SNetworkEventTypes[] = {
+  "InnerClientConnected",
+  "InnerClientDisconnected",
+  "ConfigChanged",
+
+  "CountNetworkEvent"
+};
+
+}
+
 namespace common {
 
 std::string convertToString(NetworkEventTypes net) {

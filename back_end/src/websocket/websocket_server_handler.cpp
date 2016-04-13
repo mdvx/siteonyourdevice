@@ -279,7 +279,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient* hclient,
     return;
   }
 
-  const std::string sec_key = key_field.value + WEBSOCK_GUID;
+  std::string sec_key = key_field.value + WEBSOCK_GUID;
 
   sha1nfo s;
 
@@ -287,8 +287,8 @@ void WebSocketServerHandler::handleRequest(http::HttpClient* hclient,
   sha1_write(&s, sec_key.c_str(), sec_key.length());
   uint8_t* sha_bin_ptr = sha1_result(&s);
 
-  common::buffer_type bin_sha1 = MAKE_BUFFER_TYPE_SIZE(sha_bin_ptr, HASH_LENGTH);
-  common::buffer_type enc_accept = common::utils::base64::encode64(bin_sha1);
+  common::buffer_t bin_sha1 = MAKE_buffer_t_SIZE(sha_bin_ptr, HASH_LENGTH);
+  common::buffer_t enc_accept = common::utils::base64::encode64(bin_sha1);
   std::string header_up = common::MemSPrintf("Upgrade: websocket\r\n"
                                              "Connection: Upgrade\r\n"
                                              "Sec-WebSocket-Accept: %s",

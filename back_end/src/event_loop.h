@@ -27,7 +27,7 @@
 namespace fasto {
 namespace siteonyourdevice {
 
-typedef std::function<void()> async_loop_exec_function_type;
+typedef std::function<void()> async_loop_exec_function_t;
 
 class EvLoopObserver {
  public:
@@ -51,7 +51,7 @@ class LibEvLoop {
   void start_timer(ev_timer* timer);
   void stop_timer(ev_timer* timer);
 
-  void execInLoopThread(async_loop_exec_function_type async_cb);
+  void execInLoopThread(async_loop_exec_function_t async_cb);
 
   int exec();
   void stop();
@@ -64,7 +64,7 @@ class LibEvLoop {
 
   struct ev_loop* const loop_;
   EvLoopObserver* observer_;
-  common::thread::platform_threadid_type exec_id_;
+  common::thread::platform_thread_id_type exec_id_;
   ev_async* async_stop_;
 };
 

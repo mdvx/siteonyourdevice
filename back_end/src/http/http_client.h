@@ -89,8 +89,8 @@ class Http2Client
 
  private:
   bool is_http2() const;
-  StreamSPtr findStreamByStreamID(IStream::stream_id_type stream_id) const;
-  StreamSPtr findStreamByType(common::http2::frame_type type) const;
+  StreamSPtr findStreamByStreamID(IStream::stream_id_t stream_id) const;
+  StreamSPtr findStreamByType(common::http2::frame_t type) const;
   streams_t streams_;
 };
 

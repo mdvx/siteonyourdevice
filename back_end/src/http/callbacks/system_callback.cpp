@@ -72,7 +72,7 @@ bool HttpSystemShutdownCallback::handleRequest(http::HttpClient* hclient, const 
   bool isKeepAlive = EqualsASCII(connectionField.value, "Keep-Alive", false);
   const common::http::http_protocols protocol = request.protocol();
 
-  common::system::shutdown_types sh_type;
+  common::system::shutdown_t sh_type;
   if (type_ == system_shutdown) {
     sh_type = common::system::SHUTDOWN;
   } else if (type_ == system_logout) {
@@ -86,7 +86,7 @@ bool HttpSystemShutdownCallback::handleRequest(http::HttpClient* hclient, const 
   common::Error err = common::system::systemShutdown(sh_type);
   if (err && err->isError()) {
     DEBUG_MSG_ERROR(err);
-    const std::string cause = common::MemSPrintf("Shutdown failed(%s).", err->description());
+    std::string cause = common::MemSPrintf("Shutdown failed(%s).", err->description());
     err = hclient->send_error(protocol, common::http::HS_NOT_ALLOWED, extra_header,
                               cause.c_str(), isKeepAlive, info);
     if (err && err->isError()) {

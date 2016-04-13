@@ -31,13 +31,13 @@ class InnerClient;
 
 class RequestCallback {
  public:
-  typedef std::function<void(cmd_seq_type request_id, int argc, char* argv[])> callback_t;
-  RequestCallback(cmd_seq_type request_id, callback_t cb);
-  cmd_seq_type request_id() const;
+  typedef std::function<void(cmd_seq_t request_id, int argc, char* argv[])> callback_t;
+  RequestCallback(cmd_seq_t request_id, callback_t cb);
+  cmd_seq_t request_id() const;
   void execute(int argc, char *argv[]);
 
  private:
-  cmd_seq_type request_id_;
+  cmd_seq_t request_id_;
   callback_t cb_;
 };
 
@@ -49,7 +49,7 @@ class InnerServerCommandSeqParser {
   template<typename... Args>
   cmd_request_t make_request(const char* cmd_fmt, Args... args) {
     char buff[MAX_COMMAND_SIZE] = {0};
-    cmd_seq_type id = next_id();
+    cmd_seq_t id = next_id();
     int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, REQUEST_COMMAND, id, args...);
     CHECK_NE(res, -1);
     return cmd_request_t(id, buff);
@@ -61,7 +61,7 @@ class InnerServerCommandSeqParser {
   void handleInnerDataReceived(InnerClient* connection, char* buff, uint32_t buff_len);
 
   template<typename... Args>
-  cmd_responce_t make_responce(cmd_seq_type id, const char* cmd_fmt, Args... args) {
+  cmd_responce_t make_responce(cmd_seq_t id, const char* cmd_fmt, Args... args) {
     char buff[MAX_COMMAND_SIZE] = {0};
     int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, RESPONCE_COMMAND, id, args...);
     CHECK_NE(res, -1);
@@ -69,7 +69,7 @@ class InnerServerCommandSeqParser {
   }
 
   template<typename... Args>
-  cmd_approve_t make_approve_responce(cmd_seq_type id, const char* cmd_fmt, Args... args) {
+  cmd_approve_t make_approve_responce(cmd_seq_t id, const char* cmd_fmt, Args... args) {
     char buff[MAX_COMMAND_SIZE] = {0};
     int res = common::SNPrintf(buff, MAX_COMMAND_SIZE, cmd_fmt, APPROVE_COMMAND, id, args...);
     CHECK_NE(res, -1);
@@ -77,14 +77,14 @@ class InnerServerCommandSeqParser {
   }
 
  private:
-  void processRequest(cmd_seq_type request_id, int argc, char *argv[]);
+  void processRequest(cmd_seq_t request_id, int argc, char *argv[]);
 
-  cmd_seq_type next_id();
-  virtual void handleInnerRequestCommand(InnerClient *connection, cmd_seq_type id,
+  cmd_seq_t next_id();
+  virtual void handleInnerRequestCommand(InnerClient *connection, cmd_seq_t id,
                                          int argc, char *argv[]) = 0;  // called when argv not NULL and argc > 0 , only responce
-  virtual void handleInnerResponceCommand(InnerClient *connection, cmd_seq_type id,
+  virtual void handleInnerResponceCommand(InnerClient *connection, cmd_seq_t id,
                                           int argc, char *argv[]) = 0;  // called when argv not NULL and argc > 0, only approve responce
-  virtual void handleInnerApproveCommand(InnerClient *connection, cmd_seq_type id,
+  virtual void handleInnerApproveCommand(InnerClient *connection, cmd_seq_t id,
                                          int argc, char *argv[]) = 0;  // called when argv not NULL and argc > 0
 
   common::atomic<uintmax_t> id_;

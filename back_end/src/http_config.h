@@ -46,7 +46,7 @@
 namespace fasto {
 namespace siteonyourdevice {
 
-enum http_server_type {
+enum http_server_t {
   FASTO_SERVER = 0,
   EXTERNAL_SERVER = 1
 };
@@ -59,13 +59,13 @@ struct HttpConfig {
   bool is_private_site;
 
   common::net::hostAndPort external_host;
-  http_server_type server_type;
+  http_server_t server_type;
 
-  typedef std::pair<std::string, std::string>  handlers_urls_t;
-  std::vector<handlers_urls_t> handlers_urls;
+  typedef std::pair<std::string, std::string>  handlers_url_t;
+  std::vector<handlers_url_t> handlers_urls;
 
-  typedef std::pair<std::string, common::uri::Uri> server_sockets_urls_t;
-  std::vector<server_sockets_urls_t> server_sockets_urls;
+  typedef std::pair<std::string, common::uri::Uri> server_sockets_url_t;
+  std::vector<server_sockets_url_t> server_sockets_urls;
 };
 
 }  // namespace siteonyourdevice

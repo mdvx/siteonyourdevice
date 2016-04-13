@@ -50,19 +50,19 @@ class InnerServerHandler
   virtual void dataReceived(tcp::TcpClient* client);
   virtual void dataReadyToWrite(tcp::TcpClient* client);
   virtual void postLooped(tcp::ITcpLoop* server);
-  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_type id);
+  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_t id);
 
  private:
   virtual void handleInnerRequestCommand(InnerClient* connection,
-                                         cmd_seq_type id, int argc, char* argv[]);
+                                         cmd_seq_t id, int argc, char* argv[]);
   virtual void handleInnerResponceCommand(InnerClient* connection,
-                                          cmd_seq_type id, int argc, char* argv[]);
+                                          cmd_seq_t id, int argc, char* argv[]);
   virtual void handleInnerApproveCommand(InnerClient* connection,
-                                         cmd_seq_type id, int argc, char* argv[]);
+                                         cmd_seq_t id, int argc, char* argv[]);
 
   HttpConfig config_;
   InnerClient* inner_connection_;
-  timer_id_type ping_server_id_timer_;
+  timer_id_t ping_server_id_timer_;
 
   const common::net::hostAndPort innerHost_;
 };

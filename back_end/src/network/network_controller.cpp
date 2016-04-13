@@ -62,7 +62,7 @@ int ini_handler_fasto(void* user, const char* section, const char* name, const c
     pconfig->external_host = common::convertFromString<common::net::hostAndPort>(value);
     return 1;
   } else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, SERVER_TYPE_SETTING_LABEL)) {
-    pconfig->server_type = (fasto::siteonyourdevice::http_server_type)atoi(value);
+    pconfig->server_type = (fasto::siteonyourdevice::http_server_t)atoi(value);
     return 1;
   } else if (strcmp(section, HANDLERS_URLS_SECTION_LABEL) == 0) {
     pconfig->handlers_urls.push_back(std::make_pair(name, value));
@@ -133,8 +133,8 @@ class ServerControllerBase
 
     // handler prepare
     for (size_t i = 0; i < config_.handlers_urls.size(); ++i) {
-      HttpConfig::handlers_urls_t handurl = config_.handlers_urls[i];
-      const std::string httpcallbackstr = handurl.second;
+      HttpConfig::handlers_url_t handurl = config_.handlers_urls[i];
+      std::string httpcallbackstr = handurl.second;
       std::string httpcallback_ns = handurl.second;
       std::string httpcallback_name;
       std::string::size_type ns_del = httpcallbackstr.find_first_of("::");
@@ -150,8 +150,8 @@ class ServerControllerBase
     }
 
     for (size_t i = 0; i < config_.server_sockets_urls.size(); ++i) {
-      HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls[i];
-      const common::uri::Uri url = sock_url.second;
+      HttpConfig::server_sockets_url_t sock_url = config_.server_sockets_urls[i];
+      common::uri::Uri url = sock_url.second;
       handler->registerSocketUrl(url);
     }
 
@@ -261,7 +261,7 @@ void NetworkController::connect() {
     return;
   }
 
-  const http_server_type server_type = config_.server_type;
+  const http_server_t server_type = config_.server_type;
   const common::net::hostAndPort externalHost = config_.external_host;
   if (server_type == FASTO_SERVER) {
      server_ = new LocalHttpServerController(auth_checker_, config_);
@@ -320,13 +320,13 @@ void NetworkController::saveConfig() {
   configSave.writeFormated(SERVER_TYPE_SETTING_LABEL "=%u\n", config_.server_type);
   configSave.write("[" HANDLERS_URLS_SECTION_LABEL "]\n");
   for (size_t i = 0; i < config_.handlers_urls.size(); ++i) {
-    HttpConfig::handlers_urls_t handurl = config_.handlers_urls[i];
+    HttpConfig::handlers_url_t handurl = config_.handlers_urls[i];
     configSave.writeFormated("%s=%s\n", handurl.first, handurl.second);
   }
   configSave.write("[" SERVER_SOCKETS_SECTION_LABEL "]\n");
   for (size_t i = 0; i < config_.server_sockets_urls.size(); ++i) {
-    HttpConfig::server_sockets_urls_t sock_url = config_.server_sockets_urls[i];
-    const std::string url = sock_url.second.get_url();
+    HttpConfig::server_sockets_url_t sock_url = config_.server_sockets_urls[i];
+    std::string url = sock_url.second.get_url();
     configSave.writeFormated("%s=%s\n", sock_url.first, url);
   }
   configSave.close();
@@ -349,7 +349,7 @@ void NetworkController::readConfig() {
   config.content_path = USER_SPECIFIC_CONTENT_PATH;
   config.is_private_site = USER_SPECIFIC_DEFAULT_PRIVATE_SITE;
   config.external_host = common::convertFromString<common::net::hostAndPort>(USER_SPECIFIC_DEFAULT_EXTERNAL_DOMAIN);
-  config.server_type = static_cast<http_server_type>(USER_SPECIFIC_SERVER_TYPE);
+  config.server_type = static_cast<http_server_t>(USER_SPECIFIC_SERVER_TYPE);
 
   // try to parse settings file
   if (ini_parse(path, ini_handler_fasto, &config) < 0) {

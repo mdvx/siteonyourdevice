@@ -278,7 +278,7 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
     common::http2::http2_nvs_t nvs;
 
     common::http2::http2_nv nvstatus;
-    nvstatus.name = MAKE_BUFFER_TYPE(":status");
+    nvstatus.name = MAKE_buffer_t(":status");
     nvstatus.value = common::convertToBytes((uint32_t)status);
     nvs.push_back(nvstatus);
 
@@ -286,29 +286,29 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
     time_t now = time(nullptr);
     strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime(&now));
     common::http2::http2_nv nvdate;
-    nvdate.name = MAKE_BUFFER_TYPE("date");
+    nvdate.name = MAKE_buffer_t("date");
     nvdate.value = common::convertToBytes(timebuf);
     nvs.push_back(nvdate);
 
     common::http2::http2_nv nvserver;
-    nvserver.name = MAKE_BUFFER_TYPE("server");
+    nvserver.name = MAKE_buffer_t("server");
     nvserver.value = common::convertToBytes(info.server_name);
     nvs.push_back(nvserver);
 
     /*http2::http2_nv nvenc;
-    nvenc.name = MAKE_BUFFER_TYPE("content-encoding");
-    nvenc.value = MAKE_BUFFER_TYPE("deflate");
+    nvenc.name = MAKE_buffer_t("content-encoding");
+    nvenc.value = MAKE_buffer_t("deflate");
     nvs.push_back(nvenc);*/
 
     if (mime_type) {
       common::http2::http2_nv nvmime;
-      nvmime.name = MAKE_BUFFER_TYPE("content-type");
+      nvmime.name = MAKE_buffer_t("content-type");
       nvmime.value = common::convertToBytes(mime_type);
       nvs.push_back(nvmime);
     }
     if (length) {
       common::http2::http2_nv nvlen;
-      nvlen.name = MAKE_BUFFER_TYPE("content-length");
+      nvlen.name = MAKE_buffer_t("content-length");
       nvlen.value = common::convertToBytes(*length);
       nvs.push_back(nvlen);
     }
@@ -316,13 +316,13 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
     if (mod) {
       strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime(mod));
       common::http2::http2_nv nvmod;
-      nvmod.name = MAKE_BUFFER_TYPE("last-modified");
+      nvmod.name = MAKE_buffer_t("last-modified");
       nvmod.value = common::convertToBytes(timebuf);
       nvs.push_back(nvmod);
     }
 
     common::http2::http2_deflater hd;
-    common::buffer_type buff;
+    common::buffer_t buff;
     hd.http2_deflate_hd_bufs(buff, nvs);
 
     common::http2::frame_hdr hdr = common::http2::frame_headers::create_frame_header(common::http2::HTTP2_FLAG_END_HEADERS, header_stream->sid(), buff.size());
@@ -335,7 +335,7 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
                                   mime_type, length, mod, is_keep_alive, info);
 }
 
-StreamSPtr Http2Client::findStreamByStreamID(IStream::stream_id_type stream_id) const {
+StreamSPtr Http2Client::findStreamByStreamID(IStream::stream_id_t stream_id) const {
   for (size_t i = 0; i < streams_.size(); ++i) {
     StreamSPtr stream = streams_[i];
     if (stream->sid() == stream_id) {
@@ -346,7 +346,7 @@ StreamSPtr Http2Client::findStreamByStreamID(IStream::stream_id_type stream_id) 
   return StreamSPtr();
 }
 
-StreamSPtr Http2Client::findStreamByType(common::http2::frame_type type) const {
+StreamSPtr Http2Client::findStreamByType(common::http2::frame_t type) const {
   for (size_t i = 0; i < streams_.size(); ++i) {
     StreamSPtr stream = streams_[i];
     if (stream->type() == type) {

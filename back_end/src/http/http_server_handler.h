@@ -60,7 +60,7 @@ class HttpServerHandler
   virtual void dataReceived(tcp::TcpClient* client);
   virtual void dataReadyToWrite(tcp::TcpClient* client);
   virtual void postLooped(tcp::ITcpLoop* server);
-  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_type id);
+  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_t id);
 
   virtual ~HttpServerHandler();
 

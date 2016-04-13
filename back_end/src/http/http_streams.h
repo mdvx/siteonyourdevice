@@ -28,10 +28,10 @@ namespace http {
 
 class IStream {
  public:
-  typedef uint32_t stream_id_type;
+  typedef uint32_t stream_id_t;
 
-  common::http2::frame_type type() const;
-  stream_id_type sid() const;
+  common::http2::frame_t type() const;
+  stream_id_t sid() const;
 
   bool processFrame(const common::http2::frame_base& frame);  // true if is handled
 
@@ -49,7 +49,7 @@ class IStream {
   virtual bool processFrameImpl(const common::http2::frame_base& frame) = 0;
 
  private:
-  common::ErrnoError sendData(const common::buffer_type& buff);
+  common::ErrnoError sendData(const common::buffer_t& buff);
   common::net::SocketHolder sock_;
   const common::http2::frame_base init_frame_;
 };

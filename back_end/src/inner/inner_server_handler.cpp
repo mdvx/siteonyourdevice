@@ -110,7 +110,7 @@ void InnerServerHandler::postLooped(tcp::ITcpLoop* server){
   }
 }
 
-void InnerServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_type id){
+void InnerServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_t id){
   if (id == ping_server_id_timer_ && inner_connection_) {
     const cmd_request_t ping_request = make_request(PING_COMMAND_REQ);
     ssize_t nwrite = 0;
@@ -132,7 +132,7 @@ void InnerServerHandler::setConfig(const HttpConfig& config){
   config_ = config;
 }
 
-void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_seq_type id,
+void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_seq_t id,
                                                    int argc, char* argv[]) {
   ssize_t nwrite = 0;
   char* command = argv[0];
@@ -345,23 +345,23 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
 
     json_object* jhttp_urls = json_object_new_array();
     for (size_t i = 0; i < config_.handlers_urls.size(); ++i) {
-        HttpConfig::handlers_urls_t url = config_.handlers_urls[i];
-        json_object* jhttp_url = json_object_new_object();
-        json_object_object_add(jhttp_url, "url", json_object_new_string(url.first.c_str()));
-        json_object_object_add(jhttp_url, "handler",
-                               json_object_new_string(url.second.c_str()));
-        json_object_array_add(jhttp_urls, jhttp_url);
+      HttpConfig::handlers_url_t url = config_.handlers_urls[i];
+      json_object* jhttp_url = json_object_new_object();
+      json_object_object_add(jhttp_url, "url", json_object_new_string(url.first.c_str()));
+      json_object_object_add(jhttp_url, "handler",
+                             json_object_new_string(url.second.c_str()));
+      json_object_array_add(jhttp_urls, jhttp_url);
     }
     json_object_object_add(config_json, HANDLERS_URLS_SECTION_LABEL, jhttp_urls);
 
     json_object* jsockets_urls = json_object_new_array();
     for (size_t i = 0; i < config_.server_sockets_urls.size(); ++i) {
-        HttpConfig::server_sockets_urls_t url = config_.server_sockets_urls[i];
-        json_object* jsocket_url = json_object_new_object();
-        json_object_object_add(jsocket_url, "type", json_object_new_string(url.first.c_str()));
-        const std::string surl = url.second.get_url();
-        json_object_object_add(jsocket_url, "path", json_object_new_string(surl.c_str()));
-        json_object_array_add(jsockets_urls, jsocket_url);
+      HttpConfig::server_sockets_url_t url = config_.server_sockets_urls[i];
+      json_object* jsocket_url = json_object_new_object();
+      json_object_object_add(jsocket_url, "type", json_object_new_string(url.first.c_str()));
+      const std::string surl = url.second.get_url();
+      json_object_object_add(jsocket_url, "path", json_object_new_string(surl.c_str()));
+      json_object_array_add(jsockets_urls, jsocket_url);
     }
     json_object_object_add(config_json, SERVER_SOCKETS_SECTION_LABEL, jsockets_urls);
 
@@ -370,120 +370,120 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
                                         config_json_string);
     common::Error err = connection->write(resp, &nwrite);
     if (err && err->isError()) {
-        DEBUG_MSG_ERROR(err);
+      DEBUG_MSG_ERROR(err);
     }
 
     json_object_put(config_json);
   } else if (IS_EQUAL_COMMAND(command, SERVER_PLEASE_SET_CONFIG_COMMAND)) {
     if (argc > 1) {
-       const char* config_json_str = argv[1];
-       json_object * config_json = json_tokener_parse(config_json_str);
-       if (!config_json) {
-           cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S,
-                                               CAUSE_INVALID_ARGS);
-           common::Error err = connection->write(resp, &nwrite);
-           if (err && err->isError()) {
-             DEBUG_MSG_ERROR(err);
-           }
-           return;
-       }
+      const char* config_json_str = argv[1];
+      json_object * config_json = json_tokener_parse(config_json_str);
+      if (!config_json) {
+        cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S,
+                                            CAUSE_INVALID_ARGS);
+        common::Error err = connection->write(resp, &nwrite);
+        if (err && err->isError()) {
+          DEBUG_MSG_ERROR(err);
+        }
+        return;
+      }
 
-       HttpConfig new_config;
-       new_config.login = config_.login;
-       new_config.password = config_.password;
+      HttpConfig new_config;
+      new_config.login = config_.login;
+      new_config.password = config_.password;
 
-       json_object* jlocal_host = NULL;
-       json_object_object_get_ex(config_json, LOCAL_HOST_SETTING_LABEL, &jlocal_host);
-       if (jlocal_host) {
-         const char * lhost_str = json_object_get_string(jlocal_host);
-         new_config.local_host = common::convertFromString<common::net::hostAndPort>(lhost_str);
-       }
+      json_object* jlocal_host = NULL;
+      json_object_object_get_ex(config_json, LOCAL_HOST_SETTING_LABEL, &jlocal_host);
+      if (jlocal_host) {
+        const char * lhost_str = json_object_get_string(jlocal_host);
+        new_config.local_host = common::convertFromString<common::net::hostAndPort>(lhost_str);
+      }
 
-       json_object* jexternal_host = NULL;
-       json_object_object_get_ex(config_json, EXTERNAL_HOST_SETTING_LABEL, &jexternal_host);
-       if (jexternal_host) {
-         const char * ehost_str = json_object_get_string(jexternal_host);
-         new_config.external_host = common::convertFromString<common::net::hostAndPort>(ehost_str);
-       }
+      json_object* jexternal_host = NULL;
+      json_object_object_get_ex(config_json, EXTERNAL_HOST_SETTING_LABEL, &jexternal_host);
+      if (jexternal_host) {
+        const char * ehost_str = json_object_get_string(jexternal_host);
+        new_config.external_host = common::convertFromString<common::net::hostAndPort>(ehost_str);
+      }
 
-       json_object* jcontent_path = NULL;
-       json_object_object_get_ex(config_json, CONTENT_PATH_SETTING_LABEL, &jcontent_path);
-       if (jcontent_path) {
-         new_config.content_path = json_object_get_string(jcontent_path);
-       }
+      json_object* jcontent_path = NULL;
+      json_object_object_get_ex(config_json, CONTENT_PATH_SETTING_LABEL, &jcontent_path);
+      if (jcontent_path) {
+        new_config.content_path = json_object_get_string(jcontent_path);
+      }
 
-       json_object* jprivate_site = NULL;
-       json_object_object_get_ex(config_json, PRIVATE_SITE_SETTING_LABEL, &jprivate_site);
-       if (jprivate_site) {
-         new_config.is_private_site = json_object_get_boolean(jprivate_site);
-       }
+      json_object* jprivate_site = NULL;
+      json_object_object_get_ex(config_json, PRIVATE_SITE_SETTING_LABEL, &jprivate_site);
+      if (jprivate_site) {
+        new_config.is_private_site = json_object_get_boolean(jprivate_site);
+      }
 
-       json_object* jserver_type = NULL;
-       json_object_object_get_ex(config_json, SERVER_TYPE_SETTING_LABEL, &jserver_type);
-       if (jserver_type) {
-         new_config.server_type = static_cast<http_server_type>(json_object_get_int(jserver_type));
-       }
+      json_object* jserver_type = NULL;
+      json_object_object_get_ex(config_json, SERVER_TYPE_SETTING_LABEL, &jserver_type);
+      if (jserver_type) {
+        new_config.server_type = static_cast<http_server_t>(json_object_get_int(jserver_type));
+      }
 
-       json_object* jhandler_urls = NULL;
-       json_object_object_get_ex(config_json, HANDLERS_URLS_SECTION_LABEL, &jhandler_urls);
-       if (jhandler_urls) {
-          int urls_count = json_object_array_length(jhandler_urls);
-          for(int i = 0; i < urls_count; ++i){
-            json_object *jurlh = json_object_array_get_idx(jhandler_urls, i);
+      json_object* jhandler_urls = NULL;
+      json_object_object_get_ex(config_json, HANDLERS_URLS_SECTION_LABEL, &jhandler_urls);
+      if (jhandler_urls) {
+        int urls_count = json_object_array_length(jhandler_urls);
+        for(int i = 0; i < urls_count; ++i){
+          json_object *jurlh = json_object_array_get_idx(jhandler_urls, i);
 
-            json_object* jurl = NULL;
-            json_object_object_get_ex(jurlh, "url", &jurl);
+          json_object* jurl = NULL;
+          json_object_object_get_ex(jurlh, "url", &jurl);
 
-            json_object* jhandler = NULL;
-            json_object_object_get_ex(jurlh, "handler", &jhandler);
-            if(jurl && jhandler){
-              std::string url_str = json_object_get_string(jurl);
-              std::string handler_str = json_object_get_string(jhandler);
-              new_config.handlers_urls.push_back(std::make_pair(url_str, handler_str));
-            }
+          json_object* jhandler = NULL;
+          json_object_object_get_ex(jurlh, "handler", &jhandler);
+          if(jurl && jhandler){
+            std::string url_str = json_object_get_string(jurl);
+            std::string handler_str = json_object_get_string(jhandler);
+            new_config.handlers_urls.push_back(std::make_pair(url_str, handler_str));
           }
-       }
+        }
+      }
 
-       json_object* jsockets_section = NULL;
-       json_object_object_get_ex(config_json, SERVER_SOCKETS_SECTION_LABEL, &jsockets_section);
-       if (jsockets_section) {
-          int sockets_count = json_object_array_length(jsockets_section);
-          for(int i = 0; i < sockets_count; ++i){
-            json_object *jtsocket = json_object_array_get_idx(jsockets_section, i);
+      json_object* jsockets_section = NULL;
+      json_object_object_get_ex(config_json, SERVER_SOCKETS_SECTION_LABEL, &jsockets_section);
+      if (jsockets_section) {
+        int sockets_count = json_object_array_length(jsockets_section);
+        for(int i = 0; i < sockets_count; ++i){
+          json_object *jtsocket = json_object_array_get_idx(jsockets_section, i);
 
-            json_object* jtype = NULL;
-            json_object_object_get_ex(jtsocket, "type", &jtype);
+          json_object* jtype = NULL;
+          json_object_object_get_ex(jtsocket, "type", &jtype);
 
-            json_object* jpath = NULL;
-            json_object_object_get_ex(jtsocket, "path", &jpath);
-            if(jtype && jpath){
-              std::string type_str = json_object_get_string(jtype);
-              std::string path_str = json_object_get_string(jpath);
-              new_config.server_sockets_urls.push_back(std::make_pair(type_str,
-                                                                      common::uri::Uri(path_str)));
-            }
+          json_object* jpath = NULL;
+          json_object_object_get_ex(jtsocket, "path", &jpath);
+          if(jtype && jpath){
+            std::string type_str = json_object_get_string(jtype);
+            std::string path_str = json_object_get_string(jpath);
+            new_config.server_sockets_urls.push_back(std::make_pair(type_str,
+                                                                    common::uri::Uri(path_str)));
           }
-       }
+        }
+      }
 
-       if(new_config.local_host.host != config_.local_host.host){
-           cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S,
+      if(new_config.local_host.host != config_.local_host.host){
+        cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S,
                                                CAUSE_INVALID_ARGS);
-           common::Error err = connection->write(resp, &nwrite);
-           if (err && err->isError()) {
-             DEBUG_MSG_ERROR(err);
-           }
-           json_object_put(config_json);
-           return;
-       }
+        common::Error err = connection->write(resp, &nwrite);
+        if (err && err->isError()) {
+          DEBUG_MSG_ERROR(err);
+        }
+        json_object_put(config_json);
+        return;
+      }
 
-       cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_SUCCSESS);
-       common::Error err = connection->write(resp, &nwrite);
-       if (err && err->isError()) {
-         DEBUG_MSG_ERROR(err);
-       }
-       json_object_put(config_json);
+      cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_SUCCSESS);
+      common::Error err = connection->write(resp, &nwrite);
+      if (err && err->isError()) {
+        DEBUG_MSG_ERROR(err);
+      }
+      json_object_put(config_json);
 
-       EVENT_BUS()->postEvent(new network::ConfigChangedEvent(this, new_config));
+      EVENT_BUS()->postEvent(new network::ConfigChangedEvent(this, new_config));
     } else {
       cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S,
                                           CAUSE_INVALID_ARGS);
@@ -499,7 +499,7 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
 }
 
 void InnerServerHandler::handleInnerResponceCommand(InnerClient* connection,
-                                                    cmd_seq_type id, int argc, char* argv[]) {
+                                                    cmd_seq_t id, int argc, char* argv[]) {
   ssize_t nwrite = 0;
   char* state_command = argv[0];
 
@@ -544,7 +544,7 @@ void InnerServerHandler::handleInnerResponceCommand(InnerClient* connection,
 }
 
 void InnerServerHandler::handleInnerApproveCommand(InnerClient* connection,
-                                                   cmd_seq_type id, int argc, char* argv[]) {
+                                                   cmd_seq_t id, int argc, char* argv[]) {
   char* command = argv[0];
 
   if (IS_EQUAL_COMMAND(command, SUCCESS_COMMAND)) {
@@ -557,8 +557,7 @@ void InnerServerHandler::handleInnerApproveCommand(InnerClient* connection,
     }
   } else if (IS_EQUAL_COMMAND(command, FAIL_COMMAND)) {
   } else {
-    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING,
-                                      "UNKNOWN COMMAND: %s", command);
+    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN COMMAND: %s", command);
   }
 }
 

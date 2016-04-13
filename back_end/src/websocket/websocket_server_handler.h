@@ -30,8 +30,8 @@ class WebSocketServerHandler
   explicit WebSocketServerHandler(const HttpServerInfo& info);
 
  protected:
-  virtual void processReceived(http::HttpClient *hclient, const char* request, size_t req_len);
-  virtual void handleRequest(http::HttpClient *hclient, const common::http::http_request& hrequest,
+  virtual void processReceived(http::HttpClient* hclient, const char* request, size_t req_len);
+  virtual void handleRequest(http::HttpClient* hclient, const common::http::http_request& hrequest,
                              bool notClose);
 };
 

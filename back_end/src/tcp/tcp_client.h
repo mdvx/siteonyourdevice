@@ -34,9 +34,9 @@ class ITcpLoop;
 class TcpClient
   : common::IMetaClassInfo {
  public:
-  typedef int flags_type;
+  typedef int flags_t;
   friend class ITcpLoop;
-  TcpClient(ITcpLoop* server, const common::net::socket_info& info, flags_type flags = EV_READ);
+  TcpClient(ITcpLoop* server, const common::net::socket_info& info, flags_t flags = EV_READ);
   virtual ~TcpClient();
 
   ITcpLoop* server() const;
@@ -52,8 +52,8 @@ class TcpClient
   void setName(const std::string& name);
   std::string name() const;
 
-  flags_type flags() const;
-  void setFlags(flags_type flags);
+  flags_t flags() const;
+  void setFlags(flags_t flags);
 
   common::patterns::id_counter<TcpClient>::type_t id() const;
   virtual const char* className() const;

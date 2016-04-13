@@ -84,21 +84,21 @@
 namespace fasto {
 namespace siteonyourdevice {
 
-typedef std::string cmd_seq_type;
-typedef uint8_t cmd_id_type;
+typedef std::string cmd_seq_t;
+typedef uint8_t cmd_id_t;
 
-template<cmd_id_type cmd_id>
+template<cmd_id_t cmd_id>
 class InnerCmd {
  public:
-  InnerCmd(cmd_seq_type id, const std::string& cmd)
+  InnerCmd(cmd_seq_t id, const std::string& cmd)
     : id_(id), cmd_(cmd) {
   }
 
-  static cmd_id_type type() {
+  static cmd_id_t type() {
     return cmd_id;
   }
 
-  cmd_seq_type id() const {
+  cmd_seq_t id() const {
     return id_;
   }
 
@@ -106,7 +106,7 @@ class InnerCmd {
     return cmd_;
   }
 
-  const char * data() const {
+  const char* data() const {
     return cmd_.c_str();
   }
 
@@ -115,8 +115,8 @@ class InnerCmd {
   }
 
  private:
-  cmd_seq_type id_;
-  std::string cmd_;
+  const cmd_seq_t id_;
+  const std::string cmd_;
 };
 
 typedef InnerCmd<REQUEST_COMMAND> cmd_request_t;

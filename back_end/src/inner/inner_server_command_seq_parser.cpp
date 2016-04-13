@@ -36,11 +36,11 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-RequestCallback::RequestCallback(cmd_seq_type request_id, callback_t cb)
+RequestCallback::RequestCallback(cmd_seq_t request_id, callback_t cb)
   : request_id_(request_id), cb_(cb) {
 }
 
-cmd_seq_type RequestCallback::request_id() const {
+cmd_seq_t RequestCallback::request_id() const {
   return request_id_;
 }
 
@@ -59,7 +59,7 @@ InnerServerCommandSeqParser::InnerServerCommandSeqParser()
 InnerServerCommandSeqParser::~InnerServerCommandSeqParser() {
 }
 
-cmd_seq_type InnerServerCommandSeqParser::next_id() {
+cmd_seq_t InnerServerCommandSeqParser::next_id() {
   size_t next_id = id_++;
   char bytes[sizeof(size_t)];
   betoh_memcpy(&bytes, &next_id, sizeof(bytes));
@@ -69,7 +69,7 @@ cmd_seq_type InnerServerCommandSeqParser::next_id() {
 
 namespace {
 
-  bool exec_reqest(RequestCallback req, cmd_seq_type request_id, int argc, char *argv[]) {
+  bool exec_reqest(RequestCallback req, cmd_seq_t request_id, int argc, char *argv[]) {
     if (request_id == req.request_id()) {
         req.execute(argc, argv);
       return true;
@@ -80,7 +80,7 @@ namespace {
 
 }  // namespace
 
-void InnerServerCommandSeqParser::processRequest(cmd_seq_type request_id, int argc, char* argv[]) {
+void InnerServerCommandSeqParser::processRequest(cmd_seq_t request_id, int argc, char* argv[]) {
   subscribed_requests_.erase(std::remove_if(subscribed_requests_.begin(),
                                             subscribed_requests_.end(),
                                             std::bind(&exec_reqest, std::placeholders::_1,
@@ -111,7 +111,7 @@ void InnerServerCommandSeqParser::handleInnerDataReceived(InnerClient* connectio
   *end = 0;
 
   char *star_seq = NULL;
-  cmd_id_type seq = strtoul(buff, &star_seq, 10);
+  cmd_id_t seq = strtoul(buff, &star_seq, 10);
   if (*star_seq != ' ') {
     DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING,
                                        "PROBLEM EXTRACTING SEQUENCE: %s", buff);
@@ -140,7 +140,7 @@ void InnerServerCommandSeqParser::handleInnerDataReceived(InnerClient* connectio
   }
 
   size_t len_seq = id_ptr - (star_seq + 1);
-  cmd_seq_type id = std::string(star_seq + 1, len_seq);
+  cmd_seq_t id = std::string(star_seq + 1, len_seq);
   const char *cmd = id_ptr;
 
   int argc;

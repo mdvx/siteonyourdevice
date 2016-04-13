@@ -33,7 +33,7 @@
 namespace fasto {
 namespace siteonyourdevice {
 
-typedef int timer_id_type;
+typedef int timer_id_t;
 
 namespace tcp {
 
@@ -55,8 +55,8 @@ class ITcpLoop
   void unregisterClient(TcpClient* client);
   virtual void closeClient(TcpClient* client);
 
-  timer_id_type createTimer(double sec, double repeat);
-  void removeTimer(timer_id_type id);
+  timer_id_t createTimer(double sec, double repeat);
+  void removeTimer(timer_id_t id);
 
   void changeFlags(TcpClient* client);
 
@@ -68,7 +68,7 @@ class ITcpLoop
   virtual const char* className() const = 0;
   std::string formatedName() const;
 
-  void execInLoopThread(async_loop_exec_function_type func);
+  void execInLoopThread(async_loop_exec_function_t func);
 
   bool isLoopThread() const;
 
@@ -105,7 +105,7 @@ class ITcpLoopObserver {
   virtual void accepted(TcpClient* client) = 0;
   virtual void moved(TcpClient* client) = 0;
   virtual void closed(TcpClient* client) = 0;
-  virtual void timerEmited(ITcpLoop* server, timer_id_type id) = 0;
+  virtual void timerEmited(ITcpLoop* server, timer_id_t id) = 0;
 
   virtual void dataReceived(TcpClient* client) = 0;
   virtual void dataReadyToWrite(TcpClient* client) = 0;

@@ -24,11 +24,11 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace http {
 
-common::http2::frame_type IStream::type() const {
+common::http2::frame_t IStream::type() const {
   return init_frame_.type();
 }
 
-IStream::stream_id_type IStream::sid() const {
+IStream::stream_id_t IStream::sid() const {
   return init_frame_.stream_id();
 }
 
@@ -45,14 +45,14 @@ bool IStream::processFrame(const common::http2::frame_base& frame) {
   return processFrameImpl(frame);
 }
 
-common::ErrnoError IStream::sendData(const common::buffer_type& buff) {
+common::ErrnoError IStream::sendData(const common::buffer_t& buff) {
   ssize_t nwrite = 0;
   return sock_.write((const char*)buff.data(), buff.size(), &nwrite);
 }
 
 common::ErrnoError IStream::sendFrame(const common::http2::frame_base& frame) {
   CHECK(sid() == frame.stream_id());
-  common::buffer_type raw = frame.raw_data();
+  common::buffer_t raw = frame.raw_data();
   return sendData(raw);
 }
 
@@ -70,7 +70,7 @@ IStream* IStream::createStream(const common::net::socket_info& info,
     return nullptr;
   }
 
-  common::http2::frame_type type = frame.type();
+  common::http2::frame_t type = frame.type();
 
   switch (type) {
   case common::http2::HTTP2_DATA:

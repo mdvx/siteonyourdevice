@@ -62,7 +62,7 @@ void Http2ClientServerHandler::postLooped(tcp::ITcpLoop* server) {
   Http2ServerHandler::postLooped(server);
 }
 
-void Http2ClientServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_type id) {
+void Http2ClientServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_t id) {
 
 }
 

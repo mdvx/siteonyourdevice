@@ -32,12 +32,6 @@ enum NetworkEventTypes {
   CountNetworkEvent
 };
 
-const std::string SNetworkEventTypes[] = {
-  "InnerClientConnected",
-  "InnerClientDisconnected",
-  "CountNetworkEvent"
-};
-
 namespace common {
 
 template<>

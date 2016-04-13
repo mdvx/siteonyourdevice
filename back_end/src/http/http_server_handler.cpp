@@ -119,7 +119,7 @@ void HttpServerHandler::postLooped(tcp::ITcpLoop *server) {
   }
 }
 
-void HttpServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_type id) {
+void HttpServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_t id) {
 }
 
 void HttpServerHandler::accepted(tcp::TcpClient* client) {
