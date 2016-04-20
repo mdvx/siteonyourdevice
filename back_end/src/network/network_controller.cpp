@@ -302,7 +302,7 @@ void NetworkController::setConfig(const HttpConfig& config) {
 }
 
 void NetworkController::saveConfig() {
-  common::file_system::Path configPath(config_path_);
+  common::file_system::ascii_string_path configPath(config_path_);
   common::file_system::File configSave(configPath);
   if (!configSave.open("w")) {
       return;
