@@ -1,140 +1,140 @@
 SET(HEADERS_GLOBAL
-    event_loop.h
-    globals.h
-    infos.h
-    server/server_config.h
-    http_config.h
-    loop_controller.h
+  event_loop.h
+  globals.h
+  infos.h
+  server/server_config.h
+  http_config.h
+  loop_controller.h
 )
 SET(SOURCES_GLOBAL
-    event_loop.cpp
-    infos.cpp
-    globals.cpp
-    loop_controller.cpp
+  event_loop.cpp
+  infos.cpp
+  globals.cpp
+  loop_controller.cpp
 )
 
 SET(HEADERS_APPLICATION
-    application/fasto_application.h
-    application/fasto_remote_application.h
+  application/fasto_application.h
+  application/fasto_remote_application.h
 )
 SET(SOURCES_APPLICATION
-    application/fasto_application.cpp
-    application/fasto_remote_application.cpp
+  application/fasto_application.cpp
+  application/fasto_remote_application.cpp
 )
 
 SET(HEADERS_COMMANDS
-    commands/commands.h
+  commands/commands.h
 )
 SET(SOURCES_COMMANDS
-    commands/commands.cpp
+  commands/commands.cpp
 )
 
 SET(HEADERS_NETWORK
-    network/network_event_handler.h
-    network/network_controller.h
-    network/network_events.h
+  network/network_event_handler.h
+  network/network_controller.h
+  network/network_events.h
 )
 SET(SOURCES_NETWORK
-    network/network_event_handler.cpp
-    network/network_controller.cpp
-    network/network_events.cpp
+  network/network_event_handler.cpp
+  network/network_controller.cpp
+  network/network_events.cpp
 )
 
 SET(HEADERS_TCP
-    tcp/tcp_server.h
-    tcp/tcp_client.h
+  tcp/tcp_server.h
+  tcp/tcp_client.h
 )
 SET(SOURCES_TCP
-    tcp/tcp_server.cpp
-    tcp/tcp_client.cpp
+  tcp/tcp_server.cpp
+  tcp/tcp_client.cpp
 )
 
 SET(HEADERS_HTTP
-    http/http_streams.h
-    http/http_client.h
-    http/http_server.h
-    http/http_server_handler.h
+  http/http_streams.h
+  http/http_client.h
+  http/http_server.h
+  http/http_server_handler.h
 )
 SET(SOURCES_HTTP
-    http/http_streams.cpp
-    http/http_client.cpp
-    http/http_server.cpp
-    http/http_server_handler.cpp
+  http/http_streams.cpp
+  http/http_client.cpp
+  http/http_server.cpp
+  http/http_server_handler.cpp
 )
 
 SET(HEADERS_WEBSOCKET
-    websocket/websocket_client.h
-    websocket/websocket_server.h
-    websocket/websocket_server_handler.h
+  websocket/websocket_client.h
+  websocket/websocket_server.h
+  websocket/websocket_server_handler.h
 )
 SET(SOURCES_WEBSOCKET
-    websocket/websocket_client.cpp
-    websocket/websocket_server.cpp
-    websocket/websocket_server_handler.cpp
+  websocket/websocket_client.cpp
+  websocket/websocket_server.cpp
+  websocket/websocket_server_handler.cpp
 )
 
 SET(HEADERS_INNER
-    inner/http_inner_server_handler.h
-    inner/http_inner_server.h
-    inner/inner_server_command_seq_parser.h
-    inner/inner_relay_client.h
-    inner/inner_client.h
-    inner/inner_server_handler.h
+  inner/http_inner_server_handler.h
+  inner/http_inner_server.h
+  inner/inner_server_command_seq_parser.h
+  inner/inner_relay_client.h
+  inner/inner_client.h
+  inner/inner_server_handler.h
 )
 SET(SOURCES_INNER
-    inner/http_inner_server_handler.cpp
-    inner/http_inner_server.cpp
-    inner/inner_server_command_seq_parser.cpp
-    inner/inner_relay_client.cpp
-    inner/inner_client.cpp
-    inner/inner_server_handler.cpp
+  inner/http_inner_server_handler.cpp
+  inner/http_inner_server.cpp
+  inner/inner_server_command_seq_parser.cpp
+  inner/inner_relay_client.cpp
+  inner/inner_client.cpp
+  inner/inner_server_handler.cpp
 )
 
 SET(HEADERS_HTTP_CALLBACKS
-    http/callbacks/http_callbacks.h
-    http/callbacks/file_system_callback.h
-    http/callbacks/system_callback.h
+  http/callbacks/http_callbacks.h
+  http/callbacks/file_system_callback.h
+  http/callbacks/system_callback.h
 )
 SET(SOURCES_HTTP_CALLBACKS
-    http/callbacks/http_callbacks.cpp
-    http/callbacks/file_system_callback.cpp
-    http/callbacks/system_callback.cpp
+  http/callbacks/http_callbacks.cpp
+  http/callbacks/file_system_callback.cpp
+  http/callbacks/system_callback.cpp
 )
 
 SET(SOURCES_SDS
-    third-party/sds/sds.c
+  third-party/sds/sds.c
 )
 
 #RESOURCE_APP resources of application
 IF(OS_WINDOWS)
-    SET(PLATFORM_LIBRARIES ws2_32)
+  SET(PLATFORM_LIBRARIES ws2_32)
 
-    SET(PLATFORM_HDRS ${PLATFORM_HDRS})
-    SET(PLATFORM_SRCS ${PLATFORM_SRCS})
-    SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES})
-    SET(RESOURCE_APP "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/winapp.rc")
-    SET(RESOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}/resources/${PROJECT_NAME_LOWERCASE}")
-    CONFIGURE_FILE(resources/win.rc.in ${RESOURCE_APP} @ONLY IMMEDIATE)
+  SET(PLATFORM_HDRS ${PLATFORM_HDRS})
+  SET(PLATFORM_SRCS ${PLATFORM_SRCS})
+  SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES})
+  SET(RESOURCE_APP "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/winapp.rc")
+  SET(RESOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}/resources/${PROJECT_NAME_LOWERCASE}")
+  CONFIGURE_FILE(resources/win.rc.in ${RESOURCE_APP} @ONLY IMMEDIATE)
 ELSEIF(OS_MACOSX)
-    FIND_LIBRARY(COCOA_LIBRARY Cocoa)
+  FIND_LIBRARY(COCOA_LIBRARY Cocoa)
 
-    SET(PLATFORM_HDRS ${PLATFORM_HDRS})
-    SET(PLATFORM_SRCS ${PLATFORM_SRCS})
-    SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES})
+  SET(PLATFORM_HDRS ${PLATFORM_HDRS})
+  SET(PLATFORM_SRCS ${PLATFORM_SRCS})
+  SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES})
 ELSEIF(OS_LINUX OR OS_FREEBSD)
-    IF(OS_LINUX)
-        SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES} rt)
-    ENDIF(OS_LINUX)
+  IF(OS_LINUX)
+    SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES} rt)
+  ENDIF(OS_LINUX)
 
-    SET(PLATFORM_HDRS ${PLATFORM_HDRS})
-    SET(PLATFORM_SRCS ${PLATFORM_SRCS})
-    SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES})
+  SET(PLATFORM_HDRS ${PLATFORM_HDRS})
+  SET(PLATFORM_SRCS ${PLATFORM_SRCS})
+  SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES})
 ELSEIF(OS_ANDROID)
 
 ENDIF(OS_WINDOWS)
 
 IF(USE_PTHREAD)
-    SET(${PLATFORM_LIBRARIES} ${PLATFORM_LIBRARIES} pthread)
+  SET(${PLATFORM_LIBRARIES} ${PLATFORM_LIBRARIES} pthread)
 ENDIF(USE_PTHREAD)
 
 ADD_SUBDIRECTORY(common)
@@ -144,11 +144,11 @@ SET(INCLUDE_DIRS ${INCLUDE_DIRS} ${CMAKE_CURRENT_LIST_DIR} third-party/libev/src
 INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
 SET(HEADERS ${HEADERS} ${HEADERS_GLOBAL} ${HEADERS_APPLICATION} ${HEADERS_NETWORK}
-            ${HEADERS_TCP} ${HEADERS_HTTP} ${HEADERS_WEBSOCKET} ${HEADERS_INNER}
-            ${HEADERS_HTTP_CALLBACKS} ${HEADERS_COMMANDS})
+      ${HEADERS_TCP} ${HEADERS_HTTP} ${HEADERS_WEBSOCKET} ${HEADERS_INNER}
+      ${HEADERS_HTTP_CALLBACKS} ${HEADERS_COMMANDS})
 SET(SOURCES ${SOURCES} ${SOURCES_GLOBAL} ${SOURCES_APPLICATION} ${SOURCES_NETWORK}
-            ${SOURCES_TCP} ${SOURCES_HTTP} ${SOURCES_WEBSOCKET} ${SOURCES_INNER}
-            ${SOURCES_HTTP_CALLBACKS} ${SOURCES_COMMANDS})
+      ${SOURCES_TCP} ${SOURCES_HTTP} ${SOURCES_WEBSOCKET} ${SOURCES_INNER}
+      ${SOURCES_HTTP_CALLBACKS} ${SOURCES_COMMANDS})
 
 SOURCE_GROUP("Header Files" FILES ${HEADERS})
 SOURCE_GROUP("Source Files" FILES ${SOURCES})
@@ -164,61 +164,61 @@ SET(EXE_SOURCES client_commands.h main.cpp ${RESOURCE_APP} ${ICON_FILE} ${RESOUR
 SET(PROJECT_EXE_LIBRARIES ${PROJECT_CORE_LIBRARY})
 
 IF(MINGW OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
-    ADD_APP_LIBRARY_OBJECT(${PROJECT_CORE_LIBRARY} "${ALL_SOURCES}" "${ALL_LIBS}" "${OBJECT_LIBS}")
-    IF(OS_ANDROID)
-        ADD_APP_SHARED_LIBRARY(${PROJECT_NAME} "${EXE_SOURCES}" "${PROJECT_EXE_LIBRARIES}")
-    ELSE()
-        ADD_APP_EXECUTABLE(${PROJECT_NAME} "${EXE_SOURCES}" "${PROJECT_EXE_LIBRARIES}")
-    ENDIF(OS_ANDROID)
-ELSEIF(MSVC)
-    ADD_APP_LIBRARY_OBJECT(${PROJECT_CORE_LIBRARY} "${ALL_SOURCES}" "${ALL_LIBS}" "${OBJECT_LIBS}")
+  ADD_APP_LIBRARY_OBJECT(${PROJECT_CORE_LIBRARY} "${ALL_SOURCES}" "${ALL_LIBS}" "${OBJECT_LIBS}")
+  IF(OS_ANDROID)
+    ADD_APP_SHARED_LIBRARY(${PROJECT_NAME} "${EXE_SOURCES}" "${PROJECT_EXE_LIBRARIES}")
+  ELSE()
     ADD_APP_EXECUTABLE(${PROJECT_NAME} "${EXE_SOURCES}" "${PROJECT_EXE_LIBRARIES}")
+  ENDIF(OS_ANDROID)
+ELSEIF(MSVC)
+  ADD_APP_LIBRARY_OBJECT(${PROJECT_CORE_LIBRARY} "${ALL_SOURCES}" "${ALL_LIBS}" "${OBJECT_LIBS}")
+  ADD_APP_EXECUTABLE(${PROJECT_NAME} "${EXE_SOURCES}" "${PROJECT_EXE_LIBRARIES}")
 ELSE()
-    MESSAGE(FATAL_ERROR "NOT SUPPORTED COMPILER!!!")
+  MESSAGE(FATAL_ERROR "NOT SUPPORTED COMPILER!!!")
 ENDIF(MINGW OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
 
 IF(OS_WINDOWS)
-    SET_SOURCE_FILES_PROPERTIES(${RESOURCE_OS} PROPERTIES LANGUAGE RC)
+  SET_SOURCE_FILES_PROPERTIES(${RESOURCE_OS} PROPERTIES LANGUAGE RC)
 ELSEIF(OS_MACOSX)
-    SET_SOURCE_FILES_PROPERTIES(${RESOURCE_OS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-    SET_SOURCE_FILES_PROPERTIES(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+  SET_SOURCE_FILES_PROPERTIES(${RESOURCE_OS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+  SET_SOURCE_FILES_PROPERTIES(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 ENDIF(OS_WINDOWS)
 
 GET_FILENAME_COMPONENT(ICON_FILE_NAME ${ICON_FILE} NAME)
 IF(OS_MACOSX)
-    SET(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
-    SET(MACOSX_BUNDLE_GUI_IDENTIFIER ${PROJECT_NAME})
-    SET(MACOSX_BUNDLE_INFO_STRING "${PROJECT_VERSION},${PROJECT_COPYRIGHT}" )
-    SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${SHORT_VERSION}" )
-    SET(MACOSX_BUNDLE_LONG_VERSION_STRING ${PROJECT_VERSION})
-    SET(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
-    SET(MACOSX_BUNDLE_COPYRIGHT ${PROJECT_COPYRIGHT})
-    SET(MACOSX_BUNDLE_ICON_FILE ${ICON_FILE_NAME})
-    SET(MACOSX_BUNDLE_PRINCIPAL_CLASS "NSApplication")
-    #SET(MACOSX_MAIN_NIB_FILE "MainMenu")
+  SET(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
+  SET(MACOSX_BUNDLE_GUI_IDENTIFIER ${PROJECT_NAME})
+  SET(MACOSX_BUNDLE_INFO_STRING "${PROJECT_VERSION},${PROJECT_COPYRIGHT}" )
+  SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${SHORT_VERSION}" )
+  SET(MACOSX_BUNDLE_LONG_VERSION_STRING ${PROJECT_VERSION})
+  SET(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+  SET(MACOSX_BUNDLE_COPYRIGHT ${PROJECT_COPYRIGHT})
+  SET(MACOSX_BUNDLE_ICON_FILE ${ICON_FILE_NAME})
+  SET(MACOSX_BUNDLE_PRINCIPAL_CLASS "NSApplication")
+  #SET(MACOSX_MAIN_NIB_FILE "MainMenu")
 ENDIF(OS_MACOSX)
 
 IF(BUILD_SERVER)
-    SET(PROJECT_SERVER_NAME ${PROJECT_NAME_LOWERCASE}_server)
+  SET(PROJECT_SERVER_NAME ${PROJECT_NAME_LOWERCASE}_server)
 
-    ADD_DEFINITIONS(-DCONFIG_FILE_PATH="/etc/${PROJECT_SERVER_NAME}.conf")
-    ADD_DEFINITIONS(-DPROJECT_NAME_SERVER_TITLE="${PROJECT_NAME}")
-    ADD_DEFINITIONS(-DPROJECT_NAME_SERVER="${PROJECT_NAME_LOWERCASE}")
+  ADD_DEFINITIONS(-DCONFIG_FILE_PATH="/etc/${PROJECT_SERVER_NAME}.conf")
+  ADD_DEFINITIONS(-DPROJECT_NAME_SERVER_TITLE="${PROJECT_NAME}")
+  ADD_DEFINITIONS(-DPROJECT_NAME_SERVER="${PROJECT_NAME_LOWERCASE}")
 
-    ADD_SUBDIRECTORY(third-party/redis)
-    INCLUDE_DIRECTORIES(third-party/redis/deps)
+  ADD_SUBDIRECTORY(third-party/redis)
+  INCLUDE_DIRECTORIES(third-party/redis/deps)
 
-    ADD_EXECUTABLE(${PROJECT_SERVER_NAME}
-                    server/main.cpp
-                    server/http_server_host.h server/http_server_host.cpp
-                    server/inner/inner_tcp_server.h server/inner/inner_tcp_server.cpp
-                    server/inner/inner_tcp_client.h server/inner/inner_tcp_client.cpp
-                    server/websocket/websocket_server.h server/websocket/websocket_server.cpp
-                    server/websocket/websocket_client.h server/websocket/websocket_client.cpp
-                    server/redis_helpers.h server/redis_helpers.cpp
-                    server/server_commands.h
-    )
-    TARGET_LINK_LIBRARIES(${PROJECT_SERVER_NAME} ${PROJECT_CORE_LIBRARY} hiredis)
+  ADD_EXECUTABLE(${PROJECT_SERVER_NAME}
+    server/main.cpp
+    server/http_server_host.h server/http_server_host.cpp
+    server/inner/inner_tcp_server.h server/inner/inner_tcp_server.cpp
+    server/inner/inner_tcp_client.h server/inner/inner_tcp_client.cpp
+    server/websocket/websocket_server.h server/websocket/websocket_server.cpp
+    server/websocket/websocket_client.h server/websocket/websocket_client.cpp
+    server/redis_helpers.h server/redis_helpers.cpp
+    server/server_commands.h
+  )
+  TARGET_LINK_LIBRARIES(${PROJECT_SERVER_NAME} ${PROJECT_CORE_LIBRARY} hiredis)
 ENDIF(BUILD_SERVER)
 
 # Start to install
@@ -240,27 +240,27 @@ SET(USER_SPECIFIC_DEFAULT_PRIVATE_SITE 0 CACHE INTEGER "Default private site for
 SET(USER_SPECIFIC_SERVER_TYPE 0 CACHE INTEGER "Default server type for ${USER_SPECIFIC_SERVER_TYPE}")
 
 ADD_DEFINITIONS(
-    -DUSER_SPECIFIC_DEFAULT_LOGIN="${USER_SPECIFIC_DEFAULT_LOGIN}"
-    -DUSER_SPECIFIC_DEFAULT_LOCAL_DOMAIN="${USER_SPECIFIC_DEFAULT_LOCAL_DOMAIN}"
-    -DUSER_SPECIFIC_DEFAULT_EXTERNAL_DOMAIN="${USER_SPECIFIC_DEFAULT_EXTERNAL_DOMAIN}"
-    -DUSER_SPECIFIC_CONTENT_PATH="${USER_SPECIFIC_CONTENT_PATH}"
-    -DUSER_SPECIFIC_DEFAULT_PASSWORD="${USER_SPECIFIC_DEFAULT_PASSWORD}"
-    -DUSER_SPECIFIC_DEFAULT_PRIVATE_SITE=${USER_SPECIFIC_DEFAULT_PRIVATE_SITE}
-    -DUSER_SPECIFIC_SERVER_TYPE=${USER_SPECIFIC_SERVER_TYPE}
+  -DUSER_SPECIFIC_DEFAULT_LOGIN="${USER_SPECIFIC_DEFAULT_LOGIN}"
+  -DUSER_SPECIFIC_DEFAULT_LOCAL_DOMAIN="${USER_SPECIFIC_DEFAULT_LOCAL_DOMAIN}"
+  -DUSER_SPECIFIC_DEFAULT_EXTERNAL_DOMAIN="${USER_SPECIFIC_DEFAULT_EXTERNAL_DOMAIN}"
+  -DUSER_SPECIFIC_CONTENT_PATH="${USER_SPECIFIC_CONTENT_PATH}"
+  -DUSER_SPECIFIC_DEFAULT_PASSWORD="${USER_SPECIFIC_DEFAULT_PASSWORD}"
+  -DUSER_SPECIFIC_DEFAULT_PRIVATE_SITE=${USER_SPECIFIC_DEFAULT_PRIVATE_SITE}
+  -DUSER_SPECIFIC_SERVER_TYPE=${USER_SPECIFIC_SERVER_TYPE}
 )
 CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/install/${PROJECT_NAME_LOWERCASE}/config.in" "${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_FILE_NAME}" @ONLY IMMEDIATE)
 
 IF(OS_WINDOWS)
-    SET(CONFIG_INSTALL_DESTINATION ${TARGET_INSTALL_DESTINATION})
+  SET(CONFIG_INSTALL_DESTINATION ${TARGET_INSTALL_DESTINATION})
 ELSEIF(OS_MACOSX)
-    SET(BUNDLE_NAME ${MACOSX_BUNDLE_BUNDLE_NAME}.app)
-    SET(CONFIG_INSTALL_DESTINATION ${TARGET_INSTALL_DESTINATION}/${BUNDLE_NAME}/Contents/Resources)
+  SET(BUNDLE_NAME ${MACOSX_BUNDLE_BUNDLE_NAME}.app)
+  SET(CONFIG_INSTALL_DESTINATION ${TARGET_INSTALL_DESTINATION}/${BUNDLE_NAME}/Contents/Resources)
 ELSEIF(OS_LINUX OR OS_FREEBSD)
-    SET(CONFIG_INSTALL_DESTINATION ${TARGET_INSTALL_DESTINATION})
-    CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/install/${PROJECT_NAME_LOWERCASE}/linux/start.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWERCASE}.sh" @ONLY IMMEDIATE)
-    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWERCASE}.sh DESTINATION ${TARGET_INSTALL_DESTINATION})
-    INSTALL(FILES ${RESOURCE_OS} DESTINATION share/applications COMPONENT RESOURCES)
-    INSTALL(FILES ${ICON_FILE} DESTINATION share/icons COMPONENT RESOURCES)
+  SET(CONFIG_INSTALL_DESTINATION ${TARGET_INSTALL_DESTINATION})
+  CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/install/${PROJECT_NAME_LOWERCASE}/linux/start.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWERCASE}.sh" @ONLY IMMEDIATE)
+  INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWERCASE}.sh DESTINATION ${TARGET_INSTALL_DESTINATION})
+  INSTALL(FILES ${RESOURCE_OS} DESTINATION share/applications COMPONENT RESOURCES)
+  INSTALL(FILES ${ICON_FILE} DESTINATION share/icons COMPONENT RESOURCES)
 ENDIF(OS_WINDOWS)
 
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_FILE_NAME} DESTINATION ${CONFIG_INSTALL_DESTINATION} COMPONENT CONFIG)
@@ -269,17 +269,17 @@ INSTALL_RUNTIME_LIBRARIES()
 
 IF(DEVELOPER_ENABLE_TESTS)
 ########## PREPARE GTEST LIBRARY ##########
-    IF(MSVC)
-        SET(gtest_force_shared_crt ON CACHE BOOL "Build shared gtest library")
-        ADD_DEFINITIONS(-D_VARIADIC_MAX=10)
-    ENDIF(MSVC)
-    ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/tests/gtest gtest)
-    INCLUDE_DIRECTORIES(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+  IF(MSVC)
+    SET(gtest_force_shared_crt ON CACHE BOOL "Build shared gtest library")
+    ADD_DEFINITIONS(-D_VARIADIC_MAX = 10)
+  ENDIF(MSVC)
+  ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/tests/gtest gtest)
+  INCLUDE_DIRECTORIES(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 ########## PREPARE GTEST LIBRARY ##########
 
-    ADD_EXECUTABLE(unit_tests ${CMAKE_SOURCE_DIR}/tests/unit_test_http_clients.cpp ${CMAKE_SOURCE_DIR}/tests/unit_test_tcp_server.cpp)
-    TARGET_LINK_LIBRARIES(unit_tests gtest gtest_main ${PROJECT_CORE_LIBRARY})
+  ADD_EXECUTABLE(unit_tests ${CMAKE_SOURCE_DIR}/tests/unit_test_http_clients.cpp ${CMAKE_SOURCE_DIR}/tests/unit_test_tcp_server.cpp)
+  TARGET_LINK_LIBRARIES(unit_tests gtest gtest_main ${PROJECT_CORE_LIBRARY})
 
-    ADD_TEST(NAME unit_tests COMMAND tests)
-    SET_PROPERTY(TARGET unit_tests PROPERTY FOLDER "Unit tests")
+  ADD_TEST(NAME unit_tests COMMAND tests)
+  SET_PROPERTY(TARGET unit_tests PROPERTY FOLDER "Unit tests")
 ENDIF(DEVELOPER_ENABLE_TESTS)
