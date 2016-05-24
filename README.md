@@ -48,7 +48,7 @@ Compare with standard internet domains:
   examples of html page you can see here http://siteonyourdevice.com/templates/
  
 **WebSockets**<br/>
-  Port 8060 on proxe.siteonyourdevice.com allocated for proxy websockets connection.<br/>
+  Port 8060 on proxy.siteonyourdevice.com allocated for proxy websockets connection.<br/>
   Simple add next line on your server config file. 
   ```
   [http_server_sockets]
