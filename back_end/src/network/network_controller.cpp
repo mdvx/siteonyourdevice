@@ -38,13 +38,22 @@
 
 namespace {
 
+std::string prepare_content_path(const std::string& path) {
+  bool is_valid_path = common::file_system::is_valid_path(path);
+  if (is_valid_path) {
+    return common::file_system::stable_dir_path(path);
+  }
+
+  std::string appdir = fApp->appDir();
+  return appdir + path;
+}
+
 int ini_handler_fasto(void* user, const char* section, const char* name, const char* value) {
   fasto::siteonyourdevice::HttpConfig* pconfig = reinterpret_cast<fasto::siteonyourdevice::HttpConfig*>(user);
 
   #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
   if (MATCH(SERVER_SETTINGS_SECTION_LABEL, CONTENT_PATH_SETTING_LABEL)) {
-    const std::string contentPath = value;
-    pconfig->content_path = common::file_system::stable_dir_path(contentPath);
+    pconfig->content_path = prepare_content_path(value);
     return 1;
   } else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, LOCAL_HOST_SETTING_LABEL)) {
     pconfig->local_host = common::convertFromString<common::net::hostAndPort>(value);
@@ -342,11 +351,10 @@ void NetworkController::readConfig() {
 
   HttpConfig config;
   // default settings
+  config.content_path = prepare_content_path(USER_SPECIFIC_CONTENT_PATH);
   config.local_host = common::convertFromString<common::net::hostAndPort>(USER_SPECIFIC_DEFAULT_LOCAL_DOMAIN);
-  config.content_path = USER_SPECIFIC_CONTENT_PATH;
   config.login = USER_SPECIFIC_DEFAULT_LOGIN;
   config.password = USER_SPECIFIC_DEFAULT_PASSWORD;
-  config.content_path = USER_SPECIFIC_CONTENT_PATH;
   config.is_private_site = USER_SPECIFIC_DEFAULT_PRIVATE_SITE;
   config.external_host = common::convertFromString<common::net::hostAndPort>(USER_SPECIFIC_DEFAULT_EXTERNAL_DOMAIN);
   config.server_type = static_cast<http_server_t>(USER_SPECIFIC_SERVER_TYPE);
