@@ -85,7 +85,7 @@ HttpClient::HttpClient(tcp::ITcpLoop* server, const common::net::socket_info& in
   : TcpClient(server, info), isAuth_(false) {
 }
 
-const char* HttpClient::className() const {
+const char* HttpClient::ClassName() const {
   return "HttpClient";
 }
 
@@ -108,7 +108,7 @@ common::Error HttpClient::send_error(common::http::http_protocols protocol,
                                      const char* extra_header, const char* text,
                                      bool is_keep_alive, const HttpServerInfo& info) {
   CHECK(protocol <= common::http::HP_1_1);
-  const std::string title = common::convertToString(status);
+  const std::string title = common::ConvertToString(status);
 
   char err_data[1024] = {0};
   off_t err_len = common::SNPrintf(err_data, sizeof(err_data), HTML_PATTERN_ISISSSS7,
@@ -139,7 +139,7 @@ common::Error HttpClient::send_headers(common::http::http_protocols protocol,
                                        const char* mime_type, off_t* length, time_t* mod,
                                        bool is_keep_alive, const HttpServerInfo& info) {
   CHECK(protocol <= common::http::HP_1_1);
-  const std::string title = common::convertToString(status);
+  const std::string title = common::ConvertToString(status);
 
   time_t now = time(nullptr);
   char timebuf[100];
@@ -201,7 +201,7 @@ Http2Client::Http2Client(tcp::ITcpLoop* server, const common::net::socket_info& 
   : HttpClient(server, info), streams_() {
 }
 
-const char* Http2Client::className() const {
+const char* Http2Client::ClassName() const {
   return "Http2Client";
 }
 
@@ -215,7 +215,7 @@ common::Error Http2Client::send_error(common::http::http_protocols protocol,
                                       const char* text, bool is_keep_alive,
                                       const HttpServerInfo& info) {
   if (is_http2() && protocol == common::http::HP_2_0) {
-    const std::string title = common::convertToString(status);
+    const std::string title = common::ConvertToString(status);
     char err_data[1024] = {0};
     off_t err_len = common::SNPrintf(err_data, sizeof(err_data), HTML_PATTERN_ISISSSS7,
                                      status, title, status, title,
@@ -279,7 +279,7 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
 
     common::http2::http2_nv nvstatus;
     nvstatus.name = MAKE_buffer_t(":status");
-    nvstatus.value = common::convertToBytes((uint32_t)status);
+    nvstatus.value = common::ConvertToBytes((uint32_t)status);
     nvs.push_back(nvstatus);
 
     char timebuf[100];
@@ -287,12 +287,12 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
     strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime(&now));
     common::http2::http2_nv nvdate;
     nvdate.name = MAKE_buffer_t("date");
-    nvdate.value = common::convertToBytes(timebuf);
+    nvdate.value = common::ConvertToBytes(timebuf);
     nvs.push_back(nvdate);
 
     common::http2::http2_nv nvserver;
     nvserver.name = MAKE_buffer_t("server");
-    nvserver.value = common::convertToBytes(info.server_name);
+    nvserver.value = common::ConvertToBytes(info.server_name);
     nvs.push_back(nvserver);
 
     /*http2::http2_nv nvenc;
@@ -303,13 +303,13 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
     if (mime_type) {
       common::http2::http2_nv nvmime;
       nvmime.name = MAKE_buffer_t("content-type");
-      nvmime.value = common::convertToBytes(mime_type);
+      nvmime.value = common::ConvertToBytes(mime_type);
       nvs.push_back(nvmime);
     }
     if (length) {
       common::http2::http2_nv nvlen;
       nvlen.name = MAKE_buffer_t("content-length");
-      nvlen.value = common::convertToBytes(*length);
+      nvlen.value = common::ConvertToBytes(*length);
       nvs.push_back(nvlen);
     }
 
@@ -317,7 +317,7 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
       strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime(mod));
       common::http2::http2_nv nvmod;
       nvmod.name = MAKE_buffer_t("last-modified");
-      nvmod.value = common::convertToBytes(timebuf);
+      nvmod.value = common::ConvertToBytes(timebuf);
       nvs.push_back(nvmod);
     }
 

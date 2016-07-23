@@ -29,12 +29,12 @@
 
 namespace common {
 
-std::string convertToString(fasto::siteonyourdevice::HSCTypes t) {
+std::string ConvertToString(fasto::siteonyourdevice::HSCTypes t) {
   return fasto::siteonyourdevice::HSystemCallbackTypes[t];
 }
 
 template<>
-fasto::siteonyourdevice::HSCTypes convertFromString(const std::string& text) {
+fasto::siteonyourdevice::HSCTypes ConvertFromString(const std::string& text) {
   for (uint32_t i = 0; i < SIZEOFMASS(fasto::siteonyourdevice::HSystemCallbackTypes); ++i) {
     if (text == fasto::siteonyourdevice::HSystemCallbackTypes[i]) {
       return static_cast<fasto::siteonyourdevice::HSCTypes>(i);
@@ -69,7 +69,7 @@ bool HttpSystemShutdownCallback::handleRequest(http::HttpClient* hclient, const 
                                                const HttpServerInfo& info) {
   // keep alive
   common::http::header_t connectionField = request.findHeaderByKey("Connection", false);
-  bool isKeepAlive = EqualsASCII(connectionField.value, "Keep-Alive", false);
+  bool isKeepAlive = common::EqualsASCII(connectionField.value, "Keep-Alive", false);
   const common::http::http_protocols protocol = request.protocol();
 
   common::system::shutdown_t sh_type;
@@ -103,7 +103,7 @@ bool HttpSystemShutdownCallback::handleRequest(http::HttpClient* hclient, const 
 }
 
 common::shared_ptr<IHttpCallback> createSystemHttpCallback(const std::string& name) {
-  HSCTypes sys_type = common::convertFromString<HSCTypes>(name);
+  HSCTypes sys_type = common::ConvertFromString<HSCTypes>(name);
   return common::shared_ptr<IHttpCallback>(new HttpSystemShutdownCallback(sys_type));
 }
 

@@ -65,7 +65,7 @@ class ITcpLoop
   void setName(const std::string& name);
   std::string name() const;
 
-  virtual const char* className() const = 0;
+  virtual const char* ClassName() const = 0;
   std::string formatedName() const;
 
   void execInLoopThread(async_loop_exec_function_t func);
@@ -118,16 +118,16 @@ class ITcpLoopObserver {
 class TcpServer
   : public ITcpLoop {
  public:
-  explicit TcpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer = nullptr);
+  explicit TcpServer(const common::net::HostAndPort& host, ITcpLoopObserver* observer = nullptr);
   virtual ~TcpServer();
 
   common::Error bind() WARN_UNUSED_RESULT;
   common::Error listen(int backlog) WARN_UNUSED_RESULT;
 
-  const char* className() const;
-  common::net::hostAndPort host() const;
+  const char* ClassName() const;
+  common::net::HostAndPort host() const;
 
-  static ITcpLoop *findExistServerByHost(const common::net::hostAndPort& host);
+  static ITcpLoop *findExistServerByHost(const common::net::HostAndPort& host);
 
  private:
   TcpClient* createClient(const common::net::socket_info& info);

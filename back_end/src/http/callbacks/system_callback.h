@@ -60,5 +60,5 @@ common::shared_ptr<IHttpCallback> createSystemHttpCallback(const std::string& na
 }  // namespace fasto
 
 namespace common {
-    std::string convertToString(fasto::siteonyourdevice::HSCTypes t);
+    std::string ConvertToString(fasto::siteonyourdevice::HSCTypes t);
 }  // namespace common

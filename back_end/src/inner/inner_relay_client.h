@@ -28,7 +28,7 @@ class RelayClient
         : public http::Http2Client {
  public:
   RelayClient(tcp::ITcpLoop* server, const common::net::socket_info& info);
-  const char* className() const;
+  const char* ClassName() const;
 };
 
 class ProxyRelayClient;
@@ -37,16 +37,16 @@ class RelayClientEx
         : public RelayClient {
  public:
   RelayClientEx(tcp::ITcpLoop* server, const common::net::socket_info& info,
-                const common::net::hostAndPort& externalHost);
-  const char* className() const;
+                const common::net::HostAndPort& externalHost);
+  const char* ClassName() const;
 
-  common::net::hostAndPort externalHost() const;
+  common::net::HostAndPort externalHost() const;
 
   ProxyRelayClient *eclient() const;
   void setEclient(ProxyRelayClient* client);
 
  private:
-  const common::net::hostAndPort external_host_;
+  const common::net::HostAndPort external_host_;
   ProxyRelayClient * eclient_;
 };
 

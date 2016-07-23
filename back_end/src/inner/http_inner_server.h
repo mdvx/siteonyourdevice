@@ -30,7 +30,7 @@ class ProxyInnerServer
   : public tcp::ITcpLoop {
  public:
   explicit ProxyInnerServer(tcp::ITcpLoopObserver* observer);
-  virtual const char* className() const;
+  virtual const char* ClassName() const;
 
  protected:
   tcp::TcpClient* createClient(const common::net::socket_info& info);
@@ -41,7 +41,7 @@ class Http2InnerServer
  public:
   Http2InnerServer(tcp::ITcpLoopObserver * observer, const HttpConfig& config);
 
-  virtual const char* className() const;
+  virtual const char* ClassName() const;
 
  protected:
   virtual tcp::TcpClient* createClient(const common::net::socket_info& info);

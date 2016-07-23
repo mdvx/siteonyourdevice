@@ -27,9 +27,9 @@ namespace websocket {
 class WebSocketServer
   : public tcp::TcpServer {
  public:
-  explicit WebSocketServer(const common::net::hostAndPort& host,
+  explicit WebSocketServer(const common::net::HostAndPort& host,
                            tcp::ITcpLoopObserver* observer = nullptr);
-  const char* className() const;
+  const char* ClassName() const;
 
  protected:
   virtual tcp::TcpClient * createClient(const common::net::socket_info& info);

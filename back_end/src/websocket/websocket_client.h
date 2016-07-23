@@ -30,7 +30,7 @@ class WebSocketClient
   WebSocketClient(tcp::ITcpLoop* server, const common::net::socket_info& info);
   ~WebSocketClient();
 
-  const char* className() const;
+  const char* ClassName() const;
 };
 
 }  // namespace websocket

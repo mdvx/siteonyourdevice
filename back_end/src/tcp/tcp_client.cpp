@@ -93,12 +93,12 @@ common::patterns::id_counter<TcpClient>::type_t TcpClient::id() const {
   return id_.id();
 }
 
-const char* TcpClient::className() const {
+const char* TcpClient::ClassName() const {
   return "TcpClient";
 }
 
 std::string TcpClient::formatedName() const {
-  return common::MemSPrintf("[%s][%s(%" PRIuMAX ")]", name(), className(), id());
+  return common::MemSPrintf("[%s][%s(%" PRIuMAX ")]", name(), ClassName(), id());
 }
 
 }  // namespace tcp

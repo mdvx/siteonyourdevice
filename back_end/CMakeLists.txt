@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
 ###################### Branding ##########################
 
 SET(BRANDING_PROJECT_NAME "SiteOnYourDevice" CACHE STRING "Branding for ${BRANDING_PROJECT_NAME}") #default
@@ -118,7 +118,7 @@ MESSAGE(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 ############################################################################
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
-INCLUDE(fasto_config) ###################
+INCLUDE(config) ###################
 DEFINE_DEFAULT_DEFINITIONS()
 
 IF(OS_ANDROID)
@@ -309,7 +309,6 @@ IF(CPACK_SUPPORT)
         SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/postinst")
         SET(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/prerm")
       ELSEIF(CPACK_GENERATOR STREQUAL "DEB")
-        # CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/install/${PROJECT_NAME_LOWERCASE}/linux/fixup_deb.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/fixup_deb.sh" @ONLY IMMEDIATE)
         IF(ARCH_TEXT_PACKAGE STREQUAL x86_64)
           SET(ARCH_TEXT_PACKAGE amd64)
         ENDIF()

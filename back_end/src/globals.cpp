@@ -36,12 +36,12 @@ const std::string SNetworkEventTypes[] = {
 
 namespace common {
 
-std::string convertToString(NetworkEventTypes net) {
+std::string ConvertToString(NetworkEventTypes net) {
   return SNetworkEventTypes[net];
 }
 
 template<>
-NetworkEventTypes convertFromString(const std::string& net_str) {
+NetworkEventTypes ConvertFromString(const std::string& net_str) {
   for (size_t i = 0; i < SIZEOFMASS(SNetworkEventTypes); ++i) {
     if (net_str == SNetworkEventTypes[i]) {
       return static_cast<NetworkEventTypes>(i);

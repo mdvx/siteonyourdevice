@@ -64,7 +64,7 @@ class LibEvLoop {
 
   struct ev_loop* const loop_;
   EvLoopObserver* observer_;
-  common::thread::platform_thread_id_type exec_id_;
+  common::thread::platform_thread_id_t exec_id_;
   ev_async* async_stop_;
 };
 

@@ -42,10 +42,10 @@
 namespace {
 class WebSocketController
   : public fasto::siteonyourdevice::ILoopThreadController {
-  const common::net::hostAndPort host_;
+  const common::net::HostAndPort host_;
   const fasto::siteonyourdevice::HttpServerInfo info_;
  public:
-  WebSocketController(const common::net::hostAndPort& host,
+  WebSocketController(const common::net::HostAndPort& host,
                       const fasto::siteonyourdevice::HttpServerInfo& info)
     : host_(host), info_(info) {
   }
@@ -94,7 +94,7 @@ void HttpServerHandler::preLooped(tcp::ITcpLoop *server) {
     socket_url_t url = sockets_urls_[i];
     CHECK(url.second == nullptr);
 
-    common::net::hostAndPort host = common::convertFromString<common::net::hostAndPort>(url.first.host());
+    common::net::HostAndPort host = common::ConvertFromString<common::net::HostAndPort>(url.first.host());
     if (!host.isValid()) {
       continue;
     }
@@ -252,10 +252,10 @@ void HttpServerHandler::processReceived(HttpClient *hclient, const char* request
 
   // keep alive
   common::http::header_t connectionField = hrequest.findHeaderByKey("Connection", false);
-  bool isKeepAlive = EqualsASCII(connectionField.value, "Keep-Alive", false);
+  bool isKeepAlive = common::EqualsASCII(connectionField.value, "Keep-Alive", false);
 
   common::http::header_t hostField = hrequest.findHeaderByKey("Host", false);
-  bool isProxy = EqualsASCII(hostField.value, HTTP_PROXY_HOST_NAME, false);
+  bool isProxy = common::EqualsASCII(hostField.value, HTTP_PROXY_HOST_NAME, false);
 
   handleRequest(hclient, hrequest, isKeepAlive | isProxy);
 }

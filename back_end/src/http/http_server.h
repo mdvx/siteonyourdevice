@@ -27,10 +27,10 @@ namespace http {
 class HttpServer
   : public tcp::TcpServer {
  public:
-  HttpServer(const common::net::hostAndPort& host, tcp::ITcpLoopObserver* observer);
+  HttpServer(const common::net::HostAndPort& host, tcp::ITcpLoopObserver* observer);
   ~HttpServer();
 
-  virtual const char* className() const;
+  virtual const char* ClassName() const;
 
  protected:
   virtual tcp::TcpClient* createClient(const common::net::socket_info& info);
@@ -39,9 +39,9 @@ class HttpServer
 class Http2Server
   : public HttpServer {
  public:
-  Http2Server(const common::net::hostAndPort& host, tcp::ITcpLoopObserver* observer);
+  Http2Server(const common::net::HostAndPort& host, tcp::ITcpLoopObserver* observer);
 
-  virtual const char* className() const;
+  virtual const char* ClassName() const;
 
  protected:
   virtual tcp::TcpClient* createClient(const common::net::socket_info& info);

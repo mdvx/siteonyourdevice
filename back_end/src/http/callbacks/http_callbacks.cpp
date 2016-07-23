@@ -24,12 +24,12 @@
 #include "http/callbacks/system_callback.h"
 
 namespace common {
-std::string convertToString(fasto::siteonyourdevice::HCTypes t) {
+std::string ConvertToString(fasto::siteonyourdevice::HCTypes t) {
   return fasto::siteonyourdevice::HCallbackTypes[t];
 }
 
 template<>
-fasto::siteonyourdevice::HCTypes convertFromString(const std::string& text) {
+fasto::siteonyourdevice::HCTypes ConvertFromString(const std::string& text) {
   for (uint32_t i = 0; i < SIZEOFMASS(fasto::siteonyourdevice::HCallbackTypes); ++i) {
     if (text == fasto::siteonyourdevice::HCallbackTypes[i]) {
       return static_cast<fasto::siteonyourdevice::HCTypes>(i);
@@ -64,7 +64,7 @@ common::shared_ptr<IHttpCallback> IHttpCallback::createHttpCallback(HCTypes type
 
 common::shared_ptr<IHttpCallback> IHttpCallback::createHttpCallback(const std::string& ns_name,
                                                                     const std::string& name) {
-  HCTypes htype = common::convertFromString<HCTypes>(ns_name);
+  HCTypes htype = common::ConvertFromString<HCTypes>(ns_name);
   if (htype == file_system) {
     return createFileSystemHttpCallback(name);
   } else if (htype == system) {

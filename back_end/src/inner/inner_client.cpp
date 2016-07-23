@@ -26,7 +26,7 @@ InnerClient::InnerClient(tcp::ITcpLoop *server, const common::net::socket_info& 
   : TcpClient(server, info) {
 }
 
-const char* InnerClient::className() const {
+const char* InnerClient::ClassName() const {
   return "InnerClient";
 }
 

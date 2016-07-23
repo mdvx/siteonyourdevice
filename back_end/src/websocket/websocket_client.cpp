@@ -29,7 +29,7 @@ WebSocketClient::WebSocketClient(tcp::ITcpLoop* server, const common::net::socke
 WebSocketClient::~WebSocketClient() {
 }
 
-const char* WebSocketClient::className() const {
+const char* WebSocketClient::ClassName() const {
   return "WebSocketClient";
 }
 

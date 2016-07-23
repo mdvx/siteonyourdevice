@@ -37,7 +37,7 @@ class InnerServerHandler
     ping_timeout_server = 30  // sec
   };
 
-  explicit InnerServerHandler(const common::net::hostAndPort& innerHost, const HttpConfig& config);
+  explicit InnerServerHandler(const common::net::HostAndPort& innerHost, const HttpConfig& config);
   ~InnerServerHandler();
 
   UserAuthInfo authInfo() const;
@@ -64,7 +64,7 @@ class InnerServerHandler
   InnerClient* inner_connection_;
   timer_id_t ping_server_id_timer_;
 
-  const common::net::hostAndPort innerHost_;
+  const common::net::HostAndPort innerHost_;
 };
 
 }  // namespace inner

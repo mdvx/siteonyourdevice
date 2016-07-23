@@ -28,7 +28,7 @@ ProxyInnerServer::ProxyInnerServer(tcp::ITcpLoopObserver* observer)
   : ITcpLoop(observer) {
 }
 
-const char* ProxyInnerServer::className() const {
+const char* ProxyInnerServer::ClassName() const {
   return "ProxyInnerServer";
 }
 
@@ -40,7 +40,7 @@ Http2InnerServer::Http2InnerServer(tcp::ITcpLoopObserver* observer, const HttpCo
   : Http2Server(config.local_host, observer), config_(config) {
 }
 
-const char* Http2InnerServer::className() const {
+const char* Http2InnerServer::ClassName() const {
   return "Http2InnerServer";
 }
 

@@ -24,12 +24,12 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace websocket {
 
-WebSocketServer::WebSocketServer(const common::net::hostAndPort& host,
+WebSocketServer::WebSocketServer(const common::net::HostAndPort& host,
                                  tcp::ITcpLoopObserver* observer)
   : TcpServer(host, observer) {
 }
 
-const char* WebSocketServer::className() const {
+const char* WebSocketServer::ClassName() const {
   return "WebSocketServer";
 }
 

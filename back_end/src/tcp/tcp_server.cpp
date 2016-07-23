@@ -224,7 +224,7 @@ std::string ITcpLoop::name() const {
 }
 
 std::string ITcpLoop::formatedName() const {
-  return common::MemSPrintf("[%s][%s(%" PRIuMAX ")]", name(), className(), id());
+  return common::MemSPrintf("[%s][%s(%" PRIuMAX ")]", name(), ClassName(), id());
 }
 
 void ITcpLoop::read_write_cb(struct ev_loop* loop, struct ev_io* watcher, int revents) {
@@ -308,7 +308,7 @@ void ITcpLoop::postLooped(LibEvLoop* loop) {
 }
 
 // server
-TcpServer::TcpServer(const common::net::hostAndPort& host, ITcpLoopObserver* observer)
+TcpServer::TcpServer(const common::net::HostAndPort& host, ITcpLoopObserver* observer)
   : ITcpLoop(observer), sock_(host), accept_io_((struct ev_io*)calloc(1, sizeof(struct ev_io))) {
   accept_io_->data = this;
 }
@@ -318,7 +318,7 @@ TcpServer::~TcpServer() {
   accept_io_ = NULL;
 }
 
-ITcpLoop* TcpServer::findExistServerByHost(const common::net::hostAndPort& host) {
+ITcpLoop* TcpServer::findExistServerByHost(const common::net::HostAndPort& host) {
   if (!host.isValid()) {
     return nullptr;
   }
@@ -368,11 +368,11 @@ common::Error TcpServer::listen(int backlog) {
   return sock_.listen(backlog);
 }
 
-const char* TcpServer::className() const {
+const char* TcpServer::ClassName() const {
   return "TcpServer";
 }
 
-common::net::hostAndPort TcpServer::host() const {
+common::net::HostAndPort TcpServer::host() const {
   return sock_.host();
 }
 

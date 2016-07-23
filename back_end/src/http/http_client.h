@@ -52,7 +52,7 @@ class HttpClient
                                      bool is_keep_alive,
                                      const HttpServerInfo& info) WARN_UNUSED_RESULT;
 
-  virtual const char* className() const;
+  virtual const char* ClassName() const;
 
   void setIsAuthenticated(bool auth);
   bool isAuthenticated() const;
@@ -85,7 +85,7 @@ class Http2Client
 
   bool isSettingNegotiated() const;
 
-  virtual const char* className() const;
+  virtual const char* ClassName() const;
 
  private:
   bool is_http2() const;

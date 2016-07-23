@@ -246,7 +246,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient* hclient,
   }
 
   common::http::header_t upgradeField = request.findHeaderByKey("Upgrade", false);
-  bool isWebSocket = EqualsASCII(upgradeField.value, "websocket", false);
+  bool isWebSocket = common::EqualsASCII(upgradeField.value, "websocket", false);
   if (!isWebSocket) {
     common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST,
                                             nullptr, "Bad Request",
@@ -292,7 +292,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient* hclient,
   std::string header_up = common::MemSPrintf("Upgrade: websocket\r\n"
                                              "Connection: Upgrade\r\n"
                                              "Sec-WebSocket-Accept: %s",
-                                             common::convertToString(enc_accept));
+                                             common::ConvertToString(enc_accept));
   common::Error err = hclient->send_headers(protocol, common::http::HS_SWITCH_PROTOCOL,
                                             header_up.c_str(), nullptr,
                                             nullptr, nullptr,

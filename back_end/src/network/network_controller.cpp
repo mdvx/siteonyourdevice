@@ -56,7 +56,7 @@ int ini_handler_fasto(void* user, const char* section, const char* name, const c
     pconfig->content_path = prepare_content_path(value);
     return 1;
   } else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, LOCAL_HOST_SETTING_LABEL)) {
-    pconfig->local_host = common::convertFromString<common::net::hostAndPort>(value);
+    pconfig->local_host = common::ConvertFromString<common::net::HostAndPort>(value);
     return 1;
   } else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, LOGIN_SETTING_LABEL)) {
     pconfig->login = value;
@@ -68,7 +68,7 @@ int ini_handler_fasto(void* user, const char* section, const char* name, const c
     pconfig->is_private_site = atoi(value);
     return 1;
   } else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, EXTERNAL_HOST_SETTING_LABEL)) {
-    pconfig->external_host = common::convertFromString<common::net::hostAndPort>(value);
+    pconfig->external_host = common::ConvertFromString<common::net::HostAndPort>(value);
     return 1;
   } else if (MATCH(SERVER_SETTINGS_SECTION_LABEL, SERVER_TYPE_SETTING_LABEL)) {
     pconfig->server_type = (fasto::siteonyourdevice::http_server_t)atoi(value);
@@ -271,7 +271,7 @@ void NetworkController::connect() {
   }
 
   const http_server_t server_type = config_.server_type;
-  const common::net::hostAndPort externalHost = config_.external_host;
+  const common::net::HostAndPort externalHost = config_.external_host;
   if (server_type == FASTO_SERVER) {
      server_ = new LocalHttpServerController(auth_checker_, config_);
      server_->start();
@@ -319,13 +319,13 @@ void NetworkController::saveConfig() {
 
   configSave.write("[" SERVER_SETTINGS_SECTION_LABEL "]\n");
   configSave.writeFormated(LOCAL_HOST_SETTING_LABEL "=%s\n",
-                           common::convertToString(config_.local_host));
+                           common::ConvertToString(config_.local_host));
   configSave.writeFormated(LOGIN_SETTING_LABEL "=%s\n", config_.login);
   configSave.writeFormated(PASSWORD_SETTING_LABEL "=%s\n", config_.password);
   configSave.writeFormated(CONTENT_PATH_SETTING_LABEL "=%s\n", config_.content_path);
   configSave.writeFormated(PRIVATE_SITE_SETTING_LABEL "=%u\n", config_.is_private_site);
   configSave.writeFormated(EXTERNAL_HOST_SETTING_LABEL "=%s\n",
-                           common::convertToString(config_.external_host));
+                           common::ConvertToString(config_.external_host));
   configSave.writeFormated(SERVER_TYPE_SETTING_LABEL "=%u\n", config_.server_type);
   configSave.write("[" HANDLERS_URLS_SECTION_LABEL "]\n");
   for (size_t i = 0; i < config_.handlers_urls.size(); ++i) {
@@ -352,11 +352,11 @@ void NetworkController::readConfig() {
   HttpConfig config;
   // default settings
   config.content_path = prepare_content_path(USER_SPECIFIC_CONTENT_PATH);
-  config.local_host = common::convertFromString<common::net::hostAndPort>(USER_SPECIFIC_DEFAULT_LOCAL_DOMAIN);
+  config.local_host = common::ConvertFromString<common::net::HostAndPort>(USER_SPECIFIC_DEFAULT_LOCAL_DOMAIN);
   config.login = USER_SPECIFIC_DEFAULT_LOGIN;
   config.password = USER_SPECIFIC_DEFAULT_PASSWORD;
   config.is_private_site = USER_SPECIFIC_DEFAULT_PRIVATE_SITE;
-  config.external_host = common::convertFromString<common::net::hostAndPort>(USER_SPECIFIC_DEFAULT_EXTERNAL_DOMAIN);
+  config.external_host = common::ConvertFromString<common::net::HostAndPort>(USER_SPECIFIC_DEFAULT_EXTERNAL_DOMAIN);
   config.server_type = static_cast<http_server_t>(USER_SPECIFIC_SERVER_TYPE);
 
   // try to parse settings file

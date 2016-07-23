@@ -77,7 +77,7 @@ void NetworkEventHandler::handleEvent(NetworkEvent* event) {
 void NetworkEventHandler::handleExceptionEvent(NetworkEvent* event, common::Error err) {
   DEBUG_MSG_FORMAT<512>(common::logging::L_WARNING,
                         "Exception event %s, %s",
-                        common::convertToString(event->eventType()), err->description());
+                        common::ConvertToString(event->eventType()), err->description());
 }
 
 }  // namespace network

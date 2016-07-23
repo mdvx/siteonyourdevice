@@ -30,7 +30,7 @@ UserAuthInfo::UserAuthInfo()
 }
 
 UserAuthInfo::UserAuthInfo(const std::string& login, const std::string& password,
-                           const common::net::hostAndPort& host)
+                           const common::net::HostAndPort& host)
   : login(login), password(password), host(host) {
 }
 
@@ -52,12 +52,12 @@ HttpServerInfo::HttpServerInfo(const std::string& server_name,
 
 namespace common {
 
-std::string convertToString(const fasto::siteonyourdevice::UserAuthInfo& uinfo) {
-  return common::MemSPrintf("%s:%s:%s", uinfo.login, uinfo.password, convertToString(uinfo.host));
+std::string ConvertToString(const fasto::siteonyourdevice::UserAuthInfo& uinfo) {
+  return common::MemSPrintf("%s:%s:%s", uinfo.login, uinfo.password, ConvertToString(uinfo.host));
 }
 
 template<>
-fasto::siteonyourdevice::UserAuthInfo convertFromString(const std::string& uinfo_str) {
+fasto::siteonyourdevice::UserAuthInfo ConvertFromString(const std::string& uinfo_str) {
   size_t up = uinfo_str.find_first_of(':');
   if (up == std::string::npos) {
     return fasto::siteonyourdevice::UserAuthInfo();
@@ -71,7 +71,7 @@ fasto::siteonyourdevice::UserAuthInfo convertFromString(const std::string& uinfo
   fasto::siteonyourdevice::UserAuthInfo uinfo;
   uinfo.login = uinfo_str.substr(0, up);
   uinfo.password = uinfo_str.substr(up + 1, ph - up - 1);
-  uinfo.host = convertFromString<common::net::hostAndPort>(uinfo_str.substr(ph + 1));
+  uinfo.host = ConvertFromString<common::net::HostAndPort>(uinfo_str.substr(ph + 1));
 
   return uinfo;
 }

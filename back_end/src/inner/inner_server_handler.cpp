@@ -41,7 +41,7 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-InnerServerHandler::InnerServerHandler(const common::net::hostAndPort& innerHost,
+InnerServerHandler::InnerServerHandler(const common::net::HostAndPort& innerHost,
                                        const HttpConfig& config) :
   config_(config), inner_connection_(nullptr),
   ping_server_id_timer_(INVALID_TIMER_ID), innerHost_(innerHost) {
@@ -144,7 +144,7 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
       DEBUG_MSG_ERROR(err);
     }
   } else if (IS_EQUAL_COMMAND(command, SERVER_WHO_ARE_YOU_COMMAND)) {
-    std::string authStr = common::convertToString(authInfo());
+    std::string authStr = common::ConvertToString(authInfo());
     cmd_responce_t iAm = make_responce(id, CLIENT_WHO_ARE_YOU_COMMAND_RESP_SUCCSESS_1S,
                                            authStr);
     common::Error err = connection->write(iAm, &nwrite);
@@ -155,7 +155,7 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
     if (argc > 1) {
       const char* hostandport = argv[1];
       if (hostandport) {
-        common::net::hostAndPort host = common::convertFromString<common::net::hostAndPort>(hostandport);
+        common::net::HostAndPort host = common::ConvertFromString<common::net::HostAndPort>(hostandport);
         common::net::socket_info rinfo;
         common::Error err = common::net::connect(host, common::net::ST_SOCK_STREAM,
                                                  nullptr, &rinfo);
@@ -221,7 +221,7 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
       const char* hostandport = argv[1];
       const char* hostandport_src = argv[2];
       if (hostandport && hostandport_src) {
-        common::net::hostAndPort host_src = common::convertFromString<common::net::hostAndPort>(hostandport_src);
+        common::net::HostAndPort host_src = common::ConvertFromString<common::net::HostAndPort>(hostandport_src);
         if (!host_src.isValid()) {
           cmd_responce_t resp = make_responce(id,
                                               CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S,
@@ -233,7 +233,7 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
           return;
         }
 
-        common::net::hostAndPort host = common::convertFromString<common::net::hostAndPort>(hostandport);
+        common::net::HostAndPort host = common::ConvertFromString<common::net::HostAndPort>(hostandport);
         common::net::socket_info rinfo;
         common::Error err = common::net::connect(host,
                                                          common::net::ST_SOCK_STREAM, nullptr, &rinfo);
@@ -302,7 +302,7 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
       }
     }
   } else if (IS_EQUAL_COMMAND(command, SERVER_PLEASE_SYSTEM_INFO_COMMAND)) {
-    common::system_info::CpuInfo c1 = common::system_info::currentCpuInfo();
+    const common::system_info::CpuInfo& c1 = common::system_info::currentCpuInfo();
     std::string brand = c1.brandName();
 
     int64_t ram_total = common::system_info::amountOfPhysicalMemory();
@@ -330,14 +330,14 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
     json_object_put(info_json);
   } else if (IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONFIG_COMMAND)) {
     json_object * config_json = json_object_new_object();
-    const std::string local_host_str = common::convertToString(config_.local_host);
+    const std::string local_host_str = common::ConvertToString(config_.local_host);
     json_object_object_add(config_json, LOCAL_HOST_SETTING_LABEL,
                            json_object_new_string(local_host_str.c_str()));
     json_object_object_add(config_json, CONTENT_PATH_SETTING_LABEL,
                            json_object_new_string(config_.content_path.c_str()));
     json_object_object_add(config_json, PRIVATE_SITE_SETTING_LABEL,
                            json_object_new_boolean(config_.is_private_site));
-    const std::string external_host_str = common::convertToString(config_.external_host);
+    const std::string external_host_str = common::ConvertToString(config_.external_host);
     json_object_object_add(config_json, EXTERNAL_HOST_SETTING_LABEL,
                            json_object_new_string(external_host_str.c_str()));
     json_object_object_add(config_json, SERVER_TYPE_SETTING_LABEL,
@@ -396,14 +396,14 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
       json_object_object_get_ex(config_json, LOCAL_HOST_SETTING_LABEL, &jlocal_host);
       if (jlocal_host) {
         const char * lhost_str = json_object_get_string(jlocal_host);
-        new_config.local_host = common::convertFromString<common::net::hostAndPort>(lhost_str);
+        new_config.local_host = common::ConvertFromString<common::net::HostAndPort>(lhost_str);
       }
 
       json_object* jexternal_host = NULL;
       json_object_object_get_ex(config_json, EXTERNAL_HOST_SETTING_LABEL, &jexternal_host);
       if (jexternal_host) {
         const char * ehost_str = json_object_get_string(jexternal_host);
-        new_config.external_host = common::convertFromString<common::net::hostAndPort>(ehost_str);
+        new_config.external_host = common::ConvertFromString<common::net::HostAndPort>(ehost_str);
       }
 
       json_object* jcontent_path = NULL;

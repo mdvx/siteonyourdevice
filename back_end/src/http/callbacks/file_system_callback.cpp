@@ -40,12 +40,12 @@ HttpFileSystemCallback::HttpFileSystemCallback()
 bool HttpFileSystemCallback::handleRequest(http::HttpClient* hclient, const char* extra_header,
                                            const common::http::http_request& request,
                                            const HttpServerInfo& info) {
-  std::string requeststr = common::convertToString(request);
+  std::string requeststr = common::ConvertToString(request);
   DEBUG_MSG_FORMAT<1024>(common::logging::L_INFO, "handleRequest:\n%s", requeststr);
 
   // keep alive
   common::http::header_t connectionField = request.findHeaderByKey("Connection", false);
-  bool isKeepAlive = EqualsASCII(connectionField.value, "Keep-Alive", false);
+  bool isKeepAlive = common::EqualsASCII(connectionField.value, "Keep-Alive", false);
   const common::http::http_protocols protocol = request.protocol();
 
   if (request.method() == common::http::http_method::HM_GET ||

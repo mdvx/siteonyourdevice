@@ -89,7 +89,7 @@ void Http2ClientServerHandler::relayExDataReceived(inner::RelayClientEx* rclient
     return;
   }
 
-  const common::net::hostAndPort externalHost = rclient->externalHost();
+  const common::net::HostAndPort externalHost = rclient->externalHost();
 
   common::net::socket_info client_info;
   common::http::http_protocols protocol = common::http::HP_1_1;

@@ -43,6 +43,6 @@ struct event_traits<NetworkEventTypes> {
   static const unsigned id = NETWORK_EVENT_LOOP_ID;
 };
 
-std::string convertToString(NetworkEventTypes net);
+std::string ConvertToString(NetworkEventTypes net);
 
 }  // namespace common

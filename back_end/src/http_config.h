@@ -53,12 +53,12 @@ enum http_server_t {
 
 struct HttpConfig {
   std::string content_path;
-  common::net::hostAndPort local_host;
+  common::net::HostAndPort local_host;
   std::string login;
   std::string password;
   bool is_private_site;
 
-  common::net::hostAndPort external_host;
+  common::net::HostAndPort external_host;
   http_server_t server_type;
 
   typedef std::pair<std::string, std::string>  handlers_url_t;

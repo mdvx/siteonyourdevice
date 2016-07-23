@@ -65,5 +65,5 @@ class HttpCallbackUrl
 }  // namespace fasto
 
 namespace common {
-    std::string convertToString(fasto::siteonyourdevice::HCTypes t);
+    std::string ConvertToString(fasto::siteonyourdevice::HCTypes t);
 }  // namespace common

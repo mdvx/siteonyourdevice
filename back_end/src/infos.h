@@ -28,13 +28,13 @@ namespace siteonyourdevice {
 struct UserAuthInfo {
   UserAuthInfo();
   UserAuthInfo(const std::string& login, const std::string& password,
-               const common::net::hostAndPort& host);
+               const common::net::HostAndPort& host);
 
   bool isValid() const;
 
   std::string login;
   std::string password;
-  common::net::hostAndPort host;
+  common::net::HostAndPort host;
 };
 
 inline bool operator == (const UserAuthInfo& lhs, const UserAuthInfo& rhs) {
@@ -58,6 +58,6 @@ struct HttpServerInfo {
 
 namespace common {
 
-std::string convertToString(const fasto::siteonyourdevice::UserAuthInfo& uinfo);
+std::string ConvertToString(const fasto::siteonyourdevice::UserAuthInfo& uinfo);
 
 }  // namespace common

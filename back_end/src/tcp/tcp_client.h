@@ -56,7 +56,7 @@ class TcpClient
   void setFlags(flags_t flags);
 
   common::patterns::id_counter<TcpClient>::type_t id() const;
-  virtual const char* className() const;
+  virtual const char* ClassName() const;
   std::string formatedName() const;
 
  private:
