@@ -68,7 +68,7 @@ class InnerServerHandlerHost::InnerSubHandler
     bool res = parent_->sub_commands_in_->publish_command_out(msg, msg_len);
     if (!res) {
       std::string err_str = common::MemSPrintf("publish_command_out with args: msg = %s, msg_len = " PRIu64 " failed!", msg, msg_len);
-      DEBUG_MSG(common::logging::L_ERR, err_str);
+      DEBUG_MSG(common::logging::L_ERROR, err_str);
     }
   }
 
@@ -211,7 +211,7 @@ void InnerServerHandlerHost::closed(tcp::TcpClient* client) {
       bool res = sub_commands_in_->publish_clients_state(connected_resp);
       if (!res) {
         std::string err_str = common::MemSPrintf("publish_clients_state with args: connected_resp = %s failed!", connected_resp);
-        DEBUG_MSG(common::logging::L_ERR, err_str);
+        DEBUG_MSG(common::logging::L_ERROR, err_str);
       }
     }
   }
@@ -291,7 +291,7 @@ void InnerServerHandlerHost::handleInnerResponceCommand(siteonyourdevice::inner:
           goto fail;
         }
 
-        UserAuthInfo uauth = common::convertFromString<UserAuthInfo>(uauthstr);
+        UserAuthInfo uauth = common::ConvertFromString<UserAuthInfo>(uauthstr);
         if (!uauth.isValid()) {
           cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_USER);
           connection->write(resp, &nwrite);
@@ -327,7 +327,7 @@ void InnerServerHandlerHost::handleInnerResponceCommand(siteonyourdevice::inner:
           bool res = sub_commands_in_->publish_clients_state(connected_resp);
           if (!res) {
             std::string err_str = common::MemSPrintf("publish_clients_state with args: connected_resp = %s failed!", connected_resp);
-            DEBUG_MSG(common::logging::L_ERR, err_str);
+            DEBUG_MSG(common::logging::L_ERROR, err_str);
           }
         }
       } else {
@@ -373,7 +373,7 @@ void InnerServerHandlerHost::handleInnerApproveCommand(siteonyourdevice::inner::
   }
 }
 
-InnerTcpServer::InnerTcpServer(const common::net::hostAndPort& host,
+InnerTcpServer::InnerTcpServer(const common::net::HostAndPort& host,
                                tcp::ITcpLoopObserver *observer)
   : TcpServer(host, observer) {
 }

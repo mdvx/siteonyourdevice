@@ -33,7 +33,7 @@ namespace websocket {
 class WebSocketServerHost :
   public http::Http2Server {
  public:
-  WebSocketServerHost(const common::net::hostAndPort& host, tcp::ITcpLoopObserver *observer);
+  WebSocketServerHost(const common::net::HostAndPort& host, tcp::ITcpLoopObserver *observer);
 
   virtual const char* className() const;
 

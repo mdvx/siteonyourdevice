@@ -46,7 +46,7 @@
 
 namespace {
 
-const common::net::hostAndPort redis_default_host = common::net::hostAndPort::createLocalHost(6379);
+const common::net::HostAndPort redis_default_host = common::net::HostAndPort::createLocalHost(6379);
 sig_atomic_t is_stop = 0;
 int total_clients = 0;
 const char* config_path = CONFIG_FILE_PATH;
@@ -62,7 +62,7 @@ int ini_handler_fasto(void* user, const char* section, const char* name, const c
 
   #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
   if (MATCH("http_server", "redis_server")) {
-    pconfig->redis_config_.redis_host = common::convertFromString<common::net::hostAndPort>(value);
+    pconfig->redis_config_.redis_host = common::ConvertFromString<common::net::HostAndPort>(value);
     return 1;
   } else if (MATCH("http_server", "redis_unix_path")) {
     pconfig->redis_config_.redis_unix_socket = value;

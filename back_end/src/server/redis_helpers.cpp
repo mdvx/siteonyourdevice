@@ -37,7 +37,7 @@ namespace server {
 namespace {
 
 redisContext * redis_connect(const redis_configuration_t& config) {
-  common::net::hostAndPort redisHost = config.redis_host;
+  common::net::HostAndPort redisHost = config.redis_host;
   const std::string unixPath = config.redis_unix_socket;
 
   redisContext * redis = NULL;

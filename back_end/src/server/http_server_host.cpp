@@ -140,7 +140,7 @@ void HttpInnerServerHandlerHost::processHttpRequest(http::HttpClient *hclient,
   std::string fpath = path.fpath();
 
   inner::InnerTcpServerClient * innerConnection = parent_->findInnerConnectionByHost(hpath);
-  if (!innerConnection) {
+  /*if (!innerConnection) {
     common::http::header_t refererField = hrequest.findHeaderByKey("Referer", false);
     if (refererField.isValid()) {
       common::uri::Uri refpath(refererField.value);
@@ -152,13 +152,13 @@ void HttpInnerServerHandlerHost::processHttpRequest(http::HttpClient *hclient,
     }
 
     innerConnection = parent_->findInnerConnectionByHost(hpath);
-  }
+  }*/
 
   if (!innerConnection) {
     DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING,
                            "HttpInnerServerHandlerHost not found host %s, request str:\n%s",
-                           hpath, common::convertToString(hrequest));
-    std::string msg = common::MemSPrintf("Not registered host(%s) or it is offline.", hpath);
+                           hpath, common::ConvertToString(hrequest));
+    std::string msg = common::MemSPrintf("Not registered host(%s) or it is offline(if it is your host, please build server installer(button in your profile page) and run it on your device!).", hpath);
     hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL, msg.c_str(), false, info());
     hclient->close();
     delete hclient;
@@ -174,12 +174,12 @@ void HttpInnerServerHandlerHost::processHttpRequest(http::HttpClient *hclient,
   tcp::ITcpLoop *server = hclient->server();
   server->unregisterClient(hclient);
   innerConnection->addHttpRelayClient(parent_->innerHandler(),
-                                      hclient, common::convertToBytes(chrequest));
+                                      hclient, common::ConvertToBytes(chrequest));
 }
 
-HttpServerHost::HttpServerHost(const common::net::hostAndPort& httpHost,
-                               const common::net::hostAndPort &innerHost,
-                               const common::net::hostAndPort &webSocketHost)
+HttpServerHost::HttpServerHost(const common::net::HostAndPort& httpHost,
+                               const common::net::HostAndPort &innerHost,
+                               const common::net::HostAndPort &webSocketHost)
   : httpHandler_(NULL), httpServer_(NULL), http_thread_(),
     innerHandler_(NULL), innerServer_(NULL), inner_thread_(),
     websocketHandler_(NULL), websocketServer_(NULL), websocket_thread_(),

@@ -62,9 +62,9 @@ class HttpServerHost {
  public:
   typedef std::unordered_map<std::string, inner::InnerTcpServerClient*> inner_connections_type;
 
-  HttpServerHost(const common::net::hostAndPort& httpHost,
-                 const common::net::hostAndPort& innerHost,
-                 const common::net::hostAndPort& webSocketHost);
+  HttpServerHost(const common::net::HostAndPort& httpHost,
+                 const common::net::HostAndPort& innerHost,
+                 const common::net::HostAndPort& webSocketHost);
   ~HttpServerHost();
 
   void setStorageConfig(const redis_sub_configuration_t &config);

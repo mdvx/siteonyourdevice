@@ -78,7 +78,7 @@ class InnerTcpServerClient
                           const common::buffer_t& request);  // move ovnerships
   void addWebsocketRelayClient(InnerServerHandlerHost* handler, tcp::TcpClient* client,
                                const common::buffer_t& request,
-                                 const common::net::hostAndPort &srcHost);  // move ovnerships
+                                 const common::net::HostAndPort &srcHost);  // move ovnerships
 
  private:
   UserAuthInfo hinfo_;

@@ -79,7 +79,7 @@ class InnerServerHandlerHost
 class InnerTcpServer
         : public tcp::TcpServer {
  public:
-  InnerTcpServer(const common::net::hostAndPort& host, tcp::ITcpLoopObserver* observer);
+  InnerTcpServer(const common::net::HostAndPort& host, tcp::ITcpLoopObserver* observer);
   virtual const char* className() const;
 
  private:

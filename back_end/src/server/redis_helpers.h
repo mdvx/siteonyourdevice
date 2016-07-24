@@ -29,7 +29,7 @@ namespace siteonyourdevice {
 namespace server {
 
 struct redis_configuration_t {
-  common::net::hostAndPort redis_host;
+  common::net::HostAndPort redis_host;
   std::string redis_unix_socket;
 };
 

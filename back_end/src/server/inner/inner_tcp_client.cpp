@@ -184,7 +184,7 @@ fasto::siteonyourdevice::tcp::ITcpLoop * createServer(fasto::siteonyourdevice::t
 
   ssize_t nwrite = 0;
   fasto::siteonyourdevice::cmd_request_t createConnection = ihandler_->make_request(SERVER_PLEASE_CONNECT_HTTP_COMMAND_REQ_1S,
-                                                                                    common::convertToString(serv->host()));
+                                                                                    common::ConvertToString(serv->host()));
   err = parent_->write(createConnection, &nwrite);  // inner command write
   if (err && err->isError()) {;
     DEBUG_MSG_ERROR(err);
@@ -198,11 +198,11 @@ fasto::siteonyourdevice::tcp::ITcpLoop * createServer(fasto::siteonyourdevice::t
 
 class WebSocketRelayLoop
     : public fasto::siteonyourdevice::server::inner::IInnerRelayLoop {
-  const common::net::hostAndPort srcHost_;
+  const common::net::HostAndPort srcHost_;
  public:
   WebSocketRelayLoop(fasto::siteonyourdevice::inner::InnerServerCommandSeqParser *handler,
                      fasto::siteonyourdevice::server::inner::InnerTcpServerClient *parent,
-                     const request_t& request, const common::net::hostAndPort& srcHost)
+                     const request_t& request, const common::net::HostAndPort& srcHost)
     : IInnerRelayLoop(handler, parent, request), srcHost_(srcHost) {
   }
 
@@ -231,8 +231,8 @@ class WebSocketRelayLoop
 
     ssize_t nwrite = 0;
     fasto::siteonyourdevice::cmd_request_t createConnection = ihandler_->make_request(SERVER_PLEASE_CONNECT_WEBSOCKET_COMMAND_REQ_2SS,
-                                                                                      common::convertToString(serv->host()),
-                                                                                      common::convertToString(srcHost_));
+                                                                                      common::ConvertToString(serv->host()),
+                                                                                      common::ConvertToString(srcHost_));
     err = parent_->write(createConnection, &nwrite);  // inner command write
     if (err && err->isError()) {;
       DEBUG_MSG_ERROR(err);
@@ -301,7 +301,7 @@ void InnerTcpServerClient::addHttpRelayClient(InnerServerHandlerHost* handler,
 
 void InnerTcpServerClient::addWebsocketRelayClient(InnerServerHandlerHost* handler,
                                              TcpClient *client, const common::buffer_t& request,
-                                             const common::net::hostAndPort& srcHost) {
+                                             const common::net::HostAndPort& srcHost) {
   websocket_relay_loop_t tmp(new WebSocketRelayLoop(handler, this,
                                                     std::make_pair(client, request), srcHost));
   tmp->start();

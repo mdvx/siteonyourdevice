@@ -33,7 +33,7 @@ namespace siteonyourdevice {
 namespace server {
 namespace websocket {
 
-WebSocketServerHost::WebSocketServerHost(const common::net::hostAndPort& host,
+WebSocketServerHost::WebSocketServerHost(const common::net::HostAndPort& host,
                                          tcp::ITcpLoopObserver *observer)
   : Http2Server(host, observer) {
 }
@@ -86,14 +86,14 @@ void WebSocketServerHandlerHost::processWebsocketRequest(http::HttpClient *hclie
   common::uri::Upath path = hrequest.path();
   std::string hpath = path.hpath();
   std::string fpath = path.fpath();
-  common::net::hostAndPort host = common::convertFromString<common::net::hostAndPort>(hpath);
+  common::net::HostAndPort host = common::ConvertFromString<common::net::HostAndPort>(hpath);
   std::string hpath_without_port = host.host;
 
   inner::InnerTcpServerClient * innerConnection = parent_->findInnerConnectionByHost(hpath_without_port);
   if (!innerConnection) {
     DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING,
                            "WebSocketServerHandlerHost not found host %s, request str:\n%s",
-                           hpath, common::convertToString(hrequest));
+                           hpath, common::ConvertToString(hrequest));
     hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL,
                         "Not registered host.", false, info());
     hclient->close();
@@ -101,18 +101,18 @@ void WebSocketServerHandlerHost::processWebsocketRequest(http::HttpClient *hclie
     return;
   }
 
-  hclient->setName(common::convertToString(host));
+  hclient->setName(common::ConvertToString(host));
 
   common::http::http_request chrequest = hrequest;
   path.setPath(fpath);
   chrequest.setPath(path);
 
-  common::buffer_t res = common::convertToBytes(chrequest);
+  common::buffer_t res = common::ConvertToBytes(chrequest);
 
   tcp::ITcpLoop *server = hclient->server();
   server->unregisterClient(hclient);
   innerConnection->addWebsocketRelayClient(parent_->innerHandler(), hclient, res,
-                                           common::net::hostAndPort::createLocalHost(host.port));
+                                           common::net::HostAndPort::createLocalHost(host.port));
 }
 
 }  // namespace websocket
