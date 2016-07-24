@@ -67,7 +67,8 @@ module.exports = function(app, passport) {
     // ADD DOMAIN 
     app.post('/add_domain', function(req, res) {
         var user = req.user;        
-        var new_domain = req.body.domain_name.replace(/^www\./ig, '');
+        var stable_domain = req.body.domain_name.replace(/^www\./ig, '');
+        var new_domain = stable_domain.toLowerCase();
         
         if (!checkIsValidDomain(new_domain)) {
             req.flash('statusProfileMessage', new_domain + ' not valid domain name.');
