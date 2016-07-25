@@ -16,11 +16,20 @@
     along with SiteOnYourDevice.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "common/file_system.h"
+#include "common/logger.h"
+
 #include "application/fasto_application.h"
 
 // [-c] config path [-d] run as daemon
 
 int main(int argc, char* argv[]) {
+#if defined(LOG_TO_FILE)
+  std::string log_path = common::file_system::prepare_path("~/" PROJECT_NAME_LOWERCASE ".log");
+  INIT_LOGGER(PROJECT_NAME_TITLE, log_path);
+#else
+  INIT_LOGGER(PROJECT_NAME_TITLE);
+#endif
   fasto::siteonyourdevice::application::FastoApplication app(argc, argv);
   int res = app.exec();
   return res;

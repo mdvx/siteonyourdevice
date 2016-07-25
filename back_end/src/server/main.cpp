@@ -90,6 +90,12 @@ void sync_config();
 void app_logger_hadler(common::logging::LEVEL_LOG level, const std::string& message);
 
 int main(int argc, char *argv[]) {
+#if defined(LOG_TO_FILE)
+  std::string log_path = common::file_system::prepare_path("~/" PROJECT_NAME_LOWERCASE ".log");
+  INIT_LOGGER(PROJECT_NAME_TITLE, log_path);
+#else
+  INIT_LOGGER(PROJECT_NAME_TITLE);
+#endif
     int opt;
     bool daemon_mode = false;
     while ((opt = getopt(argc, argv, "cd:")) != -1) {
