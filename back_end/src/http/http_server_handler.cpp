@@ -25,7 +25,7 @@
 #include "common/string_util.h"
 #include "common/logger.h"
 #include "common/net/net.h"
-
+#include "common/convert2string.h"
 
 #include "http/http_client.h"
 

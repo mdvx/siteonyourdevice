@@ -30,6 +30,7 @@
 #include "common/hash/sha1.h"
 #include "common/utils.h"
 #include "common/logger.h"
+#include "common/convert2string.h"
 
 #include "websocket/websocket_client.h"
 

@@ -224,7 +224,7 @@ std::string ITcpLoop::name() const {
 }
 
 std::string ITcpLoop::formatedName() const {
-  return common::MemSPrintf("[%s][%s(%" PRIuMAX ")]", name(), ClassName(), id());
+  return common::MemSPrintf("[%s][%s(%llu)]", name(), ClassName(), id());
 }
 
 void ITcpLoop::read_write_cb(struct ev_loop* loop, struct ev_io* watcher, int revents) {

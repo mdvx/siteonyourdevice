@@ -75,6 +75,7 @@ OPTION(DEVELOPER_FEATURES "Use some debug tricks for developers" OFF)
 OPTION(DEVELOPER_ENABLE_TESTS "Enable tests for ${PROJECT_NAME_TITLE} project" OFF)
 OPTION(BUILD_SERVER "Build server for ${PROJECT_NAME_TITLE} project" OFF)
 OPTION(IPV6_ENABLED "Build server and client with ipv6 support" OFF)
+OPTION(CHECK_STYLE "Enable check style for ${PROJECT_NAME_TITLE} project" OFF)
 
 IF(MSVC)
   IF(CMAKE_CL_64)

@@ -21,6 +21,7 @@
 #include <string>
 
 #include "common/sprintf.h"
+#include "common/convert2string.h"
 
 namespace fasto {
 namespace siteonyourdevice {

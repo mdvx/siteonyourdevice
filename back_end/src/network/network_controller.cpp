@@ -22,6 +22,7 @@
 
 #include "inih/ini.h"
 
+#include "common/convert2string.h"
 #include "common/file_system.h"
 #include "common/logger.h"
 #include "common/utils.h"
@@ -335,7 +336,7 @@ void NetworkController::saveConfig() {
   configSave.write("[" SERVER_SOCKETS_SECTION_LABEL "]\n");
   for (size_t i = 0; i < config_.server_sockets_urls.size(); ++i) {
     HttpConfig::server_sockets_url_t sock_url = config_.server_sockets_urls[i];
-    std::string url = sock_url.second.get_url();
+    std::string url = sock_url.second.url();
     configSave.writeFormated("%s=%s\n", sock_url.first, url);
   }
   configSave.close();

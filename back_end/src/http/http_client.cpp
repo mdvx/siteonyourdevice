@@ -23,6 +23,7 @@
 
 #include <string>
 
+#include "common/convert2string.h"
 #include "common/sprintf.h"
 #include "common/net/net.h"
 #include "common/logger.h"

@@ -114,7 +114,7 @@ module.exports = function(app, passport) {
           console.log('scan folder: ', dir);
           var results = [];
           fs.readdir(dir, function(err, list) {
-            if (err) return done(err);
+            if (err) return done(err, []);
             var pending = list.length;
             if (!pending) return done(null, results);
             list.forEach(function(file) {

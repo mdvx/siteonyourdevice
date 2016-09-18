@@ -25,8 +25,10 @@
 #include "common/error.h"
 #include "common/logger.h"
 #include "common/net/net.h"
+#include "common/system_info/cpu_info.h"
 #include "common/system_info/system_info.h"
 #include "common/thread/event_bus.h"
+#include "common/convert2string.h"
 
 #include "network/network_events.h"
 
@@ -359,7 +361,7 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
       HttpConfig::server_sockets_url_t url = config_.server_sockets_urls[i];
       json_object* jsocket_url = json_object_new_object();
       json_object_object_add(jsocket_url, "type", json_object_new_string(url.first.c_str()));
-      const std::string surl = url.second.get_url();
+      const std::string surl = url.second.url();
       json_object_object_add(jsocket_url, "path", json_object_new_string(surl.c_str()));
       json_object_array_add(jsockets_urls, jsocket_url);
     }
