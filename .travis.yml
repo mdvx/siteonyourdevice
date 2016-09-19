@@ -27,7 +27,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install rpm; fi
   
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew ls | grep -wq cmake || brew install cmake; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew ls ; fi
 before_script:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then wget --no-check-certificate http://www.cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz -O cmake.tar.gz; fi
   #- if [ "$TRAVIS_OS_NAME" = "osx" ]; then wget http://www.cmake.org/files/v3.3/cmake-3.3.2-Darwin-x86_64.tar.gz -O cmake.tar.gz; fi
@@ -36,6 +36,10 @@ before_script:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export PATH=$HOME/cmake-3.3.2-Linux-x86_64/bin:$PATH; fi
   #- if [ "$TRAVIS_OS_NAME" = "osx" ]; then export PATH=$HOME/cmake-3.3.2-Darwin-x86_64/CMake.app/Contents/bin:$PATH; fi
   #- if [ "$TRAVIS_OS_NAME" = "osx" ]; then CMAKE_ARGS="-DCMAKE_PREFIX_PATH=/usr/local/opt/qt5"; fi
+  
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then wget http://www.cmake.org/files/v3.3/cmake-3.3.2-Darwin-x86_64.tar.gz -O cmake.tar.gz; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then tar -xzf cmake.tar.gz -C $HOME; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export PATH=$HOME/cmake-3.3.2-Darwin-x86_64/CMake.app/Contents/bin:$PATH; fi
 
   - which cmake
   - cmake --version
