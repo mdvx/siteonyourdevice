@@ -27,7 +27,8 @@ namespace siteonyourdevice {
 
 struct UserAuthInfo {
   UserAuthInfo();
-  UserAuthInfo(const std::string& login, const std::string& password,
+  UserAuthInfo(const std::string& login,
+               const std::string& password,
                const common::net::HostAndPort& host);
 
   bool isValid() const;
@@ -37,11 +38,11 @@ struct UserAuthInfo {
   common::net::HostAndPort host;
 };
 
-inline bool operator == (const UserAuthInfo& lhs, const UserAuthInfo& rhs) {
+inline bool operator==(const UserAuthInfo& lhs, const UserAuthInfo& rhs) {
   return lhs.login == rhs.login && lhs.password == rhs.password && lhs.host == rhs.host;
 }
 
-inline bool operator !=(const UserAuthInfo& x, const UserAuthInfo& y) {
+inline bool operator!=(const UserAuthInfo& x, const UserAuthInfo& y) {
   return !(x == y);
 }
 

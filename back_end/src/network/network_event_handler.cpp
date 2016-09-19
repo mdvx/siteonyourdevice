@@ -27,12 +27,12 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace network {
 
-class NetworkEventHandler::NetworkListener
-  : public common::IListener<NetworkEventTypes> {
+class NetworkEventHandler::NetworkListener : public common::IListener<NetworkEventTypes> {
   NetworkEventHandler* const app_;
+
  public:
   explicit NetworkListener(NetworkEventHandler* app)
-    : common::IListener<NetworkEventTypes>(), app_(app) {
+      : common::IListener<NetworkEventTypes>(), app_(app) {
     EVENT_BUS()->subscribe<InnerClientConnectedEvent>(this);
     EVENT_BUS()->subscribe<InnerClientDisconnectedEvent>(this);
     EVENT_BUS()->subscribe<ConfigChangedEvent>(this);
@@ -44,9 +44,7 @@ class NetworkEventHandler::NetworkListener
     EVENT_BUS()->unsubscribe<InnerClientConnectedEvent>(this);
   }
 
-  virtual void handleEvent(event_t* event) {
-    app_->handleEvent(event);
-  }
+  virtual void handleEvent(event_t* event) { app_->handleEvent(event); }
 
   virtual void handleExceptionEvent(event_t* event, common::Error err) {
     app_->handleExceptionEvent(event, err);
@@ -54,7 +52,7 @@ class NetworkEventHandler::NetworkListener
 };
 
 NetworkEventHandler::NetworkEventHandler(NetworkController* controller)
-  : network_listener_(nullptr), controller_(controller) {
+    : network_listener_(nullptr), controller_(controller) {
   network_listener_ = new NetworkListener(this);
 }
 
@@ -66,17 +64,16 @@ void NetworkEventHandler::handleEvent(NetworkEvent* event) {
   if (event->eventType() == InnerClientConnectedEvent::EventType) {
   } else if (event->eventType() == InnerClientDisconnectedEvent::EventType) {
   } else if (event->eventType() == ConfigChangedEvent::EventType) {
-      ConfigChangedEvent* new_config_event = static_cast<ConfigChangedEvent*>(event);
-      HttpConfig config = new_config_event->info();
-      controller_->disConnect();
-      controller_->setConfig(config);
-      controller_->connect();
+    ConfigChangedEvent* new_config_event = static_cast<ConfigChangedEvent*>(event);
+    HttpConfig config = new_config_event->info();
+    controller_->disConnect();
+    controller_->setConfig(config);
+    controller_->connect();
   }
 }
 
 void NetworkEventHandler::handleExceptionEvent(NetworkEvent* event, common::Error err) {
-  DEBUG_MSG_FORMAT<512>(common::logging::L_WARNING,
-                        "Exception event %s, %s",
+  DEBUG_MSG_FORMAT<512>(common::logging::L_WARNING, "Exception event %s, %s",
                         common::ConvertToString(event->eventType()), err->description());
 }
 

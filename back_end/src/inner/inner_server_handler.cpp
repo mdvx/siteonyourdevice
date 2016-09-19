@@ -44,26 +44,28 @@ namespace siteonyourdevice {
 namespace inner {
 
 InnerServerHandler::InnerServerHandler(const common::net::HostAndPort& innerHost,
-                                       const HttpConfig& config) :
-  config_(config), inner_connection_(nullptr),
-  ping_server_id_timer_(INVALID_TIMER_ID), innerHost_(innerHost) {
-}
+                                       const HttpConfig& config)
+    : config_(config),
+      inner_connection_(nullptr),
+      ping_server_id_timer_(INVALID_TIMER_ID),
+      innerHost_(innerHost) {}
 
-InnerServerHandler::~InnerServerHandler(){
+InnerServerHandler::~InnerServerHandler() {
   delete inner_connection_;
   inner_connection_ = nullptr;
 }
 
-void InnerServerHandler::preLooped(tcp::ITcpLoop* server){
+void InnerServerHandler::preLooped(tcp::ITcpLoop* server) {
   ping_server_id_timer_ = server->createTimer(ping_timeout_server, ping_timeout_server);
   CHECK(!inner_connection_);
 
   common::net::socket_info client_info;
-  common::ErrnoError err = common::net::connect(innerHost_, common::net::ST_SOCK_STREAM,
-                                                  0, &client_info);
+  common::ErrnoError err =
+      common::net::connect(innerHost_, common::net::ST_SOCK_STREAM, 0, &client_info);
   if (err && err->isError()) {
     DEBUG_MSG_ERROR(err);
-    auto ex_event = make_exception_event(new network::InnerClientConnectedEvent(this, authInfo()), err);
+    auto ex_event =
+        make_exception_event(new network::InnerClientConnectedEvent(this, authInfo()), err);
     EVENT_BUS()->postEvent(ex_event);
     return;
   }
@@ -73,13 +75,11 @@ void InnerServerHandler::preLooped(tcp::ITcpLoop* server){
   server->registerClient(connection);
 }
 
-void InnerServerHandler::accepted(tcp::TcpClient* client){
-}
+void InnerServerHandler::accepted(tcp::TcpClient* client) {}
 
-void InnerServerHandler::moved(tcp::TcpClient* client){
-}
+void InnerServerHandler::moved(tcp::TcpClient* client) {}
 
-void InnerServerHandler::closed(tcp::TcpClient* client){
+void InnerServerHandler::closed(tcp::TcpClient* client) {
   if (client == inner_connection_) {
     EVENT_BUS()->postEvent(new network::InnerClientDisconnectedEvent(this, authInfo()));
     inner_connection_ = nullptr;
@@ -87,7 +87,7 @@ void InnerServerHandler::closed(tcp::TcpClient* client){
   }
 }
 
-void InnerServerHandler::dataReceived(tcp::TcpClient* client){
+void InnerServerHandler::dataReceived(tcp::TcpClient* client) {
   char buff[MAX_COMMAND_SIZE] = {0};
   ssize_t nread = 0;
   common::Error err = client->read(buff, MAX_COMMAND_SIZE, &nread);
@@ -101,10 +101,9 @@ void InnerServerHandler::dataReceived(tcp::TcpClient* client){
   handleInnerDataReceived(dynamic_cast<InnerClient*>(client), buff, nread);
 }
 
-void InnerServerHandler::dataReadyToWrite(tcp::TcpClient* client){
-}
+void InnerServerHandler::dataReadyToWrite(tcp::TcpClient* client) {}
 
-void InnerServerHandler::postLooped(tcp::ITcpLoop* server){
+void InnerServerHandler::postLooped(tcp::ITcpLoop* server) {
   if (inner_connection_) {
     InnerClient* connection = inner_connection_;
     connection->close();
@@ -112,7 +111,7 @@ void InnerServerHandler::postLooped(tcp::ITcpLoop* server){
   }
 }
 
-void InnerServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_t id){
+void InnerServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_t id) {
   if (id == ping_server_id_timer_ && inner_connection_) {
     const cmd_request_t ping_request = make_request(PING_COMMAND_REQ);
     ssize_t nwrite = 0;
@@ -130,12 +129,14 @@ UserAuthInfo InnerServerHandler::authInfo() const {
   return UserAuthInfo(config_.login, config_.password, config_.local_host);
 }
 
-void InnerServerHandler::setConfig(const HttpConfig& config){
+void InnerServerHandler::setConfig(const HttpConfig& config) {
   config_ = config;
 }
 
-void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_seq_t id,
-                                                   int argc, char* argv[]) {
+void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection,
+                                                   cmd_seq_t id,
+                                                   int argc,
+                                                   char* argv[]) {
   ssize_t nwrite = 0;
   char* command = argv[0];
 
@@ -147,8 +148,7 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
     }
   } else if (IS_EQUAL_COMMAND(command, SERVER_WHO_ARE_YOU_COMMAND)) {
     std::string authStr = common::ConvertToString(authInfo());
-    cmd_responce_t iAm = make_responce(id, CLIENT_WHO_ARE_YOU_COMMAND_RESP_SUCCSESS_1S,
-                                           authStr);
+    cmd_responce_t iAm = make_responce(id, CLIENT_WHO_ARE_YOU_COMMAND_RESP_SUCCSESS_1S, authStr);
     common::Error err = connection->write(iAm, &nwrite);
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
@@ -157,10 +157,11 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
     if (argc > 1) {
       const char* hostandport = argv[1];
       if (hostandport) {
-        common::net::HostAndPort host = common::ConvertFromString<common::net::HostAndPort>(hostandport);
+        common::net::HostAndPort host =
+            common::ConvertFromString<common::net::HostAndPort>(hostandport);
         common::net::socket_info rinfo;
-        common::Error err = common::net::connect(host, common::net::ST_SOCK_STREAM,
-                                                 nullptr, &rinfo);
+        common::Error err =
+            common::net::connect(host, common::net::ST_SOCK_STREAM, nullptr, &rinfo);
         if (err && err->isError()) {
           cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S,
                                               CAUSE_CONNECT_FAILED);
@@ -171,31 +172,31 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
           return;
         }
 
-        auto find_by_name = [](tcp::ITcpLoop * loop) -> bool {
+        auto find_by_name = [](tcp::ITcpLoop* loop) -> bool {
           return loop->name() == "local_http_server" ||
-              loop->name() == "proxy_http_server";  // hardcode
+                 loop->name() == "proxy_http_server";  // hardcode
         };
 
         tcp::ITcpLoop* server = tcp::ITcpLoop::findExistLoopByPredicate(find_by_name);
-        if(!server){
-            cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S,
-                                                CAUSE_CONNECT_FAILED);
-            err = connection->write(resp, &nwrite);
-            if (err && err->isError()) {
-              DEBUG_MSG_ERROR(err);
-            }
-            return;
+        if (!server) {
+          cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S,
+                                              CAUSE_CONNECT_FAILED);
+          err = connection->write(resp, &nwrite);
+          if (err && err->isError()) {
+            DEBUG_MSG_ERROR(err);
+          }
+          return;
         }
 
-        cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_SUCCSESS_1S,
-                                                    hostandport);
+        cmd_responce_t resp =
+            make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_SUCCSESS_1S, hostandport);
         err = connection->write(resp, &nwrite);
         if (err && err->isError()) {
           DEBUG_MSG_ERROR(err);
           return;
         }
 
-        RelayClient *relayConnection = nullptr;
+        RelayClient* relayConnection = nullptr;
         if (config_.server_type == EXTERNAL_SERVER) {
           relayConnection = new RelayClientEx(server, rinfo, config_.external_host);
         } else {
@@ -203,16 +204,14 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
         }
         relayConnection->setIsAuthenticated(!config_.is_private_site);
 
-        auto cb = [server, relayConnection]() {
-          server->registerClient(relayConnection);
-        };
+        auto cb = [server, relayConnection]() { server->registerClient(relayConnection); };
         server->execInLoopThread(cb);
       } else {
         NOTREACHED();
       }
     } else {
-      cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S,
-                                                CAUSE_INVALID_ARGS);
+      cmd_responce_t resp =
+          make_responce(id, CLIENT_PLEASE_CONNECT_HTTP_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
       common::Error err = connection->write(resp, &nwrite);
       if (err && err->isError()) {
         DEBUG_MSG_ERROR(err);
@@ -223,11 +222,11 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
       const char* hostandport = argv[1];
       const char* hostandport_src = argv[2];
       if (hostandport && hostandport_src) {
-        common::net::HostAndPort host_src = common::ConvertFromString<common::net::HostAndPort>(hostandport_src);
+        common::net::HostAndPort host_src =
+            common::ConvertFromString<common::net::HostAndPort>(hostandport_src);
         if (!host_src.isValid()) {
-          cmd_responce_t resp = make_responce(id,
-                                              CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S,
-                                              CAUSE_INVALID_ARGS);
+          cmd_responce_t resp = make_responce(
+              id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
           common::Error err = connection->write(resp, &nwrite);
           if (err && err->isError()) {
             DEBUG_MSG_ERROR(err);
@@ -235,25 +234,25 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
           return;
         }
 
-        common::net::HostAndPort host = common::ConvertFromString<common::net::HostAndPort>(hostandport);
+        common::net::HostAndPort host =
+            common::ConvertFromString<common::net::HostAndPort>(hostandport);
         common::net::socket_info rinfo;
-        common::Error err = common::net::connect(host,
-                                                         common::net::ST_SOCK_STREAM, nullptr, &rinfo);
+        common::Error err =
+            common::net::connect(host, common::net::ST_SOCK_STREAM, nullptr, &rinfo);
         if (err && err->isError()) {
-          cmd_responce_t resp = make_responce(id,
-                                              CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S,
-                                              CAUSE_CONNECT_FAILED);
+          cmd_responce_t resp = make_responce(
+              id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_CONNECT_FAILED);
           err = connection->write(resp, &nwrite);
           if (err && err->isError()) {
             DEBUG_MSG_ERROR(err);
           }
-            return;
+          return;
         }
 
-        tcp::ITcpLoop * server = nullptr;
+        tcp::ITcpLoop* server = nullptr;
 
         if (config_.server_type == EXTERNAL_SERVER) {
-          auto find_by_name = [](tcp::ITcpLoop * loop) -> bool {
+          auto find_by_name = [](tcp::ITcpLoop* loop) -> bool {
             return loop->name() == "proxy_http_server";  // hardcode
           };
 
@@ -263,9 +262,8 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
         }
 
         if (!server) {
-          cmd_responce_t resp = make_responce(id,
-                                              CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S,
-                                              CAUSE_INVALID_ARGS);
+          cmd_responce_t resp = make_responce(
+              id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
           common::Error err = connection->write(resp, &nwrite);
           if (err && err->isError()) {
             DEBUG_MSG_ERROR(err);
@@ -279,14 +277,11 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
         } else {
           relay_connection = new RelayClient(server, rinfo);
         }
-        auto cb = [server, relay_connection]() {
-          server->registerClient(relay_connection);
-        };
+        auto cb = [server, relay_connection]() { server->registerClient(relay_connection); };
         server->execInLoopThread(cb);
 
-        cmd_responce_t resp = make_responce(id,
-                                            CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_SUCCSESS_1S,
-                                            hostandport);
+        cmd_responce_t resp = make_responce(
+            id, CLIENT_PLEASE_CONNECT_WEBSOCKET_COMMAND_RESP_SUCCSESS_1S, hostandport);
         err = connection->write(resp, &nwrite);
         if (err && err->isError()) {
           DEBUG_MSG_ERROR(err);
@@ -316,22 +311,22 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
 
     std::string os = common::MemSPrintf("%s %s(%s)", os_name, os_version, os_arch);
 
-    json_object * info_json = json_object_new_object();
+    json_object* info_json = json_object_new_object();
     json_object_object_add(info_json, "os", json_object_new_string(os.c_str()));
     json_object_object_add(info_json, "cpu", json_object_new_string(brand.c_str()));
     json_object_object_add(info_json, "ram_total", json_object_new_int64(ram_total));
     json_object_object_add(info_json, "ram_free", json_object_new_int64(ram_free));
 
-    const char *info_json_string = json_object_get_string(info_json);
-    cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SYSTEM_INFO_COMMAND_RESP_SUCCSESS_1J,
-                                        info_json_string);
+    const char* info_json_string = json_object_get_string(info_json);
+    cmd_responce_t resp =
+        make_responce(id, CLIENT_PLEASE_SYSTEM_INFO_COMMAND_RESP_SUCCSESS_1J, info_json_string);
     common::Error err = connection->write(resp, &nwrite);
     if (err && err->isError()) {
-        DEBUG_MSG_ERROR(err);
+      DEBUG_MSG_ERROR(err);
     }
     json_object_put(info_json);
   } else if (IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONFIG_COMMAND)) {
-    json_object * config_json = json_object_new_object();
+    json_object* config_json = json_object_new_object();
     const std::string local_host_str = common::ConvertToString(config_.local_host);
     json_object_object_add(config_json, LOCAL_HOST_SETTING_LABEL,
                            json_object_new_string(local_host_str.c_str()));
@@ -350,8 +345,7 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
       HttpConfig::handlers_url_t url = config_.handlers_urls[i];
       json_object* jhttp_url = json_object_new_object();
       json_object_object_add(jhttp_url, "url", json_object_new_string(url.first.c_str()));
-      json_object_object_add(jhttp_url, "handler",
-                             json_object_new_string(url.second.c_str()));
+      json_object_object_add(jhttp_url, "handler", json_object_new_string(url.second.c_str()));
       json_object_array_add(jhttp_urls, jhttp_url);
     }
     json_object_object_add(config_json, HANDLERS_URLS_SECTION_LABEL, jhttp_urls);
@@ -367,9 +361,9 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
     }
     json_object_object_add(config_json, SERVER_SOCKETS_SECTION_LABEL, jsockets_urls);
 
-    const char *config_json_string = json_object_get_string(config_json);
-    cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_CONFIG_COMMAND_RESP_SUCCSESS_1J,
-                                        config_json_string);
+    const char* config_json_string = json_object_get_string(config_json);
+    cmd_responce_t resp =
+        make_responce(id, CLIENT_PLEASE_CONFIG_COMMAND_RESP_SUCCSESS_1J, config_json_string);
     common::Error err = connection->write(resp, &nwrite);
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
@@ -379,10 +373,10 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
   } else if (IS_EQUAL_COMMAND(command, SERVER_PLEASE_SET_CONFIG_COMMAND)) {
     if (argc > 1) {
       const char* config_json_str = argv[1];
-      json_object * config_json = json_tokener_parse(config_json_str);
+      json_object* config_json = json_tokener_parse(config_json_str);
       if (!config_json) {
-        cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S,
-                                            CAUSE_INVALID_ARGS);
+        cmd_responce_t resp =
+            make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
         common::Error err = connection->write(resp, &nwrite);
         if (err && err->isError()) {
           DEBUG_MSG_ERROR(err);
@@ -397,14 +391,14 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
       json_object* jlocal_host = NULL;
       json_object_object_get_ex(config_json, LOCAL_HOST_SETTING_LABEL, &jlocal_host);
       if (jlocal_host) {
-        const char * lhost_str = json_object_get_string(jlocal_host);
+        const char* lhost_str = json_object_get_string(jlocal_host);
         new_config.local_host = common::ConvertFromString<common::net::HostAndPort>(lhost_str);
       }
 
       json_object* jexternal_host = NULL;
       json_object_object_get_ex(config_json, EXTERNAL_HOST_SETTING_LABEL, &jexternal_host);
       if (jexternal_host) {
-        const char * ehost_str = json_object_get_string(jexternal_host);
+        const char* ehost_str = json_object_get_string(jexternal_host);
         new_config.external_host = common::ConvertFromString<common::net::HostAndPort>(ehost_str);
       }
 
@@ -430,15 +424,15 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
       json_object_object_get_ex(config_json, HANDLERS_URLS_SECTION_LABEL, &jhandler_urls);
       if (jhandler_urls) {
         int urls_count = json_object_array_length(jhandler_urls);
-        for(int i = 0; i < urls_count; ++i){
-          json_object *jurlh = json_object_array_get_idx(jhandler_urls, i);
+        for (int i = 0; i < urls_count; ++i) {
+          json_object* jurlh = json_object_array_get_idx(jhandler_urls, i);
 
           json_object* jurl = NULL;
           json_object_object_get_ex(jurlh, "url", &jurl);
 
           json_object* jhandler = NULL;
           json_object_object_get_ex(jurlh, "handler", &jhandler);
-          if(jurl && jhandler){
+          if (jurl && jhandler) {
             std::string url_str = json_object_get_string(jurl);
             std::string handler_str = json_object_get_string(jhandler);
             new_config.handlers_urls.push_back(std::make_pair(url_str, handler_str));
@@ -450,26 +444,26 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
       json_object_object_get_ex(config_json, SERVER_SOCKETS_SECTION_LABEL, &jsockets_section);
       if (jsockets_section) {
         int sockets_count = json_object_array_length(jsockets_section);
-        for(int i = 0; i < sockets_count; ++i){
-          json_object *jtsocket = json_object_array_get_idx(jsockets_section, i);
+        for (int i = 0; i < sockets_count; ++i) {
+          json_object* jtsocket = json_object_array_get_idx(jsockets_section, i);
 
           json_object* jtype = NULL;
           json_object_object_get_ex(jtsocket, "type", &jtype);
 
           json_object* jpath = NULL;
           json_object_object_get_ex(jtsocket, "path", &jpath);
-          if(jtype && jpath){
+          if (jtype && jpath) {
             std::string type_str = json_object_get_string(jtype);
             std::string path_str = json_object_get_string(jpath);
-            new_config.server_sockets_urls.push_back(std::make_pair(type_str,
-                                                                    common::uri::Uri(path_str)));
+            new_config.server_sockets_urls.push_back(
+                std::make_pair(type_str, common::uri::Uri(path_str)));
           }
         }
       }
 
-      if(new_config.local_host.host != config_.local_host.host){
-        cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S,
-                                               CAUSE_INVALID_ARGS);
+      if (new_config.local_host.host != config_.local_host.host) {
+        cmd_responce_t resp =
+            make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
         common::Error err = connection->write(resp, &nwrite);
         if (err && err->isError()) {
           DEBUG_MSG_ERROR(err);
@@ -487,21 +481,23 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection, cmd_
 
       EVENT_BUS()->postEvent(new network::ConfigChangedEvent(this, new_config));
     } else {
-      cmd_responce_t resp = make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S,
-                                          CAUSE_INVALID_ARGS);
+      cmd_responce_t resp =
+          make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
       common::Error err = connection->write(resp, &nwrite);
       if (err && err->isError()) {
         DEBUG_MSG_ERROR(err);
       }
     }
   } else {
-      DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING,
-                                         "UNKNOWN REQUEST COMMAND: %s", command);
+    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN REQUEST COMMAND: %s",
+                                       command);
   }
 }
 
 void InnerServerHandler::handleInnerResponceCommand(InnerClient* connection,
-                                                    cmd_seq_t id, int argc, char* argv[]) {
+                                                    cmd_seq_t id,
+                                                    int argc,
+                                                    char* argv[]) {
   ssize_t nwrite = 0;
   char* state_command = argv[0];
 
@@ -510,43 +506,45 @@ void InnerServerHandler::handleInnerResponceCommand(InnerClient* connection,
     if (IS_EQUAL_COMMAND(command, PING_COMMAND)) {
       if (argc > 2) {
         const char* pong = argv[2];
-          if (!pong) {
-            cmd_approve_t resp = make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S,
-                                                       CAUSE_INVALID_ARGS);
-            common::Error err = connection->write(resp, &nwrite);
-            if (err && err->isError()) {
-              DEBUG_MSG_ERROR(err);
-            }
-            return;
-          }
-
-          const cmd_approve_t resp = make_approve_responce(id, PING_COMMAND_APPROVE_SUCCESS);
+        if (!pong) {
+          cmd_approve_t resp =
+              make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
           common::Error err = connection->write(resp, &nwrite);
           if (err && err->isError()) {
             DEBUG_MSG_ERROR(err);
-            return;
           }
-      } else {
-        cmd_approve_t resp = make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S,
-                                                   CAUSE_INVALID_ARGS);
+          return;
+        }
+
+        const cmd_approve_t resp = make_approve_responce(id, PING_COMMAND_APPROVE_SUCCESS);
         common::Error err = connection->write(resp, &nwrite);
-          if (err && err->isError()) {
-            DEBUG_MSG_ERROR(err);
-          }
+        if (err && err->isError()) {
+          DEBUG_MSG_ERROR(err);
+          return;
         }
       } else {
-          DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING,
-                                             "UNKNOWN RESPONCE COMMAND: %s", command);
+        cmd_approve_t resp =
+            make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
+        common::Error err = connection->write(resp, &nwrite);
+        if (err && err->isError()) {
+          DEBUG_MSG_ERROR(err);
+        }
       }
+    } else {
+      DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN RESPONCE COMMAND: %s",
+                                         command);
+    }
   } else if (IS_EQUAL_COMMAND(state_command, FAIL_COMMAND) && argc > 1) {
   } else {
-      DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING,
-                                         "UNKNOWN STATE COMMAND: %s", state_command);
+    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN STATE COMMAND: %s",
+                                       state_command);
   }
 }
 
 void InnerServerHandler::handleInnerApproveCommand(InnerClient* connection,
-                                                   cmd_seq_t id, int argc, char* argv[]) {
+                                                   cmd_seq_t id,
+                                                   int argc,
+                                                   char* argv[]) {
   char* command = argv[0];
 
   if (IS_EQUAL_COMMAND(command, SUCCESS_COMMAND)) {

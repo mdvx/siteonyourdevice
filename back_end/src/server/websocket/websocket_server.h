@@ -30,29 +30,27 @@ class HttpServerHost;
 
 namespace websocket {
 
-class WebSocketServerHost :
-  public http::Http2Server {
+class WebSocketServerHost : public http::Http2Server {
  public:
-  WebSocketServerHost(const common::net::HostAndPort& host, tcp::ITcpLoopObserver *observer);
+  WebSocketServerHost(const common::net::HostAndPort& host, tcp::ITcpLoopObserver* observer);
 
   virtual const char* className() const;
 
  protected:
-  virtual tcp::TcpClient * createClient(const common::net::socket_info &info);
+  virtual tcp::TcpClient* createClient(const common::net::socket_info& info);
 };
 
-class WebSocketServerHandlerHost
-  : public http::Http2ServerHandler {
+class WebSocketServerHandlerHost : public http::Http2ServerHandler {
  public:
-  WebSocketServerHandlerHost(const HttpServerInfo & info, HttpServerHost * parent);
+  WebSocketServerHandlerHost(const HttpServerInfo& info, HttpServerHost* parent);
 
   virtual void dataReceived(tcp::TcpClient* client);
 
  private:
-  void processWebsocketRequest(http::HttpClient *hclient,
+  void processWebsocketRequest(http::HttpClient* hclient,
                                const common::http::http_request& hrequest);
 
-  HttpServerHost * parent_;
+  HttpServerHost* parent_;
 };
 
 }  // namespace websocket

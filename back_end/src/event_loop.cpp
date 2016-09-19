@@ -34,7 +34,7 @@ struct fasto_async_cb {
 
 void async_exec_cb(struct ev_loop* loop, struct ev_async* watcher, int revents) {
   ev_async_stop(loop, watcher);
-  fasto_async_cb* ioclient = reinterpret_cast<fasto_async_cb *>(watcher);
+  fasto_async_cb* ioclient = reinterpret_cast<fasto_async_cb*>(watcher);
   ioclient->func();
   free(ioclient);
 }
@@ -44,12 +44,13 @@ void async_exec_cb(struct ev_loop* loop, struct ev_async* watcher, int revents) 
 namespace fasto {
 namespace siteonyourdevice {
 
-EvLoopObserver::~EvLoopObserver() {
-}
+EvLoopObserver::~EvLoopObserver() {}
 
 LibEvLoop::LibEvLoop()
-  : loop_(ev_loop_new(0)), observer_(nullptr), exec_id_(),
-    async_stop_((struct ev_async*)calloc(1, sizeof(struct ev_async))) {
+    : loop_(ev_loop_new(0)),
+      observer_(nullptr),
+      exec_id_(),
+      async_stop_((struct ev_async*)calloc(1, sizeof(struct ev_async))) {
   ev_async_init(async_stop_, stop_cb);
   ev_set_userdata(loop_, this);
 }
@@ -65,22 +66,22 @@ void LibEvLoop::setObserver(EvLoopObserver* observer) {
   observer_ = observer;
 }
 
-void LibEvLoop::start_io(ev_io *io) {
+void LibEvLoop::start_io(ev_io* io) {
   CHECK(isLoopThread());
   ev_io_start(loop_, io);
 }
 
-void LibEvLoop::stop_io(ev_io *io) {
+void LibEvLoop::stop_io(ev_io* io) {
   CHECK(isLoopThread());
   ev_io_stop(loop_, io);
 }
 
-void LibEvLoop::start_timer(ev_timer * timer) {
+void LibEvLoop::start_timer(ev_timer* timer) {
   CHECK(isLoopThread());
   ev_timer_start(loop_, timer);
 }
 
-void LibEvLoop::stop_timer(ev_timer * timer) {
+void LibEvLoop::stop_timer(ev_timer* timer) {
   CHECK(isLoopThread());
   ev_timer_stop(loop_, timer);
 }
@@ -121,7 +122,7 @@ void LibEvLoop::stop() {
 }
 
 void LibEvLoop::stop_cb(struct ev_loop* loop, struct ev_async* watcher, int revents) {
-  LibEvLoop* evloop = reinterpret_cast<LibEvLoop *>(ev_userdata(loop));
+  LibEvLoop* evloop = reinterpret_cast<LibEvLoop*>(ev_userdata(loop));
   ev_async_stop(loop, evloop->async_stop_);
   if (evloop->observer_) {
     evloop->observer_->stoped(evloop);

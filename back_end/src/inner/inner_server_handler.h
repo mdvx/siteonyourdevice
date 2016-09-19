@@ -30,8 +30,7 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-class InnerServerHandler
-  : public InnerServerCommandSeqParser, public tcp::ITcpLoopObserver  {
+class InnerServerHandler : public InnerServerCommandSeqParser, public tcp::ITcpLoopObserver {
  public:
   enum {
     ping_timeout_server = 30  // sec
@@ -54,11 +53,17 @@ class InnerServerHandler
 
  private:
   virtual void handleInnerRequestCommand(InnerClient* connection,
-                                         cmd_seq_t id, int argc, char* argv[]);
+                                         cmd_seq_t id,
+                                         int argc,
+                                         char* argv[]);
   virtual void handleInnerResponceCommand(InnerClient* connection,
-                                          cmd_seq_t id, int argc, char* argv[]);
+                                          cmd_seq_t id,
+                                          int argc,
+                                          char* argv[]);
   virtual void handleInnerApproveCommand(InnerClient* connection,
-                                         cmd_seq_t id, int argc, char* argv[]);
+                                         cmd_seq_t id,
+                                         int argc,
+                                         char* argv[]);
 
   HttpConfig config_;
   InnerClient* inner_connection_;

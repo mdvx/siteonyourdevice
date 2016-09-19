@@ -34,15 +34,14 @@ namespace server {
 class HttpServerHost;
 namespace inner {
 
-class InnerServerHandlerHost
-  : public fasto::siteonyourdevice::inner::InnerServerCommandSeqParser,
-    public tcp::ITcpLoopObserver {
+class InnerServerHandlerHost : public fasto::siteonyourdevice::inner::InnerServerCommandSeqParser,
+                               public tcp::ITcpLoopObserver {
  public:
   enum {
     ping_timeout_clients = 60  // sec
   };
 
-  explicit InnerServerHandlerHost(HttpServerHost * parent);
+  explicit InnerServerHandlerHost(HttpServerHost* parent);
 
   virtual void preLooped(tcp::ITcpLoop* server);
 
@@ -57,33 +56,38 @@ class InnerServerHandlerHost
 
   virtual ~InnerServerHandlerHost();
 
-  void setStorageConfig(const redis_sub_configuration_t &config);
+  void setStorageConfig(const redis_sub_configuration_t& config);
 
  private:
-  virtual void handleInnerRequestCommand(siteonyourdevice::inner::InnerClient *connection,
-                                         cmd_seq_t id, int argc, char *argv[]);
-  virtual void handleInnerResponceCommand(siteonyourdevice::inner::InnerClient *connection,
-                                          cmd_seq_t id, int argc, char *argv[]);
-  virtual void handleInnerApproveCommand(siteonyourdevice::inner::InnerClient *connection,
-                                         cmd_seq_t id, int argc, char *argv[]);
+  virtual void handleInnerRequestCommand(siteonyourdevice::inner::InnerClient* connection,
+                                         cmd_seq_t id,
+                                         int argc,
+                                         char* argv[]);
+  virtual void handleInnerResponceCommand(siteonyourdevice::inner::InnerClient* connection,
+                                          cmd_seq_t id,
+                                          int argc,
+                                          char* argv[]);
+  virtual void handleInnerApproveCommand(siteonyourdevice::inner::InnerClient* connection,
+                                         cmd_seq_t id,
+                                         int argc,
+                                         char* argv[]);
 
   HttpServerHost* const parent_;
 
   class InnerSubHandler;
-  RedisSub *sub_commands_in_;
-  InnerSubHandler *handler_;
+  RedisSub* sub_commands_in_;
+  InnerSubHandler* handler_;
   std::shared_ptr<common::thread::Thread<void> > redis_subscribe_command_in_thread_;
   timer_id_t ping_client_id_timer_;
 };
 
-class InnerTcpServer
-        : public tcp::TcpServer {
+class InnerTcpServer : public tcp::TcpServer {
  public:
   InnerTcpServer(const common::net::HostAndPort& host, tcp::ITcpLoopObserver* observer);
   virtual const char* className() const;
 
  private:
-  virtual tcp::TcpClient * createClient(const common::net::socket_info& info);
+  virtual tcp::TcpClient* createClient(const common::net::socket_info& info);
 };
 
 }  // namespace inner

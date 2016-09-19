@@ -41,8 +41,7 @@ class ITcpLoopObserver;
 class TcpClient;
 class LoopTimer;
 
-class ITcpLoop
-  : public EvLoopObserver, common::IMetaClassInfo {
+class ITcpLoop : public EvLoopObserver, common::IMetaClassInfo {
  public:
   explicit ITcpLoop(ITcpLoopObserver* observer = nullptr);
   virtual ~ITcpLoop();
@@ -72,7 +71,7 @@ class ITcpLoop
 
   bool isLoopThread() const;
 
-  std::vector<TcpClient *> clients() const;
+  std::vector<TcpClient*> clients() const;
 
   static ITcpLoop* findExistLoopByPredicate(std::function<bool(ITcpLoop*)> pred);
 
@@ -91,8 +90,8 @@ class ITcpLoop
 
   ITcpLoopObserver* const observer_;
 
-  std::vector<TcpClient *> clients_;
-  std::vector<LoopTimer *> timers_;
+  std::vector<TcpClient*> clients_;
+  std::vector<LoopTimer*> timers_;
   const common::patterns::id_counter<ITcpLoop> id_;
 
   std::string name_;
@@ -115,8 +114,7 @@ class ITcpLoopObserver {
   virtual ~ITcpLoopObserver();
 };
 
-class TcpServer
-  : public ITcpLoop {
+class TcpServer : public ITcpLoop {
  public:
   explicit TcpServer(const common::net::HostAndPort& host, ITcpLoopObserver* observer = nullptr);
   virtual ~TcpServer();
@@ -127,7 +125,7 @@ class TcpServer
   const char* ClassName() const;
   common::net::HostAndPort host() const;
 
-  static ITcpLoop *findExistServerByHost(const common::net::HostAndPort& host);
+  static ITcpLoop* findExistServerByHost(const common::net::HostAndPort& host);
 
  private:
   TcpClient* createClient(const common::net::socket_info& info);

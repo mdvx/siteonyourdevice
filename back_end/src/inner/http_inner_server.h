@@ -26,8 +26,7 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-class ProxyInnerServer
-  : public tcp::ITcpLoop {
+class ProxyInnerServer : public tcp::ITcpLoop {
  public:
   explicit ProxyInnerServer(tcp::ITcpLoopObserver* observer);
   virtual const char* ClassName() const;
@@ -36,10 +35,9 @@ class ProxyInnerServer
   tcp::TcpClient* createClient(const common::net::socket_info& info);
 };
 
-class Http2InnerServer
-        : public http::Http2Server {
+class Http2InnerServer : public http::Http2Server {
  public:
-  Http2InnerServer(tcp::ITcpLoopObserver * observer, const HttpConfig& config);
+  Http2InnerServer(tcp::ITcpLoopObserver* observer, const HttpConfig& config);
 
   virtual const char* ClassName() const;
 

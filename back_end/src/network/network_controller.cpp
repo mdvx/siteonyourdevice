@@ -50,9 +50,10 @@ std::string prepare_content_path(const std::string& path) {
 }
 
 int ini_handler_fasto(void* user, const char* section, const char* name, const char* value) {
-  fasto::siteonyourdevice::HttpConfig* pconfig = reinterpret_cast<fasto::siteonyourdevice::HttpConfig*>(user);
+  fasto::siteonyourdevice::HttpConfig* pconfig =
+      reinterpret_cast<fasto::siteonyourdevice::HttpConfig*>(user);
 
-  #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+#define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
   if (MATCH(SERVER_SETTINGS_SECTION_LABEL, CONTENT_PATH_SETTING_LABEL)) {
     pconfig->content_path = prepare_content_path(value);
     return 1;
@@ -82,7 +83,7 @@ int ini_handler_fasto(void* user, const char* section, const char* name, const c
     pconfig->server_sockets_urls.push_back(std::make_pair(name, uri));
     return 1;
   } else {
-    return 0;  /* unknown section/name, error */
+    return 0; /* unknown section/name, error */
   }
 }
 }  // namespace
@@ -93,25 +94,22 @@ namespace network {
 
 namespace {
 
-class HttpAuthObserver
-  : public http::IHttpAuthObserver {
+class HttpAuthObserver : public http::IHttpAuthObserver {
  public:
-  explicit HttpAuthObserver(inner::InnerServerHandler* servh)
-    : servh_(servh) {
-  }
+  explicit HttpAuthObserver(inner::InnerServerHandler* servh) : servh_(servh) {}
 
   virtual bool userCanAuth(const std::string& user, const std::string& password) {
     if (user.empty()) {
-        return false;
+      return false;
     }
 
     if (password.empty()) {
-        return false;
+      return false;
     }
 
     const UserAuthInfo& ainf = servh_->authInfo();
     if (!ainf.isValid()) {
-       return false;
+      return false;
     }
 
     return ainf.login == user && ainf.password == password;
@@ -121,22 +119,19 @@ class HttpAuthObserver
   inner::InnerServerHandler* const servh_;
 };
 
-class ServerControllerBase
-  : public ILoopThreadController {
+class ServerControllerBase : public ILoopThreadController {
  public:
   ServerControllerBase(http::IHttpAuthObserver* auth_checker, const HttpConfig& config)
-    : auth_checker_(auth_checker), config_(config) {
-  }
+      : auth_checker_(auth_checker), config_(config) {}
 
-  ~ServerControllerBase() {  
-  }
+  ~ServerControllerBase() {}
 
  protected:
   const HttpConfig config_;
   http::IHttpAuthObserver* const auth_checker_;
 
  private:
-  tcp::ITcpLoopObserver * createHandler() {
+  tcp::ITcpLoopObserver* createHandler() {
     HttpServerInfo hs(PROJECT_NAME_TITLE, PROJECT_DOMAIN);
     inner::Http2ClientServerHandler* handler = new inner::Http2ClientServerHandler(hs);
     handler->setAuthChecker(auth_checker_);
@@ -153,7 +148,8 @@ class ServerControllerBase
         httpcallback_name = httpcallbackstr.substr(ns_del + 2);
       }
 
-      common::shared_ptr<IHttpCallback> hhandler = IHttpCallback::createHttpCallback(httpcallback_ns, httpcallback_name);
+      common::shared_ptr<IHttpCallback> hhandler =
+          IHttpCallback::createHttpCallback(httpcallback_ns, httpcallback_name);
       if (hhandler) {
         handler->registerHttpCallback(handurl.first, hhandler);
       }
@@ -170,11 +166,10 @@ class ServerControllerBase
   }
 };
 
-class LocalHttpServerController
-        : public ServerControllerBase {
+class LocalHttpServerController : public ServerControllerBase {
  public:
   LocalHttpServerController(http::IHttpAuthObserver* auth_checker, const HttpConfig& config)
-    : ServerControllerBase(auth_checker, config) {
+      : ServerControllerBase(auth_checker, config) {
     common::Error err = common::file_system::change_directory(config.content_path);
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
@@ -190,7 +185,7 @@ class LocalHttpServerController
   }
 
  private:
-  tcp::ITcpLoop * createServer(tcp::ITcpLoopObserver * handler) {
+  tcp::ITcpLoop* createServer(tcp::ITcpLoopObserver* handler) {
     inner::Http2InnerServer* serv = new inner::Http2InnerServer(handler, config_);
     serv->setName("local_http_server");
 
@@ -212,15 +207,13 @@ class LocalHttpServerController
   }
 };
 
-class ExternalHttpServerController
-  : public ServerControllerBase {
+class ExternalHttpServerController : public ServerControllerBase {
  public:
   ExternalHttpServerController(http::IHttpAuthObserver* auth_checker, const HttpConfig& config)
-    : ServerControllerBase(auth_checker, config) {
-  }
+      : ServerControllerBase(auth_checker, config) {}
 
  private:
-  tcp::ITcpLoop * createServer(tcp::ITcpLoopObserver * handler) {
+  tcp::ITcpLoop* createServer(tcp::ITcpLoopObserver* handler) {
     inner::ProxyInnerServer* serv = new inner::ProxyInnerServer(handler);
     serv->setName("proxy_http_server");
     return serv;
@@ -229,7 +222,7 @@ class ExternalHttpServerController
 }  // namespace
 
 NetworkController::NetworkController(int argc, char* argv[])
-  : ILoopThreadController(), auth_checker_(nullptr), server_(nullptr), config_() {
+    : ILoopThreadController(), auth_checker_(nullptr), server_(nullptr), config_() {
   bool daemon_mode = false;
 #ifdef OS_MACOSX
   std::string config_path = PROJECT_NAME ".app/Contents/Resources/" CONFIG_FILE_NAME;
@@ -274,11 +267,11 @@ void NetworkController::connect() {
   const http_server_t server_type = config_.server_type;
   const common::net::HostAndPort externalHost = config_.external_host;
   if (server_type == FASTO_SERVER) {
-     server_ = new LocalHttpServerController(auth_checker_, config_);
-     server_->start();
+    server_ = new LocalHttpServerController(auth_checker_, config_);
+    server_->start();
   } else if (server_type == EXTERNAL_SERVER && externalHost.isValid()) {
-     server_ = new ExternalHttpServerController(auth_checker_, config_);
-     server_->start();
+    server_ = new ExternalHttpServerController(auth_checker_, config_);
+    server_->start();
   } else {
     NOTREACHED();
   }
@@ -286,7 +279,7 @@ void NetworkController::connect() {
 
 void NetworkController::disConnect() {
   if (!server_) {  // if connect dosen't clicked
-      return;
+    return;
   }
 
   server_->stop();
@@ -315,7 +308,7 @@ void NetworkController::saveConfig() {
   common::file_system::ascii_string_path configPath(config_path_);
   common::file_system::File configSave(configPath);
   if (!configSave.open("w")) {
-      return;
+    return;
   }
 
   configSave.write("[" SERVER_SETTINGS_SECTION_LABEL "]\n");
@@ -353,29 +346,31 @@ void NetworkController::readConfig() {
   HttpConfig config;
   // default settings
   config.content_path = prepare_content_path(USER_SPECIFIC_CONTENT_PATH);
-  config.local_host = common::ConvertFromString<common::net::HostAndPort>(USER_SPECIFIC_DEFAULT_LOCAL_DOMAIN);
+  config.local_host =
+      common::ConvertFromString<common::net::HostAndPort>(USER_SPECIFIC_DEFAULT_LOCAL_DOMAIN);
   config.login = USER_SPECIFIC_DEFAULT_LOGIN;
   config.password = USER_SPECIFIC_DEFAULT_PASSWORD;
   config.is_private_site = USER_SPECIFIC_DEFAULT_PRIVATE_SITE;
-  config.external_host = common::ConvertFromString<common::net::HostAndPort>(USER_SPECIFIC_DEFAULT_EXTERNAL_DOMAIN);
+  config.external_host =
+      common::ConvertFromString<common::net::HostAndPort>(USER_SPECIFIC_DEFAULT_EXTERNAL_DOMAIN);
   config.server_type = static_cast<http_server_t>(USER_SPECIFIC_SERVER_TYPE);
 
   // try to parse settings file
   if (ini_parse(path, ini_handler_fasto, &config) < 0) {
-    DEBUG_MSG_FORMAT<256>(common::logging::L_INFO,
-                          "Can't load config '%s', use default settings.", path);
+    DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Can't load config '%s', use default settings.",
+                          path);
   }
 
   setConfig(config);
 }
 
-tcp::ITcpLoopObserver* NetworkController::createHandler(){
+tcp::ITcpLoopObserver* NetworkController::createHandler() {
   inner::InnerServerHandler* handler = new inner::InnerServerHandler(server::g_inner_host, config_);
   auth_checker_ = new HttpAuthObserver(handler);
   return handler;
 }
 
-tcp::ITcpLoop * NetworkController::createServer(tcp::ITcpLoopObserver * handler){
+tcp::ITcpLoop* NetworkController::createServer(tcp::ITcpLoopObserver* handler) {
   inner::ProxyInnerServer* serv = new inner::ProxyInnerServer(handler);
   serv->setName("local_inner_server");
   return serv;

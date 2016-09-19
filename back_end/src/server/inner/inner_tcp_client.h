@@ -42,26 +42,25 @@ namespace inner {
 class InnerServerHandlerHost;
 class InnerTcpServerClient;
 
-class IInnerRelayLoop
-        : public ILoopThreadController {
+class IInnerRelayLoop : public ILoopThreadController {
  public:
-  typedef std::pair<tcp::TcpClient *, common::buffer_t> request_t;
-  IInnerRelayLoop(fasto::siteonyourdevice::inner::InnerServerCommandSeqParser *handler,
-                  InnerTcpServerClient *parent, const request_t& request);
+  typedef std::pair<tcp::TcpClient*, common::buffer_t> request_t;
+  IInnerRelayLoop(fasto::siteonyourdevice::inner::InnerServerCommandSeqParser* handler,
+                  InnerTcpServerClient* parent,
+                  const request_t& request);
   ~IInnerRelayLoop();
 
   bool readyForRequest() const;
   void addRequest(const request_t& request);
 
  protected:
-  InnerTcpServerClient *const parent_;
-  fasto::siteonyourdevice::inner::InnerServerCommandSeqParser *ihandler_;
+  InnerTcpServerClient* const parent_;
+  fasto::siteonyourdevice::inner::InnerServerCommandSeqParser* ihandler_;
 
   const request_t request_;
 };
 
-class InnerTcpServerClient
-        : public siteonyourdevice::inner::InnerClient {
+class InnerTcpServerClient : public siteonyourdevice::inner::InnerClient {
  public:
   typedef std::shared_ptr<IInnerRelayLoop> http_relay_loop_t;
   typedef std::shared_ptr<IInnerRelayLoop> websocket_relay_loop_t;
@@ -74,11 +73,13 @@ class InnerTcpServerClient
   void setServerHostInfo(const UserAuthInfo& info);
   UserAuthInfo serverHostInfo() const;
 
-  void addHttpRelayClient(InnerServerHandlerHost* handler, tcp::TcpClient* client,
+  void addHttpRelayClient(InnerServerHandlerHost* handler,
+                          tcp::TcpClient* client,
                           const common::buffer_t& request);  // move ovnerships
-  void addWebsocketRelayClient(InnerServerHandlerHost* handler, tcp::TcpClient* client,
+  void addWebsocketRelayClient(InnerServerHandlerHost* handler,
+                               tcp::TcpClient* client,
                                const common::buffer_t& request,
-                                 const common::net::HostAndPort &srcHost);  // move ovnerships
+                               const common::net::HostAndPort& srcHost);  // move ovnerships
 
  private:
   UserAuthInfo hinfo_;

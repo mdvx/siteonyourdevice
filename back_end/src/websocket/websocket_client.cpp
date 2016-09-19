@@ -23,11 +23,9 @@ namespace siteonyourdevice {
 namespace websocket {
 
 WebSocketClient::WebSocketClient(tcp::ITcpLoop* server, const common::net::socket_info& info)
-  : Http2Client(server, info) {
-}
+    : Http2Client(server, info) {}
 
-WebSocketClient::~WebSocketClient() {
-}
+WebSocketClient::~WebSocketClient() {}
 
 const char* WebSocketClient::ClassName() const {
   return "WebSocketClient";

@@ -25,13 +25,11 @@ namespace siteonyourdevice {
 namespace http {
 
 HttpServer::HttpServer(const common::net::HostAndPort& host, tcp::ITcpLoopObserver* observer)
-  : TcpServer(host, observer) {
-}
+    : TcpServer(host, observer) {}
 
-HttpServer::~HttpServer() {
-}
+HttpServer::~HttpServer() {}
 
-tcp::TcpClient *HttpServer::createClient(const common::net::socket_info& info) {
+tcp::TcpClient* HttpServer::createClient(const common::net::socket_info& info) {
   return new HttpClient(this, info);
 }
 
@@ -40,10 +38,9 @@ const char* HttpServer::ClassName() const {
 }
 
 Http2Server::Http2Server(const common::net::HostAndPort& host, tcp::ITcpLoopObserver* observer)
-  : HttpServer(host, observer) {
-}
+    : HttpServer(host, observer) {}
 
-tcp::TcpClient *Http2Server::createClient(const common::net::socket_info& info) {
+tcp::TcpClient* Http2Server::createClient(const common::net::socket_info& info) {
   return new Http2Client(this, info);
 }
 

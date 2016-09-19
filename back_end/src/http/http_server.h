@@ -24,8 +24,7 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace http {
 
-class HttpServer
-  : public tcp::TcpServer {
+class HttpServer : public tcp::TcpServer {
  public:
   HttpServer(const common::net::HostAndPort& host, tcp::ITcpLoopObserver* observer);
   ~HttpServer();
@@ -36,8 +35,7 @@ class HttpServer
   virtual tcp::TcpClient* createClient(const common::net::socket_info& info);
 };
 
-class Http2Server
-  : public HttpServer {
+class Http2Server : public HttpServer {
  public:
   Http2Server(const common::net::HostAndPort& host, tcp::ITcpLoopObserver* observer);
 

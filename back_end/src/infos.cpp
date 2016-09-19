@@ -26,27 +26,21 @@
 namespace fasto {
 namespace siteonyourdevice {
 
-UserAuthInfo::UserAuthInfo()
-  : login(), password(), host() {
-}
+UserAuthInfo::UserAuthInfo() : login(), password(), host() {}
 
-UserAuthInfo::UserAuthInfo(const std::string& login, const std::string& password,
+UserAuthInfo::UserAuthInfo(const std::string& login,
+                           const std::string& password,
                            const common::net::HostAndPort& host)
-  : login(login), password(password), host(host) {
-}
+    : login(login), password(password), host(host) {}
 
 bool UserAuthInfo::isValid() const {
   return !login.empty() && host.isValid();
 }
 
-HttpServerInfo::HttpServerInfo()
-  : server_name(), server_url() {
-}
+HttpServerInfo::HttpServerInfo() : server_name(), server_url() {}
 
-HttpServerInfo::HttpServerInfo(const std::string& server_name,
-                               const std::string& server_url)
-  : server_name(server_name), server_url(server_url) {
-}
+HttpServerInfo::HttpServerInfo(const std::string& server_name, const std::string& server_url)
+    : server_name(server_name), server_url(server_url) {}
 
 }  // namespace siteonyourdevice
 }  // namespace fasto
@@ -57,7 +51,7 @@ std::string ConvertToString(const fasto::siteonyourdevice::UserAuthInfo& uinfo) 
   return common::MemSPrintf("%s:%s:%s", uinfo.login, uinfo.password, ConvertToString(uinfo.host));
 }
 
-template<>
+template <>
 fasto::siteonyourdevice::UserAuthInfo ConvertFromString(const std::string& uinfo_str) {
   size_t up = uinfo_str.find_first_of(':');
   if (up == std::string::npos) {

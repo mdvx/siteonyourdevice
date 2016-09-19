@@ -21,6 +21,7 @@
 #include "server/websocket/websocket_server.h"
 
 #include "common/logger.h"
+#include "common/convert2string.h"
 
 #include "server/inner/inner_tcp_client.h"
 #include "server/http_server_host.h"
@@ -34,22 +35,20 @@ namespace server {
 namespace websocket {
 
 WebSocketServerHost::WebSocketServerHost(const common::net::HostAndPort& host,
-                                         tcp::ITcpLoopObserver *observer)
-  : Http2Server(host, observer) {
-}
+                                         tcp::ITcpLoopObserver* observer)
+    : Http2Server(host, observer) {}
 
 const char* WebSocketServerHost::className() const {
   return "WebSocketServerHost";
 }
 
-tcp::TcpClient * WebSocketServerHost::createClient(const common::net::socket_info &info) {
+tcp::TcpClient* WebSocketServerHost::createClient(const common::net::socket_info& info) {
   return new WebSocketClientHost(this, info);
 }
 
-WebSocketServerHandlerHost::WebSocketServerHandlerHost(const HttpServerInfo &info,
-                                                       HttpServerHost * parent)
-  : Http2ServerHandler(info, NULL), parent_(parent) {
-}
+WebSocketServerHandlerHost::WebSocketServerHandlerHost(const HttpServerInfo& info,
+                                                       HttpServerHost* parent)
+    : Http2ServerHandler(info, NULL), parent_(parent) {}
 
 void WebSocketServerHandlerHost::dataReceived(tcp::TcpClient* client) {
   char buff[BUF_SIZE] = {0};
@@ -70,8 +69,8 @@ void WebSocketServerHandlerHost::dataReceived(tcp::TcpClient* client) {
 
   if (result.second && result.second->isError()) {
     const std::string error_text = result.second->description();
-    hclient->send_error(common::http::HP_1_1, result.first, NULL,
-                        error_text.c_str(), false, info());
+    hclient->send_error(common::http::HP_1_1, result.first, NULL, error_text.c_str(), false,
+                        info());
     hclient->close();
     delete hclient;
     return;
@@ -80,22 +79,24 @@ void WebSocketServerHandlerHost::dataReceived(tcp::TcpClient* client) {
   processWebsocketRequest(hclient, hrequest);
 }
 
-void WebSocketServerHandlerHost::processWebsocketRequest(http::HttpClient *hclient,
-                                                         const common::http::http_request& hrequest) {
+void WebSocketServerHandlerHost::processWebsocketRequest(
+    http::HttpClient* hclient,
+    const common::http::http_request& hrequest) {
   const common::http::http_protocols protocol = hrequest.protocol();
   common::uri::Upath path = hrequest.path();
   std::string hpath = path.hpath();
-  std::string fpath = path.fpath();
+  std::string fpath = path.filename();
   common::net::HostAndPort host = common::ConvertFromString<common::net::HostAndPort>(hpath);
   std::string hpath_without_port = host.host;
 
-  inner::InnerTcpServerClient * innerConnection = parent_->findInnerConnectionByHost(hpath_without_port);
+  inner::InnerTcpServerClient* innerConnection =
+      parent_->findInnerConnectionByHost(hpath_without_port);
   if (!innerConnection) {
     DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING,
-                           "WebSocketServerHandlerHost not found host %s, request str:\n%s",
-                           hpath, common::ConvertToString(hrequest));
-    hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL,
-                        "Not registered host.", false, info());
+                           "WebSocketServerHandlerHost not found host %s, request str:\n%s", hpath,
+                           common::ConvertToString(hrequest));
+    hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL, "Not registered host.", false,
+                        info());
     hclient->close();
     delete hclient;
     return;
@@ -109,7 +110,7 @@ void WebSocketServerHandlerHost::processWebsocketRequest(http::HttpClient *hclie
 
   common::buffer_t res = common::ConvertToBytes(chrequest);
 
-  tcp::ITcpLoop *server = hclient->server();
+  tcp::ITcpLoop* server = hclient->server();
   server->unregisterClient(hclient);
   innerConnection->addWebsocketRelayClient(parent_->innerHandler(), hclient, res,
                                            common::net::HostAndPort::createLocalHost(host.port));

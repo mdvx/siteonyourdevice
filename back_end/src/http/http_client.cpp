@@ -34,7 +34,7 @@
 namespace {
 
 const char* HTML_PATTERN_ISISSSS7 =
-  R"(<!DOCTYPE html>
+    R"(<!DOCTYPE html>
   <html>
   <head>
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
@@ -51,7 +51,9 @@ struct SendDataHelper {
   uint32_t all_size;
 };
 
-common::Error send_data_frame(const char* buff, uint32_t buff_len, void* user_data,
+common::Error send_data_frame(const char* buff,
+                              uint32_t buff_len,
+                              void* user_data,
                               uint32_t* processed) {
   SendDataHelper* helper = reinterpret_cast<SendDataHelper*>(user_data);
   fasto::siteonyourdevice::http::StreamSPtr header_stream = helper->header_stream;
@@ -61,8 +63,8 @@ common::Error send_data_frame(const char* buff, uint32_t buff_len, void* user_da
     flags = common::http2::HTTP2_FLAG_END_STREAM;
   }
 
-  common::http2::frame_hdr hdr = common::http2::frame_data::create_frame_header(flags,
-                                                                  header_stream->sid(), buff_len);
+  common::http2::frame_hdr hdr =
+      common::http2::frame_data::create_frame_header(flags, header_stream->sid(), buff_len);
   common::http2::frame_data fdata(hdr, buff);
   common::Error err = header_stream->sendFrame(fdata);
   if (err && err->isError()) {
@@ -83,8 +85,7 @@ namespace siteonyourdevice {
 namespace http {
 
 HttpClient::HttpClient(tcp::ITcpLoop* server, const common::net::socket_info& info)
-  : TcpClient(server, info), isAuth_(false) {
-}
+    : TcpClient(server, info), isAuth_(false) {}
 
 const char* HttpClient::ClassName() const {
   return "HttpClient";
@@ -99,24 +100,27 @@ bool HttpClient::isAuthenticated() const {
 }
 
 common::Error HttpClient::send_ok(common::http::http_protocols protocol,
-                                  const char* extra_header, const char* text,
-                                  bool is_keep_alive, const HttpServerInfo& info) {
+                                  const char* extra_header,
+                                  const char* text,
+                                  bool is_keep_alive,
+                                  const HttpServerInfo& info) {
   return send_error(protocol, common::http::HS_OK, extra_header, text, is_keep_alive, info);
 }
 
 common::Error HttpClient::send_error(common::http::http_protocols protocol,
                                      common::http::http_status status,
-                                     const char* extra_header, const char* text,
-                                     bool is_keep_alive, const HttpServerInfo& info) {
+                                     const char* extra_header,
+                                     const char* text,
+                                     bool is_keep_alive,
+                                     const HttpServerInfo& info) {
   CHECK(protocol <= common::http::HP_1_1);
   const std::string title = common::ConvertToString(status);
 
   char err_data[1024] = {0};
-  off_t err_len = common::SNPrintf(err_data, sizeof(err_data), HTML_PATTERN_ISISSSS7,
-                                   status, title, status, title, text,
-                                   info.server_url, info.server_name);
-  common::Error err = send_headers(protocol, status, extra_header,
-                                   "text/html", &err_len, nullptr, is_keep_alive, info);
+  off_t err_len = common::SNPrintf(err_data, sizeof(err_data), HTML_PATTERN_ISISSSS7, status, title,
+                                   status, title, text, info.server_url, info.server_name);
+  common::Error err = send_headers(protocol, status, extra_header, "text/html", &err_len, nullptr,
+                                   is_keep_alive, info);
   if (err && err->isError()) {
     DEBUG_MSG_ERROR(err);
   }
@@ -130,36 +134,42 @@ common::Error HttpClient::send_error(common::http::http_protocols protocol,
 }
 
 common::Error HttpClient::send_file_by_fd(common::http::http_protocols protocol,
-                                          int fdesc, off_t size) {
+                                          int fdesc,
+                                          off_t size) {
   CHECK(protocol <= common::http::HP_1_1);
   return common::net::send_file_to_fd(fd(), fdesc, 0, size);
 }
 
 common::Error HttpClient::send_headers(common::http::http_protocols protocol,
-                                       common::http::http_status status, const char* extra_header,
-                                       const char* mime_type, off_t* length, time_t* mod,
-                                       bool is_keep_alive, const HttpServerInfo& info) {
+                                       common::http::http_status status,
+                                       const char* extra_header,
+                                       const char* mime_type,
+                                       off_t* length,
+                                       time_t* mod,
+                                       bool is_keep_alive,
+                                       const HttpServerInfo& info) {
   CHECK(protocol <= common::http::HP_1_1);
   const std::string title = common::ConvertToString(status);
 
   time_t now = time(nullptr);
   char timebuf[100];
-  strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime( &now ));
+  strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime(&now));
 
   char header_data[1024] = {0};
   int cur_pos = common::SNPrintf(header_data, sizeof(header_data),
-                                 protocol == common::http::HP_2_0 ?
-                                 HTTP_2_0_PROTOCOL_NAME " %d %s\r\n"
-                                 "Server: %s\r\n"
-                                 "Date: %s\r\n"
-                                 : HTTP_1_1_PROTOCOL_NAME " %d %s\r\n"
-                                 "Server: %s\r\n"
-                                 "Date: %s\r\n", status, title,
-                                 info.server_name, timebuf);
+                                 protocol == common::http::HP_2_0 ? HTTP_2_0_PROTOCOL_NAME
+                                     " %d %s\r\n"
+                                     "Server: %s\r\n"
+                                     "Date: %s\r\n"
+                                                                  : HTTP_1_1_PROTOCOL_NAME
+                                     " %d %s\r\n"
+                                     "Server: %s\r\n"
+                                     "Date: %s\r\n",
+                                 status, title, info.server_name, timebuf);
 
   if (extra_header) {
-    int exlen = common::SNPrintf(header_data + cur_pos, sizeof(header_data) - cur_pos,
-                                 "%s\r\n", extra_header);
+    int exlen = common::SNPrintf(header_data + cur_pos, sizeof(header_data) - cur_pos, "%s\r\n",
+                                 extra_header);
     cur_pos += exlen;
   }
   if (mime_type) {
@@ -175,17 +185,17 @@ common::Error HttpClient::send_headers(common::http::http_protocols protocol,
   if (mod) {
     strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime(mod));
     int mlen = common::SNPrintf(header_data + cur_pos, sizeof(header_data) - cur_pos,
-                               "Last-Modified: %s\r\n", timebuf);
+                                "Last-Modified: %s\r\n", timebuf);
     cur_pos += mlen;
   }
 
   if (!is_keep_alive) {
-    #define CONNECTION_CLOSE "Connection: close\r\n\r\n"
+#define CONNECTION_CLOSE "Connection: close\r\n\r\n"
     const int last_len = sizeof(CONNECTION_CLOSE) - 1;
     memcpy(header_data + cur_pos, CONNECTION_CLOSE, last_len);
     cur_pos += last_len;
   } else {
-    #define CONNECTION_KEEP_ALIVE "Keep-Alive: timeout=15, max=100\r\n\r\n"
+#define CONNECTION_KEEP_ALIVE "Keep-Alive: timeout=15, max=100\r\n\r\n"
     const int last_len = sizeof(CONNECTION_KEEP_ALIVE) - 1;
     memcpy(header_data + cur_pos, CONNECTION_KEEP_ALIVE, last_len);
     cur_pos += last_len;
@@ -199,8 +209,7 @@ common::Error HttpClient::send_headers(common::http::http_protocols protocol,
 }
 
 Http2Client::Http2Client(tcp::ITcpLoop* server, const common::net::socket_info& info)
-  : HttpClient(server, info), streams_() {
-}
+    : HttpClient(server, info), streams_() {}
 
 const char* Http2Client::ClassName() const {
   return "Http2Client";
@@ -212,20 +221,21 @@ bool Http2Client::is_http2() const {
 }
 
 common::Error Http2Client::send_error(common::http::http_protocols protocol,
-                                      common::http::http_status status, const char* extra_header,
-                                      const char* text, bool is_keep_alive,
+                                      common::http::http_status status,
+                                      const char* extra_header,
+                                      const char* text,
+                                      bool is_keep_alive,
                                       const HttpServerInfo& info) {
   if (is_http2() && protocol == common::http::HP_2_0) {
     const std::string title = common::ConvertToString(status);
     char err_data[1024] = {0};
-    off_t err_len = common::SNPrintf(err_data, sizeof(err_data), HTML_PATTERN_ISISSSS7,
-                                     status, title, status, title,
-                                     text, info.server_url, info.server_name);
-    common::Error err = send_headers(protocol, status, extra_header,
-                                     "text/html", &err_len, nullptr, is_keep_alive, info);
+    off_t err_len = common::SNPrintf(err_data, sizeof(err_data), HTML_PATTERN_ISISSSS7, status,
+                                     title, status, title, text, info.server_url, info.server_name);
+    common::Error err = send_headers(protocol, status, extra_header, "text/html", &err_len, nullptr,
+                                     is_keep_alive, info);
     if (err && err->isError()) {
-        DEBUG_MSG_ERROR(err);
-        return err;
+      DEBUG_MSG_ERROR(err);
+      return err;
     }
 
     StreamSPtr header_stream = findStreamByType(common::http2::HTTP2_HEADERS);
@@ -233,7 +243,8 @@ common::Error Http2Client::send_error(common::http::http_protocols protocol,
       return DEBUG_MSG_PERROR("findStreamByType", EAGAIN);
     }
 
-    common::http2::frame_hdr hdr = common::http2::frame_data::create_frame_header(common::http2::HTTP2_FLAG_END_STREAM, header_stream->sid(), err_len);
+    common::http2::frame_hdr hdr = common::http2::frame_data::create_frame_header(
+        common::http2::HTTP2_FLAG_END_STREAM, header_stream->sid(), err_len);
     common::http2::frame_data fdata(hdr, err_data);
     return header_stream->sendFrame(fdata);
   }
@@ -242,7 +253,8 @@ common::Error Http2Client::send_error(common::http::http_protocols protocol,
 }
 
 common::Error Http2Client::send_file_by_fd(common::http::http_protocols protocol,
-                                           int fdesc, off_t size) {
+                                           int fdesc,
+                                           off_t size) {
   if (is_http2() && protocol == common::http::HP_2_0) {
     StreamSPtr header_stream = findStreamByType(common::http2::HTTP2_HEADERS);
     if (!header_stream) {
@@ -253,23 +265,26 @@ common::Error Http2Client::send_file_by_fd(common::http::http_protocols protocol
     help.header_stream = header_stream;
     help.all_size = size;
 
-    common::Error err = common::file_system::read_file_cb(fdesc, 0, size,
-                                                              &send_data_frame, &help);
+    common::Error err = common::file_system::read_file_cb(fdesc, 0, size, &send_data_frame, &help);
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
       return err;
     }
 
     return common::Error();
- }
+  }
 
   return HttpClient::send_file_by_fd(protocol, fdesc, size);
 }
 
 common::Error Http2Client::send_headers(common::http::http_protocols protocol,
-                                        common::http::http_status status, const char* extra_header,
-                                        const char* mime_type, off_t* length, time_t* mod,
-                                        bool is_keep_alive, const HttpServerInfo& info) {
+                                        common::http::http_status status,
+                                        const char* extra_header,
+                                        const char* mime_type,
+                                        off_t* length,
+                                        time_t* mod,
+                                        bool is_keep_alive,
+                                        const HttpServerInfo& info) {
   if (is_http2() && protocol == common::http::HP_2_0) {
     StreamSPtr header_stream = findStreamByType(common::http2::HTTP2_HEADERS);
     if (!header_stream) {
@@ -326,14 +341,15 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
     common::buffer_t buff;
     hd.http2_deflate_hd_bufs(buff, nvs);
 
-    common::http2::frame_hdr hdr = common::http2::frame_headers::create_frame_header(common::http2::HTTP2_FLAG_END_HEADERS, header_stream->sid(), buff.size());
+    common::http2::frame_hdr hdr = common::http2::frame_headers::create_frame_header(
+        common::http2::HTTP2_FLAG_END_HEADERS, header_stream->sid(), buff.size());
     common::http2::frame_headers fhdr(hdr, buff);
 
     return header_stream->sendFrame(fhdr);
   }
 
-  return HttpClient::send_headers(protocol, status, extra_header,
-                                  mime_type, length, mod, is_keep_alive, info);
+  return HttpClient::send_headers(protocol, status, extra_header, mime_type, length, mod,
+                                  is_keep_alive, info);
 }
 
 StreamSPtr Http2Client::findStreamByStreamID(IStream::stream_id_t stream_id) const {

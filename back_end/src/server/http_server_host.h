@@ -40,13 +40,12 @@ namespace inner {
 class InnerTcpServerClient;
 }  // namespace inner
 
-class HttpInnerServerHandlerHost
-        : public http::Http2ServerHandler {
+class HttpInnerServerHandlerHost : public http::Http2ServerHandler {
  public:
   typedef http::Http2Server server_t;
   typedef http::HttpClient client_t;
 
-  HttpInnerServerHandlerHost(const HttpServerInfo & info, HttpServerHost * parent);
+  HttpInnerServerHandlerHost(const HttpServerInfo& info, HttpServerHost* parent);
   virtual void accepted(tcp::TcpClient* client);
   virtual void closed(tcp::TcpClient* client);
   virtual void dataReceived(tcp::TcpClient* client);
@@ -54,7 +53,7 @@ class HttpInnerServerHandlerHost
   virtual ~HttpInnerServerHandlerHost();
 
  private:
-  void processHttpRequest(http::HttpClient *hclient, const common::http::http_request& hrequest);
+  void processHttpRequest(http::HttpClient* hclient, const common::http::http_request& hrequest);
   HttpServerHost* const parent_;
 };
 
@@ -67,7 +66,7 @@ class HttpServerHost {
                  const common::net::HostAndPort& webSocketHost);
   ~HttpServerHost();
 
-  void setStorageConfig(const redis_sub_configuration_t &config);
+  void setStorageConfig(const redis_sub_configuration_t& config);
 
   bool unRegisterInnerConnectionByHost(tcp::TcpClient* connection) WARN_UNUSED_RESULT;
   bool registerInnerConnectionByUser(const UserAuthInfo& user,
@@ -78,7 +77,7 @@ class HttpServerHost {
   int exec() WARN_UNUSED_RESULT;
   void stop();
 
-  inner::InnerServerHandlerHost * innerHandler() const;
+  inner::InnerServerHandlerHost* innerHandler() const;
 
  private:
   HttpInnerServerHandlerHost* httpHandler_;
@@ -86,11 +85,11 @@ class HttpServerHost {
   std::shared_ptr<common::thread::Thread<int> > http_thread_;
 
   inner::InnerServerHandlerHost* innerHandler_;
-  inner::InnerTcpServer * innerServer_;
+  inner::InnerTcpServer* innerServer_;
   std::shared_ptr<common::thread::Thread<int> > inner_thread_;
 
   websocket::WebSocketServerHandlerHost* websocketHandler_;
-  websocket::WebSocketServerHost * websocketServer_;
+  websocket::WebSocketServerHost* websocketServer_;
   std::shared_ptr<common::thread::Thread<int> > websocket_thread_;
 
   inner_connections_type connections_;

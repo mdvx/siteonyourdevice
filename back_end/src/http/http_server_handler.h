@@ -43,8 +43,7 @@ class IHttpAuthObserver {
   virtual ~IHttpAuthObserver();
 };
 
-class HttpServerHandler
-  : public tcp::ITcpLoopObserver {
+class HttpServerHandler : public tcp::ITcpLoopObserver {
  public:
   typedef common::shared_ptr<IHttpCallback> http_callback_t;
   typedef std::map<std::string, http_callback_t> http_callbacks_t;
@@ -52,7 +51,7 @@ class HttpServerHandler
   typedef std::pair<common::uri::Uri, ILoopController*> socket_url_t;
   typedef std::vector<socket_url_t> sockets_url_t;
 
-  HttpServerHandler(const HttpServerInfo& info, IHttpAuthObserver * observer);
+  HttpServerHandler(const HttpServerInfo& info, IHttpAuthObserver* observer);
   virtual void preLooped(tcp::ITcpLoop* server);
   virtual void accepted(tcp::TcpClient* client);
   virtual void moved(tcp::TcpClient* client);
@@ -73,27 +72,28 @@ class HttpServerHandler
 
  protected:
   virtual void processReceived(HttpClient* hclient, const char* request, size_t req_len);
-  virtual void handleRequest(HttpClient* hclient, const common::http::http_request& hrequest,
+  virtual void handleRequest(HttpClient* hclient,
+                             const common::http::http_request& hrequest,
                              bool notClose);
 
  private:
-  bool tryToHandleAsRegisteredCallback(HttpClient* hclient, const std::string& uri,
+  bool tryToHandleAsRegisteredCallback(HttpClient* hclient,
+                                       const std::string& uri,
                                        const common::http::http_request& request);
-  bool tryAuthenticateIfNeeded(HttpClient* hclient, const char* extra_header,
+  bool tryAuthenticateIfNeeded(HttpClient* hclient,
+                               const char* extra_header,
                                const common::http::http_request& request);
-
 
   http_callbacks_t httpCallbacks_;
   const common::shared_ptr<IHttpCallback> fshandler_;
-  IHttpAuthObserver * authChecker_;
+  IHttpAuthObserver* authChecker_;
 
   sockets_url_t sockets_urls_;
 
   const HttpServerInfo info_;
 };
 
-class Http2ServerHandler
-  : public HttpServerHandler {
+class Http2ServerHandler : public HttpServerHandler {
  public:
   Http2ServerHandler(const HttpServerInfo& info, IHttpAuthObserver* observer);
 

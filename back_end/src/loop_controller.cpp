@@ -27,9 +27,7 @@
 namespace fasto {
 namespace siteonyourdevice {
 
-ILoopController::ILoopController()
-  : loop_(nullptr), handler_(nullptr) {
-}
+ILoopController::ILoopController() : loop_(nullptr), handler_(nullptr) {}
 
 int ILoopController::exec() {
   CHECK(!handler_);
@@ -67,13 +65,11 @@ ILoopController::~ILoopController() {
   delete handler_;
 }
 
-ILoopThreadController::ILoopThreadController()
-  : ILoopController(), loop_thread_() {
+ILoopThreadController::ILoopThreadController() : ILoopController(), loop_thread_() {
   loop_thread_ = THREAD_MANAGER()->createThread(&ILoopController::exec, this);
 }
 
-ILoopThreadController::~ILoopThreadController() {
-}
+ILoopThreadController::~ILoopThreadController() {}
 
 int ILoopThreadController::join() {
   return loop_thread_->joinAndGet();

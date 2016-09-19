@@ -36,13 +36,14 @@ enum HCTypes {
   file_system  // handle all requests
 };
 
-const std::string HCallbackTypes[] = { "system", "file_system" };
+const std::string HCallbackTypes[] = {"system", "file_system"};
 
 class IHttpCallback {
  public:
   IHttpCallback();
   virtual ~IHttpCallback();
-  virtual bool handleRequest(http::HttpClient* hclient, const char* extra_header,
+  virtual bool handleRequest(http::HttpClient* hclient,
+                             const char* extra_header,
                              const common::http::http_request& request,
                              const HttpServerInfo& info) = 0;
 
@@ -51,8 +52,7 @@ class IHttpCallback {
                                                               const std::string& name);
 };
 
-class HttpCallbackUrl
-  : public IHttpCallback {
+class HttpCallbackUrl : public IHttpCallback {
  public:
   explicit HttpCallbackUrl(HCTypes type);
   HCTypes type() const;
@@ -65,5 +65,5 @@ class HttpCallbackUrl
 }  // namespace fasto
 
 namespace common {
-    std::string ConvertToString(fasto::siteonyourdevice::HCTypes t);
+std::string ConvertToString(fasto::siteonyourdevice::HCTypes t);
 }  // namespace common

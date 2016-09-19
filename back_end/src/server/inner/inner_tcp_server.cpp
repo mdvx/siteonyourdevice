@@ -24,6 +24,7 @@
 #include "common/net/net.h"
 #include "common/logger.h"
 #include "common/thread/thread_manager.h"
+#include "common/convert2string.h"
 
 #include "server/http_server_host.h"
 #include "server/server_commands.h"
@@ -39,14 +40,11 @@ namespace siteonyourdevice {
 namespace server {
 namespace inner {
 
-class InnerServerHandlerHost::InnerSubHandler
-  : public RedisSubHandler {
+class InnerServerHandlerHost::InnerSubHandler : public RedisSubHandler {
  public:
-  explicit InnerSubHandler(InnerServerHandlerHost* parent)
-    : parent_(parent) {
-  }
+  explicit InnerSubHandler(InnerServerHandlerHost* parent) : parent_(parent) {}
 
-  void processSubscribed(cmd_seq_t request_id, int argc, char *argv[]) {
+  void processSubscribed(cmd_seq_t request_id, int argc, char* argv[]) {
     sds join = sdsempty();
     join = sdscatfmt(join, "%s ", request_id.c_str());
     for (int i = 0; i < argc; ++i) {
@@ -67,7 +65,8 @@ class InnerServerHandlerHost::InnerSubHandler
   void publish_command_out(const char* msg, size_t msg_len) {
     bool res = parent_->sub_commands_in_->publish_command_out(msg, msg_len);
     if (!res) {
-      std::string err_str = common::MemSPrintf("publish_command_out with args: msg = %s, msg_len = " PRIu64 " failed!", msg, msg_len);
+      std::string err_str = common::MemSPrintf(
+          "publish_command_out with args: msg = %s, msg_len = " PRIu64 " failed!", msg, msg_len);
       DEBUG_MSG(common::logging::L_ERROR, err_str);
     }
   }
@@ -77,7 +76,7 @@ class InnerServerHandlerHost::InnerSubHandler
     // [hex_string]seq OK/FAIL [std::string]command args ..
     DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_INFO,
                                            "InnerSubHandler channel: %s, %s", channel, msg);
-    char *space = strchr(msg, ' ');
+    char* space = strchr(msg, ' ');
     if (!space) {
       const std::string resp = common::MemSPrintf("UNKNOWN COMMAND: %s", msg);
       DEBUG_MSG(common::logging::L_WARNING, resp);
@@ -89,9 +88,9 @@ class InnerServerHandlerHost::InnerSubHandler
 
     char buff[MAX_COMMAND_SIZE] = {0};
     int len = snprintf(buff, sizeof(buff), STRINGIZE(REQUEST_COMMAND) " %s" END_OF_COMMAND,
-                         space + 1);  // only REQUEST_COMMAND
+                       space + 1);  // only REQUEST_COMMAND
 
-    char *star_seq = NULL;
+    char* star_seq = NULL;
     cmd_id_t seq = strtoul(buff, &star_seq, 10);
     if (*star_seq != ' ') {
       std::string resp = common::MemSPrintf("PROBLEM EXTRACTING SEQUENCE: %s", space + 1);
@@ -110,51 +109,53 @@ class InnerServerHandlerHost::InnerSubHandler
 
     size_t len_seq = id_ptr - (star_seq + 1);
     cmd_seq_t id = std::string(star_seq + 1, len_seq);
-    const char *cmd = id_ptr;
+    const char* cmd = id_ptr;
 
     InnerTcpServerClient* fclient = parent_->parent_->findInnerConnectionByHost(msg);
     if (!fclient) {
       int argc;
-      sds *argv = sdssplitargs(cmd, &argc);
+      sds* argv = sdssplitargs(cmd, &argc);
       char* command = argv[0];
 
-      std::string resp = common::MemSPrintf(SERVER_COMMANDS_OUT_FAIL_2US(CAUSE_NOT_CONNECTED),
-                                            id, command);
-        publish_command_out(resp);
-        sdsfreesplitres(argv, argc);
-        return;
+      std::string resp =
+          common::MemSPrintf(SERVER_COMMANDS_OUT_FAIL_2US(CAUSE_NOT_CONNECTED), id, command);
+      publish_command_out(resp);
+      sdsfreesplitres(argv, argc);
+      return;
     }
 
     ssize_t nwrite = 0;
     common::Error err = fclient->TcpClient::write(buff, len, &nwrite);
     if (err && err->isError()) {
       int argc;
-      sds *argv = sdssplitargs(cmd, &argc);
+      sds* argv = sdssplitargs(cmd, &argc);
       char* command = argv[0];
 
-      std::string resp = common::MemSPrintf(SERVER_COMMANDS_OUT_FAIL_2US(CAUSE_NOT_HANDLED),
-                                            id, command);
+      std::string resp =
+          common::MemSPrintf(SERVER_COMMANDS_OUT_FAIL_2US(CAUSE_NOT_HANDLED), id, command);
       publish_command_out(resp);
       sdsfreesplitres(argv, argc);
       return;
     }
 
-    auto cb = std::bind(&InnerSubHandler::processSubscribed, this,
-                        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    auto cb = std::bind(&InnerSubHandler::processSubscribed, this, std::placeholders::_1,
+                        std::placeholders::_2, std::placeholders::_3);
     fasto::siteonyourdevice::inner::RequestCallback rc(id, cb);
     parent_->subscribeRequest(rc);
   }
 
-  InnerServerHandlerHost * parent_;
+  InnerServerHandlerHost* parent_;
 };
 
-InnerServerHandlerHost::InnerServerHandlerHost(HttpServerHost *parent)
-  : parent_(parent), sub_commands_in_(NULL), handler_(NULL),
-    ping_client_id_timer_(INVALID_TIMER_ID) {
+InnerServerHandlerHost::InnerServerHandlerHost(HttpServerHost* parent)
+    : parent_(parent),
+      sub_commands_in_(NULL),
+      handler_(NULL),
+      ping_client_id_timer_(INVALID_TIMER_ID) {
   handler_ = new InnerSubHandler(this);
   sub_commands_in_ = new RedisSub(handler_);
-  redis_subscribe_command_in_thread_ = THREAD_MANAGER()->createThread(&RedisSub::listen,
-                                                                      sub_commands_in_);
+  redis_subscribe_command_in_thread_ =
+      THREAD_MANAGER()->createThread(&RedisSub::listen, sub_commands_in_);
 }
 
 InnerServerHandlerHost::~InnerServerHandlerHost() {
@@ -168,21 +169,21 @@ void InnerServerHandlerHost::preLooped(tcp::ITcpLoop* server) {
   ping_client_id_timer_ = server->createTimer(ping_timeout_clients, ping_timeout_clients);
 }
 
-void InnerServerHandlerHost::moved(tcp::TcpClient* client) {
-}
+void InnerServerHandlerHost::moved(tcp::TcpClient* client) {}
 
-void InnerServerHandlerHost::postLooped(tcp::ITcpLoop *server) {
-}
+void InnerServerHandlerHost::postLooped(tcp::ITcpLoop* server) {}
 
 void InnerServerHandlerHost::timerEmited(tcp::ITcpLoop* server, timer_id_t id) {
   if (ping_client_id_timer_ == id) {
-    std::vector<tcp::TcpClient *> online_clients = server->clients();
+    std::vector<tcp::TcpClient*> online_clients = server->clients();
     for (size_t i = 0; i < online_clients.size(); ++i) {
       tcp::TcpClient* client = online_clients[i];
       const cmd_request_t ping_request = make_request(PING_COMMAND_REQ);
       ssize_t nwrite = 0;
       common::Error err = client->write(ping_request.data(), ping_request.size(), &nwrite);
-      DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "Pinged sended %" PRIuS " byte, client[%s], from server[%s], %" PRIuS " client(s) connected.",
+      DEBUG_MSG_FORMAT<512>(common::logging::L_INFO,
+                            "Pinged sended %" PRIuS " byte, client[%s], from server[%s], %" PRIuS
+                            " client(s) connected.",
                             nwrite, client->formatedName(), server->formatedName(),
                             online_clients.size());
       if (err && err->isError()) {
@@ -203,14 +204,16 @@ void InnerServerHandlerHost::accepted(tcp::TcpClient* client) {
 void InnerServerHandlerHost::closed(tcp::TcpClient* client) {
   bool isOk = parent_->unRegisterInnerConnectionByHost(client);
   if (isOk) {
-    InnerTcpServerClient * iconnection = dynamic_cast<InnerTcpServerClient *>(client);
+    InnerTcpServerClient* iconnection = dynamic_cast<InnerTcpServerClient*>(client);
     if (iconnection) {
       UserAuthInfo hinf = iconnection->serverHostInfo();
       std::string hoststr = hinf.host.host;
-      std::string connected_resp = common::MemSPrintf(SERVER_NOTIFY_CLIENT_DISCONNECTED_1S, hoststr);
+      std::string connected_resp =
+          common::MemSPrintf(SERVER_NOTIFY_CLIENT_DISCONNECTED_1S, hoststr);
       bool res = sub_commands_in_->publish_clients_state(connected_resp);
       if (!res) {
-        std::string err_str = common::MemSPrintf("publish_clients_state with args: connected_resp = %s failed!", connected_resp);
+        std::string err_str = common::MemSPrintf(
+            "publish_clients_state with args: connected_resp = %s failed!", connected_resp);
         DEBUG_MSG(common::logging::L_ERROR, err_str);
       }
     }
@@ -233,16 +236,18 @@ void InnerServerHandlerHost::dataReceived(tcp::TcpClient* client) {
   handleInnerDataReceived(iclient, buff, nread);
 }
 
-void InnerServerHandlerHost::dataReadyToWrite(tcp::TcpClient* client) {
-}
+void InnerServerHandlerHost::dataReadyToWrite(tcp::TcpClient* client) {}
 
 void InnerServerHandlerHost::setStorageConfig(const redis_sub_configuration_t& config) {
   sub_commands_in_->setConfig(config);
   redis_subscribe_command_in_thread_->start();
 }
 
-void InnerServerHandlerHost::handleInnerRequestCommand(siteonyourdevice::inner::InnerClient *connection,
-                                                       cmd_seq_t id, int argc, char *argv[]) {
+void InnerServerHandlerHost::handleInnerRequestCommand(
+    siteonyourdevice::inner::InnerClient* connection,
+    cmd_seq_t id,
+    int argc,
+    char* argv[]) {
   char* command = argv[0];
 
   if (IS_EQUAL_COMMAND(command, PING_COMMAND)) {
@@ -250,13 +255,16 @@ void InnerServerHandlerHost::handleInnerRequestCommand(siteonyourdevice::inner::
     ssize_t nwrite = 0;
     connection->write(pong, &nwrite);
   } else {
-    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING,
-                                           "UNKNOWN COMMAND: %s", command);
+    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN COMMAND: %s",
+                                           command);
   }
 }
 
-void InnerServerHandlerHost::handleInnerResponceCommand(siteonyourdevice::inner::InnerClient *connection,
-                                                        cmd_seq_t id, int argc, char *argv[]) {
+void InnerServerHandlerHost::handleInnerResponceCommand(
+    siteonyourdevice::inner::InnerClient* connection,
+    cmd_seq_t id,
+    int argc,
+    char* argv[]) {
   ssize_t nwrite = 0;
   char* state_command = argv[0];
 
@@ -266,41 +274,44 @@ void InnerServerHandlerHost::handleInnerResponceCommand(siteonyourdevice::inner:
       if (argc > 2) {
         const char* pong = argv[2];
         if (!pong) {
-          cmd_approve_t resp = make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S,
-                                                     CAUSE_INVALID_ARGS);
+          cmd_approve_t resp =
+              make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
           connection->write(resp, &nwrite);
           goto fail;
         }
 
-        cmd_approve_t resp =  make_approve_responce(id, PING_COMMAND_APPROVE_SUCCESS);
+        cmd_approve_t resp = make_approve_responce(id, PING_COMMAND_APPROVE_SUCCESS);
         common::Error err = connection->write(resp, &nwrite);
         if (err && err->isError()) {
           goto fail;
         }
       } else {
-        cmd_approve_t resp = make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S,
-                                                   CAUSE_INVALID_ARGS);
+        cmd_approve_t resp =
+            make_approve_responce(id, PING_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
         connection->write(resp, &nwrite);
       }
     } else if (IS_EQUAL_COMMAND(command, SERVER_WHO_ARE_YOU_COMMAND)) {
       if (argc > 2) {
         const char* uauthstr = argv[2];
         if (!uauthstr) {
-          cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
+          cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S,
+                                                     CAUSE_INVALID_ARGS);
           connection->write(resp, &nwrite);
           goto fail;
         }
 
         UserAuthInfo uauth = common::ConvertFromString<UserAuthInfo>(uauthstr);
         if (!uauth.isValid()) {
-          cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_USER);
+          cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S,
+                                                     CAUSE_INVALID_USER);
           connection->write(resp, &nwrite);
           goto fail;
         }
 
         bool isOk = parent_->findUser(uauth);
         if (!isOk) {
-          cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_UNREGISTERED_USER);
+          cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S,
+                                                     CAUSE_UNREGISTERED_USER);
           connection->write(resp, &nwrite);
           goto fail;
         }
@@ -308,7 +319,8 @@ void InnerServerHandlerHost::handleInnerResponceCommand(siteonyourdevice::inner:
         std::string hoststr = uauth.host.host;
         InnerTcpServerClient* fclient = parent_->findInnerConnectionByHost(hoststr);
         if (fclient) {
-          cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_DOUBLE_CONNECTION_HOST);
+          cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S,
+                                                     CAUSE_DOUBLE_CONNECTION_HOST);
           connection->write(resp, &nwrite);
           goto fail;
         }
@@ -316,22 +328,26 @@ void InnerServerHandlerHost::handleInnerResponceCommand(siteonyourdevice::inner:
         cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_SUCCESS);
         common::Error err = connection->write(resp, &nwrite);
         if (err && err->isError()) {
-          cmd_approve_t resp2 = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, err->description());
+          cmd_approve_t resp2 = make_approve_responce(
+              id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, err->description());
           connection->write(resp2, &nwrite);
           goto fail;
         }
 
         isOk = parent_->registerInnerConnectionByUser(uauth, connection);
         if (isOk) {
-          std::string connected_resp = common::MemSPrintf(SERVER_NOTIFY_CLIENT_CONNECTED_1S, hoststr);
+          std::string connected_resp =
+              common::MemSPrintf(SERVER_NOTIFY_CLIENT_CONNECTED_1S, hoststr);
           bool res = sub_commands_in_->publish_clients_state(connected_resp);
           if (!res) {
-            std::string err_str = common::MemSPrintf("publish_clients_state with args: connected_resp = %s failed!", connected_resp);
+            std::string err_str = common::MemSPrintf(
+                "publish_clients_state with args: connected_resp = %s failed!", connected_resp);
             DEBUG_MSG(common::logging::L_ERROR, err_str);
           }
         }
       } else {
-        cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S, CAUSE_INVALID_ARGS);
+        cmd_approve_t resp = make_approve_responce(id, SERVER_WHO_ARE_YOU_COMMAND_APPROVE_FAIL_1S,
+                                                   CAUSE_INVALID_ARGS);
         connection->write(resp, &nwrite);
       }
     } else if (IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONNECT_HTTP_COMMAND)) {
@@ -344,8 +360,8 @@ void InnerServerHandlerHost::handleInnerResponceCommand(siteonyourdevice::inner:
     }
   } else if (IS_EQUAL_COMMAND(state_command, FAIL_COMMAND) && argc > 1) {
   } else {
-    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING,
-                                           "UNKNOWN STATE COMMAND: %s", state_command);
+    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN STATE COMMAND: %s",
+                                           state_command);
   }
 
   return;
@@ -355,8 +371,11 @@ fail:
   delete connection;
 }
 
-void InnerServerHandlerHost::handleInnerApproveCommand(siteonyourdevice::inner::InnerClient *connection,
-                                                       cmd_seq_t id, int argc, char *argv[]) {
+void InnerServerHandlerHost::handleInnerApproveCommand(
+    siteonyourdevice::inner::InnerClient* connection,
+    cmd_seq_t id,
+    int argc,
+    char* argv[]) {
   char* command = argv[0];
 
   if (IS_EQUAL_COMMAND(command, SUCCESS_COMMAND)) {
@@ -368,21 +387,20 @@ void InnerServerHandlerHost::handleInnerApproveCommand(siteonyourdevice::inner::
     }
   } else if (IS_EQUAL_COMMAND(command, FAIL_COMMAND)) {
   } else {
-    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING,
-                                           "UNKNOWN COMMAND: %s", command);
+    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN COMMAND: %s",
+                                           command);
   }
 }
 
 InnerTcpServer::InnerTcpServer(const common::net::HostAndPort& host,
-                               tcp::ITcpLoopObserver *observer)
-  : TcpServer(host, observer) {
-}
+                               tcp::ITcpLoopObserver* observer)
+    : TcpServer(host, observer) {}
 
 const char* InnerTcpServer::className() const {
   return "InnerTcpServer";
 }
 
-tcp::TcpClient * InnerTcpServer::createClient(const common::net::socket_info &info) {
+tcp::TcpClient* InnerTcpServer::createClient(const common::net::socket_info& info) {
   return new InnerTcpServerClient(this, info);
 }
 
@@ -390,4 +408,3 @@ tcp::TcpClient * InnerTcpServer::createClient(const common::net::socket_info &in
 }  // namespace server
 }  // namespace siteonyourdevice
 }  // namespace fasto
-

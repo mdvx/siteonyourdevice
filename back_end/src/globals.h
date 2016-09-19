@@ -34,7 +34,7 @@ enum NetworkEventTypes {
 
 namespace common {
 
-template<>
+template <>
 struct event_traits<NetworkEventTypes> {
   typedef IEvent<NetworkEventTypes> event_t;
   typedef IExceptionEvent<NetworkEventTypes> ex_event_t;

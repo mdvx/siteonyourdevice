@@ -24,14 +24,10 @@
 
 namespace {
 
-const std::string SNetworkEventTypes[] = {
-  "InnerClientConnected",
-  "InnerClientDisconnected",
-  "ConfigChanged",
+const std::string SNetworkEventTypes[] = {"InnerClientConnected", "InnerClientDisconnected",
+                                          "ConfigChanged",
 
-  "CountNetworkEvent"
-};
-
+                                          "CountNetworkEvent"};
 }
 
 namespace common {
@@ -40,7 +36,7 @@ std::string ConvertToString(NetworkEventTypes net) {
   return SNetworkEventTypes[net];
 }
 
-template<>
+template <>
 NetworkEventTypes ConvertFromString(const std::string& net_str) {
   for (size_t i = 0; i < SIZEOFMASS(SNetworkEventTypes); ++i) {
     if (net_str == SNetworkEventTypes[i]) {

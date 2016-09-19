@@ -23,17 +23,16 @@ namespace siteonyourdevice {
 namespace inner {
 
 RelayClient::RelayClient(tcp::ITcpLoop* server, const common::net::socket_info& info)
-  : Http2Client(server, info) {
-}
+    : Http2Client(server, info) {}
 
 const char* RelayClient::ClassName() const {
   return "RelayClient";
 }
 
-RelayClientEx::RelayClientEx(tcp::ITcpLoop* server, const common::net::socket_info& info,
+RelayClientEx::RelayClientEx(tcp::ITcpLoop* server,
+                             const common::net::socket_info& info,
                              const common::net::HostAndPort& externalHost)
-  : RelayClient(server, info), external_host_(externalHost), eclient_(nullptr) {
-}
+    : RelayClient(server, info), external_host_(externalHost), eclient_(nullptr) {}
 
 common::net::HostAndPort RelayClientEx::externalHost() const {
   return external_host_;
@@ -43,7 +42,7 @@ ProxyRelayClient* RelayClientEx::eclient() const {
   return eclient_;
 }
 
-void RelayClientEx::setEclient(ProxyRelayClient *client) {
+void RelayClientEx::setEclient(ProxyRelayClient* client) {
   eclient_ = client;
 }
 
@@ -51,10 +50,10 @@ const char* RelayClientEx::ClassName() const {
   return "RelayClientEx";
 }
 
-ProxyRelayClient::ProxyRelayClient(tcp::ITcpLoop* server, const common::net::socket_info& info,
+ProxyRelayClient::ProxyRelayClient(tcp::ITcpLoop* server,
+                                   const common::net::socket_info& info,
                                    RelayClientEx* relay)
-  : TcpClient(server, info), relay_(relay) {
-}
+    : TcpClient(server, info), relay_(relay) {}
 
 RelayClientEx* ProxyRelayClient::relay() const {
   return relay_;

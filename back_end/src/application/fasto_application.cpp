@@ -38,16 +38,14 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace application {
 
-IFastoApplicationImpl::IFastoApplicationImpl(int argc, char* argv[]) {
-}
+IFastoApplicationImpl::IFastoApplicationImpl(int argc, char* argv[]) {}
 
-IFastoApplicationImpl::~IFastoApplicationImpl() {
-}
+IFastoApplicationImpl::~IFastoApplicationImpl() {}
 
 FastoApplication* FastoApplication::self_ = nullptr;
 
 FastoApplication::FastoApplication(int argc, char* argv[])
-  : argc_(argc), argv_(argv), impl_(createImpl(argc, argv)) {
+    : argc_(argc), argv_(argv), impl_(createImpl(argc, argv)) {
   CHECK(!self_);
   if (!self_) {
     self_ = this;
@@ -58,7 +56,7 @@ int FastoApplication::argc() const {
   return argc_;
 }
 
-char **FastoApplication::argv() const {
+char** FastoApplication::argv() const {
   return argv_;
 }
 

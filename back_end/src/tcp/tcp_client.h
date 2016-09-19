@@ -31,8 +31,7 @@ namespace tcp {
 
 class ITcpLoop;
 
-class TcpClient
-  : common::IMetaClassInfo {
+class TcpClient : common::IMetaClassInfo {
  public:
   typedef int flags_t;
   friend class ITcpLoop;
@@ -61,7 +60,7 @@ class TcpClient
 
  private:
   ITcpLoop* server_;
-  ev_io * read_write_io_;
+  ev_io* read_write_io_;
   int flags_;
 
   common::net::SocketHolder sock_;

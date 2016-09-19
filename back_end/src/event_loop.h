@@ -59,8 +59,7 @@ class LibEvLoop {
   bool isLoopThread() const;
 
  private:
-  static void stop_cb(struct ev_loop* loop,
-                      struct ev_async* watcher, int revents);
+  static void stop_cb(struct ev_loop* loop, struct ev_async* watcher, int revents);
 
   struct ev_loop* const loop_;
   EvLoopObserver* observer_;

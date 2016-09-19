@@ -28,8 +28,7 @@ class RelayClient;
 class RelayClientEx;
 class ProxyRelayClient;
 
-class Http2ClientServerHandler
-  : public http::Http2ServerHandler {
+class Http2ClientServerHandler : public http::Http2ServerHandler {
  public:
   Http2ClientServerHandler(const HttpServerInfo& info);
   ~Http2ClientServerHandler();

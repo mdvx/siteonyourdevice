@@ -31,15 +31,14 @@ namespace fasto {
 namespace siteonyourdevice {
 
 namespace http {
-  class IHttpAuthObserver;
+class IHttpAuthObserver;
 }  // namespace http
 
 namespace network {
 
-class NetworkController
-  : private ILoopThreadController {
+class NetworkController : private ILoopThreadController {
  public:
-  NetworkController(int argc, char *argv[]);
+  NetworkController(int argc, char* argv[]);
   ~NetworkController();
 
   void exit(int result);

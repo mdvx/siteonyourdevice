@@ -49,8 +49,7 @@ class ILoopController {
   virtual void stoped() = 0;
 };
 
-class ILoopThreadController
-        : public ILoopController {
+class ILoopThreadController : public ILoopController {
  public:
   ILoopThreadController();
   virtual ~ILoopThreadController();

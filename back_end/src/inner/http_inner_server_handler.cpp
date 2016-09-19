@@ -29,7 +29,7 @@
 #include "inner/inner_client.h"
 #include "inner/inner_relay_client.h"
 
-#define GB (1024*1024*1024)
+#define GB (1024 * 1024 * 1024)
 #define BUF_SIZE 4096
 
 namespace fasto {
@@ -37,23 +37,20 @@ namespace siteonyourdevice {
 namespace inner {
 
 Http2ClientServerHandler::Http2ClientServerHandler(const HttpServerInfo& info)
-  : Http2ServerHandler(info, nullptr) {
-}
+    : Http2ServerHandler(info, nullptr) {}
 
-Http2ClientServerHandler::~Http2ClientServerHandler() {
-}
+Http2ClientServerHandler::~Http2ClientServerHandler() {}
 
 void Http2ClientServerHandler::preLooped(tcp::ITcpLoop* server) {
   Http2ServerHandler::preLooped(server);
 }
 
-void Http2ClientServerHandler::accepted(tcp::TcpClient* client) {
-}
+void Http2ClientServerHandler::accepted(tcp::TcpClient* client) {}
 
 void Http2ClientServerHandler::closed(tcp::TcpClient* client) {
-  ProxyRelayClient * prclient = dynamic_cast<ProxyRelayClient*>(client);  // proxyrelay connection
+  ProxyRelayClient* prclient = dynamic_cast<ProxyRelayClient*>(client);  // proxyrelay connection
   if (prclient) {
-    RelayClientEx * rclient = prclient->relay();
+    RelayClientEx* rclient = prclient->relay();
     rclient->setEclient(nullptr);
   }
 }
@@ -62,9 +59,7 @@ void Http2ClientServerHandler::postLooped(tcp::ITcpLoop* server) {
   Http2ServerHandler::postLooped(server);
 }
 
-void Http2ClientServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_t id) {
-
-}
+void Http2ClientServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_t id) {}
 
 void Http2ClientServerHandler::relayDataReceived(inner::RelayClient* rclient) {
   char buff[BUF_SIZE] = {0};
@@ -102,8 +97,8 @@ void Http2ClientServerHandler::relayExDataReceived(inner::RelayClientEx* rclient
   if (externalHost.isValid()) {
     ProxyRelayClient* eclient = rclient->eclient();
     if (!eclient) {
-      common::Error err = common::net::connect(externalHost,
-                                               common::net::ST_SOCK_STREAM, 0, &client_info);
+      common::Error err =
+          common::net::connect(externalHost, common::net::ST_SOCK_STREAM, 0, &client_info);
       if (err && err->isError()) {
         DEBUG_MSG_ERROR(err);
         const std::string error_text = err->description();
@@ -138,9 +133,9 @@ void Http2ClientServerHandler::relayExDataReceived(inner::RelayClientEx* rclient
   } else {
     err = rclient->send_error(protocol, common::http::HS_INTERNAL_ERROR, nullptr,
                               "Invalid external host!", false, info());
-     if (err && err->isError()) {
-       DEBUG_MSG_ERROR(err);
-     }
+    if (err && err->isError()) {
+      DEBUG_MSG_ERROR(err);
+    }
   }
 }
 
@@ -154,7 +149,7 @@ void Http2ClientServerHandler::proxyDataReceived(ProxyRelayClient* prclient) {
     return;
   }
 
-  RelayClient * rclient = prclient->relay();
+  RelayClient* rclient = prclient->relay();
   ssize_t nwrite = 0;
   err = rclient->TcpClient::write(buff, nread, &nwrite);
   if (err && err->isError()) {
@@ -165,19 +160,19 @@ void Http2ClientServerHandler::proxyDataReceived(ProxyRelayClient* prclient) {
 }
 
 void Http2ClientServerHandler::dataReceived(tcp::TcpClient* client) {
-  RelayClientEx * rexclient = dynamic_cast<RelayClientEx*>(client);  // relay external connection
+  RelayClientEx* rexclient = dynamic_cast<RelayClientEx*>(client);  // relay external connection
   if (rexclient) {
     relayExDataReceived(rexclient);
     return;
   }
 
-  RelayClient * rclient = dynamic_cast<RelayClient*>(client);  // relay connection
+  RelayClient* rclient = dynamic_cast<RelayClient*>(client);  // relay connection
   if (rclient) {
     relayDataReceived(rclient);
     return;
   }
 
-  ProxyRelayClient * prclient = dynamic_cast<ProxyRelayClient*>(client);  // proxyrelay connection
+  ProxyRelayClient* prclient = dynamic_cast<ProxyRelayClient*>(client);  // proxyrelay connection
   if (prclient) {
     proxyDataReceived(prclient);
     return;
@@ -186,8 +181,7 @@ void Http2ClientServerHandler::dataReceived(tcp::TcpClient* client) {
   Http2ServerHandler::dataReceived(client);  // direct connection
 }
 
-void Http2ClientServerHandler::dataReadyToWrite(tcp::TcpClient* client) {
-}
+void Http2ClientServerHandler::dataReadyToWrite(tcp::TcpClient* client) {}
 
 }  // namespace inner
 }  // namespace siteonyourdevice

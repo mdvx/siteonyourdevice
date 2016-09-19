@@ -24,15 +24,14 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace websocket {
 
-class WebSocketServer
-  : public tcp::TcpServer {
+class WebSocketServer : public tcp::TcpServer {
  public:
   explicit WebSocketServer(const common::net::HostAndPort& host,
                            tcp::ITcpLoopObserver* observer = nullptr);
   const char* ClassName() const;
 
  protected:
-  virtual tcp::TcpClient * createClient(const common::net::socket_info& info);
+  virtual tcp::TcpClient* createClient(const common::net::socket_info& info);
 };
 
 }  // namespace websocket

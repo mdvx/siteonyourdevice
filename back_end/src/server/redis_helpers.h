@@ -33,8 +33,7 @@ struct redis_configuration_t {
   std::string redis_unix_socket;
 };
 
-struct redis_sub_configuration_t
-  : public redis_configuration_t {
+struct redis_sub_configuration_t : public redis_configuration_t {
   std::string channel_in;
   std::string channel_out;
   std::string channel_clients_state;
@@ -58,7 +57,7 @@ class RedisSubHandler {
 
 class RedisSub {
  public:
-  explicit RedisSub(RedisSubHandler * handler);
+  explicit RedisSub(RedisSubHandler* handler);
 
   void setConfig(const redis_sub_configuration_t& config);
   void listen();
@@ -69,7 +68,7 @@ class RedisSub {
   bool publish(const char* chn, size_t chn_len, const char* msg, size_t msg_len) WARN_UNUSED_RESULT;
 
  private:
-  RedisSubHandler * const handler_;
+  RedisSubHandler* const handler_;
   redis_sub_configuration_t config_;
   bool stop_;
 };

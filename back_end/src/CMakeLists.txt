@@ -198,7 +198,14 @@ ENDIF(OS_MACOSX)
 
 IF(BUILD_SERVER)
   SET(PROJECT_SERVER_NAME ${PROJECT_NAME_LOWERCASE}_server)
-
+  SET(BUILD_SERVER_SOURCES server/http_server_host.h server/http_server_host.cpp
+    server/inner/inner_tcp_server.h server/inner/inner_tcp_server.cpp
+    server/inner/inner_tcp_client.h server/inner/inner_tcp_client.cpp
+    server/websocket/websocket_server.h server/websocket/websocket_server.cpp
+    server/websocket/websocket_client.h server/websocket/websocket_client.cpp
+    server/redis_helpers.h server/redis_helpers.cpp
+    server/server_commands.h
+  )
   ADD_DEFINITIONS(-DCONFIG_FILE_PATH="/etc/${PROJECT_SERVER_NAME}.conf")
   ADD_DEFINITIONS(-DPROJECT_NAME_SERVER_TITLE="${PROJECT_NAME}")
   ADD_DEFINITIONS(-DPROJECT_NAME_SERVER="${PROJECT_NAME_LOWERCASE}")
@@ -208,15 +215,13 @@ IF(BUILD_SERVER)
 
   ADD_EXECUTABLE(${PROJECT_SERVER_NAME}
     server/main.cpp
-    server/http_server_host.h server/http_server_host.cpp
-    server/inner/inner_tcp_server.h server/inner/inner_tcp_server.cpp
-    server/inner/inner_tcp_client.h server/inner/inner_tcp_client.cpp
-    server/websocket/websocket_server.h server/websocket/websocket_server.cpp
-    server/websocket/websocket_client.h server/websocket/websocket_client.cpp
-    server/redis_helpers.h server/redis_helpers.cpp
-    server/server_commands.h
+    ${BUILD_SERVER_SOURCES}
   )
   TARGET_LINK_LIBRARIES(${PROJECT_SERVER_NAME} ${PROJECT_CORE_LIBRARY} hiredis)
+  IF (CHECK_STYLE)
+    REGISTER_CHECK_STYLE_TARGET(check_style_server "${BUILD_SERVER_SOURCES}")
+    REGISTER_CHECK_INCLUDES_TARGET(${PROJECT_SERVER_NAME})
+  ENDIF(CHECK_STYLE)
 ENDIF(BUILD_SERVER)
 
 # Start to install

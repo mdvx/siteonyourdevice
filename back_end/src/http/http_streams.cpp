@@ -33,8 +33,7 @@ IStream::stream_id_t IStream::sid() const {
 }
 
 IStream::IStream(const common::net::socket_info& info, const common::http2::frame_base& frame)
-  : sock_(info), init_frame_(frame) {
-}
+    : sock_(info), init_frame_(frame) {}
 
 bool IStream::processFrame(const common::http2::frame_base& frame) {
   if (!frame.isValid()) {
@@ -73,47 +72,46 @@ IStream* IStream::createStream(const common::net::socket_info& info,
   common::http2::frame_t type = frame.type();
 
   switch (type) {
-  case common::http2::HTTP2_DATA:
-    return new HTTP2DataStream(info, frame);
-  case common::http2::HTTP2_HEADERS:
-    return new HTTP2HeadersStream(info, frame);
-  case common::http2::HTTP2_PRIORITY: {
-    IStream* res = new HTTP2PriorityStream(info, frame);
-    return res;
-  }
-  case common::http2::HTTP2_RST_STREAM:
-    NOTREACHED();
-    return nullptr;
-  case common::http2::HTTP2_SETTINGS:
-    return new HTTP2SettingsStream(info, frame);
-  case common::http2::HTTP2_PUSH_PROMISE:
-    NOTREACHED();
-    return nullptr;
-  case common::http2::HTTP2_PING:
-    NOTREACHED();
-    return nullptr;
-  case common::http2::HTTP2_GOAWAY:
-    NOTREACHED();
-    return nullptr;
-  case common::http2::HTTP2_WINDOW_UPDATE:
-    NOTREACHED();
-    return nullptr;
-  case common::http2::HTTP2_CONTINUATION:
-    NOTREACHED();
-    return nullptr;
+    case common::http2::HTTP2_DATA:
+      return new HTTP2DataStream(info, frame);
+    case common::http2::HTTP2_HEADERS:
+      return new HTTP2HeadersStream(info, frame);
+    case common::http2::HTTP2_PRIORITY: {
+      IStream* res = new HTTP2PriorityStream(info, frame);
+      return res;
+    }
+    case common::http2::HTTP2_RST_STREAM:
+      NOTREACHED();
+      return nullptr;
+    case common::http2::HTTP2_SETTINGS:
+      return new HTTP2SettingsStream(info, frame);
+    case common::http2::HTTP2_PUSH_PROMISE:
+      NOTREACHED();
+      return nullptr;
+    case common::http2::HTTP2_PING:
+      NOTREACHED();
+      return nullptr;
+    case common::http2::HTTP2_GOAWAY:
+      NOTREACHED();
+      return nullptr;
+    case common::http2::HTTP2_WINDOW_UPDATE:
+      NOTREACHED();
+      return nullptr;
+    case common::http2::HTTP2_CONTINUATION:
+      NOTREACHED();
+      return nullptr;
 
-  default:
-    NOTREACHED();
-    return nullptr;
+    default:
+      NOTREACHED();
+      return nullptr;
   }
 }
 
-IStream::~IStream() {
-}
+IStream::~IStream() {}
 
 HTTP2DataStream::HTTP2DataStream(const common::net::socket_info& info,
                                  const common::http2::frame_base& frame)
-  : IStream(info, frame) {
+    : IStream(info, frame) {
   CHECK(common::http2::HTTP2_DATA == frame.type());
 }
 
@@ -123,12 +121,11 @@ bool HTTP2DataStream::processFrameImpl(const common::http2::frame_base& frame) {
 
 HTTP2PriorityStream::HTTP2PriorityStream(const common::net::socket_info& info,
                                          const common::http2::frame_base& frame)
-  : IStream(info, frame) {
+    : IStream(info, frame) {
   CHECK(common::http2::HTTP2_PRIORITY == frame.type());
 }
 
-HTTP2PriorityStream::~HTTP2PriorityStream() {
-}
+HTTP2PriorityStream::~HTTP2PriorityStream() {}
 
 bool HTTP2PriorityStream::processFrameImpl(const common::http2::frame_base& frame) {
   sendCloseFrame();
@@ -137,7 +134,7 @@ bool HTTP2PriorityStream::processFrameImpl(const common::http2::frame_base& fram
 
 HTTP2SettingsStream::HTTP2SettingsStream(const common::net::socket_info& info,
                                          const common::http2::frame_base& frame)
-  : IStream(info, frame), negotiated_(false) {
+    : IStream(info, frame), negotiated_(false) {
   CHECK(common::http2::HTTP2_SETTINGS == frame.type());
 }
 
@@ -159,7 +156,7 @@ bool HTTP2SettingsStream::processFrameImpl(const common::http2::frame_base& fram
 
 HTTP2HeadersStream::HTTP2HeadersStream(const common::net::socket_info& info,
                                        const common::http2::frame_base& frame)
-  : IStream(info, frame) {
+    : IStream(info, frame) {
   CHECK(common::http2::HTTP2_HEADERS == frame.type());
 }
 

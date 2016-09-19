@@ -31,8 +31,12 @@ namespace siteonyourdevice {
 namespace tcp {
 
 TcpClient::TcpClient(ITcpLoop* server, const common::net::socket_info& info, flags_t flags)
-  : server_(server), read_write_io_((struct ev_io*)calloc(1, sizeof(struct ev_io))),
-    flags_(flags), sock_(info), name_(), id_() {
+    : server_(server),
+      read_write_io_((struct ev_io*)calloc(1, sizeof(struct ev_io))),
+      flags_(flags),
+      sock_(info),
+      name_(),
+      id_() {
   read_write_io_->data = this;
 }
 
@@ -57,7 +61,7 @@ TcpClient::~TcpClient() {
   read_write_io_ = NULL;
 }
 
-ITcpLoop *TcpClient::server() const {
+ITcpLoop* TcpClient::server() const {
   return server_;
 }
 

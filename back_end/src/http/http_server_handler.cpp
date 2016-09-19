@@ -40,23 +40,24 @@
 #define AUTH_BASIC_METHOD "Basic"
 
 namespace {
-class WebSocketController
-  : public fasto::siteonyourdevice::ILoopThreadController {
+class WebSocketController : public fasto::siteonyourdevice::ILoopThreadController {
   const common::net::HostAndPort host_;
   const fasto::siteonyourdevice::HttpServerInfo info_;
+
  public:
   WebSocketController(const common::net::HostAndPort& host,
                       const fasto::siteonyourdevice::HttpServerInfo& info)
-    : host_(host), info_(info) {
-  }
+      : host_(host), info_(info) {}
 
  private:
   fasto::siteonyourdevice::tcp::ITcpLoopObserver* createHandler() {
     return new fasto::siteonyourdevice::websocket::WebSocketServerHandler(info_);
   }
 
-  fasto::siteonyourdevice::tcp::ITcpLoop* createServer(fasto::siteonyourdevice::tcp::ITcpLoopObserver* handler) {
-    fasto::siteonyourdevice::websocket::WebSocketServer* serv = new fasto::siteonyourdevice::websocket::WebSocketServer(host_, handler);
+  fasto::siteonyourdevice::tcp::ITcpLoop* createServer(
+      fasto::siteonyourdevice::tcp::ITcpLoopObserver* handler) {
+    fasto::siteonyourdevice::websocket::WebSocketServer* serv =
+        new fasto::siteonyourdevice::websocket::WebSocketServer(host_, handler);
     serv->setName("websocket_server");
 
     common::Error err = serv->bind();
@@ -78,34 +79,32 @@ class WebSocketController
 };
 }  // namespace
 
-
 namespace fasto {
 namespace siteonyourdevice {
 namespace http {
 
-IHttpAuthObserver::IHttpAuthObserver() {
-}
+IHttpAuthObserver::IHttpAuthObserver() {}
 
-IHttpAuthObserver::~IHttpAuthObserver() {
-}
+IHttpAuthObserver::~IHttpAuthObserver() {}
 
-void HttpServerHandler::preLooped(tcp::ITcpLoop *server) {
+void HttpServerHandler::preLooped(tcp::ITcpLoop* server) {
   for (size_t i = 0; i < sockets_urls_.size(); ++i) {
     socket_url_t url = sockets_urls_[i];
     CHECK(url.second == nullptr);
 
-    common::net::HostAndPort host = common::ConvertFromString<common::net::HostAndPort>(url.first.host());
+    common::net::HostAndPort host =
+        common::ConvertFromString<common::net::HostAndPort>(url.first.host());
     if (!host.isValid()) {
       continue;
     }
 
-    ILoopThreadController * loopc = new WebSocketController(host, info());
+    ILoopThreadController* loopc = new WebSocketController(host, info());
     loopc->start();
     sockets_urls_[i].second = loopc;
   }
 }
 
-void HttpServerHandler::postLooped(tcp::ITcpLoop *server) {
+void HttpServerHandler::postLooped(tcp::ITcpLoop* server) {
   for (size_t i = 0; i < sockets_urls_.size(); ++i) {
     socket_url_t url = sockets_urls_[i];
 
@@ -115,21 +114,17 @@ void HttpServerHandler::postLooped(tcp::ITcpLoop *server) {
 
     url.second->stop();
     delete url.second;
-    sockets_urls_[i].second =  nullptr;
+    sockets_urls_[i].second = nullptr;
   }
 }
 
-void HttpServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_t id) {
-}
+void HttpServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_t id) {}
 
-void HttpServerHandler::accepted(tcp::TcpClient* client) {
-}
+void HttpServerHandler::accepted(tcp::TcpClient* client) {}
 
-void HttpServerHandler::moved(tcp::TcpClient* client) {
-}
+void HttpServerHandler::moved(tcp::TcpClient* client) {}
 
-void HttpServerHandler::closed(tcp::TcpClient* client) {
-}
+void HttpServerHandler::closed(tcp::TcpClient* client) {}
 
 void HttpServerHandler::dataReceived(tcp::TcpClient* client) {
   char buff[BUF_SIZE] = {0};
@@ -146,8 +141,7 @@ void HttpServerHandler::dataReceived(tcp::TcpClient* client) {
   processReceived(hclient, buff, nread);
 }
 
-void HttpServerHandler::dataReadyToWrite(tcp::TcpClient* client) {
-}
+void HttpServerHandler::dataReadyToWrite(tcp::TcpClient* client) {}
 
 void HttpServerHandler::registerHttpCallback(const std::string& url, http_callback_t callback) {
   httpCallbacks_[url] = callback;
@@ -157,7 +151,7 @@ void HttpServerHandler::registerSocketUrl(const common::uri::Uri& url) {
   sockets_urls_.push_back(std::make_pair(url, nullptr));
 }
 
-void HttpServerHandler::setAuthChecker(IHttpAuthObserver * authChecker) {
+void HttpServerHandler::setAuthChecker(IHttpAuthObserver* authChecker) {
   authChecker_ = authChecker;
 }
 
@@ -165,7 +159,8 @@ const HttpServerInfo& HttpServerHandler::info() const {
   return info_;
 }
 
-bool HttpServerHandler::tryToHandleAsRegisteredCallback(HttpClient* hclient, const std::string& uri,
+bool HttpServerHandler::tryToHandleAsRegisteredCallback(HttpClient* hclient,
+                                                        const std::string& uri,
                                                         const common::http::http_request& request) {
   http_callbacks_t::const_iterator it = httpCallbacks_.find(uri);
   if (it == httpCallbacks_.end()) {
@@ -181,7 +176,8 @@ bool HttpServerHandler::tryToHandleAsRegisteredCallback(HttpClient* hclient, con
   return callback->handleRequest(hclient, nullptr, request, info());
 }
 
-bool HttpServerHandler::tryAuthenticateIfNeeded(HttpClient* hclient, const char* extra_header,
+bool HttpServerHandler::tryAuthenticateIfNeeded(HttpClient* hclient,
+                                                const char* extra_header,
                                                 const common::http::http_request& request) {
   if (!authChecker_) {
     return false;
@@ -213,8 +209,9 @@ bool HttpServerHandler::tryAuthenticateIfNeeded(HttpClient* hclient, const char*
     }
 
     common::Error err = hclient->send_error(common::http::HP_1_1, common::http::HS_UNAUTHORIZED,
-                                          "WWW-Authenticate: " AUTH_BASIC_METHOD " realm=User or password incorrect, try again",
-                                          nullptr, true, info());
+                                            "WWW-Authenticate: " AUTH_BASIC_METHOD
+                                            " realm=User or password incorrect, try again",
+                                            nullptr, true, info());
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
     }
@@ -222,7 +219,8 @@ bool HttpServerHandler::tryAuthenticateIfNeeded(HttpClient* hclient, const char*
   }
 
   common::Error err = hclient->send_error(common::http::HP_1_1, common::http::HS_UNAUTHORIZED,
-                                          "WWW-Authenticate: " AUTH_BASIC_METHOD " realm=Private page please authenticate",
+                                          "WWW-Authenticate: " AUTH_BASIC_METHOD
+                                          " realm=Private page please authenticate",
                                           nullptr, true, info());
   if (err && err->isError()) {
     DEBUG_MSG_ERROR(err);
@@ -231,7 +229,7 @@ bool HttpServerHandler::tryAuthenticateIfNeeded(HttpClient* hclient, const char*
   return true;
 }
 
-void HttpServerHandler::processReceived(HttpClient *hclient, const char* request, size_t req_len) {
+void HttpServerHandler::processReceived(HttpClient* hclient, const char* request, size_t req_len) {
   common::http::http_request hrequest;
   std::string request_str(request, req_len);
   std::pair<common::http::http_status, common::Error> result =
@@ -260,20 +258,21 @@ void HttpServerHandler::processReceived(HttpClient *hclient, const char* request
   handleRequest(hclient, hrequest, isKeepAlive | isProxy);
 }
 
-void HttpServerHandler::handleRequest(HttpClient *hclient,
-                                      const common::http::http_request& hrequest, bool notClose) {
+void HttpServerHandler::handleRequest(HttpClient* hclient,
+                                      const common::http::http_request& hrequest,
+                                      bool notClose) {
   common::uri::Upath path = hrequest.path();
 
   if (tryAuthenticateIfNeeded(hclient, nullptr, hrequest)) {
-      goto cleanup;
+    goto cleanup;
   }
 
   if (tryToHandleAsRegisteredCallback(hclient, path.path(), hrequest)) {
-      goto cleanup;
+    goto cleanup;
   }
 
   if (fshandler_->handleRequest(hclient, nullptr, hrequest, info())) {
-      goto cleanup;
+    goto cleanup;
   }
 
   NOTREACHED();
@@ -285,20 +284,19 @@ cleanup:
   }
 }
 
-HttpServerHandler::HttpServerHandler(const HttpServerInfo& info, IHttpAuthObserver *observer)
-  : fshandler_(IHttpCallback::createHttpCallback(file_system)),
-  authChecker_(observer), info_(info) {
+HttpServerHandler::HttpServerHandler(const HttpServerInfo& info, IHttpAuthObserver* observer)
+    : fshandler_(IHttpCallback::createHttpCallback(file_system)),
+      authChecker_(observer),
+      info_(info) {
   CHECK(fshandler_);
 }
 
-HttpServerHandler::~HttpServerHandler() {
-}
+HttpServerHandler::~HttpServerHandler() {}
 
-Http2ServerHandler::Http2ServerHandler(const HttpServerInfo& info, IHttpAuthObserver * observer)
-    : HttpServerHandler(info, observer) {
-}
+Http2ServerHandler::Http2ServerHandler(const HttpServerInfo& info, IHttpAuthObserver* observer)
+    : HttpServerHandler(info, observer) {}
 
-void Http2ServerHandler::processReceived(HttpClient *hclient, const char* request, size_t req_len) {
+void Http2ServerHandler::processReceived(HttpClient* hclient, const char* request, size_t req_len) {
   if (common::http2::is_preface_data(request, req_len)) {
     Http2Client* h2client = dynamic_cast<Http2Client*>(hclient);
     CHECK(h2client);
@@ -316,7 +314,8 @@ void Http2ServerHandler::processReceived(HttpClient *hclient, const char* reques
   }
 }
 
-void Http2ServerHandler::handleHttp2Request(Http2Client* h2client, const char* request,
+void Http2ServerHandler::handleHttp2Request(Http2Client* h2client,
+                                            const char* request,
                                             uint32_t req_len) {
   const std::string hexstr = common::HexEncode(request, req_len, false);
 

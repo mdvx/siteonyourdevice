@@ -52,7 +52,8 @@ enum wsFrameType {  // errors starting from 0xF0
 };
 
 size_t getPayloadLength(const uint8_t* inputFrame,
-                        size_t inputLength, uint8_t* payloadFieldExtraBytes,
+                        size_t inputLength,
+                        uint8_t* payloadFieldExtraBytes,
                         enum wsFrameType* frameType) {
   size_t payloadLength = inputFrame[1] & 0x7F;
   *payloadFieldExtraBytes = 0;
@@ -87,34 +88,36 @@ size_t getPayloadLength(const uint8_t* inputFrame,
   return payloadLength;
 }
 
-wsFrameType wsParseInputFrame(const uint8_t* inputFrame, size_t inputLength, uint8_t** dataPtr,
-                              size_t *dataLength) {
+wsFrameType wsParseInputFrame(const uint8_t* inputFrame,
+                              size_t inputLength,
+                              uint8_t** dataPtr,
+                              size_t* dataLength) {
   DCHECK(inputFrame && inputLength);
   if (inputLength < 2)
     return WS_INCOMPLETE_FRAME;
   if ((inputFrame[0] & 0x70) != 0x0)  // checks extensions off
     return WS_ERROR_FRAME;
   if ((inputFrame[0] & 0x80) != 0x80)  // we haven't continuation frames
-    return WS_ERROR_FRAME;  // so, fin flag must be set
+    return WS_ERROR_FRAME;             // so, fin flag must be set
   if ((inputFrame[1] & 0x80) != 0x80)  // checks masking bit
     return WS_ERROR_FRAME;
   uint8_t opcode = inputFrame[0] & 0x0F;
   if (opcode == WS_TEXT_FRAME || opcode == WS_BINARY_FRAME || opcode == WS_CLOSING_FRAME ||
       opcode == WS_PING_FRAME || opcode == WS_PONG_FRAME) {
-      wsFrameType frameType = (wsFrameType)opcode;
-      uint8_t payloadFieldExtraBytes = 0;
-      size_t payloadLength = getPayloadLength(inputFrame, inputLength, &payloadFieldExtraBytes,
-                                              &frameType);
+    wsFrameType frameType = (wsFrameType)opcode;
+    uint8_t payloadFieldExtraBytes = 0;
+    size_t payloadLength =
+        getPayloadLength(inputFrame, inputLength, &payloadFieldExtraBytes, &frameType);
     if (payloadLength > 0) {
       if (payloadLength + 6 + payloadFieldExtraBytes > inputLength)  // 4-maskingKey, 2-header
         return WS_INCOMPLETE_FRAME;
 
-      uint8_t *maskingKey = const_cast<uint8_t *>(&inputFrame[2 + payloadFieldExtraBytes]);
+      uint8_t* maskingKey = const_cast<uint8_t*>(&inputFrame[2 + payloadFieldExtraBytes]);
       DCHECK(payloadLength == inputLength - 6 - payloadFieldExtraBytes);
-      *dataPtr = const_cast<uint8_t *>(&inputFrame[2 + payloadFieldExtraBytes + 4]);
+      *dataPtr = const_cast<uint8_t*>(&inputFrame[2 + payloadFieldExtraBytes + 4]);
       *dataLength = payloadLength;
       for (size_t i = 0; i < *dataLength; i++) {
-        (*dataPtr)[i] = (*dataPtr)[i] ^ maskingKey[i%4];
+        (*dataPtr)[i] = (*dataPtr)[i] ^ maskingKey[i % 4];
       }
     }
 
@@ -124,7 +127,10 @@ wsFrameType wsParseInputFrame(const uint8_t* inputFrame, size_t inputLength, uin
   return WS_ERROR_FRAME;
 }
 
-void wsMakeFrame(const uint8_t* data,  size_t dataLength, uint8_t* outFrame, size_t* outLength,
+void wsMakeFrame(const uint8_t* data,
+                 size_t dataLength,
+                 uint8_t* outFrame,
+                 size_t* outLength,
                  wsFrameType frameType) {
   DCHECK(outFrame && *outLength);
   DCHECK_LT(frameType, 0x10);
@@ -152,7 +158,7 @@ void wsMakeFrame(const uint8_t* data,  size_t dataLength, uint8_t* outFrame, siz
   }
 
   memcpy(&outFrame[*outLength], data, dataLength);
-  *outLength+= dataLength;
+  *outLength += dataLength;
 }
 
 }  // namespace
@@ -161,15 +167,15 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace websocket {
 
-WebSocketServerHandler::WebSocketServerHandler(const HttpServerInfo &info)
-  : Http2ServerHandler(info, nullptr) {
-}
+WebSocketServerHandler::WebSocketServerHandler(const HttpServerInfo& info)
+    : Http2ServerHandler(info, nullptr) {}
 
-void WebSocketServerHandler::processReceived(http::HttpClient* hclient, const char* request,
+void WebSocketServerHandler::processReceived(http::HttpClient* hclient,
+                                             const char* request,
                                              size_t req_len) {
-  uint8_t *data = nullptr;
+  uint8_t* data = nullptr;
   size_t dataSize = 0;
-  wsFrameType frame_type = wsParseInputFrame((const uint8_t *)request, req_len, &data, &dataSize);
+  wsFrameType frame_type = wsParseInputFrame((const uint8_t*)request, req_len, &data, &dataSize);
 
   if (frame_type == WS_ERROR_FRAME) {
     Http2ServerHandler::processReceived(hclient, request, req_len);
@@ -196,7 +202,7 @@ void WebSocketServerHandler::processReceived(http::HttpClient* hclient, const ch
     ssize_t nwrite = 0;
     common::Error err = hclient->write((const char*)odata, frameSize, &nwrite);
     if (err && err->isError()) {
-        DEBUG_MSG_ERROR(err);
+      DEBUG_MSG_ERROR(err);
     }
   } else if (frame_type == WS_BINARY_FRAME) {
     size_t frameSize = BUF_LEN;
@@ -226,7 +232,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient* hclient,
   const common::http::http_protocols protocol = request.protocol();
   if (request.method() != common::http::http_method::HM_GET) {
     common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST, nullptr,
-                                                "Bad Request", notClose, info());
+                                            "Bad Request", notClose, info());
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
     }
@@ -237,21 +243,19 @@ void WebSocketServerHandler::handleRequest(http::HttpClient* hclient,
   const std::string lconnectionField = common::StringToLowerASCII(connectionField.value);
   bool isUpgrade = lconnectionField.find_first_of("upgrade") != std::string::npos;
   if (!isUpgrade) {
-    common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST,
-                                            nullptr, "Bad Request",
-                                            notClose, info());
+    common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST, nullptr,
+                                            "Bad Request", notClose, info());
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
     }
-      return;
+    return;
   }
 
   common::http::header_t upgradeField = request.findHeaderByKey("Upgrade", false);
   bool isWebSocket = common::EqualsASCII(upgradeField.value, "websocket", false);
   if (!isWebSocket) {
-    common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST,
-                                            nullptr, "Bad Request",
-                                            notClose, info());
+    common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST, nullptr,
+                                            "Bad Request", notClose, info());
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
     }
@@ -260,9 +264,8 @@ void WebSocketServerHandler::handleRequest(http::HttpClient* hclient,
 
   common::http::header_t key_field = request.findHeaderByKey("Sec-WebSocket-Key", false);
   if (!key_field.isValid()) {
-    common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST,
-                                            nullptr, "Bad Request",
-                                            notClose, info());
+    common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST, nullptr,
+                                            "Bad Request", notClose, info());
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
     }
@@ -271,9 +274,8 @@ void WebSocketServerHandler::handleRequest(http::HttpClient* hclient,
 
   common::http::header_t web_vers_field = request.findHeaderByKey("Sec-WebSocket-Version", false);
   if (!web_vers_field.isValid()) {
-    common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST,
-                                            nullptr, "Bad Request",
-                                            notClose, info());
+    common::Error err = hclient->send_error(protocol, common::http::HS_BAD_REQUEST, nullptr,
+                                            "Bad Request", notClose, info());
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
     }
@@ -290,14 +292,14 @@ void WebSocketServerHandler::handleRequest(http::HttpClient* hclient,
 
   common::buffer_t bin_sha1 = MAKE_buffer_t_SIZE(sha_bin_ptr, HASH_LENGTH);
   common::buffer_t enc_accept = common::utils::base64::encode64(bin_sha1);
-  std::string header_up = common::MemSPrintf("Upgrade: websocket\r\n"
-                                             "Connection: Upgrade\r\n"
-                                             "Sec-WebSocket-Accept: %s",
-                                             common::ConvertToString(enc_accept));
-  common::Error err = hclient->send_headers(protocol, common::http::HS_SWITCH_PROTOCOL,
-                                            header_up.c_str(), nullptr,
-                                            nullptr, nullptr,
-                                            notClose, info());
+  std::string header_up = common::MemSPrintf(
+      "Upgrade: websocket\r\n"
+      "Connection: Upgrade\r\n"
+      "Sec-WebSocket-Accept: %s",
+      common::ConvertToString(enc_accept));
+  common::Error err =
+      hclient->send_headers(protocol, common::http::HS_SWITCH_PROTOCOL, header_up.c_str(), nullptr,
+                            nullptr, nullptr, notClose, info());
   if (err && err->isError()) {
     DEBUG_MSG_ERROR(err);
   }

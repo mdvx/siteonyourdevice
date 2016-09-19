@@ -24,8 +24,7 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-class RelayClient
-        : public http::Http2Client {
+class RelayClient : public http::Http2Client {
  public:
   RelayClient(tcp::ITcpLoop* server, const common::net::socket_info& info);
   const char* ClassName() const;
@@ -33,32 +32,32 @@ class RelayClient
 
 class ProxyRelayClient;
 
-class RelayClientEx
-        : public RelayClient {
+class RelayClientEx : public RelayClient {
  public:
-  RelayClientEx(tcp::ITcpLoop* server, const common::net::socket_info& info,
+  RelayClientEx(tcp::ITcpLoop* server,
+                const common::net::socket_info& info,
                 const common::net::HostAndPort& externalHost);
   const char* ClassName() const;
 
   common::net::HostAndPort externalHost() const;
 
-  ProxyRelayClient *eclient() const;
+  ProxyRelayClient* eclient() const;
   void setEclient(ProxyRelayClient* client);
 
  private:
   const common::net::HostAndPort external_host_;
-  ProxyRelayClient * eclient_;
+  ProxyRelayClient* eclient_;
 };
 
-class ProxyRelayClient
-        : public tcp::TcpClient {
+class ProxyRelayClient : public tcp::TcpClient {
  public:
-  ProxyRelayClient(tcp::ITcpLoop* server, const common::net::socket_info& info,
+  ProxyRelayClient(tcp::ITcpLoop* server,
+                   const common::net::socket_info& info,
                    RelayClientEx* relay);
-  RelayClientEx * relay() const;
+  RelayClientEx* relay() const;
 
  private:
-  RelayClientEx * const relay_;
+  RelayClientEx* const relay_;
 };
 
 }  // namespace inner

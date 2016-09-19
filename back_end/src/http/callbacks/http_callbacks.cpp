@@ -30,7 +30,7 @@ std::string ConvertToString(fasto::siteonyourdevice::HCTypes t) {
   return fasto::siteonyourdevice::HCallbackTypes[t];
 }
 
-template<>
+template <>
 fasto::siteonyourdevice::HCTypes ConvertFromString(const std::string& text) {
   for (uint32_t i = 0; i < SIZEOFMASS(fasto::siteonyourdevice::HCallbackTypes); ++i) {
     if (text == fasto::siteonyourdevice::HCallbackTypes[i]) {
@@ -47,11 +47,9 @@ fasto::siteonyourdevice::HCTypes ConvertFromString(const std::string& text) {
 namespace fasto {
 namespace siteonyourdevice {
 
-IHttpCallback::IHttpCallback() {
-}
+IHttpCallback::IHttpCallback() {}
 
-IHttpCallback::~IHttpCallback() {
-}
+IHttpCallback::~IHttpCallback() {}
 
 common::shared_ptr<IHttpCallback> IHttpCallback::createHttpCallback(HCTypes type) {
   if (type == file_system) {
@@ -77,9 +75,7 @@ common::shared_ptr<IHttpCallback> IHttpCallback::createHttpCallback(const std::s
   }
 }
 
-HttpCallbackUrl::HttpCallbackUrl(HCTypes type)
-  : IHttpCallback(), type_(type) {
-}
+HttpCallbackUrl::HttpCallbackUrl(HCTypes type) : IHttpCallback(), type_(type) {}
 
 HCTypes HttpCallbackUrl::type() const {
   return type_;

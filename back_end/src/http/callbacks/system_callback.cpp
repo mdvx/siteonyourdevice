@@ -34,7 +34,7 @@ std::string ConvertToString(fasto::siteonyourdevice::HSCTypes t) {
   return fasto::siteonyourdevice::HSystemCallbackTypes[t];
 }
 
-template<>
+template <>
 fasto::siteonyourdevice::HSCTypes ConvertFromString(const std::string& text) {
   for (uint32_t i = 0; i < SIZEOFMASS(fasto::siteonyourdevice::HSystemCallbackTypes); ++i) {
     if (text == fasto::siteonyourdevice::HSystemCallbackTypes[i]) {
@@ -51,21 +51,20 @@ fasto::siteonyourdevice::HSCTypes ConvertFromString(const std::string& text) {
 namespace fasto {
 namespace siteonyourdevice {
 
-HttpSystemCallback::HttpSystemCallback()
-  : HttpCallbackUrl(system) {
-}
+HttpSystemCallback::HttpSystemCallback() : HttpCallbackUrl(system) {}
 
-bool HttpSystemCallback::handleRequest(http::HttpClient* hclient, const char* extra_header,
+bool HttpSystemCallback::handleRequest(http::HttpClient* hclient,
+                                       const char* extra_header,
                                        const common::http::http_request& request,
                                        const HttpServerInfo& info) {
   return false;
 }
 
 HttpSystemShutdownCallback::HttpSystemShutdownCallback(HSCTypes type)
-  : HttpCallbackUrl(system), type_(type) {
-}
+    : HttpCallbackUrl(system), type_(type) {}
 
-bool HttpSystemShutdownCallback::handleRequest(http::HttpClient* hclient, const char* extra_header,
+bool HttpSystemShutdownCallback::handleRequest(http::HttpClient* hclient,
+                                               const char* extra_header,
                                                const common::http::http_request& request,
                                                const HttpServerInfo& info) {
   // keep alive
@@ -88,8 +87,8 @@ bool HttpSystemShutdownCallback::handleRequest(http::HttpClient* hclient, const 
   if (err && err->isError()) {
     DEBUG_MSG_ERROR(err);
     std::string cause = common::MemSPrintf("Shutdown failed(%s).", err->description());
-    err = hclient->send_error(protocol, common::http::HS_NOT_ALLOWED, extra_header,
-                              cause.c_str(), isKeepAlive, info);
+    err = hclient->send_error(protocol, common::http::HS_NOT_ALLOWED, extra_header, cause.c_str(),
+                              isKeepAlive, info);
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);
     }

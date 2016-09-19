@@ -32,23 +32,30 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace http {
 
-class HttpClient
-  : public tcp::TcpClient {
+class HttpClient : public tcp::TcpClient {
  public:
   HttpClient(tcp::ITcpLoop* server, const common::net::socket_info& info);
 
   common::Error send_ok(common::http::http_protocols protocol,
-                        const char* extra_header, const char* text,
-                        bool is_keep_alive, const HttpServerInfo& info) WARN_UNUSED_RESULT;
+                        const char* extra_header,
+                        const char* text,
+                        bool is_keep_alive,
+                        const HttpServerInfo& info) WARN_UNUSED_RESULT;
   virtual common::Error send_error(common::http::http_protocols protocol,
-                                   common::http::http_status status, const char* extra_header,
-                                   const char* text, bool is_keep_alive,
+                                   common::http::http_status status,
+                                   const char* extra_header,
+                                   const char* text,
+                                   bool is_keep_alive,
                                    const HttpServerInfo& info) WARN_UNUSED_RESULT;
   virtual common::Error send_file_by_fd(common::http::http_protocols protocol,
-                                        int fdesc, off_t size) WARN_UNUSED_RESULT;
+                                        int fdesc,
+                                        off_t size) WARN_UNUSED_RESULT;
   virtual common::Error send_headers(common::http::http_protocols protocol,
-                                     common::http::http_status status, const char* extra_header,
-                                     const char* mime_type, off_t* length, time_t* mod,
+                                     common::http::http_status status,
+                                     const char* extra_header,
+                                     const char* mime_type,
+                                     off_t* length,
+                                     time_t* mod,
                                      bool is_keep_alive,
                                      const HttpServerInfo& info) WARN_UNUSED_RESULT;
 
@@ -61,8 +68,7 @@ class HttpClient
   bool isAuth_;
 };
 
-class Http2Client
-  : public HttpClient {
+class Http2Client : public HttpClient {
  public:
   typedef StreamSPtr stream_t;
   typedef std::vector<stream_t> streams_t;
@@ -70,14 +76,20 @@ class Http2Client
   Http2Client(tcp::ITcpLoop* server, const common::net::socket_info& info);
 
   virtual common::Error send_error(common::http::http_protocols protocol,
-                                   common::http::http_status status, const char* extra_header,
-                                   const char* text, bool is_keep_alive,
+                                   common::http::http_status status,
+                                   const char* extra_header,
+                                   const char* text,
+                                   bool is_keep_alive,
                                    const HttpServerInfo& info) WARN_UNUSED_RESULT;
   virtual common::Error send_file_by_fd(common::http::http_protocols protocol,
-                                        int fdesc, off_t size) WARN_UNUSED_RESULT;
+                                        int fdesc,
+                                        off_t size) WARN_UNUSED_RESULT;
   virtual common::Error send_headers(common::http::http_protocols protocol,
-                                     common::http::http_status status, const char* extra_header,
-                                     const char* mime_type, off_t* length, time_t* mod,
+                                     common::http::http_status status,
+                                     const char* extra_header,
+                                     const char* mime_type,
+                                     off_t* length,
+                                     time_t* mod,
                                      bool is_keep_alive,
                                      const HttpServerInfo& info) WARN_UNUSED_RESULT;
 

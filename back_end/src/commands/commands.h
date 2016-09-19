@@ -40,13 +40,15 @@
 #define SUCCESS_COMMAND "ok"
 
 #define MAX_COMMAND_SIZE 1024
-#define IS_EQUAL_COMMAND(BUF, CMD) BUF && memcmp(BUF, CMD, sizeof(CMD) - 1) == 0
+#define IS_EQUAL_COMMAND(BUF, CMD) BUF&& memcmp(BUF, CMD, sizeof(CMD) - 1) == 0
 
 #define CID_FMT PRIu8
 
 #define GENERATE_FMT(CMD, CMD_FMT) "%" CID_FMT " %s " CMD " " CMD_FMT END_OF_COMMAND
-#define GENEATATE_SUCCESS_FMT(CMD, CMD_FMT) "%" CID_FMT " %s " SUCCESS_COMMAND " " CMD " " CMD_FMT END_OF_COMMAND
-#define GENEATATE_FAIL_FMT(CMD, CMD_FMT) "%" CID_FMT " %s " FAIL_COMMAND " " CMD " " CMD_FMT END_OF_COMMAND
+#define GENEATATE_SUCCESS_FMT(CMD, CMD_FMT) \
+  "%" CID_FMT " %s " SUCCESS_COMMAND " " CMD " " CMD_FMT END_OF_COMMAND
+#define GENEATATE_FAIL_FMT(CMD, CMD_FMT) \
+  "%" CID_FMT " %s " FAIL_COMMAND " " CMD " " CMD_FMT END_OF_COMMAND
 
 #define REQUEST_COMMAND 0
 #define RESPONCE_COMMAND 1
@@ -88,32 +90,20 @@ namespace siteonyourdevice {
 typedef std::string cmd_seq_t;
 typedef uint8_t cmd_id_t;
 
-template<cmd_id_t cmd_id>
+template <cmd_id_t cmd_id>
 class InnerCmd {
  public:
-  InnerCmd(cmd_seq_t id, const std::string& cmd)
-    : id_(id), cmd_(cmd) {
-  }
+  InnerCmd(cmd_seq_t id, const std::string& cmd) : id_(id), cmd_(cmd) {}
 
-  static cmd_id_t type() {
-    return cmd_id;
-  }
+  static cmd_id_t type() { return cmd_id; }
 
-  cmd_seq_t id() const {
-    return id_;
-  }
+  cmd_seq_t id() const { return id_; }
 
-  const std::string& cmd() const {
-    return cmd_;
-  }
+  const std::string& cmd() const { return cmd_; }
 
-  const char* data() const {
-    return cmd_.c_str();
-  }
+  const char* data() const { return cmd_.c_str(); }
 
-  size_t size() const {
-    return cmd_.size();
-  }
+  size_t size() const { return cmd_.size(); }
 
  private:
   const cmd_seq_t id_;

@@ -25,28 +25,24 @@
 namespace fasto {
 namespace siteonyourdevice {
 
-enum HSCTypes {
-  system_shutdown,
-  system_logout,
-  system_reboot
-};
+enum HSCTypes { system_shutdown, system_logout, system_reboot };
 
-const std::string HSystemCallbackTypes[] = { "shutdown", "logout", "reboot" };
+const std::string HSystemCallbackTypes[] = {"shutdown", "logout", "reboot"};
 
-class HttpSystemCallback
-  : public HttpCallbackUrl {
+class HttpSystemCallback : public HttpCallbackUrl {
  public:
   HttpSystemCallback();
-  virtual bool handleRequest(http::HttpClient* hclient, const char* extra_header,
+  virtual bool handleRequest(http::HttpClient* hclient,
+                             const char* extra_header,
                              const common::http::http_request& request,
                              const HttpServerInfo& info);
 };
 
-class HttpSystemShutdownCallback
-  : public HttpCallbackUrl {
+class HttpSystemShutdownCallback : public HttpCallbackUrl {
  public:
   explicit HttpSystemShutdownCallback(HSCTypes type);
-  virtual bool handleRequest(http::HttpClient* hclient, const char* extra_header,
+  virtual bool handleRequest(http::HttpClient* hclient,
+                             const char* extra_header,
                              const common::http::http_request& request,
                              const HttpServerInfo& info);
 
@@ -60,5 +56,5 @@ common::shared_ptr<IHttpCallback> createSystemHttpCallback(const std::string& na
 }  // namespace fasto
 
 namespace common {
-    std::string ConvertToString(fasto::siteonyourdevice::HSCTypes t);
+std::string ConvertToString(fasto::siteonyourdevice::HSCTypes t);
 }  // namespace common

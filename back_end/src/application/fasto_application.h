@@ -29,8 +29,8 @@ namespace application {
 class IFastoApplicationImpl {
  public:
   IFastoApplicationImpl(int argc, char* argv[]);
-  virtual int preExec() = 0;  // EXIT_FAILURE, EXIT_SUCCESS
-  virtual int exec() = 0;  // EXIT_FAILURE, EXIT_SUCCESS
+  virtual int preExec() = 0;   // EXIT_FAILURE, EXIT_SUCCESS
+  virtual int exec() = 0;      // EXIT_FAILURE, EXIT_SUCCESS
   virtual int postExec() = 0;  // EXIT_FAILURE, EXIT_SUCCESS
 
   virtual void exit(int result) = 0;

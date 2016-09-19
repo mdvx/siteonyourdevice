@@ -24,7 +24,7 @@
 
 namespace common {
 namespace thread {
-template<typename type_t>
+template <typename type_t>
 class EventThread;
 }
 }
@@ -39,8 +39,7 @@ class NetworkController;
 
 namespace application {
 
-class FastoRemoteApplication
-        : public IFastoApplicationImpl {
+class FastoRemoteApplication : public IFastoApplicationImpl {
  public:
   FastoRemoteApplication(int argc, char* argv[]);
   virtual ~FastoRemoteApplication();

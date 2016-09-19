@@ -27,6 +27,7 @@
 #include "common/logger.h"
 #include "common/utils.h"
 #include "common/file_system.h"
+#include "common/convert2string.h"
 
 #include "http_server_host.h"
 #include "server_config.h"

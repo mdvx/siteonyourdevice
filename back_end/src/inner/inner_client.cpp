@@ -22,9 +22,8 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-InnerClient::InnerClient(tcp::ITcpLoop *server, const common::net::socket_info& info)
-  : TcpClient(server, info) {
-}
+InnerClient::InnerClient(tcp::ITcpLoop* server, const common::net::socket_info& info)
+    : TcpClient(server, info) {}
 
 const char* InnerClient::ClassName() const {
   return "InnerClient";
