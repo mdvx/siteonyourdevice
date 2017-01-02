@@ -20,15 +20,15 @@
 
 #include <string>
 
-#include "common/third-party/json-c/json-c/json.h"
+#include "third-party/json-c/json-c/json.h"
 
-#include "common/error.h"
-#include "common/logger.h"
-#include "common/net/net.h"
-#include "common/system_info/cpu_info.h"
-#include "common/system_info/system_info.h"
-#include "common/thread/event_bus.h"
-#include "common/convert2string.h"
+#include <common/error.h>
+#include <common/logger.h>
+#include <common/net/net.h>
+#include <common/system_info/cpu_info.h>
+#include <common/system_info/system_info.h>
+#include <common/thread/event_bus.h>
+#include <common/convert2string.h>
 
 #include "network/network_events.h"
 

@@ -20,9 +20,9 @@
 
 #include <string>
 
-#include "common/thread/event_bus.h"
-#include "common/logger.h"
-#include "common/net/net.h"
+#include <common/thread/event_bus.h>
+#include <common/logger.h>
+#include <common/net/net.h>
 
 #include "network/network_events.h"
 

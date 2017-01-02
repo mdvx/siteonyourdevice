@@ -22,10 +22,10 @@
 
 #include "inih/ini.h"
 
-#include "common/convert2string.h"
-#include "common/file_system.h"
-#include "common/logger.h"
-#include "common/utils.h"
+#include <common/convert2string.h>
+#include <common/file_system.h>
+#include <common/logger.h>
+#include <common/utils.h>
 
 #include "inner/http_inner_server.h"
 #include "inner/http_inner_server_handler.h"
@@ -357,8 +357,8 @@ void NetworkController::readConfig() {
 
   // try to parse settings file
   if (ini_parse(path, ini_handler_fasto, &config) < 0) {
-    DEBUG_MSG_FORMAT<256>(common::logging::L_INFO, "Can't load config '%s', use default settings.",
-                          path);
+    DEBUG_MSG_FORMAT(common::logging::L_INFO, "Can't load config '%s', use default settings.",
+                     path);
   }
 
   setConfig(config);

@@ -21,11 +21,11 @@
 #include <utility>
 #include <string>
 
-#include "common/utils.h"
-#include "common/string_util.h"
-#include "common/logger.h"
-#include "common/net/net.h"
-#include "common/convert2string.h"
+#include <common/utils.h>
+#include <common/string_util.h>
+#include <common/logger.h>
+#include <common/net/net.h>
+#include <common/convert2string.h>
 
 #include "http/http_client.h"
 
@@ -320,7 +320,7 @@ void Http2ServerHandler::handleHttp2Request(Http2Client* h2client,
   const std::string hexstr = common::HexEncode(request, req_len, false);
 
   common::http2::frames_t frames = common::http2::parse_frames(request, req_len);
-  DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "frame_header_data hex: %s", hexstr);
+  DEBUG_MSG_FORMAT(common::logging::L_INFO, "frame_header_data hex: %s", hexstr);
   h2client->processFrames(frames);
 
   common::http2::frames_t headers_frames =

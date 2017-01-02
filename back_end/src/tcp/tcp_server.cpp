@@ -21,8 +21,8 @@
 
 #include "tcp/tcp_server.h"
 
-#include "common/logger.h"
-#include "common/multi_threading/types.h"
+#include <common/logger.h>
+#include <common/thread/types.h>
 
 #include "tcp/tcp_client.h"
 
@@ -54,8 +54,8 @@ struct SigIgnInit {
   }
 } sig_init;
 
-typedef common::multi_threading::unique_lock<common::multi_threading::mutex_t> lock_t;
-common::multi_threading::mutex_t g_exists_loops_mutex_;
+typedef common::thread::unique_lock<common::thread::mutex> lock_t;
+common::thread::mutex g_exists_loops_mutex_;
 std::vector<fasto::siteonyourdevice::tcp::ITcpLoop*> g_exists_loops_;
 
 }  // namespace
@@ -112,10 +112,10 @@ void ITcpLoop::unregisterClient(TcpClient* client) {
 
   client->server_ = nullptr;
   clients_.erase(std::remove(clients_.begin(), clients_.end(), client), clients_.end());
-  DEBUG_MSG_FORMAT<512>(common::logging::L_INFO,
-                        "Successfully unregister client[%s], from server[%s], %" PRIuS
-                        " client(s) connected.",
-                        client->formatedName(), formatedName(), clients_.size());
+  DEBUG_MSG_FORMAT(common::logging::L_INFO,
+                   "Successfully unregister client[%s], from server[%s], %" PRIuS
+                   " client(s) connected.",
+                   client->formatedName(), formatedName(), clients_.size());
 }
 
 void ITcpLoop::registerClient(TcpClient* client) {
@@ -133,10 +133,10 @@ void ITcpLoop::registerClient(TcpClient* client) {
 
   client->server_ = this;
   clients_.push_back(client);
-  DEBUG_MSG_FORMAT<512>(common::logging::L_INFO,
-                        "Successfully connected with client[%s], from server[%s], %" PRIuS
-                        " client(s) connected.",
-                        client->formatedName(), formatedName(), clients_.size());
+  DEBUG_MSG_FORMAT(common::logging::L_INFO,
+                   "Successfully connected with client[%s], from server[%s], %" PRIuS
+                   " client(s) connected.",
+                   client->formatedName(), formatedName(), clients_.size());
 }
 
 void ITcpLoop::closeClient(TcpClient* client) {
@@ -147,10 +147,10 @@ void ITcpLoop::closeClient(TcpClient* client) {
     observer_->closed(client);
   }
   clients_.erase(std::remove(clients_.begin(), clients_.end(), client), clients_.end());
-  DEBUG_MSG_FORMAT<512>(common::logging::L_INFO,
-                        "Successfully disconnected client[%s], from server[%s], %" PRIuS
-                        " client(s) connected.",
-                        client->formatedName(), formatedName(), clients_.size());
+  DEBUG_MSG_FORMAT(common::logging::L_INFO,
+                   "Successfully disconnected client[%s], from server[%s], %" PRIuS
+                   " client(s) connected.",
+                   client->formatedName(), formatedName(), clients_.size());
 }
 
 timer_id_t ITcpLoop::createTimer(double sec, double repeat) {

@@ -16,8 +16,8 @@
     along with SiteOnYourDevice.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "common/file_system.h"
-#include "common/logger.h"
+#include <common/file_system.h>
+#include <common/logger.h>
 
 #include "application/fasto_application.h"
 

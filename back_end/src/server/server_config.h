@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "common/net/types.h"
+#include <common/net/types.h>
 
 #define INNER_HOST_PORT 8020
 #define HOST_PORT 8040

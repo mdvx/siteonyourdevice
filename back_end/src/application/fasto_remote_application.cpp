@@ -20,7 +20,7 @@
 
 #include <stdlib.h>
 
-#include "common/thread/event_bus.h"
+#include <common/thread/event_bus.h>
 
 #include "network/network_controller.h"
 #include "network/network_event_handler.h"

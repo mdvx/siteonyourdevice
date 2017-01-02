@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "common/event.h"
+#include <common/event.h>
 
 #define NETWORK_EVENT_LOOP_ID 1
 

@@ -22,9 +22,9 @@
 #include <string>
 #include <functional>
 
-#include "common/patterns/crtp_pattern.h"
+#include <common/patterns/crtp_pattern.h>
 
-#include "common/net/socket_tcp.h"
+#include <common/net/socket_tcp.h>
 
 #include "event_loop.h"
 

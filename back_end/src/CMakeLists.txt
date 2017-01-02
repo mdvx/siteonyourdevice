@@ -137,7 +137,6 @@ IF(USE_PTHREAD)
   SET(${PLATFORM_LIBRARIES} ${PLATFORM_LIBRARIES} pthread)
 ENDIF(USE_PTHREAD)
 
-ADD_SUBDIRECTORY(common)
 ADD_SUBDIRECTORY(third-party/libev)
 ADD_SUBDIRECTORY(third-party/ini)
 SET(INCLUDE_DIRS ${INCLUDE_DIRS} ${CMAKE_CURRENT_LIST_DIR} third-party/libev/src third-party/ini third-party/sds)

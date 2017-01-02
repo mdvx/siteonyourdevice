@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "common/smart_ptr.h"
-#include "common/thread/thread.h"
+#include <common/smart_ptr.h>
+#include <common/thread/thread.h>
 
 namespace fasto {
 namespace siteonyourdevice {

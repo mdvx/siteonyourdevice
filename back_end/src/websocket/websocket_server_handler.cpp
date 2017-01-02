@@ -24,13 +24,13 @@
 #include <arpa/inet.h>
 #endif
 
-#include "common/http/http.h"
-#include "common/string_util.h"
-#include "common/sprintf.h"
-#include "common/hash/sha1.h"
-#include "common/utils.h"
-#include "common/logger.h"
-#include "common/convert2string.h"
+#include <common/http/http.h>
+#include <common/string_util.h>
+#include <common/sprintf.h>
+#include <common/hash/sha1.h>
+#include <common/utils.h>
+#include <common/logger.h>
+#include <common/convert2string.h>
 
 #include "websocket/websocket_client.h"
 
@@ -290,7 +290,7 @@ void WebSocketServerHandler::handleRequest(http::HttpClient* hclient,
   sha1_write(&s, sec_key.c_str(), sec_key.length());
   uint8_t* sha_bin_ptr = sha1_result(&s);
 
-  common::buffer_t bin_sha1 = MAKE_buffer_t_SIZE(sha_bin_ptr, HASH_LENGTH);
+  common::buffer_t bin_sha1 = MAKE_BUFFER_SIZE(sha_bin_ptr, HASH_LENGTH);
   common::buffer_t enc_accept = common::utils::base64::encode64(bin_sha1);
   std::string header_up = common::MemSPrintf(
       "Upgrade: websocket\r\n"

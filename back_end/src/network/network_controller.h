@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "common/multi_threading/types.h"
+#include <common/thread/types.h>
 
 #include <string>
 

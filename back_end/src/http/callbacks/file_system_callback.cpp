@@ -24,9 +24,9 @@
 
 #include <string>
 
-#include "common/string_util.h"
-#include "common/http/http.h"
-#include "common/logger.h"
+#include <common/string_util.h>
+#include <common/http/http.h>
+#include <common/logger.h>
 
 #include "http/http_client.h"
 
@@ -40,7 +40,7 @@ bool HttpFileSystemCallback::handleRequest(http::HttpClient* hclient,
                                            const common::http::http_request& request,
                                            const HttpServerInfo& info) {
   std::string requeststr = common::ConvertToString(request);
-  DEBUG_MSG_FORMAT<1024>(common::logging::L_INFO, "handleRequest:\n%s", requeststr);
+  DEBUG_MSG_FORMAT(common::logging::L_INFO, "handleRequest:\n%s", requeststr);
 
   // keep alive
   common::http::header_t connectionField = request.findHeaderByKey("Connection", false);

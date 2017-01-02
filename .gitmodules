@@ -1,12 +1,12 @@
 [submodule "back_end/cmake"]
 	path = back_end/cmake
 	url = https://github.com/fasto/cmake.git
-[submodule "back_end/src/common"]
-	path = back_end/src/common
-	url = https://github.com/fasto/common.git
 [submodule "back_end/src/third-party/ini/inih"]
 	path = back_end/src/third-party/ini/inih
 	url = https://github.com/benhoyt/inih.git
 [submodule "back_end/tests/gtest"]
 	path = back_end/tests/gtest
 	url = https://chromium.googlesource.com/external/googletest
+[submodule "back_end/src/third-party/json-c"]
+	path = back_end/src/third-party/json-c
+	url = https://github.com/fastogt/json-c.git

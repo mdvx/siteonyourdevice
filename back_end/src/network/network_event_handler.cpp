@@ -18,8 +18,8 @@
 
 #include "network/network_event_handler.h"
 
-#include "common/thread/event_bus.h"
-#include "common/logger.h"
+#include <common/thread/event_bus.h>
+#include <common/logger.h>
 
 #include "network/network_controller.h"
 
@@ -73,8 +73,8 @@ void NetworkEventHandler::handleEvent(NetworkEvent* event) {
 }
 
 void NetworkEventHandler::handleExceptionEvent(NetworkEvent* event, common::Error err) {
-  DEBUG_MSG_FORMAT<512>(common::logging::L_WARNING, "Exception event %s, %s",
-                        common::ConvertToString(event->eventType()), err->description());
+  DEBUG_MSG_FORMAT(common::logging::L_WARNING, "Exception event %s, %s",
+                   common::ConvertToString(event->eventType()), err->description());
 }
 
 }  // namespace network

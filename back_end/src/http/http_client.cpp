@@ -23,11 +23,11 @@
 
 #include <string>
 
-#include "common/convert2string.h"
-#include "common/sprintf.h"
-#include "common/net/net.h"
-#include "common/logger.h"
-#include "common/file_system.h"
+#include <common/convert2string.h>
+#include <common/sprintf.h>
+#include <common/net/net.h>
+#include <common/logger.h>
+#include <common/file_system.h>
 
 #define RFC1123FMT "%a, %d %b %Y %H:%M:%S GMT"
 
@@ -294,7 +294,7 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
     common::http2::http2_nvs_t nvs;
 
     common::http2::http2_nv nvstatus;
-    nvstatus.name = MAKE_buffer_t(":status");
+    nvstatus.name = MAKE_BUFFER(":status");
     nvstatus.value = common::ConvertToBytes((uint32_t)status);
     nvs.push_back(nvstatus);
 
@@ -302,12 +302,12 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
     time_t now = time(nullptr);
     strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime(&now));
     common::http2::http2_nv nvdate;
-    nvdate.name = MAKE_buffer_t("date");
+    nvdate.name = MAKE_BUFFER("date");
     nvdate.value = common::ConvertToBytes(timebuf);
     nvs.push_back(nvdate);
 
     common::http2::http2_nv nvserver;
-    nvserver.name = MAKE_buffer_t("server");
+    nvserver.name = MAKE_BUFFER("server");
     nvserver.value = common::ConvertToBytes(info.server_name);
     nvs.push_back(nvserver);
 
@@ -318,13 +318,13 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
 
     if (mime_type) {
       common::http2::http2_nv nvmime;
-      nvmime.name = MAKE_buffer_t("content-type");
+      nvmime.name = MAKE_BUFFER("content-type");
       nvmime.value = common::ConvertToBytes(mime_type);
       nvs.push_back(nvmime);
     }
     if (length) {
       common::http2::http2_nv nvlen;
-      nvlen.name = MAKE_buffer_t("content-length");
+      nvlen.name = MAKE_BUFFER("content-length");
       nvlen.value = common::ConvertToBytes(*length);
       nvs.push_back(nvlen);
     }
@@ -332,7 +332,7 @@ common::Error Http2Client::send_headers(common::http::http_protocols protocol,
     if (mod) {
       strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime(mod));
       common::http2::http2_nv nvmod;
-      nvmod.name = MAKE_buffer_t("last-modified");
+      nvmod.name = MAKE_BUFFER("last-modified");
       nvmod.value = common::ConvertToBytes(timebuf);
       nvs.push_back(nvmod);
     }

@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "common/smart_ptr.h"
+#include <common/smart_ptr.h>
 
 namespace fasto {
 namespace siteonyourdevice {

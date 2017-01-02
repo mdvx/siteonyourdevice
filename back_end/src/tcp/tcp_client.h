@@ -20,8 +20,8 @@
 
 #include <string>
 
-#include "common/patterns/crtp_pattern.h"
-#include "common/net/socket_tcp.h"
+#include <common/patterns/crtp_pattern.h>
+#include <common/net/socket_tcp.h>
 
 #include "event_loop.h"
 
