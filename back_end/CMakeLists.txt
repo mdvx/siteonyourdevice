@@ -29,6 +29,7 @@ SET(BRANDING_PROJECT_CHANGELOG_FILE changelog.txt
   (File name given as relative paths are interpreted with respect to the src source directory)") #default
 
 PROJECT(${BRANDING_PROJECT_NAME} VERSION ${BRANDING_PROJECT_VERSION} LANGUAGES CXX C)
+SET(CMAKE_CXX_STANDARD 11)
 #################### Project Settings ####################
 SET(PROJECT_NAME_TITLE ${PROJECT_NAME}) #PROJECT_NAME in cache
 SET(PROJECT_DOMAIN ${BRANDING_PROJECT_DOMAIN})
@@ -68,14 +69,13 @@ IF(APPLE AND CMAKE_OSX_SYSROOT)
 ENDIF(APPLE AND CMAKE_OSX_SYSROOT)
 
 ########################## Options #########################
-OPTION(USE_CXX_STANDART "Enable tests for ${PROJECT_NAME} project" ON)
 OPTION(CPACK_SUPPORT "Enable package support" ON)
 OPTION(DEVELOPER_DYNAMIC_RUNTIME "Build with dynamic C++ runtime" ON)
 OPTION(DEVELOPER_FEATURES "Use some debug tricks for developers" OFF)
 OPTION(DEVELOPER_ENABLE_TESTS "Enable tests for ${PROJECT_NAME_TITLE} project" OFF)
 OPTION(BUILD_SERVER "Build server for ${PROJECT_NAME_TITLE} project" OFF)
 OPTION(IPV6_ENABLED "Build server and client with ipv6 support" OFF)
-OPTION(CHECK_STYLE "Enable check style for ${PROJECT_NAME_TITLE} project" OFF)
+OPTION(DEVELOPER_CHECK_STYLE "Enable check style for ${PROJECT_NAME_TITLE} project" OFF)
 
 IF(MSVC)
   IF(CMAKE_CL_64)

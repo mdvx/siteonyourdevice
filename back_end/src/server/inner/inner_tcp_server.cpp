@@ -21,10 +21,10 @@
 #include <string>
 #include <vector>
 
-#include "common/net/net.h"
-#include "common/logger.h"
-#include "common/thread/thread_manager.h"
-#include "common/convert2string.h"
+#include <common/net/net.h>
+#include <common/logger.h>
+#include <common/thread/thread_manager.h>
+#include <common/convert2string.h>
 
 #include "server/http_server_host.h"
 #include "server/server_commands.h"
@@ -74,8 +74,7 @@ class InnerServerHandlerHost::InnerSubHandler : public RedisSubHandler {
   virtual void handleMessage(char* channel, size_t channel_len, char* msg, size_t msg_len) {
     // [std::string]site [hex_string]seq [std::string]command args ...
     // [hex_string]seq OK/FAIL [std::string]command args ..
-    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_INFO,
-                                           "InnerSubHandler channel: %s, %s", channel, msg);
+    DEBUG_MSG_FORMAT(common::logging::L_INFO, "InnerSubHandler channel: %s, %s", channel, msg);
     char* space = strchr(msg, ' ');
     if (!space) {
       const std::string resp = common::MemSPrintf("UNKNOWN COMMAND: %s", msg);
@@ -181,11 +180,11 @@ void InnerServerHandlerHost::timerEmited(tcp::ITcpLoop* server, timer_id_t id) {
       const cmd_request_t ping_request = make_request(PING_COMMAND_REQ);
       ssize_t nwrite = 0;
       common::Error err = client->write(ping_request.data(), ping_request.size(), &nwrite);
-      DEBUG_MSG_FORMAT<512>(common::logging::L_INFO,
-                            "Pinged sended %" PRIuS " byte, client[%s], from server[%s], %" PRIuS
-                            " client(s) connected.",
-                            nwrite, client->formatedName(), server->formatedName(),
-                            online_clients.size());
+      DEBUG_MSG_FORMAT(common::logging::L_INFO,
+                       "Pinged sended %" PRIuS " byte, client[%s], from server[%s], %" PRIuS
+                       " client(s) connected.",
+                       nwrite, client->formatedName(), server->formatedName(),
+                       online_clients.size());
       if (err && err->isError()) {
         DEBUG_MSG_ERROR(err);
         client->close();
@@ -255,8 +254,7 @@ void InnerServerHandlerHost::handleInnerRequestCommand(
     ssize_t nwrite = 0;
     connection->write(pong, &nwrite);
   } else {
-    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN COMMAND: %s",
-                                           command);
+    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN COMMAND: %s", command);
   }
 }
 
@@ -355,13 +353,11 @@ void InnerServerHandlerHost::handleInnerResponceCommand(
     } else if (IS_EQUAL_COMMAND(command, SERVER_PLEASE_SYSTEM_INFO_COMMAND)) {
     } else if (IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONFIG_COMMAND)) {
     } else {
-      DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING,
-                                             "UNKNOWN RESPONCE COMMAND: %s", command);
+      DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN RESPONCE COMMAND: %s", command);
     }
   } else if (IS_EQUAL_COMMAND(state_command, FAIL_COMMAND) && argc > 1) {
   } else {
-    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN STATE COMMAND: %s",
-                                           state_command);
+    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN STATE COMMAND: %s", state_command);
   }
 
   return;
@@ -387,8 +383,7 @@ void InnerServerHandlerHost::handleInnerApproveCommand(
     }
   } else if (IS_EQUAL_COMMAND(command, FAIL_COMMAND)) {
   } else {
-    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE * 2>(common::logging::L_WARNING, "UNKNOWN COMMAND: %s",
-                                           command);
+    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN COMMAND: %s", command);
   }
 }
 

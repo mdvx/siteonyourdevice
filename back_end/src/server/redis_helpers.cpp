@@ -23,10 +23,10 @@
 #include <string>
 #include <vector>
 
-#include "common/third-party/json-c/json-c/json.h"
+#include <common/utils.h>
+#include <common/logger.h>
 
-#include "common/utils.h"
-#include "common/logger.h"
+#include "third-party/json-c/json-c/json.h"
 
 #define GET_ALL_USERS_REDIS_REQUEST "HGETALL users"
 #define GET_USER_1S "HGET users %s"
@@ -161,8 +161,8 @@ void RedisSub::listen() {
     redisReply* lreply = NULL;
     void** plreply = reinterpret_cast<void**>(&lreply);
     if (redisGetReply(redis_sub, plreply) != REDIS_OK) {
-      DEBUG_MSG_FORMAT<128>(common::logging::L_WARNING, "REDIS PUB/SUB GET REPLY ERROR: %s",
-                            redis_sub->errstr);
+      DEBUG_MSG_FORMAT(common::logging::L_WARNING, "REDIS PUB/SUB GET REPLY ERROR: %s",
+                       redis_sub->errstr);
       break;
     }
 

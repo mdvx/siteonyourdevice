@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "common/thread/thread.h"
+#include <common/thread/thread.h>
 
 #include "inner/inner_server_command_seq_parser.h"
 

@@ -20,8 +20,8 @@
 
 #include "server/websocket/websocket_server.h"
 
-#include "common/logger.h"
-#include "common/convert2string.h"
+#include <common/logger.h>
+#include <common/convert2string.h>
 
 #include "server/inner/inner_tcp_client.h"
 #include "server/http_server_host.h"
@@ -92,9 +92,9 @@ void WebSocketServerHandlerHost::processWebsocketRequest(
   inner::InnerTcpServerClient* innerConnection =
       parent_->findInnerConnectionByHost(hpath_without_port);
   if (!innerConnection) {
-    DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING,
-                           "WebSocketServerHandlerHost not found host %s, request str:\n%s", hpath,
-                           common::ConvertToString(hrequest));
+    DEBUG_MSG_FORMAT(common::logging::L_WARNING,
+                     "WebSocketServerHandlerHost not found host %s, request str:\n%s", hpath,
+                     common::ConvertToString(hrequest));
     hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL, "Not registered host.", false,
                         info());
     hclient->close();

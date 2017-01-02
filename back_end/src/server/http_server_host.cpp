@@ -22,8 +22,8 @@
 
 #include <string>
 
-#include "common/thread/thread_manager.h"
-#include "common/logger.h"
+#include <common/thread/thread_manager.h>
+#include <common/logger.h>
 
 #include "inner/inner_tcp_client.h"
 
@@ -151,9 +151,9 @@ void HttpInnerServerHandlerHost::processHttpRequest(http::HttpClient* hclient,
   }*/
 
   if (!innerConnection) {
-    DEBUG_MSG_FORMAT<1024>(common::logging::L_WARNING,
-                           "HttpInnerServerHandlerHost not found host %s, request str:\n%s", hpath,
-                           common::ConvertToString(hrequest));
+    DEBUG_MSG_FORMAT(common::logging::L_WARNING,
+                     "HttpInnerServerHandlerHost not found host %s, request str:\n%s", hpath,
+                     common::ConvertToString(hrequest));
     std::string msg = common::MemSPrintf(
         "Not registered host(%s) or it is offline(if it is your host, please build server "
         "installer(button in your profile page) and run it on your device!).",
