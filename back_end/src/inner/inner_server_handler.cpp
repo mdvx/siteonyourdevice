@@ -20,8 +20,6 @@
 
 #include <string>
 
-#include "third-party/json-c/json-c/json.h"
-
 #include <common/error.h>
 #include <common/logger.h>
 #include <common/net/net.h>
@@ -29,6 +27,8 @@
 #include <common/system_info/system_info.h>
 #include <common/thread/event_bus.h>
 #include <common/convert2string.h>
+
+#include "third-party/json-c/json-c/json.h"
 
 #include "network/network_events.h"
 
@@ -489,8 +489,7 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection,
       }
     }
   } else {
-    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN REQUEST COMMAND: %s",
-                                       command);
+    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN REQUEST COMMAND: %s", command);
   }
 }
 
@@ -531,13 +530,11 @@ void InnerServerHandler::handleInnerResponceCommand(InnerClient* connection,
         }
       }
     } else {
-      DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN RESPONCE COMMAND: %s",
-                                         command);
+      DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN RESPONCE COMMAND: %s", command);
     }
   } else if (IS_EQUAL_COMMAND(state_command, FAIL_COMMAND) && argc > 1) {
   } else {
-    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN STATE COMMAND: %s",
-                                       state_command);
+    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN STATE COMMAND: %s", state_command);
   }
 }
 
@@ -557,7 +554,7 @@ void InnerServerHandler::handleInnerApproveCommand(InnerClient* connection,
     }
   } else if (IS_EQUAL_COMMAND(command, FAIL_COMMAND)) {
   } else {
-    DEBUG_MSG_FORMAT<MAX_COMMAND_SIZE>(common::logging::L_WARNING, "UNKNOWN COMMAND: %s", command);
+    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN COMMAND: %s", command);
   }
 }
 
