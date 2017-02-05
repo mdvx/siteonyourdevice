@@ -75,9 +75,13 @@ void InnerServerHandler::preLooped(tcp::ITcpLoop* server) {
   server->registerClient(connection);
 }
 
-void InnerServerHandler::accepted(tcp::TcpClient* client) {}
+void InnerServerHandler::accepted(tcp::TcpClient* client) {
+  UNUSED(client);
+}
 
-void InnerServerHandler::moved(tcp::TcpClient* client) {}
+void InnerServerHandler::moved(tcp::TcpClient* client) {
+  UNUSED(client);
+}
 
 void InnerServerHandler::closed(tcp::TcpClient* client) {
   if (client == inner_connection_) {
@@ -489,7 +493,7 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection,
       }
     }
   } else {
-    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN REQUEST COMMAND: %s", command);
+    WARNING_LOG() << "UNKNOWN REQUEST COMMAND: " << command;
   }
 }
 
@@ -530,11 +534,11 @@ void InnerServerHandler::handleInnerResponceCommand(InnerClient* connection,
         }
       }
     } else {
-      DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN RESPONCE COMMAND: %s", command);
+      WARNING_LOG() << "UNKNOWN RESPONCE COMMAND: " << command;
     }
   } else if (IS_EQUAL_COMMAND(state_command, FAIL_COMMAND) && argc > 1) {
   } else {
-    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN STATE COMMAND: %s", state_command);
+    WARNING_LOG() << "UNKNOWN STATE COMMAND: " << state_command;
   }
 }
 
@@ -542,6 +546,8 @@ void InnerServerHandler::handleInnerApproveCommand(InnerClient* connection,
                                                    cmd_seq_t id,
                                                    int argc,
                                                    char* argv[]) {
+  UNUSED(connection);
+  UNUSED(id);
   char* command = argv[0];
 
   if (IS_EQUAL_COMMAND(command, SUCCESS_COMMAND)) {
@@ -554,7 +560,7 @@ void InnerServerHandler::handleInnerApproveCommand(InnerClient* connection,
     }
   } else if (IS_EQUAL_COMMAND(command, FAIL_COMMAND)) {
   } else {
-    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN COMMAND: %s", command);
+    WARNING_LOG() << "UNKNOWN COMMAND: " << command;
   }
 }
 

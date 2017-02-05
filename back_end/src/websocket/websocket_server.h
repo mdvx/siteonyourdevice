@@ -28,10 +28,10 @@ class WebSocketServer : public tcp::TcpServer {
  public:
   explicit WebSocketServer(const common::net::HostAndPort& host,
                            tcp::ITcpLoopObserver* observer = nullptr);
-  const char* ClassName() const;
+  const char* ClassName() const override;
 
  protected:
-  virtual tcp::TcpClient* createClient(const common::net::socket_info& info);
+  virtual tcp::TcpClient* createClient(const common::net::socket_info& info) override;
 };
 
 }  // namespace websocket

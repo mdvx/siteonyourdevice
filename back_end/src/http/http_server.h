@@ -29,20 +29,20 @@ class HttpServer : public tcp::TcpServer {
   HttpServer(const common::net::HostAndPort& host, tcp::ITcpLoopObserver* observer);
   ~HttpServer();
 
-  virtual const char* ClassName() const;
+  virtual const char* ClassName() const override;
 
  protected:
-  virtual tcp::TcpClient* createClient(const common::net::socket_info& info);
+  virtual tcp::TcpClient* createClient(const common::net::socket_info& info) override;
 };
 
 class Http2Server : public HttpServer {
  public:
   Http2Server(const common::net::HostAndPort& host, tcp::ITcpLoopObserver* observer);
 
-  virtual const char* ClassName() const;
+  virtual const char* ClassName() const override;
 
  protected:
-  virtual tcp::TcpClient* createClient(const common::net::socket_info& info);
+  virtual tcp::TcpClient* createClient(const common::net::socket_info& info) override;
 };
 
 }  // namespace http

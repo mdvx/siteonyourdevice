@@ -24,11 +24,16 @@
 // [-c] config path [-d] run as daemon
 
 int main(int argc, char* argv[]) {
+#if defined(NDEBUG)
+  common::logging::LEVEL_LOG level = common::logging::L_INFO;
+#else
+  common::logging::LEVEL_LOG level = common::logging::L_DEBUG;
+#endif
 #if defined(LOG_TO_FILE)
   std::string log_path = common::file_system::prepare_path("~/" PROJECT_NAME_LOWERCASE ".log");
-  INIT_LOGGER(PROJECT_NAME_TITLE, log_path);
+  INIT_LOGGER(PROJECT_NAME_TITLE, log_path, level);
 #else
-  INIT_LOGGER(PROJECT_NAME_TITLE);
+  INIT_LOGGER(PROJECT_NAME_TITLE, level);
 #endif
   fasto::siteonyourdevice::application::FastoApplication app(argc, argv);
   int res = app.exec();

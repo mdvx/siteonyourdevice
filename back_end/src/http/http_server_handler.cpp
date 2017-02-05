@@ -50,12 +50,12 @@ class WebSocketController : public fasto::siteonyourdevice::ILoopThreadControlle
       : host_(host), info_(info) {}
 
  private:
-  fasto::siteonyourdevice::tcp::ITcpLoopObserver* createHandler() {
+  fasto::siteonyourdevice::tcp::ITcpLoopObserver* createHandler() override {
     return new fasto::siteonyourdevice::websocket::WebSocketServerHandler(info_);
   }
 
   fasto::siteonyourdevice::tcp::ITcpLoop* createServer(
-      fasto::siteonyourdevice::tcp::ITcpLoopObserver* handler) {
+      fasto::siteonyourdevice::tcp::ITcpLoopObserver* handler) override {
     fasto::siteonyourdevice::websocket::WebSocketServer* serv =
         new fasto::siteonyourdevice::websocket::WebSocketServer(host_, handler);
     serv->setName("websocket_server");
@@ -88,6 +88,8 @@ IHttpAuthObserver::IHttpAuthObserver() {}
 IHttpAuthObserver::~IHttpAuthObserver() {}
 
 void HttpServerHandler::preLooped(tcp::ITcpLoop* server) {
+  UNUSED(server);
+
   for (size_t i = 0; i < sockets_urls_.size(); ++i) {
     socket_url_t url = sockets_urls_[i];
     CHECK(url.second == nullptr);
@@ -105,6 +107,8 @@ void HttpServerHandler::preLooped(tcp::ITcpLoop* server) {
 }
 
 void HttpServerHandler::postLooped(tcp::ITcpLoop* server) {
+  UNUSED(server);
+
   for (size_t i = 0; i < sockets_urls_.size(); ++i) {
     socket_url_t url = sockets_urls_[i];
 
@@ -118,13 +122,22 @@ void HttpServerHandler::postLooped(tcp::ITcpLoop* server) {
   }
 }
 
-void HttpServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_t id) {}
+void HttpServerHandler::timerEmited(tcp::ITcpLoop* server, timer_id_t id) {
+  UNUSED(server);
+  UNUSED(id);
+}
 
-void HttpServerHandler::accepted(tcp::TcpClient* client) {}
+void HttpServerHandler::accepted(tcp::TcpClient* client) {
+  UNUSED(client);
+}
 
-void HttpServerHandler::moved(tcp::TcpClient* client) {}
+void HttpServerHandler::moved(tcp::TcpClient* client) {
+  UNUSED(client);
+}
 
-void HttpServerHandler::closed(tcp::TcpClient* client) {}
+void HttpServerHandler::closed(tcp::TcpClient* client) {
+  UNUSED(client);
+}
 
 void HttpServerHandler::dataReceived(tcp::TcpClient* client) {
   char buff[BUF_SIZE] = {0};
@@ -141,7 +154,9 @@ void HttpServerHandler::dataReceived(tcp::TcpClient* client) {
   processReceived(hclient, buff, nread);
 }
 
-void HttpServerHandler::dataReadyToWrite(tcp::TcpClient* client) {}
+void HttpServerHandler::dataReadyToWrite(tcp::TcpClient* client) {
+  UNUSED(client);
+}
 
 void HttpServerHandler::registerHttpCallback(const std::string& url, http_callback_t callback) {
   httpCallbacks_[url] = callback;
@@ -179,6 +194,8 @@ bool HttpServerHandler::tryToHandleAsRegisteredCallback(HttpClient* hclient,
 bool HttpServerHandler::tryAuthenticateIfNeeded(HttpClient* hclient,
                                                 const char* extra_header,
                                                 const common::http::http_request& request) {
+  UNUSED(extra_header);
+
   if (!authChecker_) {
     return false;
   }
@@ -320,12 +337,12 @@ void Http2ServerHandler::handleHttp2Request(Http2Client* h2client,
   const std::string hexstr = common::HexEncode(request, req_len, false);
 
   common::http2::frames_t frames = common::http2::parse_frames(request, req_len);
-  DEBUG_MSG_FORMAT(common::logging::L_INFO, "frame_header_data hex: %s", hexstr);
+  INFO_LOG() <<"frame_header_data hex: " << hexstr;
   h2client->processFrames(frames);
 
   common::http2::frames_t headers_frames =
       common::http2::find_frames_by_type(frames, common::http2::HTTP2_HEADERS);
-  for (int i = 0; i < headers_frames.size(); ++i) {
+  for (size_t i = 0; i < headers_frames.size(); ++i) {
     common::http2::frame_headers* head = (common::http2::frame_headers*)(&headers_frames[i]);
     common::http::http_request request;
     auto result = common::http2::parse_http_request(*head, &request);

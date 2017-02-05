@@ -55,7 +55,7 @@ class TcpClient : common::IMetaClassInfo {
   void setFlags(flags_t flags);
 
   common::patterns::id_counter<TcpClient>::type_t id() const;
-  virtual const char* ClassName() const;
+  virtual const char* ClassName() const override;
   std::string formatedName() const;
 
  private:

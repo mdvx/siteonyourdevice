@@ -40,7 +40,7 @@ bool HttpFileSystemCallback::handleRequest(http::HttpClient* hclient,
                                            const common::http::http_request& request,
                                            const HttpServerInfo& info) {
   std::string requeststr = common::ConvertToString(request);
-  DEBUG_MSG_FORMAT(common::logging::L_INFO, "handleRequest:\n%s", requeststr);
+  INFO_LOG() << "handleRequest:\n" << requeststr;
 
   // keep alive
   common::http::header_t connectionField = request.findHeaderByKey("Connection", false);

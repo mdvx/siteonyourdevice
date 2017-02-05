@@ -93,7 +93,7 @@ void InnerServerCommandSeqParser::handleInnerDataReceived(InnerClient* connectio
   ssize_t nwrite = 0;
   char* end = strstr(buff, END_OF_COMMAND);
   if (!end) {
-    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN SEQUENCE: %s", buff);
+    WARNING_LOG() << "UNKNOWN SEQUENCE: " << buff;
     const cmd_responce_t resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
     common::Error err = connection->write(resp, &nwrite);
     if (err && err->isError()) {
@@ -109,7 +109,7 @@ void InnerServerCommandSeqParser::handleInnerDataReceived(InnerClient* connectio
   char* star_seq = NULL;
   cmd_id_t seq = strtoul(buff, &star_seq, 10);
   if (*star_seq != ' ') {
-    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "PROBLEM EXTRACTING SEQUENCE: %s", buff);
+    WARNING_LOG() << "PROBLEM EXTRACTING SEQUENCE: " << buff;
     const cmd_responce_t resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
     common::Error err = connection->write(resp, &nwrite);
     if (err && err->isError()) {
@@ -122,7 +122,7 @@ void InnerServerCommandSeqParser::handleInnerDataReceived(InnerClient* connectio
 
   const char* id_ptr = strchr(star_seq + 1, ' ');
   if (!id_ptr) {
-    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "PROBLEM EXTRACTING ID: %s", buff);
+    WARNING_LOG() << "PROBLEM EXTRACTING ID: " << buff;
     const cmd_responce_t resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
     common::Error err = connection->write(resp, &nwrite);
     if (err && err->isError()) {
@@ -141,7 +141,7 @@ void InnerServerCommandSeqParser::handleInnerDataReceived(InnerClient* connectio
   sds* argv = sdssplitargs(cmd, &argc);
   processRequest(id, argc, argv);
   if (argv == NULL) {
-    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "PROBLEM PARSING INNER COMMAND: %s", buff);
+    WARNING_LOG() << "PROBLEM PARSING INNER COMMAND: " << buff;
     const cmd_responce_t resp = make_responce(id, STATE_COMMAND_RESP_FAIL_1S, buff);
     common::Error err = connection->write(resp, &nwrite);
     if (err && err->isError()) {
@@ -152,9 +152,8 @@ void InnerServerCommandSeqParser::handleInnerDataReceived(InnerClient* connectio
     return;
   }
 
-  DEBUG_MSG_FORMAT(common::logging::L_INFO,
-                   "HANDLE INNER COMMAND client[%s] seq:% " CID_FMT ", id:%s, cmd: %s",
-                   connection->formatedName(), seq, id, cmd);
+  INFO_LOG() << "HANDLE INNER COMMAND client[" << connection->formatedName() << "] seq:" << seq
+             << ", id:" << id << ", cmd: " << cmd;
   if (seq == REQUEST_COMMAND) {
     handleInnerRequestCommand(connection, id, argc, argv);
   } else if (seq == RESPONCE_COMMAND) {

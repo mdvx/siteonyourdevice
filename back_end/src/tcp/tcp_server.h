@@ -64,7 +64,7 @@ class ITcpLoop : public EvLoopObserver, common::IMetaClassInfo {
   void setName(const std::string& name);
   std::string name() const;
 
-  virtual const char* ClassName() const = 0;
+  virtual const char* ClassName() const override = 0;
   std::string formatedName() const;
 
   void execInLoopThread(async_loop_exec_function_t func);
@@ -78,9 +78,9 @@ class ITcpLoop : public EvLoopObserver, common::IMetaClassInfo {
  protected:
   virtual TcpClient* createClient(const common::net::socket_info& info) = 0;
 
-  virtual void preLooped(LibEvLoop* loop);
-  virtual void stoped(LibEvLoop* loop);
-  virtual void postLooped(LibEvLoop* loop);
+  virtual void preLooped(LibEvLoop* loop) override;
+  virtual void stoped(LibEvLoop* loop) override;
+  virtual void postLooped(LibEvLoop* loop) override;
 
   LibEvLoop* const loop_;
 
@@ -122,17 +122,17 @@ class TcpServer : public ITcpLoop {
   common::Error bind() WARN_UNUSED_RESULT;
   common::Error listen(int backlog) WARN_UNUSED_RESULT;
 
-  const char* ClassName() const;
+  const char* ClassName() const override;
   common::net::HostAndPort host() const;
 
   static ITcpLoop* findExistServerByHost(const common::net::HostAndPort& host);
 
  private:
-  TcpClient* createClient(const common::net::socket_info& info);
-  virtual void preLooped(LibEvLoop* loop);
-  virtual void postLooped(LibEvLoop* loop);
+  virtual TcpClient* createClient(const common::net::socket_info& info) override;
+  virtual void preLooped(LibEvLoop* loop) override;
+  virtual void postLooped(LibEvLoop* loop) override;
 
-  virtual void stoped(LibEvLoop* loop);
+  virtual void stoped(LibEvLoop* loop) override;
 
   static void accept_cb(struct ev_loop* loop, struct ev_io* watcher, int revents);
 

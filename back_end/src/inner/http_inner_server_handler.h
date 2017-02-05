@@ -33,13 +33,13 @@ class Http2ClientServerHandler : public http::Http2ServerHandler {
   Http2ClientServerHandler(const HttpServerInfo& info);
   ~Http2ClientServerHandler();
 
-  virtual void preLooped(tcp::ITcpLoop* server);
-  virtual void accepted(tcp::TcpClient* client);
-  virtual void closed(tcp::TcpClient* client);
-  virtual void dataReceived(tcp::TcpClient* client);
-  virtual void dataReadyToWrite(tcp::TcpClient* client);
-  virtual void postLooped(tcp::ITcpLoop* server);
-  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_t id);
+  virtual void preLooped(tcp::ITcpLoop* server) override;
+  virtual void accepted(tcp::TcpClient* client) override;
+  virtual void closed(tcp::TcpClient* client) override;
+  virtual void dataReceived(tcp::TcpClient* client) override;
+  virtual void dataReadyToWrite(tcp::TcpClient* client) override;
+  virtual void postLooped(tcp::ITcpLoop* server) override;
+  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_t id) override;
 
  private:
   void relayDataReceived(RelayClient* rclient);

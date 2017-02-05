@@ -59,7 +59,7 @@ class HttpClient : public tcp::TcpClient {
                                      bool is_keep_alive,
                                      const HttpServerInfo& info) WARN_UNUSED_RESULT;
 
-  virtual const char* ClassName() const;
+  virtual const char* ClassName() const override;
 
   void setIsAuthenticated(bool auth);
   bool isAuthenticated() const;
@@ -80,10 +80,10 @@ class Http2Client : public HttpClient {
                                    const char* extra_header,
                                    const char* text,
                                    bool is_keep_alive,
-                                   const HttpServerInfo& info) WARN_UNUSED_RESULT;
+                                   const HttpServerInfo& info) override WARN_UNUSED_RESULT;
   virtual common::Error send_file_by_fd(common::http::http_protocols protocol,
                                         int fdesc,
-                                        off_t size) WARN_UNUSED_RESULT;
+                                        off_t size) override WARN_UNUSED_RESULT;
   virtual common::Error send_headers(common::http::http_protocols protocol,
                                      common::http::http_status status,
                                      const char* extra_header,
@@ -91,13 +91,13 @@ class Http2Client : public HttpClient {
                                      off_t* length,
                                      time_t* mod,
                                      bool is_keep_alive,
-                                     const HttpServerInfo& info) WARN_UNUSED_RESULT;
+                                     const HttpServerInfo& info) override WARN_UNUSED_RESULT;
 
   void processFrames(const common::http2::frames_t& frames);
 
   bool isSettingNegotiated() const;
 
-  virtual const char* ClassName() const;
+  virtual const char* ClassName() const override;
 
  private:
   bool is_http2() const;

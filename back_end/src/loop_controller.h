@@ -59,11 +59,11 @@ class ILoopThreadController : public ILoopController {
  private:
   using ILoopController::exec;
 
-  virtual tcp::ITcpLoopObserver* createHandler() = 0;
-  virtual tcp::ITcpLoop* createServer(tcp::ITcpLoopObserver* handler) = 0;
+  virtual tcp::ITcpLoopObserver* createHandler() override = 0;
+  virtual tcp::ITcpLoop* createServer(tcp::ITcpLoopObserver* handler) override = 0;
 
-  virtual void started();
-  virtual void stoped();
+  virtual void started() override;
+  virtual void stoped() override;
 
   common::shared_ptr<common::thread::Thread<int> > loop_thread_;
 };

@@ -357,8 +357,7 @@ void NetworkController::readConfig() {
 
   // try to parse settings file
   if (ini_parse(path, ini_handler_fasto, &config) < 0) {
-    DEBUG_MSG_FORMAT(common::logging::L_INFO, "Can't load config '%s', use default settings.",
-                     path);
+    INFO_LOG() << "Can't load config path: " << path << " , use default settings.";
   }
 
   setConfig(config);

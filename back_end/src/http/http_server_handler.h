@@ -52,14 +52,14 @@ class HttpServerHandler : public tcp::ITcpLoopObserver {
   typedef std::vector<socket_url_t> sockets_url_t;
 
   HttpServerHandler(const HttpServerInfo& info, IHttpAuthObserver* observer);
-  virtual void preLooped(tcp::ITcpLoop* server);
-  virtual void accepted(tcp::TcpClient* client);
-  virtual void moved(tcp::TcpClient* client);
-  virtual void closed(tcp::TcpClient* client);
-  virtual void dataReceived(tcp::TcpClient* client);
-  virtual void dataReadyToWrite(tcp::TcpClient* client);
-  virtual void postLooped(tcp::ITcpLoop* server);
-  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_t id);
+  virtual void preLooped(tcp::ITcpLoop* server) override;
+  virtual void accepted(tcp::TcpClient* client) override;
+  virtual void moved(tcp::TcpClient* client) override;
+  virtual void closed(tcp::TcpClient* client) override;
+  virtual void dataReceived(tcp::TcpClient* client) override;
+  virtual void dataReadyToWrite(tcp::TcpClient* client) override;
+  virtual void postLooped(tcp::ITcpLoop* server) override;
+  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_t id) override;
 
   virtual ~HttpServerHandler();
 
@@ -98,7 +98,7 @@ class Http2ServerHandler : public HttpServerHandler {
   Http2ServerHandler(const HttpServerInfo& info, IHttpAuthObserver* observer);
 
  protected:
-  virtual void processReceived(HttpClient* hclient, const char* request, size_t req_len);
+  virtual void processReceived(HttpClient* hclient, const char* request, size_t req_len) override;
 
  private:
   void handleHttp2Request(Http2Client* h2client, const char* request, uint32_t req_len);

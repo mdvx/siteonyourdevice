@@ -27,7 +27,7 @@ namespace inner {
 class RelayClient : public http::Http2Client {
  public:
   RelayClient(tcp::ITcpLoop* server, const common::net::socket_info& info);
-  const char* ClassName() const;
+  const char* ClassName() const override;
 };
 
 class ProxyRelayClient;
@@ -37,7 +37,7 @@ class RelayClientEx : public RelayClient {
   RelayClientEx(tcp::ITcpLoop* server,
                 const common::net::socket_info& info,
                 const common::net::HostAndPort& externalHost);
-  const char* ClassName() const;
+  const char* ClassName() const override;
 
   common::net::HostAndPort externalHost() const;
 

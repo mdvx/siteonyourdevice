@@ -42,28 +42,28 @@ class InnerServerHandler : public InnerServerCommandSeqParser, public tcp::ITcpL
   UserAuthInfo authInfo() const;
   void setConfig(const HttpConfig& config);
 
-  virtual void preLooped(tcp::ITcpLoop* server);
-  virtual void accepted(tcp::TcpClient* client);
-  virtual void moved(tcp::TcpClient* client);
-  virtual void closed(tcp::TcpClient* client);
-  virtual void dataReceived(tcp::TcpClient* client);
-  virtual void dataReadyToWrite(tcp::TcpClient* client);
-  virtual void postLooped(tcp::ITcpLoop* server);
-  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_t id);
+  virtual void preLooped(tcp::ITcpLoop* server) override;
+  virtual void accepted(tcp::TcpClient* client) override;
+  virtual void moved(tcp::TcpClient* client) override;
+  virtual void closed(tcp::TcpClient* client) override;
+  virtual void dataReceived(tcp::TcpClient* client) override;
+  virtual void dataReadyToWrite(tcp::TcpClient* client) override;
+  virtual void postLooped(tcp::ITcpLoop* server) override;
+  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_t id) override;
 
  private:
   virtual void handleInnerRequestCommand(InnerClient* connection,
                                          cmd_seq_t id,
                                          int argc,
-                                         char* argv[]);
+                                         char* argv[]) override;
   virtual void handleInnerResponceCommand(InnerClient* connection,
                                           cmd_seq_t id,
                                           int argc,
-                                          char* argv[]);
+                                          char* argv[]) override;
   virtual void handleInnerApproveCommand(InnerClient* connection,
                                          cmd_seq_t id,
                                          int argc,
-                                         char* argv[]);
+                                         char* argv[]) override;
 
   HttpConfig config_;
   InnerClient* inner_connection_;
