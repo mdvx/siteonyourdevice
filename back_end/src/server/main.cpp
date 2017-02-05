@@ -21,6 +21,7 @@
 #include <unistd.h>
 
 #include <string>
+#include <iostream>
 
 #include "inih/ini.h"
 
@@ -46,6 +47,37 @@
 */
 
 namespace {
+
+class SysLog : public std::basic_streambuf<char, std::char_traits<char> > {
+ public:
+  explicit SysLog(std::string ident, int facility) : buffer_() {
+    openlog(ident.c_str(), LOG_PID, facility);
+  }
+
+  ~SysLog() { closelog(); }
+
+ protected:
+  int sync() override {
+    if (!buffer_.empty()) {
+      const char* buff = buffer_.c_str();
+      syslog(LOG_DEBUG, buff);
+      buffer_.erase();
+    }
+    return 0;
+  }
+
+  int overflow(int c) override {
+    if (c != EOF) {
+      buffer_ += static_cast<char>(c);
+    } else {
+      sync();
+    }
+    return c;
+  }
+
+ private:
+  std::string buffer_;
+};
 
 const common::net::HostAndPort redis_default_host = common::net::HostAndPort::createLocalHost(6379);
 sig_atomic_t is_stop = 0;
@@ -91,12 +123,6 @@ void sync_config();
 void app_logger_hadler(common::logging::LEVEL_LOG level, const std::string& message);
 
 int main(int argc, char* argv[]) {
-#if defined(LOG_TO_FILE)
-  std::string log_path = common::file_system::prepare_path("~/" PROJECT_NAME_LOWERCASE ".log");
-  INIT_LOGGER(PROJECT_NAME_TITLE, log_path);
-#else
-  INIT_LOGGER(PROJECT_NAME_TITLE);
-#endif
   int opt;
   bool daemon_mode = false;
   while ((opt = getopt(argc, argv, "cd:")) != -1) {
@@ -124,10 +150,23 @@ int main(int argc, char* argv[]) {
   signal(SIGHUP, signal_handler);
   signal(SIGQUIT, signal_handler);
 
-  /* Open the log file */
-  openlog(PROJECT_NAME_SERVER, LOG_PID, LOG_DAEMON);
+#if defined(NDEBUG)
+  common::logging::LEVEL_LOG level = common::logging::L_INFO;
+#else
+  common::logging::LEVEL_LOG level = common::logging::L_DEBUG;
+#endif
+#if defined(LOG_TO_FILE)
+  std::string log_path = common::file_system::prepare_path("~/" PROJECT_NAME_LOWERCASE ".log");
+  INIT_LOGGER(PROJECT_NAME_TITLE, log_path, level);
+#else
+  INIT_LOGGER(PROJECT_NAME_TITLE, level);
+#endif
+  SysLog* sys_log = nullptr;
   if (daemon_mode) {
-    SET_LOG_HANDLER(&app_logger_hadler);
+    /* Open the log file */
+    sys_log = new SysLog(PROJECT_NAME_SERVER, LOG_DAEMON);
+    std::clog.rdbuf(sys_log);
+    common::logging::SET_LOGER_STREAM(&std::clog);
   }
 
   server = new fasto::siteonyourdevice::server::HttpServerHost(
@@ -146,8 +185,7 @@ int main(int argc, char* argv[]) {
 
 exit:
   delete server;
-
-  closelog();
+  delete sys_log;
   return return_code;
 }
 
@@ -179,8 +217,7 @@ void sync_config() {
   config.redis_config_.channel_clients_state = CHANNEL_CLIENTS_STATE_NAME;
   // try to parse settings file
   if (ini_parse(config_path, ini_handler_fasto, &config) < 0) {
-    DEBUG_MSG_FORMAT(common::logging::L_INFO, "Can't load config '%s', use default settings.",
-                     config_path);
+    INFO_LOG() << "Can't load config " << config_path << ", use default settings.";
   }
 
   server->setStorageConfig(config.redis_config_);

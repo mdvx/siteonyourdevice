@@ -161,8 +161,7 @@ void RedisSub::listen() {
     redisReply* lreply = NULL;
     void** plreply = reinterpret_cast<void**>(&lreply);
     if (redisGetReply(redis_sub, plreply) != REDIS_OK) {
-      DEBUG_MSG_FORMAT(common::logging::L_WARNING, "REDIS PUB/SUB GET REPLY ERROR: %s",
-                       redis_sub->errstr);
+      WARNING_LOG() << "REDIS PUB/SUB GET REPLY ERROR: " << redis_sub->errstr;
       break;
     }
 

@@ -67,18 +67,18 @@ class InnerServerHandlerHost::InnerSubHandler : public RedisSubHandler {
     if (!res) {
       std::string err_str = common::MemSPrintf(
           "publish_command_out with args: msg = %s, msg_len = " PRIu64 " failed!", msg, msg_len);
-      DEBUG_MSG(common::logging::L_ERROR, err_str);
+      ERROR_LOG() << err_str;
     }
   }
 
   virtual void handleMessage(char* channel, size_t channel_len, char* msg, size_t msg_len) {
     // [std::string]site [hex_string]seq [std::string]command args ...
     // [hex_string]seq OK/FAIL [std::string]command args ..
-    DEBUG_MSG_FORMAT(common::logging::L_INFO, "InnerSubHandler channel: %s, %s", channel, msg);
+    INFO_LOG() << "InnerSubHandler channel: " << channel << ", msg: " << msg;
     char* space = strchr(msg, ' ');
     if (!space) {
       const std::string resp = common::MemSPrintf("UNKNOWN COMMAND: %s", msg);
-      DEBUG_MSG(common::logging::L_WARNING, resp);
+      WARNING_LOG() << resp;
       publish_command_out(resp);
       return;
     }
@@ -93,7 +93,7 @@ class InnerServerHandlerHost::InnerSubHandler : public RedisSubHandler {
     cmd_id_t seq = strtoul(buff, &star_seq, 10);
     if (*star_seq != ' ') {
       std::string resp = common::MemSPrintf("PROBLEM EXTRACTING SEQUENCE: %s", space + 1);
-      DEBUG_MSG(common::logging::L_WARNING, resp);
+      WARNING_LOG() << resp;
       publish_command_out(resp);
       return;
     }
@@ -101,7 +101,8 @@ class InnerServerHandlerHost::InnerSubHandler : public RedisSubHandler {
     const char* id_ptr = strchr(star_seq + 1, ' ');
     if (!id_ptr) {
       std::string resp = common::MemSPrintf("PROBLEM EXTRACTING ID: %s", space + 1);
-      DEBUG_MSG(common::logging::L_WARNING, resp);
+      ;
+      WARNING_LOG() << resp;
       publish_command_out(resp);
       return;
     }
@@ -180,11 +181,9 @@ void InnerServerHandlerHost::timerEmited(tcp::ITcpLoop* server, timer_id_t id) {
       const cmd_request_t ping_request = make_request(PING_COMMAND_REQ);
       ssize_t nwrite = 0;
       common::Error err = client->write(ping_request.data(), ping_request.size(), &nwrite);
-      DEBUG_MSG_FORMAT(common::logging::L_INFO,
-                       "Pinged sended %" PRIuS " byte, client[%s], from server[%s], %" PRIuS
-                       " client(s) connected.",
-                       nwrite, client->formatedName(), server->formatedName(),
-                       online_clients.size());
+      INFO_LOG() << "Pinged sended " << nwrite << " byte, client[" << client->formatedName()
+                 << "], from server[" << server->formatedName() << "], " << online_clients.size()
+                 << " client(s) connected.";
       if (err && err->isError()) {
         DEBUG_MSG_ERROR(err);
         client->close();
@@ -213,7 +212,7 @@ void InnerServerHandlerHost::closed(tcp::TcpClient* client) {
       if (!res) {
         std::string err_str = common::MemSPrintf(
             "publish_clients_state with args: connected_resp = %s failed!", connected_resp);
-        DEBUG_MSG(common::logging::L_ERROR, err_str);
+        ERROR_LOG() << err_str;
       }
     }
   }
@@ -254,7 +253,7 @@ void InnerServerHandlerHost::handleInnerRequestCommand(
     ssize_t nwrite = 0;
     connection->write(pong, &nwrite);
   } else {
-    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN COMMAND: %s", command);
+    WARNING_LOG() << "UNKNOWN COMMAND: " << command;
   }
 }
 
@@ -340,7 +339,7 @@ void InnerServerHandlerHost::handleInnerResponceCommand(
           if (!res) {
             std::string err_str = common::MemSPrintf(
                 "publish_clients_state with args: connected_resp = %s failed!", connected_resp);
-            DEBUG_MSG(common::logging::L_ERROR, err_str);
+            ERROR_LOG() << err_str;
           }
         }
       } else {
@@ -353,11 +352,11 @@ void InnerServerHandlerHost::handleInnerResponceCommand(
     } else if (IS_EQUAL_COMMAND(command, SERVER_PLEASE_SYSTEM_INFO_COMMAND)) {
     } else if (IS_EQUAL_COMMAND(command, SERVER_PLEASE_CONFIG_COMMAND)) {
     } else {
-      DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN RESPONCE COMMAND: %s", command);
+      WARNING_LOG() << "UNKNOWN RESPONCE COMMAND: " << command;
     }
   } else if (IS_EQUAL_COMMAND(state_command, FAIL_COMMAND) && argc > 1) {
   } else {
-    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN STATE COMMAND: %s", state_command);
+    WARNING_LOG() << "UNKNOWN STATE COMMAND: " << state_command;
   }
 
   return;
@@ -383,7 +382,7 @@ void InnerServerHandlerHost::handleInnerApproveCommand(
     }
   } else if (IS_EQUAL_COMMAND(command, FAIL_COMMAND)) {
   } else {
-    DEBUG_MSG_FORMAT(common::logging::L_WARNING, "UNKNOWN COMMAND: %s", command);
+    WARNING_LOG() << "UNKNOWN COMMAND: " << command;
   }
 }
 

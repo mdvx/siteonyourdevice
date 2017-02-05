@@ -337,7 +337,7 @@ void Http2ServerHandler::handleHttp2Request(Http2Client* h2client,
   const std::string hexstr = common::HexEncode(request, req_len, false);
 
   common::http2::frames_t frames = common::http2::parse_frames(request, req_len);
-  INFO_LOG() <<"frame_header_data hex: " << hexstr;
+  INFO_LOG() << "frame_header_data hex: " << hexstr;
   h2client->processFrames(frames);
 
   common::http2::frames_t headers_frames =

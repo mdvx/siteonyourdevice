@@ -92,9 +92,8 @@ void WebSocketServerHandlerHost::processWebsocketRequest(
   inner::InnerTcpServerClient* innerConnection =
       parent_->findInnerConnectionByHost(hpath_without_port);
   if (!innerConnection) {
-    DEBUG_MSG_FORMAT(common::logging::L_WARNING,
-                     "WebSocketServerHandlerHost not found host %s, request str:\n%s", hpath,
-                     common::ConvertToString(hrequest));
+    WARNING_LOG() << "WebSocketServerHandlerHost not found host " << hpath << " request str:\n"
+                  << common::ConvertToString(hrequest);
     hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL, "Not registered host.", false,
                         info());
     hclient->close();
