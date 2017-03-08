@@ -19,7 +19,7 @@
 #pragma once
 
 #include <common/smart_ptr.h>
-#include <common/thread/thread.h>
+#include <common/threads/thread.h>
 
 namespace fasto {
 namespace siteonyourdevice {
@@ -65,7 +65,7 @@ class ILoopThreadController : public ILoopController {
   virtual void started() override;
   virtual void stoped() override;
 
-  common::shared_ptr<common::thread::Thread<int> > loop_thread_;
+  common::shared_ptr<common::threads::Thread<int> > loop_thread_;
 };
 
 }  // namespace siteonyourdevice

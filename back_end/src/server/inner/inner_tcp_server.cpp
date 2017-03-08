@@ -23,7 +23,7 @@
 
 #include <common/net/net.h>
 #include <common/logger.h>
-#include <common/thread/thread_manager.h>
+#include <common/threads/thread_manager.h>
 #include <common/convert2string.h>
 
 #include "server/http_server_host.h"
@@ -155,12 +155,12 @@ InnerServerHandlerHost::InnerServerHandlerHost(HttpServerHost* parent)
   handler_ = new InnerSubHandler(this);
   sub_commands_in_ = new RedisSub(handler_);
   redis_subscribe_command_in_thread_ =
-      THREAD_MANAGER()->createThread(&RedisSub::listen, sub_commands_in_);
+      THREAD_MANAGER()->CreateThread(&RedisSub::listen, sub_commands_in_);
 }
 
 InnerServerHandlerHost::~InnerServerHandlerHost() {
   sub_commands_in_->stop();
-  redis_subscribe_command_in_thread_->join();
+  redis_subscribe_command_in_thread_->Join();
   delete sub_commands_in_;
   delete handler_;
 }
@@ -238,7 +238,7 @@ void InnerServerHandlerHost::dataReadyToWrite(tcp::TcpClient* client) {}
 
 void InnerServerHandlerHost::setStorageConfig(const redis_sub_configuration_t& config) {
   sub_commands_in_->setConfig(config);
-  redis_subscribe_command_in_thread_->start();
+  redis_subscribe_command_in_thread_->Start();
 }
 
 void InnerServerHandlerHost::handleInnerRequestCommand(

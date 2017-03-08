@@ -22,7 +22,7 @@
 #include "tcp/tcp_server.h"
 
 #include <common/logger.h>
-#include <common/thread/types.h>
+#include <common/threads/types.h>
 
 #include "tcp/tcp_client.h"
 
@@ -54,8 +54,8 @@ struct SigIgnInit {
   }
 } sig_init;
 
-typedef common::thread::unique_lock<common::thread::mutex> lock_t;
-common::thread::mutex g_exists_loops_mutex_;
+typedef common::unique_lock<common::mutex> lock_t;
+common::mutex g_exists_loops_mutex_;
 std::vector<fasto::siteonyourdevice::tcp::ITcpLoop*> g_exists_loops_;
 
 }  // namespace

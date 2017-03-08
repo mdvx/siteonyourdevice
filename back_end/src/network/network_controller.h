@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <common/thread/types.h>
+#include <common/threads/types.h>
 
 #include <string>
 

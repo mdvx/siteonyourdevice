@@ -100,7 +100,7 @@ void LibEvLoop::execInLoopThread(async_loop_exec_function_t async_cb) {
 }
 
 int LibEvLoop::exec() {
-  exec_id_ = common::thread::PlatformThread::currentId();
+  exec_id_ = common::threads::PlatformThread::currentId();
 
   ev_async_start(loop_, async_stop_);
   if (observer_) {
@@ -114,7 +114,7 @@ int LibEvLoop::exec() {
 }
 
 bool LibEvLoop::isLoopThread() const {
-  return exec_id_ == common::thread::PlatformThread::currentId();
+  return exec_id_ == common::threads::PlatformThread::currentId();
 }
 
 void LibEvLoop::stop() {

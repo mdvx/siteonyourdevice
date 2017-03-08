@@ -14,11 +14,11 @@ SET(SOURCES_GLOBAL
 )
 
 SET(HEADERS_APPLICATION
-  application/fasto_application.h
+  #application/fasto_application.h
   application/fasto_remote_application.h
 )
 SET(SOURCES_APPLICATION
-  application/fasto_application.cpp
+  #application/fasto_application.cpp
   application/fasto_remote_application.cpp
 )
 

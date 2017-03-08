@@ -22,7 +22,7 @@
 
 #include <functional>
 
-#include <common/thread/platform_thread.h>
+#include <common/threads/platform_thread.h>
 
 namespace fasto {
 namespace siteonyourdevice {
@@ -63,7 +63,7 @@ class LibEvLoop {
 
   struct ev_loop* const loop_;
   EvLoopObserver* observer_;
-  common::thread::platform_thread_id_t exec_id_;
+  common::threads::platform_thread_id_t exec_id_;
   ev_async* async_stop_;
 };
 

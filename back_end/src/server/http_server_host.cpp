@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include <common/thread/thread_manager.h>
+#include <common/threads/thread_manager.h>
 #include <common/logger.h>
 
 #include "inner/inner_tcp_client.h"
@@ -194,17 +194,17 @@ HttpServerHost::HttpServerHost(const common::net::HostAndPort& httpHost,
   httpHandler_ = new HttpInnerServerHandlerHost(hinf, this);
   httpServer_ = new http::Http2Server(httpHost, httpHandler_);
   httpServer_->setName("proxy_http_server");
-  http_thread_ = THREAD_MANAGER()->createThread(&exec_http_server, httpServer_);
+  http_thread_ = THREAD_MANAGER()->CreateThread(&exec_http_server, httpServer_);
 
   innerHandler_ = new inner::InnerServerHandlerHost(this);
   innerServer_ = new inner::InnerTcpServer(innerHost, innerHandler_);
   innerServer_->setName("inner_server");
-  inner_thread_ = THREAD_MANAGER()->createThread(&exec_inner_server, innerServer_);
+  inner_thread_ = THREAD_MANAGER()->CreateThread(&exec_inner_server, innerServer_);
 
   websocketHandler_ = new websocket::WebSocketServerHandlerHost(hinf, this);
   websocketServer_ = new websocket::WebSocketServerHost(webSocketHost, websocketHandler_);
   websocketServer_->setName("websocket_server");
-  websocket_thread_ = THREAD_MANAGER()->createThread(&exec_websocket_server, websocketServer_);
+  websocket_thread_ = THREAD_MANAGER()->CreateThread(&exec_websocket_server, websocketServer_);
 }
 
 inner::InnerServerHandlerHost* HttpServerHost::innerHandler() const {
@@ -272,13 +272,13 @@ HttpServerHost::~HttpServerHost() {
 }
 
 int HttpServerHost::exec() {
-  http_thread_->start();
-  inner_thread_->start();
-  websocket_thread_->start();
+  http_thread_->Start();
+  inner_thread_->Start();
+  websocket_thread_->Start();
 
-  int res = http_thread_->joinAndGet();
-  res |= inner_thread_->joinAndGet();
-  res |= websocket_thread_->joinAndGet();
+  int res = http_thread_->JoinAndGet();
+  res |= inner_thread_->JoinAndGet();
+  res |= websocket_thread_->JoinAndGet();
   return res;
 }
 

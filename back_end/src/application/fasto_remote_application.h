@@ -18,12 +18,12 @@
 
 #pragma once
 
+#include <common/application/application.h>
+
 #include "globals.h"
 
-#include "application/fasto_application.h"
-
 namespace common {
-namespace thread {
+namespace threads {
 template <typename type_t>
 class EventThread;
 }
@@ -39,21 +39,32 @@ class NetworkController;
 
 namespace application {
 
-class FastoRemoteApplication : public IFastoApplicationImpl {
+class FastoRemoteApplication : public common::application::IApplicationImpl {
  public:
   FastoRemoteApplication(int argc, char* argv[]);
   virtual ~FastoRemoteApplication();
 
-  virtual int exec();
-  virtual void exit(int result);
+  virtual int Exec();
+
+  virtual void PostEvent(event_t* event) override;
+  virtual void SendEvent(event_t* event) override;
+
+  virtual void Subscribe(listener_t* listener, common::events_size_t id) override;
+  virtual void UnSubscribe(listener_t* listener, common::events_size_t id) override;
+  virtual void UnSubscribe(listener_t* listener) override;
+
+  virtual void ShowCursor() override;
+  virtual void HideCursor() override;
+
+  virtual void Exit(int result);
 
  private:
-  virtual int preExec();
-  virtual int postExec();
+  virtual int PreExec();
+  virtual int PostExec();
 
   network::NetworkController* controller_;
   network::NetworkEventHandler* network_handler_;
-  common::thread::EventThread<NetworkEventTypes>* const thread_;  // event thread handle
+  common::threads::EventThread<NetworkEventTypes>* const thread_;  // event thread handle
 };
 
 }  // namespace application

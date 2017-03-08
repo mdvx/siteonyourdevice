@@ -22,7 +22,7 @@
 
 #include "tcp/tcp_server.h"
 
-#include <common/thread/thread_manager.h>
+#include <common/threads/thread_manager.h>
 
 namespace fasto {
 namespace siteonyourdevice {
@@ -66,17 +66,17 @@ ILoopController::~ILoopController() {
 }
 
 ILoopThreadController::ILoopThreadController() : ILoopController(), loop_thread_() {
-  loop_thread_ = THREAD_MANAGER()->createThread(&ILoopController::exec, this);
+  loop_thread_ = THREAD_MANAGER()->CreateThread(&ILoopController::exec, this);
 }
 
 ILoopThreadController::~ILoopThreadController() {}
 
 int ILoopThreadController::join() {
-  return loop_thread_->joinAndGet();
+  return loop_thread_->JoinAndGet();
 }
 
 void ILoopThreadController::started() {
-  loop_thread_->start();
+  loop_thread_->Start();
 }
 
 void ILoopThreadController::stoped() {

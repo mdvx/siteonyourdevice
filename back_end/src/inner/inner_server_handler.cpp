@@ -25,7 +25,7 @@
 #include <common/net/net.h>
 #include <common/system_info/cpu_info.h>
 #include <common/system_info/system_info.h>
-#include <common/thread/event_bus.h>
+#include <common/threads/event_bus.h>
 #include <common/convert2string.h>
 
 #include "third-party/json-c/json-c/json.h"
@@ -66,7 +66,7 @@ void InnerServerHandler::preLooped(tcp::ITcpLoop* server) {
     DEBUG_MSG_ERROR(err);
     auto ex_event =
         make_exception_event(new network::InnerClientConnectedEvent(this, authInfo()), err);
-    EVENT_BUS()->postEvent(ex_event);
+    EVENT_BUS()->PostEvent(ex_event);
     return;
   }
 
@@ -85,7 +85,7 @@ void InnerServerHandler::moved(tcp::TcpClient* client) {
 
 void InnerServerHandler::closed(tcp::TcpClient* client) {
   if (client == inner_connection_) {
-    EVENT_BUS()->postEvent(new network::InnerClientDisconnectedEvent(this, authInfo()));
+    EVENT_BUS()->PostEvent(new network::InnerClientDisconnectedEvent(this, authInfo()));
     inner_connection_ = nullptr;
     return;
   }
@@ -483,7 +483,7 @@ void InnerServerHandler::handleInnerRequestCommand(InnerClient* connection,
       }
       json_object_put(config_json);
 
-      EVENT_BUS()->postEvent(new network::ConfigChangedEvent(this, new_config));
+      EVENT_BUS()->PostEvent(new network::ConfigChangedEvent(this, new_config));
     } else {
       cmd_responce_t resp =
           make_responce(id, CLIENT_PLEASE_SET_CONFIG_COMMAND_RESP_FAIL_1S, CAUSE_INVALID_ARGS);
@@ -555,7 +555,7 @@ void InnerServerHandler::handleInnerApproveCommand(InnerClient* connection,
       const char* okrespcommand = argv[1];
       if (IS_EQUAL_COMMAND(okrespcommand, PING_COMMAND)) {
       } else if (IS_EQUAL_COMMAND(okrespcommand, SERVER_WHO_ARE_YOU_COMMAND)) {
-        EVENT_BUS()->postEvent(new network::InnerClientConnectedEvent(this, authInfo()));
+        EVENT_BUS()->PostEvent(new network::InnerClientConnectedEvent(this, authInfo()));
       }
     }
   } else if (IS_EQUAL_COMMAND(command, FAIL_COMMAND)) {

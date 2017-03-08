@@ -31,7 +31,7 @@
 #include "inner/http_inner_server_handler.h"
 #include "inner/inner_server_handler.h"
 
-#include "application/fasto_application.h"
+#include <common/application/application.h>
 
 #include "server/server_config.h"
 
@@ -45,7 +45,7 @@ std::string prepare_content_path(const std::string& path) {
     return common::file_system::stable_dir_path(path);
   }
 
-  std::string appdir = fApp->appDir();
+  std::string appdir = fApp->AppDir();
   return appdir + path;
 }
 
@@ -177,7 +177,7 @@ class LocalHttpServerController : public ServerControllerBase {
   }
 
   ~LocalHttpServerController() {
-    std::string appdir = fApp->appDir();
+    std::string appdir = fApp->AppDir();
     common::Error err = common::file_system::change_directory(appdir);
     if (err && err->isError()) {
       DEBUG_MSG_ERROR(err);

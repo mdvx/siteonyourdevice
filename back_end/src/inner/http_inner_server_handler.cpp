@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include <common/thread/event_bus.h>
+#include <common/threads/event_bus.h>
 #include <common/logger.h>
 #include <common/net/net.h>
 

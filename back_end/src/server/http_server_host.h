@@ -22,7 +22,7 @@
 
 #include "http/http_server.h"
 
-#include <common/thread/thread.h>
+#include <common/threads/thread.h>
 
 #include "server/inner/inner_tcp_server.h"
 
@@ -82,15 +82,15 @@ class HttpServerHost {
  private:
   HttpInnerServerHandlerHost* httpHandler_;
   http::Http2Server* httpServer_;
-  std::shared_ptr<common::thread::Thread<int> > http_thread_;
+  std::shared_ptr<common::threads::Thread<int> > http_thread_;
 
   inner::InnerServerHandlerHost* innerHandler_;
   inner::InnerTcpServer* innerServer_;
-  std::shared_ptr<common::thread::Thread<int> > inner_thread_;
+  std::shared_ptr<common::threads::Thread<int> > inner_thread_;
 
   websocket::WebSocketServerHandlerHost* websocketHandler_;
   websocket::WebSocketServerHost* websocketServer_;
-  std::shared_ptr<common::thread::Thread<int> > websocket_thread_;
+  std::shared_ptr<common::threads::Thread<int> > websocket_thread_;
 
   inner_connections_type connections_;
   RedisStorage rstorage_;

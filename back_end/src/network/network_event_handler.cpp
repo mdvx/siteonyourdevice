@@ -18,7 +18,7 @@
 
 #include "network/network_event_handler.h"
 
-#include <common/thread/event_bus.h>
+#include <common/threads/event_bus.h>
 #include <common/logger.h>
 
 #include "network/network_controller.h"
@@ -27,26 +27,26 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace network {
 
-class NetworkEventHandler::NetworkListener : public common::IListener<NetworkEventTypes> {
+class NetworkEventHandler::NetworkListener : public common::IListenerEx<NetworkEventTypes> {
   NetworkEventHandler* const app_;
 
  public:
   explicit NetworkListener(NetworkEventHandler* app)
-      : common::IListener<NetworkEventTypes>(), app_(app) {
-    EVENT_BUS()->subscribe<InnerClientConnectedEvent>(this);
-    EVENT_BUS()->subscribe<InnerClientDisconnectedEvent>(this);
-    EVENT_BUS()->subscribe<ConfigChangedEvent>(this);
+      : common::IListenerEx<NetworkEventTypes>(), app_(app) {
+    EVENT_BUS()->Subscribe<InnerClientConnectedEvent>(this);
+    EVENT_BUS()->Subscribe<InnerClientDisconnectedEvent>(this);
+    EVENT_BUS()->Subscribe<ConfigChangedEvent>(this);
   }
 
   ~NetworkListener() {
-    EVENT_BUS()->unsubscribe<ConfigChangedEvent>(this);
-    EVENT_BUS()->unsubscribe<InnerClientDisconnectedEvent>(this);
-    EVENT_BUS()->unsubscribe<InnerClientConnectedEvent>(this);
+    EVENT_BUS()->UnSubscribe<ConfigChangedEvent>(this);
+    EVENT_BUS()->UnSubscribe<InnerClientDisconnectedEvent>(this);
+    EVENT_BUS()->UnSubscribe<InnerClientConnectedEvent>(this);
   }
 
-  virtual void handleEvent(event_t* event) { app_->handleEvent(event); }
+  virtual void HandleEvent(event_t* event) { app_->handleEvent(event); }
 
-  virtual void handleExceptionEvent(event_t* event, common::Error err) {
+  virtual void HandleExceptionEvent(event_t* event, common::Error err) {
     app_->handleExceptionEvent(event, err);
   }
 };
@@ -61,9 +61,9 @@ NetworkEventHandler::~NetworkEventHandler() {
 }
 
 void NetworkEventHandler::handleEvent(NetworkEvent* event) {
-  if (event->eventType() == InnerClientConnectedEvent::EventType) {
-  } else if (event->eventType() == InnerClientDisconnectedEvent::EventType) {
-  } else if (event->eventType() == ConfigChangedEvent::EventType) {
+  if (event->GetEventType() == InnerClientConnectedEvent::EventType) {
+  } else if (event->GetEventType() == InnerClientDisconnectedEvent::EventType) {
+  } else if (event->GetEventType() == ConfigChangedEvent::EventType) {
     ConfigChangedEvent* new_config_event = static_cast<ConfigChangedEvent*>(event);
     HttpConfig config = new_config_event->info();
     controller_->disConnect();
@@ -73,7 +73,7 @@ void NetworkEventHandler::handleEvent(NetworkEvent* event) {
 }
 
 void NetworkEventHandler::handleExceptionEvent(NetworkEvent* event, common::Error err) {
-  WARNING_LOG() << "Exception event: " << common::ConvertToString(event->eventType())
+  WARNING_LOG() << "Exception event: " << common::ConvertToString(event->GetEventType())
                 << " msg: " << err->description();
 }
 

@@ -20,7 +20,7 @@
 
 #include <stdlib.h>
 
-#include <common/thread/event_bus.h>
+#include <common/threads/event_bus.h>
 
 #include "network/network_controller.h"
 #include "network/network_event_handler.h"
@@ -32,36 +32,50 @@ namespace siteonyourdevice {
 namespace application {
 
 FastoRemoteApplication::FastoRemoteApplication(int argc, char* argv[])
-    : IFastoApplicationImpl(argc, argv),
+    : common::application::IApplicationImpl(argc, argv),
       controller_(nullptr),
       network_handler_(nullptr),
-      thread_(EVENT_BUS()->createEventThread<NetworkEventTypes>()) {}
+      thread_(EVENT_BUS()->CreateEventThread<NetworkEventTypes>()) {}
 
 FastoRemoteApplication::~FastoRemoteApplication() {
-  EVENT_BUS()->stop();
+  EVENT_BUS()->Stop();
 }
 
-int FastoRemoteApplication::preExec() {
-  controller_ = new network::NetworkController(fApp->argc(), fApp->argv());
+int FastoRemoteApplication::PreExec() {
+  controller_ = new network::NetworkController(fApp->Argc(), fApp->Argv());
   network_handler_ = new network::NetworkEventHandler(controller_);
   controller_->connect();
   return EXIT_SUCCESS;
 }
 
-int FastoRemoteApplication::exec() {
-  EVENT_BUS()->joinEventThread(thread_);
+int FastoRemoteApplication::Exec() {
+  EVENT_BUS()->JoinEventThread(thread_);
   return EXIT_SUCCESS;
 }
 
-int FastoRemoteApplication::postExec() {
+int FastoRemoteApplication::PostExec() {
   delete network_handler_;
   delete controller_;
   return EXIT_SUCCESS;
 }
 
-void FastoRemoteApplication::exit(int result) {
+void FastoRemoteApplication::PostEvent(event_t* event) {}
+
+void FastoRemoteApplication::SendEvent(event_t* event) {}
+
+void FastoRemoteApplication::Subscribe(listener_t* listener, common::events_size_t id) {}
+
+void FastoRemoteApplication::UnSubscribe(listener_t* listener, common::events_size_t id) {}
+
+void FastoRemoteApplication::UnSubscribe(listener_t* listener) {}
+
+void FastoRemoteApplication::ShowCursor() {}
+
+void FastoRemoteApplication::HideCursor() {}
+
+void FastoRemoteApplication::Exit(int result) {
   controller_->exit(result);
-  EVENT_BUS()->stopEventThread(thread_);
+  EVENT_BUS()->StopEventThread(thread_);
 }
 
 }  // namespace application

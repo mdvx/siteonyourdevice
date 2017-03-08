@@ -18,7 +18,8 @@
 
 #pragma once
 
-#include <common/thread/thread.h>
+#include <common/types.h>
+#include <common/threads/thread.h>
 
 #include "inner/inner_server_command_seq_parser.h"
 
@@ -77,7 +78,7 @@ class InnerServerHandlerHost : public fasto::siteonyourdevice::inner::InnerServe
   class InnerSubHandler;
   RedisSub* sub_commands_in_;
   InnerSubHandler* handler_;
-  std::shared_ptr<common::thread::Thread<void> > redis_subscribe_command_in_thread_;
+  std::shared_ptr<common::threads::Thread<void> > redis_subscribe_command_in_thread_;
   timer_id_t ping_client_id_timer_;
 };
 

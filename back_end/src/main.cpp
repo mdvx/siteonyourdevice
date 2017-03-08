@@ -19,7 +19,17 @@
 #include <common/file_system.h>
 #include <common/logger.h>
 
-#include "application/fasto_application.h"
+#include <common/application/application.h>
+
+#include "application/fasto_remote_application.h"
+
+namespace common {
+namespace application {
+common::application::IApplicationImpl* CreateApplicationImpl(int argc, char* argv[]) {
+  return new fasto::siteonyourdevice::application::FastoRemoteApplication(argc, argv);
+}
+}
+}
 
 // [-c] config path [-d] run as daemon
 
@@ -35,7 +45,7 @@ int main(int argc, char* argv[]) {
 #else
   INIT_LOGGER(PROJECT_NAME_TITLE, level);
 #endif
-  fasto::siteonyourdevice::application::FastoApplication app(argc, argv);
-  int res = app.exec();
+  common::application::Application app(argc, argv);
+  int res = app.Exec();
   return res;
 }
