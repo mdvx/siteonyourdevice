@@ -29,24 +29,24 @@ class RelayClientEx;
 class ProxyRelayClient;
 
 class Http2ClientServerHandler : public http::Http2ServerHandler {
-public:
-  Http2ClientServerHandler(const HttpServerInfo &info);
+ public:
+  Http2ClientServerHandler(const HttpServerInfo& info);
   ~Http2ClientServerHandler();
 
-  virtual void preLooped(tcp::ITcpLoop *server) override;
-  virtual void accepted(tcp::TcpClient *client) override;
-  virtual void closed(tcp::TcpClient *client) override;
-  virtual void dataReceived(tcp::TcpClient *client) override;
-  virtual void dataReadyToWrite(tcp::TcpClient *client) override;
-  virtual void postLooped(tcp::ITcpLoop *server) override;
-  virtual void timerEmited(tcp::ITcpLoop *server, timer_id_t id) override;
+  virtual void PreLooped(common::libev::IoLoop* server) override;
+  virtual void Accepted(common::libev::IoClient* client) override;
+  virtual void Closed(common::libev::IoClient* client) override;
+  virtual void DataReceived(common::libev::IoClient* client) override;
+  virtual void DataReadyToWrite(common::libev::IoClient* client) override;
+  virtual void PostLooped(common::libev::IoLoop* server) override;
+  virtual void TimerEmited(common::libev::IoLoop* server, common::libev::timer_id_t id) override;
 
-private:
-  void relayDataReceived(RelayClient *rclient);
-  void relayExDataReceived(RelayClientEx *rclient);
-  void proxyDataReceived(ProxyRelayClient *prclient);
+ private:
+  void relayDataReceived(RelayClient* rclient);
+  void relayExDataReceived(RelayClientEx* rclient);
+  void proxyDataReceived(ProxyRelayClient* prclient);
 };
 
-} // namespace inner
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace inner
+}  // namespace siteonyourdevice
+}  // namespace fasto

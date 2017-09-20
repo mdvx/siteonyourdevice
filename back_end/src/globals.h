@@ -34,7 +34,8 @@ enum NetworkEventTypes {
 
 namespace common {
 
-template <> struct event_traits<NetworkEventTypes> {
+template <>
+struct event_traits<NetworkEventTypes> {
   typedef IEventEx<NetworkEventTypes> event_t;
   typedef IExceptionEvent<NetworkEventTypes> ex_event_t;
   typedef IListenerEx<NetworkEventTypes> listener_t;
@@ -43,7 +44,6 @@ template <> struct event_traits<NetworkEventTypes> {
 };
 
 std::string ConvertToString(NetworkEventTypes net);
-bool ConvertFromString(const std::string &from,
-                       NetworkEventTypes *out) WARN_UNUSED_RESULT;
+bool ConvertFromString(const std::string& from, NetworkEventTypes* out) WARN_UNUSED_RESULT;
 
-} // namespace common
+}  // namespace common

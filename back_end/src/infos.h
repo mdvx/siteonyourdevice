@@ -27,8 +27,7 @@ namespace siteonyourdevice {
 
 struct UserAuthInfo {
   UserAuthInfo();
-  UserAuthInfo(const std::string &login, const std::string &password,
-               const common::net::HostAndPort &host);
+  UserAuthInfo(const std::string& login, const std::string& password, const common::net::HostAndPort& host);
 
   bool isValid() const;
 
@@ -37,31 +36,28 @@ struct UserAuthInfo {
   common::net::HostAndPort host;
 };
 
-inline bool operator==(const UserAuthInfo &lhs, const UserAuthInfo &rhs) {
-  return lhs.login == rhs.login && lhs.password == rhs.password &&
-         lhs.host == rhs.host;
+inline bool operator==(const UserAuthInfo& lhs, const UserAuthInfo& rhs) {
+  return lhs.login == rhs.login && lhs.password == rhs.password && lhs.host == rhs.host;
 }
 
-inline bool operator!=(const UserAuthInfo &x, const UserAuthInfo &y) {
+inline bool operator!=(const UserAuthInfo& x, const UserAuthInfo& y) {
   return !(x == y);
 }
 
 struct HttpServerInfo {
   HttpServerInfo();
-  HttpServerInfo(const std::string &server_name, const std::string &server_url);
+  HttpServerInfo(const std::string& server_name, const std::string& server_url);
 
   std::string server_name;
   std::string server_url;
 };
 
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace siteonyourdevice
+}  // namespace fasto
 
 namespace common {
 
-std::string ConvertToString(const fasto::siteonyourdevice::UserAuthInfo &uinfo);
-bool ConvertFromString(const std::string &from,
-                       fasto::siteonyourdevice::UserAuthInfo *out)
-    WARN_UNUSED_RESULT;
+std::string ConvertToString(const fasto::siteonyourdevice::UserAuthInfo& uinfo);
+bool ConvertFromString(const std::string& from, fasto::siteonyourdevice::UserAuthInfo* out) WARN_UNUSED_RESULT;
 
-} // namespace common
+}  // namespace common

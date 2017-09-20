@@ -18,37 +18,33 @@
 
 #pragma once
 
-#include "tcp/tcp_server.h"
+#include <common/libev/tcp/tcp_server.h>
 
 namespace fasto {
 namespace siteonyourdevice {
 namespace http {
 
-class HttpServer : public tcp::TcpServer {
-public:
-  HttpServer(const common::net::HostAndPort &host,
-             tcp::ITcpLoopObserver *observer);
+class HttpServer : public common::libev::tcp::TcpServer {
+ public:
+  HttpServer(const common::net::HostAndPort& host, common::libev::IoLoopObserver* observer);
   ~HttpServer();
 
-  virtual const char *ClassName() const override;
+  virtual const char* ClassName() const override;
 
-protected:
-  virtual tcp::TcpClient *
-  createClient(const common::net::socket_info &info) override;
+ protected:
+  virtual common::libev::tcp::TcpClient* CreateClient(const common::net::socket_info& info) override;
 };
 
 class Http2Server : public HttpServer {
-public:
-  Http2Server(const common::net::HostAndPort &host,
-              tcp::ITcpLoopObserver *observer);
+ public:
+  Http2Server(const common::net::HostAndPort& host, common::libev::IoLoopObserver* observer);
 
-  virtual const char *ClassName() const override;
+  virtual const char* ClassName() const override;
 
-protected:
-  virtual tcp::TcpClient *
-  createClient(const common::net::socket_info &info) override;
+ protected:
+  virtual common::libev::tcp::TcpClient* CreateClient(const common::net::socket_info& info) override;
 };
 
-} // namespace http
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace http
+}  // namespace siteonyourdevice
+}  // namespace fasto

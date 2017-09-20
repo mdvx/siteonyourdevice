@@ -65,5 +65,5 @@ struct HttpConfig {
   std::vector<server_sockets_url_t> server_sockets_urls;
 };
 
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace siteonyourdevice
+}  // namespace fasto

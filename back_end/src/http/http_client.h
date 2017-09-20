@@ -22,7 +22,7 @@
 
 #include <vector>
 
-#include "tcp/tcp_client.h"
+#include <common/libev/tcp/tcp_client.h>
 
 #include "http/http_streams.h"
 
@@ -32,73 +32,80 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace http {
 
-class HttpClient : public tcp::TcpClient {
-public:
-  HttpClient(tcp::ITcpLoop *server, const common::net::socket_info &info);
+class HttpClient : public common::libev::tcp::TcpClient {
+ public:
+  HttpClient(common::libev::IoLoop* server, const common::net::socket_info& info);
 
-  common::ErrnoError send_ok(common::http::http_protocols protocol,
-                             const char *extra_header, const char *text,
-                             bool is_keep_alive,
-                             const HttpServerInfo &info) WARN_UNUSED_RESULT;
-  virtual common::ErrnoError
-  send_error(common::http::http_protocols protocol,
-             common::http::http_status status, const char *extra_header,
-             const char *text, bool is_keep_alive,
-             const HttpServerInfo &info) WARN_UNUSED_RESULT;
-  virtual common::ErrnoError
-  send_file_by_fd(common::http::http_protocols protocol, int fdesc,
-                  off_t size) WARN_UNUSED_RESULT;
-  virtual common::ErrnoError
-  send_headers(common::http::http_protocols protocol,
-               common::http::http_status status, const char *extra_header,
-               const char *mime_type, off_t *length, time_t *mod,
-               bool is_keep_alive,
-               const HttpServerInfo &info) WARN_UNUSED_RESULT;
+  common::Error send_ok(common::http::http_protocols protocol,
+                        const char* extra_header,
+                        const char* text,
+                        bool is_keep_alive,
+                        const HttpServerInfo& info) WARN_UNUSED_RESULT;
+  virtual common::Error send_error(common::http::http_protocols protocol,
+                                   common::http::http_status status,
+                                   const char* extra_header,
+                                   const char* text,
+                                   bool is_keep_alive,
+                                   const HttpServerInfo& info) WARN_UNUSED_RESULT;
+  virtual common::ErrnoError send_file_by_fd(common::http::http_protocols protocol,
+                                             int fdesc,
+                                             off_t size) WARN_UNUSED_RESULT;
+  virtual common::Error send_headers(common::http::http_protocols protocol,
+                                     common::http::http_status status,
+                                     const char* extra_header,
+                                     const char* mime_type,
+                                     off_t* length,
+                                     time_t* mod,
+                                     bool is_keep_alive,
+                                     const HttpServerInfo& info) WARN_UNUSED_RESULT;
 
-  virtual const char *ClassName() const override;
+  virtual const char* ClassName() const override;
 
   void setIsAuthenticated(bool auth);
   bool isAuthenticated() const;
 
-private:
+ private:
   bool isAuth_;
 };
 
 class Http2Client : public HttpClient {
-public:
+ public:
   typedef StreamSPtr stream_t;
   typedef std::vector<stream_t> streams_t;
 
-  Http2Client(tcp::ITcpLoop *server, const common::net::socket_info &info);
+  Http2Client(common::libev::IoLoop* server, const common::net::socket_info& info);
 
-  virtual common::ErrnoError
-  send_error(common::http::http_protocols protocol,
-             common::http::http_status status, const char *extra_header,
-             const char *text, bool is_keep_alive,
-             const HttpServerInfo &info) override WARN_UNUSED_RESULT;
-  virtual common::ErrnoError
-  send_file_by_fd(common::http::http_protocols protocol, int fdesc,
-                  off_t size) override WARN_UNUSED_RESULT;
-  virtual common::ErrnoError
-  send_headers(common::http::http_protocols protocol,
-               common::http::http_status status, const char *extra_header,
-               const char *mime_type, off_t *length, time_t *mod,
-               bool is_keep_alive,
-               const HttpServerInfo &info) override WARN_UNUSED_RESULT;
+  virtual common::Error send_error(common::http::http_protocols protocol,
+                                   common::http::http_status status,
+                                   const char* extra_header,
+                                   const char* text,
+                                   bool is_keep_alive,
+                                   const HttpServerInfo& info) override WARN_UNUSED_RESULT;
+  virtual common::ErrnoError send_file_by_fd(common::http::http_protocols protocol,
+                                             int fdesc,
+                                             off_t size) override WARN_UNUSED_RESULT;
+  virtual common::Error send_headers(common::http::http_protocols protocol,
+                                     common::http::http_status status,
+                                     const char* extra_header,
+                                     const char* mime_type,
+                                     off_t* length,
+                                     time_t* mod,
+                                     bool is_keep_alive,
+                                     const HttpServerInfo& info) override WARN_UNUSED_RESULT;
 
-  void processFrames(const common::http2::frames_t &frames);
+  void processFrames(const common::http2::frames_t& frames);
 
   bool isSettingNegotiated() const;
 
-  virtual const char *ClassName() const override;
+  virtual const char* ClassName() const override;
 
-private:
+ private:
   bool is_http2() const;
   StreamSPtr findStreamByStreamID(IStream::stream_id_t stream_id) const;
   StreamSPtr findStreamByType(common::http2::frame_t type) const;
   streams_t streams_;
 };
 
-} // namespace http
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace http
+}  // namespace siteonyourdevice
+}  // namespace fasto

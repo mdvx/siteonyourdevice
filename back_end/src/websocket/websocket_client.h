@@ -25,13 +25,13 @@ namespace siteonyourdevice {
 namespace websocket {
 
 class WebSocketClient : public http::Http2Client {
-public:
-  WebSocketClient(tcp::ITcpLoop *server, const common::net::socket_info &info);
+ public:
+  WebSocketClient(common::libev::IoLoop* server, const common::net::socket_info& info);
   ~WebSocketClient();
 
-  const char *ClassName() const;
+  const char* ClassName() const;
 };
 
-} // namespace websocket
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace websocket
+}  // namespace siteonyourdevice
+}  // namespace fasto

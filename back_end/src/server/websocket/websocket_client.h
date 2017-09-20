@@ -26,14 +26,13 @@ namespace server {
 namespace websocket {
 
 class WebSocketClientHost : public http::Http2Client {
-public:
-  WebSocketClientHost(tcp::ITcpLoop *server,
-                      const common::net::socket_info &info);
+ public:
+  WebSocketClientHost(common::libev::IoLoop* server, const common::net::socket_info& info);
 
-  virtual const char *className() const;
+  virtual const char* ClassName() const;
 };
 
-} // namespace websocket
-} // namespace server
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace websocket
+}  // namespace server
+}  // namespace siteonyourdevice
+}  // namespace fasto

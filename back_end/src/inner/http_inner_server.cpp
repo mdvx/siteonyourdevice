@@ -24,29 +24,29 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-ProxyInnerServer::ProxyInnerServer(tcp::ITcpLoopObserver *observer)
-    : ITcpLoop(observer) {}
+ProxyInnerServer::ProxyInnerServer(common::libev::IoLoopObserver* observer) : base_class(observer) {}
 
-const char *ProxyInnerServer::ClassName() const { return "ProxyInnerServer"; }
-
-tcp::TcpClient *
-ProxyInnerServer::createClient(const common::net::socket_info &info) {
-  return new tcp::TcpClient(this, info);
+const char* ProxyInnerServer::ClassName() const {
+  return "ProxyInnerServer";
 }
 
-Http2InnerServer::Http2InnerServer(tcp::ITcpLoopObserver *observer,
-                                   const HttpConfig &config)
+common::libev::tcp::TcpClient* ProxyInnerServer::CreateClient(const common::net::socket_info& info) {
+  return new common::libev::tcp::TcpClient(this, info);
+}
+
+Http2InnerServer::Http2InnerServer(common::libev::IoLoopObserver* observer, const HttpConfig& config)
     : Http2Server(config.local_host, observer), config_(config) {}
 
-const char *Http2InnerServer::ClassName() const { return "Http2InnerServer"; }
+const char* Http2InnerServer::ClassName() const {
+  return "Http2InnerServer";
+}
 
-tcp::TcpClient *
-Http2InnerServer::createClient(const common::net::socket_info &info) {
-  http::Http2Client *cl = new http::Http2Client(this, info);
+common::libev::tcp::TcpClient* Http2InnerServer::CreateClient(const common::net::socket_info& info) {
+  http::Http2Client* cl = new http::Http2Client(this, info);
   cl->setIsAuthenticated(!config_.is_private_site);
   return cl;
 }
 
-} // namespace inner
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace inner
+}  // namespace siteonyourdevice
+}  // namespace fasto

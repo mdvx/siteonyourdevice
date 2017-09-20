@@ -30,14 +30,12 @@ std::string ConvertToString(fasto::siteonyourdevice::HCTypes t) {
   return fasto::siteonyourdevice::HCallbackTypes[t];
 }
 
-bool ConvertFromString(const std::string &from,
-                       fasto::siteonyourdevice::HCTypes *out) {
+bool ConvertFromString(const std::string& from, fasto::siteonyourdevice::HCTypes* out) {
   if (!out) {
     return false;
   }
 
-  for (uint32_t i = 0; i < SIZEOFMASS(fasto::siteonyourdevice::HCallbackTypes);
-       ++i) {
+  for (uint32_t i = 0; i < SIZEOFMASS(fasto::siteonyourdevice::HCallbackTypes); ++i) {
     if (from == fasto::siteonyourdevice::HCallbackTypes[i]) {
       *out = static_cast<fasto::siteonyourdevice::HCTypes>(i);
       return true;
@@ -48,7 +46,7 @@ bool ConvertFromString(const std::string &from,
   return false;
 }
 
-} // namespace common
+}  // namespace common
 
 namespace fasto {
 namespace siteonyourdevice {
@@ -68,9 +66,7 @@ std::shared_ptr<IHttpCallback> IHttpCallback::createHttpCallback(HCTypes type) {
   }
 }
 
-std::shared_ptr<IHttpCallback>
-IHttpCallback::createHttpCallback(const std::string &ns_name,
-                                  const std::string &name) {
+std::shared_ptr<IHttpCallback> IHttpCallback::createHttpCallback(const std::string& ns_name, const std::string& name) {
   HCTypes htype;
   if (common::ConvertFromString(ns_name, &htype)) {
     if (htype == file_system) {
@@ -85,7 +81,9 @@ IHttpCallback::createHttpCallback(const std::string &ns_name,
 
 HttpCallbackUrl::HttpCallbackUrl(HCTypes type) : IHttpCallback(), type_(type) {}
 
-HCTypes HttpCallbackUrl::type() const { return type_; }
+HCTypes HttpCallbackUrl::type() const {
+  return type_;
+}
 
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace siteonyourdevice
+}  // namespace fasto

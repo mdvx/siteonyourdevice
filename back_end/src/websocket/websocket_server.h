@@ -18,23 +18,21 @@
 
 #pragma once
 
-#include "tcp/tcp_server.h"
+#include <common/libev/tcp/tcp_server.h>
 
 namespace fasto {
 namespace siteonyourdevice {
 namespace websocket {
 
-class WebSocketServer : public tcp::TcpServer {
-public:
-  explicit WebSocketServer(const common::net::HostAndPort &host,
-                           tcp::ITcpLoopObserver *observer = nullptr);
-  const char *ClassName() const override;
+class WebSocketServer : public common::libev::tcp::TcpServer {
+ public:
+  explicit WebSocketServer(const common::net::HostAndPort& host, common::libev::IoLoopObserver* observer = nullptr);
+  const char* ClassName() const override;
 
-protected:
-  virtual tcp::TcpClient *
-  createClient(const common::net::socket_info &info) override;
+ protected:
+  virtual common::libev::tcp::TcpClient* CreateClient(const common::net::socket_info& info) override;
 };
 
-} // namespace websocket
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace websocket
+}  // namespace siteonyourdevice
+}  // namespace fasto

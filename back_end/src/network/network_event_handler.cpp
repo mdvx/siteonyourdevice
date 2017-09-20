@@ -27,13 +27,11 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace network {
 
-class NetworkEventHandler::NetworkListener
-    : public common::IListenerEx<NetworkEventTypes> {
-  NetworkEventHandler *const app_;
+class NetworkEventHandler::NetworkListener : public common::IListenerEx<NetworkEventTypes> {
+  NetworkEventHandler* const app_;
 
-public:
-  explicit NetworkListener(NetworkEventHandler *app)
-      : common::IListenerEx<NetworkEventTypes>(), app_(app) {
+ public:
+  explicit NetworkListener(NetworkEventHandler* app) : common::IListenerEx<NetworkEventTypes>(), app_(app) {
     EVENT_BUS()->Subscribe<InnerClientConnectedEvent>(this);
     EVENT_BUS()->Subscribe<InnerClientDisconnectedEvent>(this);
     EVENT_BUS()->Subscribe<ConfigChangedEvent>(this);
@@ -45,26 +43,25 @@ public:
     EVENT_BUS()->UnSubscribe<InnerClientConnectedEvent>(this);
   }
 
-  virtual void HandleEvent(event_t *event) { app_->handleEvent(event); }
+  virtual void HandleEvent(event_t* event) { app_->handleEvent(event); }
 
-  virtual void HandleExceptionEvent(event_t *event, common::Error err) {
-    app_->handleExceptionEvent(event, err);
-  }
+  virtual void HandleExceptionEvent(event_t* event, common::Error err) { app_->handleExceptionEvent(event, err); }
 };
 
-NetworkEventHandler::NetworkEventHandler(NetworkController *controller)
+NetworkEventHandler::NetworkEventHandler(NetworkController* controller)
     : network_listener_(nullptr), controller_(controller) {
   network_listener_ = new NetworkListener(this);
 }
 
-NetworkEventHandler::~NetworkEventHandler() { delete network_listener_; }
+NetworkEventHandler::~NetworkEventHandler() {
+  delete network_listener_;
+}
 
-void NetworkEventHandler::handleEvent(NetworkEvent *event) {
+void NetworkEventHandler::handleEvent(NetworkEvent* event) {
   if (event->GetEventType() == InnerClientConnectedEvent::EventType) {
   } else if (event->GetEventType() == InnerClientDisconnectedEvent::EventType) {
   } else if (event->GetEventType() == ConfigChangedEvent::EventType) {
-    ConfigChangedEvent *new_config_event =
-        static_cast<ConfigChangedEvent *>(event);
+    ConfigChangedEvent* new_config_event = static_cast<ConfigChangedEvent*>(event);
     HttpConfig config = new_config_event->info();
     controller_->disConnect();
     controller_->setConfig(config);
@@ -72,13 +69,11 @@ void NetworkEventHandler::handleEvent(NetworkEvent *event) {
   }
 }
 
-void NetworkEventHandler::handleExceptionEvent(NetworkEvent *event,
-                                               common::Error err) {
-  WARNING_LOG() << "Exception event: "
-                << common::ConvertToString(event->GetEventType())
+void NetworkEventHandler::handleExceptionEvent(NetworkEvent* event, common::Error err) {
+  WARNING_LOG() << "Exception event: " << common::ConvertToString(event->GetEventType())
                 << " msg: " << err->GetDescription();
 }
 
-} // namespace network
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace network
+}  // namespace siteonyourdevice
+}  // namespace fasto

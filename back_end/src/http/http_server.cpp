@@ -24,29 +24,30 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace http {
 
-HttpServer::HttpServer(const common::net::HostAndPort &host,
-                       tcp::ITcpLoopObserver *observer)
+HttpServer::HttpServer(const common::net::HostAndPort& host, common::libev::IoLoopObserver* observer)
     : TcpServer(host, observer) {}
 
 HttpServer::~HttpServer() {}
 
-tcp::TcpClient *HttpServer::createClient(const common::net::socket_info &info) {
+common::libev::tcp::TcpClient* HttpServer::CreateClient(const common::net::socket_info& info) {
   return new HttpClient(this, info);
 }
 
-const char *HttpServer::ClassName() const { return "HttpServer"; }
+const char* HttpServer::ClassName() const {
+  return "HttpServer";
+}
 
-Http2Server::Http2Server(const common::net::HostAndPort &host,
-                         tcp::ITcpLoopObserver *observer)
+Http2Server::Http2Server(const common::net::HostAndPort& host, common::libev::IoLoopObserver* observer)
     : HttpServer(host, observer) {}
 
-tcp::TcpClient *
-Http2Server::createClient(const common::net::socket_info &info) {
+common::libev::tcp::TcpClient* Http2Server::CreateClient(const common::net::socket_info& info) {
   return new Http2Client(this, info);
 }
 
-const char *Http2Server::ClassName() const { return "Http2Server"; }
+const char* Http2Server::ClassName() const {
+  return "Http2Server";
+}
 
-} // namespace http
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace http
+}  // namespace siteonyourdevice
+}  // namespace fasto

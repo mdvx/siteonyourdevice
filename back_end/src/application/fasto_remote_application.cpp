@@ -31,16 +31,18 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace application {
 
-FastoRemoteApplication::FastoRemoteApplication(int argc, char *argv[])
-    : common::application::IApplication(argc, argv), controller_(nullptr),
+FastoRemoteApplication::FastoRemoteApplication(int argc, char* argv[])
+    : common::application::IApplication(argc, argv),
+      controller_(nullptr),
       network_handler_(nullptr),
       thread_(EVENT_BUS()->CreateEventThread<NetworkEventTypes>()) {}
 
-FastoRemoteApplication::~FastoRemoteApplication() { EVENT_BUS()->Stop(); }
+FastoRemoteApplication::~FastoRemoteApplication() {
+  EVENT_BUS()->Stop();
+}
 
 int FastoRemoteApplication::PreExecImpl() {
-  controller_ =
-      new network::NetworkController(fApp->GetArgc(), fApp->GetArgv());
+  controller_ = new network::NetworkController(fApp->GetArgc(), fApp->GetArgv());
   network_handler_ = new network::NetworkEventHandler(controller_);
   controller_->connect();
   return EXIT_SUCCESS;
@@ -57,28 +59,27 @@ int FastoRemoteApplication::PostExecImpl() {
   return EXIT_SUCCESS;
 }
 
-void FastoRemoteApplication::PostEvent(event_t *event) {}
+void FastoRemoteApplication::PostEvent(event_t* event) {}
 
-void FastoRemoteApplication::SendEvent(event_t *event) {}
+void FastoRemoteApplication::SendEvent(event_t* event) {}
 
-void FastoRemoteApplication::Subscribe(listener_t *listener,
-                                       common::events_size_t id) {}
+void FastoRemoteApplication::Subscribe(listener_t* listener, common::events_size_t id) {}
 
-void FastoRemoteApplication::UnSubscribe(listener_t *listener,
-                                         common::events_size_t id) {}
+void FastoRemoteApplication::UnSubscribe(listener_t* listener, common::events_size_t id) {}
 
-void FastoRemoteApplication::UnSubscribe(listener_t *listener) {}
+void FastoRemoteApplication::UnSubscribe(listener_t* listener) {}
 
 void FastoRemoteApplication::ShowCursor() {}
 
 void FastoRemoteApplication::HideCursor() {}
 
-bool FastoRemoteApplication::IsCursorVisible() const { return false; }
+bool FastoRemoteApplication::IsCursorVisible() const {
+  return false;
+}
 
-common::application::timer_id_t
-FastoRemoteApplication::AddTimer(uint32_t interval,
-                                 common::application::timer_callback_t cb,
-                                 void *user_data) {
+common::application::timer_id_t FastoRemoteApplication::AddTimer(uint32_t interval,
+                                                                 common::application::timer_callback_t cb,
+                                                                 void* user_data) {
   return -1;
 }
 
@@ -91,6 +92,6 @@ void FastoRemoteApplication::ExitImpl(int result) {
   EVENT_BUS()->StopEventThread(thread_);
 }
 
-} // namespace application
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace application
+}  // namespace siteonyourdevice
+}  // namespace fasto

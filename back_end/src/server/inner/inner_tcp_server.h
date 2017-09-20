@@ -20,14 +20,14 @@
 
 #include <memory>
 
+#include <common/libev/io_loop_observer.h>
+#include <common/libev/tcp/tcp_server.h>
 #include <common/threads/thread.h>
 #include <common/types.h>
 
 #include "inner/inner_server_command_seq_parser.h"
 
 #include "server/redis_helpers.h"
-
-#include "tcp/tcp_server.h"
 
 #include "infos.h"
 
@@ -37,63 +37,63 @@ namespace server {
 class HttpServerHost;
 namespace inner {
 
-class InnerServerHandlerHost
-    : public fasto::siteonyourdevice::inner::InnerServerCommandSeqParser,
-      public tcp::ITcpLoopObserver {
-public:
+class InnerServerHandlerHost : public fasto::siteonyourdevice::inner::InnerServerCommandSeqParser,
+                               public common::libev::IoLoopObserver {
+ public:
   enum {
-    ping_timeout_clients = 60 // sec
+    ping_timeout_clients = 60  // sec
   };
 
-  explicit InnerServerHandlerHost(HttpServerHost *parent);
+  explicit InnerServerHandlerHost(HttpServerHost* parent);
 
-  virtual void preLooped(tcp::ITcpLoop *server);
+  virtual void PreLooped(common::libev::IoLoop* server);
 
-  virtual void accepted(tcp::TcpClient *client);
-  virtual void moved(tcp::TcpClient *client);
-  virtual void closed(tcp::TcpClient *client);
+  virtual void Accepted(common::libev::IoClient* client);
+  virtual void Moved(common::libev::IoLoop* server, common::libev::IoClient* client);
+  virtual void Closed(common::libev::IoClient* client);
 
-  virtual void dataReceived(tcp::TcpClient *client);
-  virtual void dataReadyToWrite(tcp::TcpClient *client);
-  virtual void postLooped(tcp::ITcpLoop *server);
-  virtual void timerEmited(tcp::ITcpLoop *server, timer_id_t id);
+  virtual void DataReceived(common::libev::IoClient* client);
+  virtual void DataReadyToWrite(common::libev::IoClient* client);
+  virtual void PostLooped(common::libev::IoLoop* server);
+  virtual void TimerEmited(common::libev::IoLoop* server, common::libev::timer_id_t id);
 
   virtual ~InnerServerHandlerHost();
 
-  void setStorageConfig(const redis_sub_configuration_t &config);
+  void setStorageConfig(const redis_sub_configuration_t& config);
 
-private:
-  virtual void
-  handleInnerRequestCommand(siteonyourdevice::inner::InnerClient *connection,
-                            cmd_seq_t id, int argc, char *argv[]);
-  virtual void
-  handleInnerResponceCommand(siteonyourdevice::inner::InnerClient *connection,
-                             cmd_seq_t id, int argc, char *argv[]);
-  virtual void
-  handleInnerApproveCommand(siteonyourdevice::inner::InnerClient *connection,
-                            cmd_seq_t id, int argc, char *argv[]);
+ private:
+  virtual void handleInnerRequestCommand(siteonyourdevice::inner::InnerClient* connection,
+                                         cmd_seq_t id,
+                                         int argc,
+                                         char* argv[]);
+  virtual void handleInnerResponceCommand(siteonyourdevice::inner::InnerClient* connection,
+                                          cmd_seq_t id,
+                                          int argc,
+                                          char* argv[]);
+  virtual void handleInnerApproveCommand(siteonyourdevice::inner::InnerClient* connection,
+                                         cmd_seq_t id,
+                                         int argc,
+                                         char* argv[]);
 
-  HttpServerHost *const parent_;
+  HttpServerHost* const parent_;
 
   class InnerSubHandler;
-  RedisSub *sub_commands_in_;
-  InnerSubHandler *handler_;
-  std::shared_ptr<common::threads::Thread<void>>
-      redis_subscribe_command_in_thread_;
-  timer_id_t ping_client_id_timer_;
+  RedisSub* sub_commands_in_;
+  InnerSubHandler* handler_;
+  std::shared_ptr<common::threads::Thread<void>> redis_subscribe_command_in_thread_;
+  common::libev::timer_id_t ping_client_id_timer_;
 };
 
-class InnerTcpServer : public tcp::TcpServer {
-public:
-  InnerTcpServer(const common::net::HostAndPort &host,
-                 tcp::ITcpLoopObserver *observer);
-  virtual const char *className() const;
+class InnerTcpServer : public common::libev::tcp::TcpServer {
+ public:
+  InnerTcpServer(const common::net::HostAndPort& host, common::libev::IoLoopObserver* observer);
+  virtual const char* ClassName() const override;
 
-private:
-  virtual tcp::TcpClient *createClient(const common::net::socket_info &info);
+ private:
+  virtual common::libev::tcp::TcpClient* CreateClient(const common::net::socket_info& info) override;
 };
 
-} // namespace inner
-} // namespace server
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace inner
+}  // namespace server
+}  // namespace siteonyourdevice
+}  // namespace fasto

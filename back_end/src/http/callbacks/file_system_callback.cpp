@@ -33,24 +33,21 @@
 namespace fasto {
 namespace siteonyourdevice {
 
-HttpFileSystemCallback::HttpFileSystemCallback()
-    : HttpCallbackUrl(file_system) {}
+HttpFileSystemCallback::HttpFileSystemCallback() : HttpCallbackUrl(file_system) {}
 
-bool HttpFileSystemCallback::handleRequest(
-    http::HttpClient *hclient, const char *extra_header,
-    const common::http::http_request &request, const HttpServerInfo &info) {
+bool HttpFileSystemCallback::handleRequest(http::HttpClient* hclient,
+                                           const char* extra_header,
+                                           const common::http::http_request& request,
+                                           const HttpServerInfo& info) {
   std::string requeststr = common::ConvertToString(request);
   INFO_LOG() << "handleRequest:\n" << requeststr;
 
   // keep alive
-  common::http::header_t connectionField =
-      request.findHeaderByKey("Connection", false);
-  bool isKeepAlive =
-      common::EqualsASCII(connectionField.value, "Keep-Alive", false);
+  common::http::header_t connectionField = request.findHeaderByKey("Connection", false);
+  bool isKeepAlive = common::EqualsASCII(connectionField.value, "Keep-Alive", false);
   const common::http::http_protocols protocol = request.protocol();
 
-  if (request.method() == common::http::http_method::HM_GET ||
-      request.method() == common::http::http_method::HM_HEAD) {
+  if (request.method() == common::http::http_method::HM_GET || request.method() == common::http::http_method::HM_HEAD) {
     common::uri::Upath path = request.path();
     if (!path.IsValid() || path.IsRoot()) {
       path = common::uri::Upath("index.html");
@@ -63,9 +60,8 @@ bool HttpFileSystemCallback::handleRequest(
 #endif
     struct stat sb;
     if (stat(file_path.c_str(), &sb) < 0) {
-      common::ErrnoError err = hclient->send_error(
-          protocol, common::http::HS_NOT_FOUND, extra_header, "File not found.",
-          isKeepAlive, info);
+      common::Error err =
+          hclient->send_error(protocol, common::http::HS_NOT_FOUND, extra_header, "File not found.", isKeepAlive, info);
       if (err) {
         DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
       }
@@ -73,9 +69,8 @@ bool HttpFileSystemCallback::handleRequest(
     }
 
     if (S_ISDIR(sb.st_mode)) {
-      common::ErrnoError err =
-          hclient->send_error(protocol, common::http::HS_BAD_REQUEST,
-                              extra_header, "Bad filename.", isKeepAlive, info);
+      common::Error err =
+          hclient->send_error(protocol, common::http::HS_BAD_REQUEST, extra_header, "Bad filename.", isKeepAlive, info);
       if (err) {
         DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
       }
@@ -84,9 +79,8 @@ bool HttpFileSystemCallback::handleRequest(
 
     int file = open(file_path.c_str(), open_flags);
     if (file == INVALID_DESCRIPTOR) { /* open the file for reading */
-      common::ErrnoError err =
-          hclient->send_error(protocol, common::http::HS_FORBIDDEN, nullptr,
-                              "File is protected.", isKeepAlive, info);
+      common::Error err =
+          hclient->send_error(protocol, common::http::HS_FORBIDDEN, nullptr, "File is protected.", isKeepAlive, info);
       if (err) {
         DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
       }
@@ -94,9 +88,8 @@ bool HttpFileSystemCallback::handleRequest(
     }
 
     const std::string mime = path.GetMime();
-    common::ErrnoError err = hclient->send_headers(
-        protocol, common::http::HS_OK, nullptr, mime.c_str(), &sb.st_size,
-        &sb.st_mtime, isKeepAlive, info);
+    common::Error err = hclient->send_headers(protocol, common::http::HS_OK, nullptr, mime.c_str(), &sb.st_size,
+                                              &sb.st_mtime, isKeepAlive, info);
     if (err) {
       DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
       ::close(file);
@@ -104,8 +97,7 @@ bool HttpFileSystemCallback::handleRequest(
     }
 
     if (request.method() == common::http::http_method::HM_GET) {
-      common::ErrnoError err =
-          hclient->send_file_by_fd(protocol, file, sb.st_size);
+      common::ErrnoError err = hclient->send_file_by_fd(protocol, file, sb.st_size);
       if (err) {
         DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
       }
@@ -113,12 +105,10 @@ bool HttpFileSystemCallback::handleRequest(
     ::close(file);
     return true;
   } else {
-    common::http::header_t contentTypeField =
-        request.findHeaderByKey("Content-Type", false);
+    common::http::header_t contentTypeField = request.findHeaderByKey("Content-Type", false);
     if (!contentTypeField.IsValid()) {
-      common::ErrnoError err =
-          hclient->send_error(protocol, common::http::HS_NOT_ALLOWED, nullptr,
-                              "Unsupported request.", isKeepAlive, info);
+      common::Error err = hclient->send_error(protocol, common::http::HS_NOT_ALLOWED, nullptr, "Unsupported request.",
+                                              isKeepAlive, info);
       if (err) {
         DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
       }
@@ -133,9 +123,8 @@ bool HttpFileSystemCallback::handleRequest(
     } else if (contentTypeValue == "multipart/form-data") {
       return true;
     } else {
-      common::ErrnoError err =
-          hclient->send_error(protocol, common::http::HS_NOT_ALLOWED, nullptr,
-                              "Unsupported content type.", isKeepAlive, info);
+      common::Error err = hclient->send_error(protocol, common::http::HS_NOT_ALLOWED, nullptr,
+                                              "Unsupported content type.", isKeepAlive, info);
       if (err) {
         DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
       }
@@ -144,10 +133,9 @@ bool HttpFileSystemCallback::handleRequest(
   }
 }
 
-std::shared_ptr<IHttpCallback>
-createFileSystemHttpCallback(const std::string &name) {
+std::shared_ptr<IHttpCallback> createFileSystemHttpCallback(const std::string& name) {
   return std::shared_ptr<IHttpCallback>(new HttpFileSystemCallback);
 }
 
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace siteonyourdevice
+}  // namespace fasto

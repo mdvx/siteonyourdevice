@@ -24,17 +24,17 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace websocket {
 
-WebSocketServer::WebSocketServer(const common::net::HostAndPort &host,
-                                 tcp::ITcpLoopObserver *observer)
+WebSocketServer::WebSocketServer(const common::net::HostAndPort& host, common::libev::IoLoopObserver* observer)
     : TcpServer(host, observer) {}
 
-const char *WebSocketServer::ClassName() const { return "WebSocketServer"; }
+const char* WebSocketServer::ClassName() const {
+  return "WebSocketServer";
+}
 
-tcp::TcpClient *
-WebSocketServer::createClient(const common::net::socket_info &info) {
+common::libev::tcp::TcpClient* WebSocketServer::CreateClient(const common::net::socket_info& info) {
   return new WebSocketClient(this, info);
 }
 
-} // namespace websocket
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace websocket
+}  // namespace siteonyourdevice
+}  // namespace fasto

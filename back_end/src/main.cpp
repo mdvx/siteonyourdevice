@@ -27,7 +27,7 @@
 
 int main(int argc, char* argv[]) {
 #if defined(NDEBUG)
-  common::logging::LEVEL_LOG level = common::logging::LOG_LEVEL_INFO;
+  common::logging::LOG_LEVEL level = common::logging::LOG_LEVEL_INFO;
 #else
   common::logging::LOG_LEVEL level = common::logging::LOG_LEVEL_DEBUG;
 #endif

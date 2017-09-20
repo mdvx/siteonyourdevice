@@ -41,12 +41,12 @@ SET(SOURCES_NETWORK
 )
 
 SET(HEADERS_TCP
-  tcp/tcp_server.h
-  tcp/tcp_client.h
+#  tcp/tcp_server.h
+#  tcp/tcp_client.h
 )
 SET(SOURCES_TCP
-  tcp/tcp_server.cpp
-  tcp/tcp_client.cpp
+#  tcp/tcp_server.cpp
+#  tcp/tcp_client.cpp
 )
 
 SET(HEADERS_HTTP
@@ -137,12 +137,13 @@ IF(USE_PTHREAD)
   SET(PLATFORM_LIBRARIES ${PLATFORM_LIBRARIES} pthread)
 ENDIF(USE_PTHREAD)
 
-ADD_SUBDIRECTORY(third-party/libev)
+FIND_PACKAGE(Common REQUIRED)
 ADD_SUBDIRECTORY(third-party/ini)
 SET(INCLUDE_DIRS
   ${INCLUDE_DIRS}
   ${CMAKE_CURRENT_LIST_DIR}
-  third-party/libev/src third-party/ini
+  ${COMMON_INCLUDE_DIR}
+  third-party/ini
   third-party/sds
 )
 INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
@@ -160,7 +161,7 @@ SOURCE_GROUP("Platform Files" FILES ${PLATFORM_HDRS} ${PLATFORM_SRCS})
 SOURCE_GROUP("Resources" FILES ${RESOURCE_APP} ${RESOURCE_OS})
 
 SET(ALL_SOURCES ${HEADERS} ${SOURCES} ${PLATFORM_HDRS} ${PLATFORM_SRCS} ${SOURCES_SDS})
-SET(ALL_LIBS libev common inih json-c ${PLATFORM_LIBRARIES})
+SET(ALL_LIBS ${COMMON_LIBRARIES} inih json-c ${PLATFORM_LIBRARIES})
 
 SET(EXE_SOURCES client_commands.h main.cpp ${RESOURCE_APP} ${ICON_FILE} ${RESOURCE_OS})
 SET(PROJECT_EXE_LIBRARIES ${PROJECT_CORE_LIBRARY})

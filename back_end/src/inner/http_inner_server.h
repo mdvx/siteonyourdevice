@@ -26,28 +26,29 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-class ProxyInnerServer : public tcp::ITcpLoop {
-public:
-  explicit ProxyInnerServer(tcp::ITcpLoopObserver *observer);
-  virtual const char *ClassName() const;
+class ProxyInnerServer : public common::libev::IoLoop {
+ public:
+  typedef common::libev::IoLoop base_class;
+  explicit ProxyInnerServer(common::libev::IoLoopObserver* observer);
+  virtual const char* ClassName() const;
 
-protected:
-  tcp::TcpClient *createClient(const common::net::socket_info &info);
+ protected:
+  common::libev::tcp::TcpClient* CreateClient(const common::net::socket_info& info) override;
 };
 
 class Http2InnerServer : public http::Http2Server {
-public:
-  Http2InnerServer(tcp::ITcpLoopObserver *observer, const HttpConfig &config);
+ public:
+  Http2InnerServer(common::libev::IoLoopObserver* observer, const HttpConfig& config);
 
-  virtual const char *ClassName() const;
+  virtual const char* ClassName() const;
 
-protected:
-  virtual tcp::TcpClient *createClient(const common::net::socket_info &info);
+ protected:
+  virtual common::libev::tcp::TcpClient* CreateClient(const common::net::socket_info& info) override;
 
-private:
+ private:
   const HttpConfig config_;
 };
 
-} // namespace inner
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace inner
+}  // namespace siteonyourdevice
+}  // namespace fasto

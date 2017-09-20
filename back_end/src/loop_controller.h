@@ -22,16 +22,13 @@
 
 #include <common/threads/thread.h>
 
+#include <common/libev/io_loop.h>
+
 namespace fasto {
 namespace siteonyourdevice {
 
-namespace tcp {
-class ITcpLoop;
-class ITcpLoopObserver;
-} // namespace tcp
-
 class ILoopController {
-public:
+ public:
   ILoopController();
   virtual ~ILoopController();
 
@@ -39,30 +36,29 @@ public:
   int exec();
   void stop();
 
-protected:
-  tcp::ITcpLoop *loop_;
-  tcp::ITcpLoopObserver *handler_;
+ protected:
+  common::libev::IoLoop* loop_;
+  common::libev::IoLoopObserver* handler_;
 
-private:
-  virtual tcp::ITcpLoopObserver *createHandler() = 0;
-  virtual tcp::ITcpLoop *createServer(tcp::ITcpLoopObserver *handler) = 0;
+ private:
+  virtual common::libev::IoLoopObserver* CreateHandler() = 0;
+  virtual common::libev::IoLoop* CreateServer(common::libev::IoLoopObserver* handler) = 0;
   virtual void started() = 0;
   virtual void stoped() = 0;
 };
 
 class ILoopThreadController : public ILoopController {
-public:
+ public:
   ILoopThreadController();
   virtual ~ILoopThreadController();
 
   int join();
 
-private:
+ private:
   using ILoopController::exec;
 
-  virtual tcp::ITcpLoopObserver *createHandler() override = 0;
-  virtual tcp::ITcpLoop *
-  createServer(tcp::ITcpLoopObserver *handler) override = 0;
+  virtual common::libev::IoLoopObserver* CreateHandler() override = 0;
+  virtual common::libev::IoLoop* CreateServer(common::libev::IoLoopObserver* handler) override = 0;
 
   virtual void started() override;
   virtual void stoped() override;
@@ -70,5 +66,5 @@ private:
   std::shared_ptr<common::threads::Thread<int>> loop_thread_;
 };
 
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace siteonyourdevice
+}  // namespace fasto

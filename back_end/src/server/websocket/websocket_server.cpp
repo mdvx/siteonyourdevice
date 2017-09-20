@@ -34,34 +34,31 @@ namespace siteonyourdevice {
 namespace server {
 namespace websocket {
 
-WebSocketServerHost::WebSocketServerHost(const common::net::HostAndPort &host,
-                                         tcp::ITcpLoopObserver *observer)
+WebSocketServerHost::WebSocketServerHost(const common::net::HostAndPort& host, common::libev::IoLoopObserver* observer)
     : Http2Server(host, observer) {}
 
-const char *WebSocketServerHost::className() const {
+const char* WebSocketServerHost::ClassName() const {
   return "WebSocketServerHost";
 }
 
-tcp::TcpClient *
-WebSocketServerHost::createClient(const common::net::socket_info &info) {
+common::libev::tcp::TcpClient* WebSocketServerHost::CreateClient(const common::net::socket_info& info) {
   return new WebSocketClientHost(this, info);
 }
 
-WebSocketServerHandlerHost::WebSocketServerHandlerHost(
-    const HttpServerInfo &info, HttpServerHost *parent)
+WebSocketServerHandlerHost::WebSocketServerHandlerHost(const HttpServerInfo& info, HttpServerHost* parent)
     : Http2ServerHandler(info, NULL), parent_(parent) {}
 
-void WebSocketServerHandlerHost::dataReceived(tcp::TcpClient *client) {
+void WebSocketServerHandlerHost::DataReceived(common::libev::IoClient* client) {
   char buff[BUF_SIZE] = {0};
   size_t nread = 0;
-  common::ErrnoError err = client->read(buff, BUF_SIZE, &nread);
+  common::Error err = client->Read(buff, BUF_SIZE, &nread);
   if (err || nread == 0) {
-    client->close();
+    client->Close();
     delete client;
     return;
   }
 
-  WebSocketClientHost *hclient = dynamic_cast<WebSocketClientHost *>(client);
+  WebSocketClientHost* hclient = dynamic_cast<WebSocketClientHost*>(client);
   CHECK(hclient);
 
   std::string request(buff, nread);
@@ -70,9 +67,8 @@ void WebSocketServerHandlerHost::dataReceived(tcp::TcpClient *client) {
 
   if (result.second) {
     const std::string error_text = result.second->GetDescription();
-    hclient->send_error(common::http::HP_1_1, result.first, NULL,
-                        error_text.c_str(), false, info());
-    hclient->close();
+    hclient->send_error(common::http::HP_1_1, result.first, NULL, error_text.c_str(), false, info());
+    hclient->Close();
     delete hclient;
     return;
   }
@@ -80,8 +76,8 @@ void WebSocketServerHandlerHost::dataReceived(tcp::TcpClient *client) {
   processWebsocketRequest(hclient, hrequest);
 }
 
-void WebSocketServerHandlerHost::processWebsocketRequest(
-    http::HttpClient *hclient, const common::http::http_request &hrequest) {
+void WebSocketServerHandlerHost::processWebsocketRequest(http::HttpClient* hclient,
+                                                         const common::http::http_request& hrequest) {
   const common::http::http_protocols protocol = hrequest.protocol();
   common::uri::Upath path = hrequest.path();
   std::string hpath = path.GetHpath();
@@ -90,20 +86,17 @@ void WebSocketServerHandlerHost::processWebsocketRequest(
   common::ConvertFromString(hpath, &host);
   std::string hpath_without_port = host.GetHost();
 
-  inner::InnerTcpServerClient *innerConnection =
-      parent_->findInnerConnectionByHost(hpath_without_port);
+  inner::InnerTcpServerClient* innerConnection = parent_->findInnerConnectionByHost(hpath_without_port);
   if (!innerConnection) {
-    WARNING_LOG() << "WebSocketServerHandlerHost not found host " << hpath
-                  << " request str:\n"
+    WARNING_LOG() << "WebSocketServerHandlerHost not found host " << hpath << " request str:\n"
                   << common::ConvertToString(hrequest);
-    hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL,
-                        "Not registered host.", false, info());
-    hclient->close();
+    hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL, "Not registered host.", false, info());
+    hclient->Close();
     delete hclient;
     return;
   }
 
-  hclient->setName(common::ConvertToString(host));
+  hclient->SetName(common::ConvertToString(host));
 
   common::http::http_request chrequest = hrequest;
   path.SetPath(fpath);
@@ -111,14 +104,13 @@ void WebSocketServerHandlerHost::processWebsocketRequest(
 
   common::buffer_t res = common::ConvertToBytes(chrequest);
 
-  tcp::ITcpLoop *server = hclient->server();
-  server->unregisterClient(hclient);
-  innerConnection->addWebsocketRelayClient(
-      parent_->innerHandler(), hclient, res,
-      common::net::HostAndPort::CreateLocalHost(host.GetPort()));
+  common::libev::IoLoop* server = hclient->GetServer();
+  server->UnRegisterClient(hclient);
+  innerConnection->addWebsocketRelayClient(parent_->innerHandler(), hclient, res,
+                                           common::net::HostAndPort::CreateLocalHost(host.GetPort()));
 }
 
-} // namespace websocket
-} // namespace server
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace websocket
+}  // namespace server
+}  // namespace siteonyourdevice
+}  // namespace fasto

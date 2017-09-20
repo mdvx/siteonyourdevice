@@ -18,11 +18,11 @@
 
 #pragma once
 
+#include <common/libev/io_loop_observer.h>
+
 #include "infos.h"
 
 #include "inner/inner_server_command_seq_parser.h"
-
-#include "tcp/tcp_server.h"
 
 #include "http_config.h"
 
@@ -30,44 +30,39 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-class InnerServerHandler : public InnerServerCommandSeqParser,
-                           public tcp::ITcpLoopObserver {
-public:
+class InnerServerHandler : public InnerServerCommandSeqParser, public common::libev::IoLoopObserver {
+ public:
   enum {
-    ping_timeout_server = 30 // sec
+    ping_timeout_server = 30  // sec
   };
 
-  explicit InnerServerHandler(const common::net::HostAndPort &innerHost,
-                              const HttpConfig &config);
+  explicit InnerServerHandler(const common::net::HostAndPort& innerHost, const HttpConfig& config);
   ~InnerServerHandler();
 
   UserAuthInfo authInfo() const;
-  void setConfig(const HttpConfig &config);
+  void setConfig(const HttpConfig& config);
 
-  virtual void preLooped(tcp::ITcpLoop *server) override;
-  virtual void accepted(tcp::TcpClient *client) override;
-  virtual void moved(tcp::TcpClient *client) override;
-  virtual void closed(tcp::TcpClient *client) override;
-  virtual void dataReceived(tcp::TcpClient *client) override;
-  virtual void dataReadyToWrite(tcp::TcpClient *client) override;
-  virtual void postLooped(tcp::ITcpLoop *server) override;
-  virtual void timerEmited(tcp::ITcpLoop *server, timer_id_t id) override;
+  virtual void PreLooped(common::libev::IoLoop* server) override;
+  virtual void Accepted(common::libev::IoClient* client) override;
+  virtual void Moved(common::libev::IoLoop* server, common::libev::IoClient* client) override;
+  virtual void Closed(common::libev::IoClient* client) override;
+  virtual void DataReceived(common::libev::IoClient* client) override;
+  virtual void DataReadyToWrite(common::libev::IoClient* client) override;
+  virtual void PostLooped(common::libev::IoLoop* server) override;
+  virtual void TimerEmited(common::libev::IoLoop* server, common::libev::timer_id_t id) override;
 
-private:
-  virtual void handleInnerRequestCommand(InnerClient *connection, cmd_seq_t id,
-                                         int argc, char *argv[]) override;
-  virtual void handleInnerResponceCommand(InnerClient *connection, cmd_seq_t id,
-                                          int argc, char *argv[]) override;
-  virtual void handleInnerApproveCommand(InnerClient *connection, cmd_seq_t id,
-                                         int argc, char *argv[]) override;
+ private:
+  virtual void handleInnerRequestCommand(InnerClient* connection, cmd_seq_t id, int argc, char* argv[]) override;
+  virtual void handleInnerResponceCommand(InnerClient* connection, cmd_seq_t id, int argc, char* argv[]) override;
+  virtual void handleInnerApproveCommand(InnerClient* connection, cmd_seq_t id, int argc, char* argv[]) override;
 
   HttpConfig config_;
-  InnerClient *inner_connection_;
-  timer_id_t ping_server_id_timer_;
+  InnerClient* inner_connection_;
+  common::libev::timer_id_t ping_server_id_timer_;
 
   const common::net::HostAndPort innerHost_;
 };
 
-} // namespace inner
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace inner
+}  // namespace siteonyourdevice
+}  // namespace fasto

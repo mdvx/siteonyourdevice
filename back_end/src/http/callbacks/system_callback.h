@@ -30,35 +30,32 @@ enum HSCTypes { system_shutdown, system_logout, system_reboot };
 const std::string HSystemCallbackTypes[] = {"shutdown", "logout", "reboot"};
 
 class HttpSystemCallback : public HttpCallbackUrl {
-public:
+ public:
   HttpSystemCallback();
-  virtual bool handleRequest(http::HttpClient *hclient,
-                             const char *extra_header,
-                             const common::http::http_request &request,
-                             const HttpServerInfo &info);
+  virtual bool handleRequest(http::HttpClient* hclient,
+                             const char* extra_header,
+                             const common::http::http_request& request,
+                             const HttpServerInfo& info);
 };
 
 class HttpSystemShutdownCallback : public HttpCallbackUrl {
-public:
+ public:
   explicit HttpSystemShutdownCallback(HSCTypes type);
-  virtual bool handleRequest(http::HttpClient *hclient,
-                             const char *extra_header,
-                             const common::http::http_request &request,
-                             const HttpServerInfo &info);
+  virtual bool handleRequest(http::HttpClient* hclient,
+                             const char* extra_header,
+                             const common::http::http_request& request,
+                             const HttpServerInfo& info);
 
-private:
+ private:
   const HSCTypes type_;
 };
 
-std::shared_ptr<IHttpCallback>
-createSystemHttpCallback(const std::string &name);
+std::shared_ptr<IHttpCallback> createSystemHttpCallback(const std::string& name);
 
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace siteonyourdevice
+}  // namespace fasto
 
 namespace common {
 std::string ConvertToString(fasto::siteonyourdevice::HSCTypes t);
-bool ConvertFromString(const std::string &text,
-                       fasto::siteonyourdevice::HSCTypes *out)
-    WARN_UNUSED_RESULT;
-} // namespace common
+bool ConvertFromString(const std::string& text, fasto::siteonyourdevice::HSCTypes* out) WARN_UNUSED_RESULT;
+}  // namespace common

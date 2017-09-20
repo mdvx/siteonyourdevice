@@ -23,15 +23,14 @@ namespace siteonyourdevice {
 namespace server {
 namespace websocket {
 
-WebSocketClientHost::WebSocketClientHost(tcp::ITcpLoop *server,
-                                         const common::net::socket_info &info)
+WebSocketClientHost::WebSocketClientHost(common::libev::IoLoop* server, const common::net::socket_info& info)
     : Http2Client(server, info) {}
 
-const char *WebSocketClientHost::className() const {
+const char* WebSocketClientHost::ClassName() const {
   return "WebSocketClientHost";
 }
 
-} // namespace websocket
-} // namespace server
-} // namespace siteonyourdevice
-} // namespace fasto
+}  // namespace websocket
+}  // namespace server
+}  // namespace siteonyourdevice
+}  // namespace fasto
