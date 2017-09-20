@@ -22,8 +22,8 @@
 
 #include <string>
 
-#include <common/threads/thread_manager.h>
 #include <common/logger.h>
+#include <common/threads/thread_manager.h>
 
 #include "inner/inner_tcp_client.h"
 
@@ -39,87 +39,87 @@ namespace server {
 
 namespace {
 
-int exec_http_server(http::Http2Server* server) {
-  common::Error err = server->bind();
-  if (err && err->isError()) {
-    DEBUG_MSG_ERROR(err);
+int exec_http_server(http::Http2Server *server) {
+  common::ErrnoError err = server->bind();
+  if (err) {
+    DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     return EXIT_FAILURE;
   }
 
   err = server->listen(5);
-  if (err && err->isError()) {
-    DEBUG_MSG_ERROR(err);
+  if (err) {
+    DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     return EXIT_FAILURE;
   }
 
   return server->exec();
 }
 
-int exec_inner_server(inner::InnerTcpServer* server) {
-  common::Error err = server->bind();
-  if (err && err->isError()) {
-    DEBUG_MSG_ERROR(err);
+int exec_inner_server(inner::InnerTcpServer *server) {
+  common::ErrnoError err = server->bind();
+  if (err) {
+    DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     return EXIT_FAILURE;
   }
 
   err = server->listen(5);
-  if (err && err->isError()) {
-    DEBUG_MSG_ERROR(err);
+  if (err) {
+    DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     return EXIT_FAILURE;
   }
 
   return server->exec();
 }
 
-int exec_websocket_server(websocket::WebSocketServerHost* server) {
-  common::Error err = server->bind();
-  if (err && err->isError()) {
-    DEBUG_MSG_ERROR(err);
+int exec_websocket_server(websocket::WebSocketServerHost *server) {
+  common::ErrnoError err = server->bind();
+  if (err) {
+    DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     return EXIT_FAILURE;
   }
 
   err = server->listen(5);
-  if (err && err->isError()) {
-    DEBUG_MSG_ERROR(err);
+  if (err) {
+    DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     return EXIT_FAILURE;
   }
 
   return server->exec();
 }
 
-}  // namespace
+} // namespace
 
-HttpInnerServerHandlerHost::HttpInnerServerHandlerHost(const HttpServerInfo& info,
-                                                       HttpServerHost* parent)
+HttpInnerServerHandlerHost::HttpInnerServerHandlerHost(
+    const HttpServerInfo &info, HttpServerHost *parent)
     : Http2ServerHandler(info, NULL), parent_(parent) {}
 
 HttpInnerServerHandlerHost::~HttpInnerServerHandlerHost() {}
 
-void HttpInnerServerHandlerHost::accepted(tcp::TcpClient* client) {}
+void HttpInnerServerHandlerHost::accepted(tcp::TcpClient *client) {}
 
-void HttpInnerServerHandlerHost::closed(tcp::TcpClient* client) {}
+void HttpInnerServerHandlerHost::closed(tcp::TcpClient *client) {}
 
-void HttpInnerServerHandlerHost::dataReceived(tcp::TcpClient* client) {
+void HttpInnerServerHandlerHost::dataReceived(tcp::TcpClient *client) {
   char buff[BUF_SIZE] = {0};
-  ssize_t nread = 0;
-  common::Error err = client->read(buff, BUF_SIZE, &nread);
-  if ((err && err->isError()) || nread == 0) {
+  size_t nread = 0;
+  common::ErrnoError err = client->read(buff, BUF_SIZE, &nread);
+  if (err || nread == 0) {
     client->close();
     delete client;
     return;
   }
 
-  client_t* hclient = dynamic_cast<client_t*>(client);
+  client_t *hclient = dynamic_cast<client_t *>(client);
   CHECK(hclient);
 
   std::string request(buff, nread);
   common::http::http_request hrequest;
   auto result = parse_http_request(request, &hrequest);
 
-  if (result.second && result.second->isError()) {
-    const std::string error_text = result.second->description();
-    hclient->send_error(common::http::HP_1_1, result.first, NULL, error_text.c_str(), false,
-                        info());
+  if (result.second) {
+    const std::string error_text = result.second->GetDescription();
+    hclient->send_error(common::http::HP_1_1, result.first, NULL,
+                        error_text.c_str(), false, info());
     hclient->close();
     delete hclient;
     return;
@@ -128,36 +128,39 @@ void HttpInnerServerHandlerHost::dataReceived(tcp::TcpClient* client) {
   processHttpRequest(hclient, hrequest);
 }
 
-void HttpInnerServerHandlerHost::processHttpRequest(http::HttpClient* hclient,
-                                                    const common::http::http_request& hrequest) {
+void HttpInnerServerHandlerHost::processHttpRequest(
+    http::HttpClient *hclient, const common::http::http_request &hrequest) {
   const common::http::http_protocols protocol = hrequest.protocol();
   common::uri::Upath path = hrequest.path();
-  std::string hpath = path.hpath();
-  std::string fpath = path.filename();
+  std::string hpath = path.GetHpath();
+  std::string fpath = path.GetFileName();
 
-  inner::InnerTcpServerClient* innerConnection = parent_->findInnerConnectionByHost(hpath);
+  inner::InnerTcpServerClient *innerConnection =
+      parent_->findInnerConnectionByHost(hpath);
   /*if (!innerConnection) {
-    common::http::header_t refererField = hrequest.findHeaderByKey("Referer", false);
-    if (refererField.isValid()) {
-      common::uri::Uri refpath(refererField.value);
-      common::uri::Upath rpath = refpath.path();
-      DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "hpath: %s, fpath %s", hpath, fpath);
-      hpath = rpath.path();
-      fpath = path.path();
-      DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "after hpath: %s, fpath %s", hpath, fpath);
+    common::http::header_t refererField = hrequest.findHeaderByKey("Referer",
+  false); if (refererField.isValid()) { common::uri::Uri
+  refpath(refererField.value); common::uri::Upath rpath = refpath.path();
+      DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "hpath: %s, fpath %s",
+  hpath, fpath); hpath = rpath.path(); fpath = path.path();
+      DEBUG_MSG_FORMAT<512>(common::logging::L_INFO, "after hpath: %s, fpath
+  %s", hpath, fpath);
     }
 
     innerConnection = parent_->findInnerConnectionByHost(hpath);
   }*/
 
   if (!innerConnection) {
-    WARNING_LOG() << "HttpInnerServerHandlerHost not found host " << hpath << ", request str:\n"
+    WARNING_LOG() << "HttpInnerServerHandlerHost not found host " << hpath
+                  << ", request str:\n"
                   << common::ConvertToString(hrequest);
     std::string msg = common::MemSPrintf(
-        "Not registered host(%s) or it is offline(if it is your host, please build server "
+        "Not registered host(%s) or it is offline(if it is your host, please "
+        "build server "
         "installer(button in your profile page) and run it on your device!).",
         hpath);
-    hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL, msg.c_str(), false, info());
+    hclient->send_error(protocol, common::http::HS_NOT_FOUND, NULL, msg.c_str(),
+                        false, info());
     hclient->close();
     delete hclient;
     return;
@@ -166,29 +169,22 @@ void HttpInnerServerHandlerHost::processHttpRequest(http::HttpClient* hclient,
   hclient->setName(hpath);
 
   common::http::http_request chrequest = hrequest;
-  path.setPath(fpath);
+  path.SetPath(fpath);
   chrequest.setPath(path);
 
-  tcp::ITcpLoop* server = hclient->server();
+  tcp::ITcpLoop *server = hclient->server();
   server->unregisterClient(hclient);
   innerConnection->addHttpRelayClient(parent_->innerHandler(), hclient,
                                       common::ConvertToBytes(chrequest));
 }
 
-HttpServerHost::HttpServerHost(const common::net::HostAndPort& httpHost,
-                               const common::net::HostAndPort& innerHost,
-                               const common::net::HostAndPort& webSocketHost)
-    : httpHandler_(NULL),
-      httpServer_(NULL),
-      http_thread_(),
-      innerHandler_(NULL),
-      innerServer_(NULL),
-      inner_thread_(),
-      websocketHandler_(NULL),
-      websocketServer_(NULL),
-      websocket_thread_(),
-      connections_(),
-      rstorage_() {
+HttpServerHost::HttpServerHost(const common::net::HostAndPort &httpHost,
+                               const common::net::HostAndPort &innerHost,
+                               const common::net::HostAndPort &webSocketHost)
+    : httpHandler_(NULL), httpServer_(NULL), http_thread_(),
+      innerHandler_(NULL), innerServer_(NULL), inner_thread_(),
+      websocketHandler_(NULL), websocketServer_(NULL), websocket_thread_(),
+      connections_(), rstorage_() {
   HttpServerInfo hinf(PROJECT_NAME_SERVER_TITLE, PROJECT_DOMAIN);
 
   httpHandler_ = new HttpInnerServerHandlerHost(hinf, this);
@@ -199,20 +195,25 @@ HttpServerHost::HttpServerHost(const common::net::HostAndPort& httpHost,
   innerHandler_ = new inner::InnerServerHandlerHost(this);
   innerServer_ = new inner::InnerTcpServer(innerHost, innerHandler_);
   innerServer_->setName("inner_server");
-  inner_thread_ = THREAD_MANAGER()->CreateThread(&exec_inner_server, innerServer_);
+  inner_thread_ =
+      THREAD_MANAGER()->CreateThread(&exec_inner_server, innerServer_);
 
   websocketHandler_ = new websocket::WebSocketServerHandlerHost(hinf, this);
-  websocketServer_ = new websocket::WebSocketServerHost(webSocketHost, websocketHandler_);
+  websocketServer_ =
+      new websocket::WebSocketServerHost(webSocketHost, websocketHandler_);
   websocketServer_->setName("websocket_server");
-  websocket_thread_ = THREAD_MANAGER()->CreateThread(&exec_websocket_server, websocketServer_);
+  websocket_thread_ =
+      THREAD_MANAGER()->CreateThread(&exec_websocket_server, websocketServer_);
 }
 
-inner::InnerServerHandlerHost* HttpServerHost::innerHandler() const {
+inner::InnerServerHandlerHost *HttpServerHost::innerHandler() const {
   return innerHandler_;
 }
 
-bool HttpServerHost::unRegisterInnerConnectionByHost(tcp::TcpClient* connection) {
-  inner::InnerTcpServerClient* iconnection = dynamic_cast<inner::InnerTcpServerClient*>(connection);
+bool HttpServerHost::unRegisterInnerConnectionByHost(
+    tcp::TcpClient *connection) {
+  inner::InnerTcpServerClient *iconnection =
+      dynamic_cast<inner::InnerTcpServerClient *>(connection);
   if (!iconnection) {
     return false;
   }
@@ -222,32 +223,33 @@ bool HttpServerHost::unRegisterInnerConnectionByHost(tcp::TcpClient* connection)
     return false;
   }
 
-  std::string host = hinf.host.host;
+  std::string host = hinf.host.GetHost();
   connections_.erase(host);
   return true;
 }
 
-bool HttpServerHost::registerInnerConnectionByUser(const UserAuthInfo& user,
-                                                   tcp::TcpClient* connection) {
+bool HttpServerHost::registerInnerConnectionByUser(const UserAuthInfo &user,
+                                                   tcp::TcpClient *connection) {
   CHECK(user.isValid());
-  inner::InnerTcpServerClient* iconnection = dynamic_cast<inner::InnerTcpServerClient*>(connection);
+  inner::InnerTcpServerClient *iconnection =
+      dynamic_cast<inner::InnerTcpServerClient *>(connection);
   if (!iconnection) {
     return false;
   }
 
   iconnection->setServerHostInfo(user);
 
-  std::string host = user.host.host;
+  std::string host = user.host.GetHost();
   connections_[host] = iconnection;
   return true;
 }
 
-bool HttpServerHost::findUser(const UserAuthInfo& user) const {
+bool HttpServerHost::findUser(const UserAuthInfo &user) const {
   return rstorage_.findUser(user);
 }
 
-inner::InnerTcpServerClient* HttpServerHost::findInnerConnectionByHost(
-    const std::string& host) const {
+inner::InnerTcpServerClient *
+HttpServerHost::findInnerConnectionByHost(const std::string &host) const {
   inner_connections_type::const_iterator hs = connections_.find(host);
   if (hs == connections_.end()) {
     return nullptr;
@@ -256,7 +258,7 @@ inner::InnerTcpServerClient* HttpServerHost::findInnerConnectionByHost(
   return (*hs).second;
 }
 
-void HttpServerHost::setStorageConfig(const redis_sub_configuration_t& config) {
+void HttpServerHost::setStorageConfig(const redis_sub_configuration_t &config) {
   rstorage_.setConfig(config);
   innerHandler_->setStorageConfig(config);
 }
@@ -288,6 +290,6 @@ void HttpServerHost::stop() {
   websocketServer_->stop();
 }
 
-}  // namespace server
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace server
+} // namespace siteonyourdevice
+} // namespace fasto

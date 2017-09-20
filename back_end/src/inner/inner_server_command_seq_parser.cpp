@@ -22,6 +22,7 @@
 
 #include <common/convert2string.h>
 #include <common/logger.h>
+#include <common/sys_byteorder.h>
 
 #include "inner/inner_client.h"
 
@@ -39,11 +40,9 @@ namespace inner {
 RequestCallback::RequestCallback(cmd_seq_t request_id, callback_t cb)
     : request_id_(request_id), cb_(cb) {}
 
-cmd_seq_t RequestCallback::request_id() const {
-  return request_id_;
-}
+cmd_seq_t RequestCallback::request_id() const { return request_id_; }
 
-void RequestCallback::execute(int argc, char* argv[]) {
+void RequestCallback::execute(int argc, char *argv[]) {
   if (!cb_) {
     return;
   }
@@ -56,16 +55,19 @@ InnerServerCommandSeqParser::InnerServerCommandSeqParser() : id_() {}
 InnerServerCommandSeqParser::~InnerServerCommandSeqParser() {}
 
 cmd_seq_t InnerServerCommandSeqParser::next_id() {
-  size_t next_id = id_++;
-  char bytes[sizeof(size_t)];
-  betoh_memcpy(&bytes, &next_id, sizeof(bytes));
-  std::string hex = common::HexEncode(&bytes, sizeof(bytes), true);
-  return hex;
+  const id_t next_id = id_++;
+  char bytes[sizeof(id_t)];
+  const id_t stabled = common::NetToHost64(next_id); // for human readable hex
+  memcpy(&bytes, &stabled, sizeof(id_t));
+  cmd_seq_t hexed =
+      common::utils::hex::encode(std::string(bytes, sizeof(id_t)), true);
+  return hexed;
 }
 
 namespace {
 
-bool exec_reqest(RequestCallback req, cmd_seq_t request_id, int argc, char* argv[]) {
+bool exec_reqest(RequestCallback req, cmd_seq_t request_id, int argc,
+                 char *argv[]) {
   if (request_id == req.request_id()) {
     req.execute(argc, argv);
     return true;
@@ -74,30 +76,32 @@ bool exec_reqest(RequestCallback req, cmd_seq_t request_id, int argc, char* argv
   return false;
 }
 
-}  // namespace
+} // namespace
 
-void InnerServerCommandSeqParser::processRequest(cmd_seq_t request_id, int argc, char* argv[]) {
+void InnerServerCommandSeqParser::processRequest(cmd_seq_t request_id, int argc,
+                                                 char *argv[]) {
   subscribed_requests_.erase(
       std::remove_if(subscribed_requests_.begin(), subscribed_requests_.end(),
-                     std::bind(&exec_reqest, std::placeholders::_1, request_id, argc, argv)),
+                     std::bind(&exec_reqest, std::placeholders::_1, request_id,
+                               argc, argv)),
       subscribed_requests_.end());
 }
 
-void InnerServerCommandSeqParser::subscribeRequest(const RequestCallback& req) {
+void InnerServerCommandSeqParser::subscribeRequest(const RequestCallback &req) {
   subscribed_requests_.push_back(req);
 }
 
-void InnerServerCommandSeqParser::handleInnerDataReceived(InnerClient* connection,
-                                                          char* buff,
-                                                          uint32_t buff_len) {
-  ssize_t nwrite = 0;
-  char* end = strstr(buff, END_OF_COMMAND);
+void InnerServerCommandSeqParser::handleInnerDataReceived(
+    InnerClient *connection, char *buff, uint32_t buff_len) {
+  size_t nwrite = 0;
+  char *end = strstr(buff, END_OF_COMMAND);
   if (!end) {
     WARNING_LOG() << "UNKNOWN SEQUENCE: " << buff;
-    const cmd_responce_t resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
-    common::Error err = connection->write(resp, &nwrite);
-    if (err && err->isError()) {
-      DEBUG_MSG_ERROR(err);
+    const cmd_responce_t resp =
+        make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
+    common::ErrnoError err = connection->write(resp, &nwrite);
+    if (err) {
+      DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     }
     connection->close();
     delete connection;
@@ -106,27 +110,29 @@ void InnerServerCommandSeqParser::handleInnerDataReceived(InnerClient* connectio
 
   *end = 0;
 
-  char* star_seq = NULL;
+  char *star_seq = NULL;
   cmd_id_t seq = strtoul(buff, &star_seq, 10);
   if (*star_seq != ' ') {
     WARNING_LOG() << "PROBLEM EXTRACTING SEQUENCE: " << buff;
-    const cmd_responce_t resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
-    common::Error err = connection->write(resp, &nwrite);
-    if (err && err->isError()) {
-      DEBUG_MSG_ERROR(err);
+    const cmd_responce_t resp =
+        make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
+    common::ErrnoError err = connection->write(resp, &nwrite);
+    if (err) {
+      DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     }
     connection->close();
     delete connection;
     return;
   }
 
-  const char* id_ptr = strchr(star_seq + 1, ' ');
+  const char *id_ptr = strchr(star_seq + 1, ' ');
   if (!id_ptr) {
     WARNING_LOG() << "PROBLEM EXTRACTING ID: " << buff;
-    const cmd_responce_t resp = make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
-    common::Error err = connection->write(resp, &nwrite);
-    if (err && err->isError()) {
-      DEBUG_MSG_ERROR(err);
+    const cmd_responce_t resp =
+        make_responce(next_id(), STATE_COMMAND_RESP_FAIL_1S, buff);
+    common::ErrnoError err = connection->write(resp, &nwrite);
+    if (err) {
+      DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     }
     connection->close();
     delete connection;
@@ -135,25 +141,26 @@ void InnerServerCommandSeqParser::handleInnerDataReceived(InnerClient* connectio
 
   size_t len_seq = id_ptr - (star_seq + 1);
   cmd_seq_t id = std::string(star_seq + 1, len_seq);
-  const char* cmd = id_ptr;
+  const char *cmd = id_ptr;
 
   int argc;
-  sds* argv = sdssplitargs(cmd, &argc);
+  sds *argv = sdssplitargs(cmd, &argc);
   processRequest(id, argc, argv);
   if (argv == NULL) {
     WARNING_LOG() << "PROBLEM PARSING INNER COMMAND: " << buff;
-    const cmd_responce_t resp = make_responce(id, STATE_COMMAND_RESP_FAIL_1S, buff);
-    common::Error err = connection->write(resp, &nwrite);
-    if (err && err->isError()) {
-      DEBUG_MSG_ERROR(err);
+    const cmd_responce_t resp =
+        make_responce(id, STATE_COMMAND_RESP_FAIL_1S, buff);
+    common::ErrnoError err = connection->write(resp, &nwrite);
+    if (err) {
+      DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     }
     connection->close();
     delete connection;
     return;
   }
 
-  INFO_LOG() << "HANDLE INNER COMMAND client[" << connection->formatedName() << "] seq:" << seq
-             << ", id:" << id << ", cmd: " << cmd;
+  INFO_LOG() << "HANDLE INNER COMMAND client[" << connection->formatedName()
+             << "] seq:" << seq << ", id:" << id << ", cmd: " << cmd;
   if (seq == REQUEST_COMMAND) {
     handleInnerRequestCommand(connection, id, argc, argv);
   } else if (seq == RESPONCE_COMMAND) {
@@ -166,6 +173,6 @@ void InnerServerCommandSeqParser::handleInnerDataReceived(InnerClient* connectio
   sdsfreesplitres(argv, argc);
 }
 
-}  // namespace inner
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace inner
+} // namespace siteonyourdevice
+} // namespace fasto

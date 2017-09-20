@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include <common/http/http.h>
@@ -29,41 +30,43 @@ namespace siteonyourdevice {
 
 namespace http {
 class HttpClient;
-}  // namespace http
+} // namespace http
 
 enum HCTypes {
   system,
-  file_system  // handle all requests
+  file_system // handle all requests
 };
 
 const std::string HCallbackTypes[] = {"system", "file_system"};
 
 class IHttpCallback {
- public:
+public:
   IHttpCallback();
   virtual ~IHttpCallback();
-  virtual bool handleRequest(http::HttpClient* hclient,
-                             const char* extra_header,
-                             const common::http::http_request& request,
-                             const HttpServerInfo& info) = 0;
+  virtual bool handleRequest(http::HttpClient *hclient,
+                             const char *extra_header,
+                             const common::http::http_request &request,
+                             const HttpServerInfo &info) = 0;
 
-  static common::shared_ptr<IHttpCallback> createHttpCallback(HCTypes type);
-  static common::shared_ptr<IHttpCallback> createHttpCallback(const std::string& ns_name,
-                                                              const std::string& name);
+  static std::shared_ptr<IHttpCallback> createHttpCallback(HCTypes type);
+  static std::shared_ptr<IHttpCallback>
+  createHttpCallback(const std::string &ns_name, const std::string &name);
 };
 
 class HttpCallbackUrl : public IHttpCallback {
- public:
+public:
   explicit HttpCallbackUrl(HCTypes type);
   HCTypes type() const;
 
- private:
+private:
   const HCTypes type_;
 };
 
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace siteonyourdevice
+} // namespace fasto
 
 namespace common {
 std::string ConvertToString(fasto::siteonyourdevice::HCTypes t);
-}  // namespace common
+bool ConvertFromString(const std::string &from,
+                       fasto::siteonyourdevice::HCTypes *out);
+} // namespace common

@@ -22,15 +22,14 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace websocket {
 
-WebSocketClient::WebSocketClient(tcp::ITcpLoop* server, const common::net::socket_info& info)
+WebSocketClient::WebSocketClient(tcp::ITcpLoop *server,
+                                 const common::net::socket_info &info)
     : Http2Client(server, info) {}
 
 WebSocketClient::~WebSocketClient() {}
 
-const char* WebSocketClient::ClassName() const {
-  return "WebSocketClient";
-}
+const char *WebSocketClient::ClassName() const { return "WebSocketClient"; }
 
-}  // namespace websocket
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace websocket
+} // namespace siteonyourdevice
+} // namespace fasto

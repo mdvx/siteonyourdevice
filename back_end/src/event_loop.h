@@ -30,26 +30,26 @@ namespace siteonyourdevice {
 typedef std::function<void()> async_loop_exec_function_t;
 
 class EvLoopObserver {
- public:
+public:
   virtual ~EvLoopObserver();
 
-  virtual void preLooped(class LibEvLoop* loop) = 0;
-  virtual void stoped(class LibEvLoop* loop) = 0;
-  virtual void postLooped(class LibEvLoop* loop) = 0;
+  virtual void preLooped(class LibEvLoop *loop) = 0;
+  virtual void stoped(class LibEvLoop *loop) = 0;
+  virtual void postLooped(class LibEvLoop *loop) = 0;
 };
 
 class LibEvLoop {
- public:
+public:
   LibEvLoop();
   ~LibEvLoop();
 
-  void setObserver(EvLoopObserver* observer);
+  void setObserver(EvLoopObserver *observer);
 
-  void start_io(ev_io* io);
-  void stop_io(ev_io* io);
+  void start_io(ev_io *io);
+  void stop_io(ev_io *io);
 
-  void start_timer(ev_timer* timer);
-  void stop_timer(ev_timer* timer);
+  void start_timer(ev_timer *timer);
+  void stop_timer(ev_timer *timer);
 
   void execInLoopThread(async_loop_exec_function_t async_cb);
 
@@ -58,14 +58,15 @@ class LibEvLoop {
 
   bool isLoopThread() const;
 
- private:
-  static void stop_cb(struct ev_loop* loop, struct ev_async* watcher, int revents);
+private:
+  static void stop_cb(struct ev_loop *loop, struct ev_async *watcher,
+                      int revents);
 
-  struct ev_loop* const loop_;
-  EvLoopObserver* observer_;
+  struct ev_loop *const loop_;
+  EvLoopObserver *observer_;
   common::threads::platform_thread_id_t exec_id_;
-  ev_async* async_stop_;
+  ev_async *async_stop_;
 };
 
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace siteonyourdevice
+} // namespace fasto

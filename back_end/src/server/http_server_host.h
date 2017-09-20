@@ -19,6 +19,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 
 #include "http/http_server.h"
 
@@ -38,64 +39,70 @@ class HttpServerHost;
 
 namespace inner {
 class InnerTcpServerClient;
-}  // namespace inner
+} // namespace inner
 
 class HttpInnerServerHandlerHost : public http::Http2ServerHandler {
- public:
+public:
   typedef http::Http2Server server_t;
   typedef http::HttpClient client_t;
 
-  HttpInnerServerHandlerHost(const HttpServerInfo& info, HttpServerHost* parent);
-  virtual void accepted(tcp::TcpClient* client);
-  virtual void closed(tcp::TcpClient* client);
-  virtual void dataReceived(tcp::TcpClient* client);
+  HttpInnerServerHandlerHost(const HttpServerInfo &info,
+                             HttpServerHost *parent);
+  virtual void accepted(tcp::TcpClient *client);
+  virtual void closed(tcp::TcpClient *client);
+  virtual void dataReceived(tcp::TcpClient *client);
 
   virtual ~HttpInnerServerHandlerHost();
 
- private:
-  void processHttpRequest(http::HttpClient* hclient, const common::http::http_request& hrequest);
-  HttpServerHost* const parent_;
+private:
+  void processHttpRequest(http::HttpClient *hclient,
+                          const common::http::http_request &hrequest);
+  HttpServerHost *const parent_;
 };
 
 class HttpServerHost {
- public:
-  typedef std::unordered_map<std::string, inner::InnerTcpServerClient*> inner_connections_type;
+public:
+  typedef std::unordered_map<std::string, inner::InnerTcpServerClient *>
+      inner_connections_type;
 
-  HttpServerHost(const common::net::HostAndPort& httpHost,
-                 const common::net::HostAndPort& innerHost,
-                 const common::net::HostAndPort& webSocketHost);
+  HttpServerHost(const common::net::HostAndPort &httpHost,
+                 const common::net::HostAndPort &innerHost,
+                 const common::net::HostAndPort &webSocketHost);
   ~HttpServerHost();
 
-  void setStorageConfig(const redis_sub_configuration_t& config);
+  void setStorageConfig(const redis_sub_configuration_t &config);
 
-  bool unRegisterInnerConnectionByHost(tcp::TcpClient* connection) WARN_UNUSED_RESULT;
-  bool registerInnerConnectionByUser(const UserAuthInfo& user,
-                                     tcp::TcpClient* connection) WARN_UNUSED_RESULT;
-  bool findUser(const UserAuthInfo& user) const;
-  inner::InnerTcpServerClient* findInnerConnectionByHost(const std::string& host) const;
+  bool unRegisterInnerConnectionByHost(tcp::TcpClient *connection)
+      WARN_UNUSED_RESULT;
+  bool
+  registerInnerConnectionByUser(const UserAuthInfo &user,
+                                tcp::TcpClient *connection) WARN_UNUSED_RESULT;
+  bool findUser(const UserAuthInfo &user) const;
+  inner::InnerTcpServerClient *
+  findInnerConnectionByHost(const std::string &host) const;
 
   int exec() WARN_UNUSED_RESULT;
   void stop();
 
-  inner::InnerServerHandlerHost* innerHandler() const;
+  inner::InnerServerHandlerHost *innerHandler() const;
 
- private:
-  HttpInnerServerHandlerHost* httpHandler_;
-  http::Http2Server* httpServer_;
-  std::shared_ptr<common::threads::Thread<int> > http_thread_;
+private:
+  HttpInnerServerHandlerHost *httpHandler_;
+  http::Http2Server *httpServer_;
+  std::shared_ptr<common::threads::Thread<int>> http_thread_;
 
-  inner::InnerServerHandlerHost* innerHandler_;
-  inner::InnerTcpServer* innerServer_;
-  std::shared_ptr<common::threads::Thread<int> > inner_thread_;
+  inner::InnerServerHandlerHost *innerHandler_;
+  inner::InnerTcpServer *innerServer_;
+  std::shared_ptr<common::threads::Thread<int>> inner_thread_;
 
-  websocket::WebSocketServerHandlerHost* websocketHandler_;
-  websocket::WebSocketServerHost* websocketServer_;
-  std::shared_ptr<common::threads::Thread<int> > websocket_thread_;
+  websocket::WebSocketServerHandlerHost *websocketHandler_;
+  websocket::WebSocketServerHost *websocketServer_;
+  std::shared_ptr<common::threads::Thread<int>> websocket_thread_;
 
   inner_connections_type connections_;
   RedisStorage rstorage_;
 };
 
-}  // namespace server
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace server
+} // namespace siteonyourdevice
+} // namespace fasto

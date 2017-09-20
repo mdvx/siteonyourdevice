@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "infos.h"
 
@@ -31,11 +31,11 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace tcp {
 class TcpServer;
-}  // namespace tcp
+} // namespace tcp
 
 namespace inner {
 class InnerServerCommandSeqParser;
-}  // namespace inner
+} // namespace inner
 
 namespace server {
 namespace inner {
@@ -43,51 +43,52 @@ class InnerServerHandlerHost;
 class InnerTcpServerClient;
 
 class IInnerRelayLoop : public ILoopThreadController {
- public:
-  typedef std::pair<tcp::TcpClient*, common::buffer_t> request_t;
-  IInnerRelayLoop(fasto::siteonyourdevice::inner::InnerServerCommandSeqParser* handler,
-                  InnerTcpServerClient* parent,
-                  const request_t& request);
+public:
+  typedef std::pair<tcp::TcpClient *, common::buffer_t> request_t;
+  IInnerRelayLoop(
+      fasto::siteonyourdevice::inner::InnerServerCommandSeqParser *handler,
+      InnerTcpServerClient *parent, const request_t &request);
   ~IInnerRelayLoop();
 
   bool readyForRequest() const;
-  void addRequest(const request_t& request);
+  void addRequest(const request_t &request);
 
- protected:
-  InnerTcpServerClient* const parent_;
-  fasto::siteonyourdevice::inner::InnerServerCommandSeqParser* ihandler_;
+protected:
+  InnerTcpServerClient *const parent_;
+  fasto::siteonyourdevice::inner::InnerServerCommandSeqParser *ihandler_;
 
   const request_t request_;
 };
 
 class InnerTcpServerClient : public siteonyourdevice::inner::InnerClient {
- public:
+public:
   typedef std::shared_ptr<IInnerRelayLoop> http_relay_loop_t;
   typedef std::shared_ptr<IInnerRelayLoop> websocket_relay_loop_t;
 
-  InnerTcpServerClient(tcp::TcpServer* server, const common::net::socket_info& info);
+  InnerTcpServerClient(tcp::TcpServer *server,
+                       const common::net::socket_info &info);
   ~InnerTcpServerClient();
 
-  virtual const char* className() const;
+  virtual const char *className() const;
 
-  void setServerHostInfo(const UserAuthInfo& info);
+  void setServerHostInfo(const UserAuthInfo &info);
   UserAuthInfo serverHostInfo() const;
 
-  void addHttpRelayClient(InnerServerHandlerHost* handler,
-                          tcp::TcpClient* client,
-                          const common::buffer_t& request);  // move ovnerships
-  void addWebsocketRelayClient(InnerServerHandlerHost* handler,
-                               tcp::TcpClient* client,
-                               const common::buffer_t& request,
-                               const common::net::HostAndPort& srcHost);  // move ovnerships
+  void addHttpRelayClient(InnerServerHandlerHost *handler,
+                          tcp::TcpClient *client,
+                          const common::buffer_t &request); // move ovnerships
+  void addWebsocketRelayClient(
+      InnerServerHandlerHost *handler, tcp::TcpClient *client,
+      const common::buffer_t &request,
+      const common::net::HostAndPort &srcHost); // move ovnerships
 
- private:
+private:
   UserAuthInfo hinfo_;
   std::vector<http_relay_loop_t> relays_http_;
   std::vector<websocket_relay_loop_t> relays_websockets_;
 };
 
-}  // namespace inner
-}  // namespace server
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace inner
+} // namespace server
+} // namespace siteonyourdevice
+} // namespace fasto

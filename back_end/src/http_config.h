@@ -18,12 +18,12 @@
 
 #pragma once
 
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
 
 #include <common/net/types.h>
-#include <common/url.h>
+#include <common/uri/url.h>
 
 #define SERVER_SETTINGS_SECTION_LABEL "http_server"
 
@@ -61,9 +61,9 @@ struct HttpConfig {
   typedef std::pair<std::string, std::string> handlers_url_t;
   std::vector<handlers_url_t> handlers_urls;
 
-  typedef std::pair<std::string, common::uri::Uri> server_sockets_url_t;
+  typedef std::pair<std::string, common::uri::Url> server_sockets_url_t;
   std::vector<server_sockets_url_t> server_sockets_urls;
 };
 
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace siteonyourdevice
+} // namespace fasto

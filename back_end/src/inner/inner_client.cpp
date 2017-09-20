@@ -22,25 +22,27 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-InnerClient::InnerClient(tcp::ITcpLoop* server, const common::net::socket_info& info)
+InnerClient::InnerClient(tcp::ITcpLoop *server,
+                         const common::net::socket_info &info)
     : TcpClient(server, info) {}
 
-const char* InnerClient::ClassName() const {
-  return "InnerClient";
-}
+const char *InnerClient::ClassName() const { return "InnerClient"; }
 
-common::Error InnerClient::write(const cmd_request_t& request, ssize_t* nwrite) {
+common::ErrnoError InnerClient::write(const cmd_request_t &request,
+                                      size_t *nwrite) {
   return TcpClient::write(request.data(), request.size(), nwrite);
 }
 
-common::Error InnerClient::write(const cmd_responce_t& responce, ssize_t* nwrite) {
+common::ErrnoError InnerClient::write(const cmd_responce_t &responce,
+                                      size_t *nwrite) {
   return TcpClient::write(responce.data(), responce.size(), nwrite);
 }
 
-common::Error InnerClient::write(const cmd_approve_t& approve, ssize_t* nwrite) {
+common::ErrnoError InnerClient::write(const cmd_approve_t &approve,
+                                      size_t *nwrite) {
   return TcpClient::write(approve.data(), approve.size(), nwrite);
 }
 
-}  // namespace inner
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace inner
+} // namespace siteonyourdevice
+} // namespace fasto

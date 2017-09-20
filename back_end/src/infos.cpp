@@ -20,55 +20,61 @@
 
 #include <string>
 
-#include <common/sprintf.h>
 #include <common/convert2string.h>
+#include <common/sprintf.h>
 
 namespace fasto {
 namespace siteonyourdevice {
 
 UserAuthInfo::UserAuthInfo() : login(), password(), host() {}
 
-UserAuthInfo::UserAuthInfo(const std::string& login,
-                           const std::string& password,
-                           const common::net::HostAndPort& host)
+UserAuthInfo::UserAuthInfo(const std::string &login,
+                           const std::string &password,
+                           const common::net::HostAndPort &host)
     : login(login), password(password), host(host) {}
 
-bool UserAuthInfo::isValid() const {
-  return !login.empty() && host.isValid();
-}
+bool UserAuthInfo::isValid() const { return !login.empty() && host.IsValid(); }
 
 HttpServerInfo::HttpServerInfo() : server_name(), server_url() {}
 
-HttpServerInfo::HttpServerInfo(const std::string& server_name, const std::string& server_url)
+HttpServerInfo::HttpServerInfo(const std::string &server_name,
+                               const std::string &server_url)
     : server_name(server_name), server_url(server_url) {}
 
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace siteonyourdevice
+} // namespace fasto
 
 namespace common {
 
-std::string ConvertToString(const fasto::siteonyourdevice::UserAuthInfo& uinfo) {
-  return common::MemSPrintf("%s:%s:%s", uinfo.login, uinfo.password, ConvertToString(uinfo.host));
+std::string
+ConvertToString(const fasto::siteonyourdevice::UserAuthInfo &uinfo) {
+  return common::MemSPrintf("%s:%s:%s", uinfo.login, uinfo.password,
+                            ConvertToString(uinfo.host));
 }
 
-template <>
-fasto::siteonyourdevice::UserAuthInfo ConvertFromString(const std::string& uinfo_str) {
-  size_t up = uinfo_str.find_first_of(':');
-  if (up == std::string::npos) {
-    return fasto::siteonyourdevice::UserAuthInfo();
+bool ConvertFromString(const std::string &from,
+                       fasto::siteonyourdevice::UserAuthInfo *out) {
+  if (!out) {
+    return false;
   }
 
-  size_t ph = uinfo_str.find_first_of(':', up + 1);
+  size_t up = from.find_first_of(':');
+  if (up == std::string::npos) {
+    return false;
+  }
+
+  size_t ph = from.find_first_of(':', up + 1);
   if (ph == std::string::npos) {
-    return fasto::siteonyourdevice::UserAuthInfo();
+    return false;
   }
 
   fasto::siteonyourdevice::UserAuthInfo uinfo;
-  uinfo.login = uinfo_str.substr(0, up);
-  uinfo.password = uinfo_str.substr(up + 1, ph - up - 1);
-  uinfo.host = ConvertFromString<common::net::HostAndPort>(uinfo_str.substr(ph + 1));
+  uinfo.login = from.substr(0, up);
+  uinfo.password = from.substr(up + 1, ph - up - 1);
+  ConvertFromString(from.substr(ph + 1), &uinfo.host);
 
-  return uinfo;
+  *out = uinfo;
+  return true;
 }
 
-}  // namespace common
+} // namespace common

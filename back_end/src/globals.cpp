@@ -23,11 +23,9 @@
 #include <common/convert2string.h>
 
 namespace {
-
-const std::string SNetworkEventTypes[] = {"InnerClientConnected", "InnerClientDisconnected",
-                                          "ConfigChanged",
-
-                                          "CountNetworkEvent"};
+const std::string SNetworkEventTypes[] = {"InnerClientConnected",
+                                          "InnerClientDisconnected",
+                                          "ConfigChanged", "CountNetworkEvent"};
 }
 
 namespace common {
@@ -36,16 +34,20 @@ std::string ConvertToString(NetworkEventTypes net) {
   return SNetworkEventTypes[net];
 }
 
-template <>
-NetworkEventTypes ConvertFromString(const std::string& net_str) {
+bool ConvertFromString(const std::string &from, NetworkEventTypes *out) {
+  if (!out) {
+    return false;
+  }
+
   for (size_t i = 0; i < SIZEOFMASS(SNetworkEventTypes); ++i) {
-    if (net_str == SNetworkEventTypes[i]) {
-      return static_cast<NetworkEventTypes>(i);
+    if (from == SNetworkEventTypes[i]) {
+      *out = static_cast<NetworkEventTypes>(i);
+      return true;
     }
   }
 
-  NOTREACHED();
-  return CountNetworkEvent;
+  DNOTREACHED();
+  return false;
 }
 
-}  // namespace common
+} // namespace common

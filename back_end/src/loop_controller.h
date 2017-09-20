@@ -18,7 +18,8 @@
 
 #pragma once
 
-#include <common/smart_ptr.h>
+#include <memory>
+
 #include <common/threads/thread.h>
 
 namespace fasto {
@@ -27,10 +28,10 @@ namespace siteonyourdevice {
 namespace tcp {
 class ITcpLoop;
 class ITcpLoopObserver;
-}
+} // namespace tcp
 
 class ILoopController {
- public:
+public:
   ILoopController();
   virtual ~ILoopController();
 
@@ -38,35 +39,36 @@ class ILoopController {
   int exec();
   void stop();
 
- protected:
-  tcp::ITcpLoop* loop_;
-  tcp::ITcpLoopObserver* handler_;
+protected:
+  tcp::ITcpLoop *loop_;
+  tcp::ITcpLoopObserver *handler_;
 
- private:
-  virtual tcp::ITcpLoopObserver* createHandler() = 0;
-  virtual tcp::ITcpLoop* createServer(tcp::ITcpLoopObserver* handler) = 0;
+private:
+  virtual tcp::ITcpLoopObserver *createHandler() = 0;
+  virtual tcp::ITcpLoop *createServer(tcp::ITcpLoopObserver *handler) = 0;
   virtual void started() = 0;
   virtual void stoped() = 0;
 };
 
 class ILoopThreadController : public ILoopController {
- public:
+public:
   ILoopThreadController();
   virtual ~ILoopThreadController();
 
   int join();
 
- private:
+private:
   using ILoopController::exec;
 
-  virtual tcp::ITcpLoopObserver* createHandler() override = 0;
-  virtual tcp::ITcpLoop* createServer(tcp::ITcpLoopObserver* handler) override = 0;
+  virtual tcp::ITcpLoopObserver *createHandler() override = 0;
+  virtual tcp::ITcpLoop *
+  createServer(tcp::ITcpLoopObserver *handler) override = 0;
 
   virtual void started() override;
   virtual void stoped() override;
 
-  common::shared_ptr<common::threads::Thread<int> > loop_thread_;
+  std::shared_ptr<common::threads::Thread<int>> loop_thread_;
 };
 
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace siteonyourdevice
+} // namespace fasto

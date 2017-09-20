@@ -20,11 +20,11 @@
 
 #include <string>
 
-#include <common/system/system.h>
-#include <common/string_util.h>
-#include <common/sprintf.h>
-#include <common/logger.h>
 #include <common/convert2string.h>
+#include <common/logger.h>
+#include <common/sprintf.h>
+#include <common/string_util.h>
+#include <common/system/system.h>
 
 #include "http/http_client.h"
 
@@ -34,42 +34,48 @@ std::string ConvertToString(fasto::siteonyourdevice::HSCTypes t) {
   return fasto::siteonyourdevice::HSystemCallbackTypes[t];
 }
 
-template <>
-fasto::siteonyourdevice::HSCTypes ConvertFromString(const std::string& text) {
-  for (uint32_t i = 0; i < SIZEOFMASS(fasto::siteonyourdevice::HSystemCallbackTypes); ++i) {
+bool ConvertFromString(const std::string &text,
+                       fasto::siteonyourdevice::HSCTypes *out) {
+  if (!out) {
+    return false;
+  }
+
+  for (uint32_t i = 0;
+       i < SIZEOFMASS(fasto::siteonyourdevice::HSystemCallbackTypes); ++i) {
     if (text == fasto::siteonyourdevice::HSystemCallbackTypes[i]) {
-      return static_cast<fasto::siteonyourdevice::HSCTypes>(i);
+      *out = static_cast<fasto::siteonyourdevice::HSCTypes>(i);
+      return true;
     }
   }
 
   DNOTREACHED();
-  return fasto::siteonyourdevice::system_shutdown;
+  return false;
 }
 
-}  // namespace common
+} // namespace common
 
 namespace fasto {
 namespace siteonyourdevice {
 
 HttpSystemCallback::HttpSystemCallback() : HttpCallbackUrl(system) {}
 
-bool HttpSystemCallback::handleRequest(http::HttpClient* hclient,
-                                       const char* extra_header,
-                                       const common::http::http_request& request,
-                                       const HttpServerInfo& info) {
+bool HttpSystemCallback::handleRequest(
+    http::HttpClient *hclient, const char *extra_header,
+    const common::http::http_request &request, const HttpServerInfo &info) {
   return false;
 }
 
 HttpSystemShutdownCallback::HttpSystemShutdownCallback(HSCTypes type)
     : HttpCallbackUrl(system), type_(type) {}
 
-bool HttpSystemShutdownCallback::handleRequest(http::HttpClient* hclient,
-                                               const char* extra_header,
-                                               const common::http::http_request& request,
-                                               const HttpServerInfo& info) {
+bool HttpSystemShutdownCallback::handleRequest(
+    http::HttpClient *hclient, const char *extra_header,
+    const common::http::http_request &request, const HttpServerInfo &info) {
   // keep alive
-  common::http::header_t connectionField = request.findHeaderByKey("Connection", false);
-  bool isKeepAlive = common::EqualsASCII(connectionField.value, "Keep-Alive", false);
+  common::http::header_t connectionField =
+      request.findHeaderByKey("Connection", false);
+  bool isKeepAlive =
+      common::EqualsASCII(connectionField.value, "Keep-Alive", false);
   const common::http::http_protocols protocol = request.protocol();
 
   common::system::shutdown_t sh_type;
@@ -83,29 +89,34 @@ bool HttpSystemShutdownCallback::handleRequest(http::HttpClient* hclient,
     DNOTREACHED();
   }
 
-  common::Error err = common::system::systemShutdown(sh_type);
-  if (err && err->isError()) {
-    DEBUG_MSG_ERROR(err);
-    std::string cause = common::MemSPrintf("Shutdown failed(%s).", err->description());
-    err = hclient->send_error(protocol, common::http::HS_NOT_ALLOWED, extra_header, cause.c_str(),
-                              isKeepAlive, info);
-    if (err && err->isError()) {
-      DEBUG_MSG_ERROR(err);
+  common::ErrnoError err = common::system::Shutdown(sh_type);
+  if (err) {
+    DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
+    std::string cause =
+        common::MemSPrintf("Shutdown failed(%s).", err->GetDescription());
+    err = hclient->send_error(protocol, common::http::HS_NOT_ALLOWED,
+                              extra_header, cause.c_str(), isKeepAlive, info);
+    if (err) {
+      DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     }
     return true;
   }
 
-  err = hclient->send_ok(protocol, extra_header, "Your device shutdowned!", isKeepAlive, info);
-  if (err && err->isError()) {
-    DEBUG_MSG_ERROR(err);
+  err = hclient->send_ok(protocol, extra_header, "Your device shutdowned!",
+                         isKeepAlive, info);
+  if (err) {
+    DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
   }
   return true;
 }
 
-common::shared_ptr<IHttpCallback> createSystemHttpCallback(const std::string& name) {
-  HSCTypes sys_type = common::ConvertFromString<HSCTypes>(name);
-  return common::shared_ptr<IHttpCallback>(new HttpSystemShutdownCallback(sys_type));
+std::shared_ptr<IHttpCallback>
+createSystemHttpCallback(const std::string &name) {
+  HSCTypes sys_type;
+  common::ConvertFromString(name, &sys_type);
+  return std::shared_ptr<IHttpCallback>(
+      new HttpSystemShutdownCallback(sys_type));
 }
 
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace siteonyourdevice
+} // namespace fasto

@@ -32,13 +32,13 @@ namespace siteonyourdevice {
 
 namespace http {
 class IHttpAuthObserver;
-}  // namespace http
+} // namespace http
 
 namespace network {
 
 class NetworkController : private ILoopThreadController {
- public:
-  NetworkController(int argc, char* argv[]);
+public:
+  NetworkController(int argc, char *argv[]);
   ~NetworkController();
 
   void exit(int result);
@@ -48,22 +48,22 @@ class NetworkController : private ILoopThreadController {
 
   UserAuthInfo authInfo() const;
   HttpConfig config() const;
-  void setConfig(const HttpConfig& config);
+  void setConfig(const HttpConfig &config);
 
- private:
+private:
   void readConfig();
   void saveConfig();
 
-  virtual tcp::ITcpLoopObserver* createHandler();
-  virtual tcp::ITcpLoop* createServer(tcp::ITcpLoopObserver* handler);
+  virtual tcp::ITcpLoopObserver *createHandler();
+  virtual tcp::ITcpLoop *createServer(tcp::ITcpLoopObserver *handler);
 
-  http::IHttpAuthObserver* auth_checker_;
-  ILoopThreadController* server_;
+  http::IHttpAuthObserver *auth_checker_;
+  ILoopThreadController *server_;
 
   std::string config_path_;
   HttpConfig config_;
 };
 
-}  // namespace network
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace network
+} // namespace siteonyourdevice
+} // namespace fasto

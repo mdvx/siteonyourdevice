@@ -23,10 +23,10 @@
 #include <string>
 #include <vector>
 
-#include <common/utils.h>
 #include <common/logger.h>
+#include <common/utils.h>
 
-#include "third-party/json-c/json-c/json.h"
+#include <json-c/json.h>
 
 #define GET_ALL_USERS_REDIS_REQUEST "HGETALL users"
 #define GET_USER_1S "HGET users %s"
@@ -36,13 +36,14 @@ namespace siteonyourdevice {
 namespace server {
 namespace {
 
-redisContext* redis_connect(const redis_configuration_t& config) {
+redisContext *redis_connect(const redis_configuration_t &config) {
   common::net::HostAndPort redisHost = config.redis_host;
   const std::string unixPath = config.redis_unix_socket;
 
-  redisContext* redis = NULL;
+  redisContext *redis = NULL;
   if (unixPath.empty()) {
-    redis = redisConnect(redisHost.host.c_str(), redisHost.port);
+    std::string host_str = redisHost.GetHost();
+    redis = redisConnect(host_str.c_str(), redisHost.GetPort());
   } else {
     redis = redisConnectUnix(unixPath.c_str());
   }
@@ -52,15 +53,13 @@ redisContext* redis_connect(const redis_configuration_t& config) {
 
 typedef std::vector<std::string> hosts_names_t;
 
-bool parse_user_json(const std::string& login,
-                     const char* userJson,
-                     UserAuthInfo* out_info,
-                     hosts_names_t* out_hosts) {
+bool parse_user_json(const std::string &login, const char *userJson,
+                     UserAuthInfo *out_info, hosts_names_t *out_hosts) {
   if (!userJson || !out_info || !out_hosts) {
     return false;
   }
 
-  json_object* obj = json_tokener_parse(userJson);
+  json_object *obj = json_tokener_parse(userJson);
   if (!obj) {
     return false;
   }
@@ -71,19 +70,19 @@ bool parse_user_json(const std::string& login,
     info.name_ = json_object_get_string(jname);
   }*/
 
-  json_object* jpass = NULL;
+  json_object *jpass = NULL;
   json_object_object_get_ex(obj, "password", &jpass);
   if (jpass) {
     out_info->password = json_object_get_string(jpass);
   }
 
-  json_object* jhosts = NULL;
+  json_object *jhosts = NULL;
   json_object_object_get_ex(obj, "hosts", &jhosts);
   if (jhosts) {
     int arraylen = json_object_array_length(jhosts);
     for (int i = 0; i < arraylen; i++) {
-      json_object* jhost = json_object_array_get_idx(jhosts, i);
-      const char* hoststr = json_object_get_string(jhost);
+      json_object *jhost = json_object_array_get_idx(jhosts, i);
+      const char *hoststr = json_object_get_string(jhost);
       out_hosts->push_back(hoststr);
     }
   }
@@ -93,38 +92,39 @@ bool parse_user_json(const std::string& login,
   return true;
 }
 
-}  // namespace
+} // namespace
 
 RedisStorage::RedisStorage() : config_() {}
 
-void RedisStorage::setConfig(const redis_configuration_t& config) {
+void RedisStorage::setConfig(const redis_configuration_t &config) {
   config_ = config;
 }
 
-bool RedisStorage::findUser(const UserAuthInfo& user) const {
+bool RedisStorage::findUser(const UserAuthInfo &user) const {
   if (!user.isValid()) {
     return false;
   }
 
-  redisContext* redis = redis_connect(config_);
+  redisContext *redis = redis_connect(config_);
   if (!redis) {
     return false;
   }
 
   std::string login = user.login;
-  const char* login_str = login.c_str();
-  redisReply* reply = reinterpret_cast<redisReply*>(redisCommand(redis, GET_USER_1S, login_str));
+  const char *login_str = login.c_str();
+  redisReply *reply = reinterpret_cast<redisReply *>(
+      redisCommand(redis, GET_USER_1S, login_str));
   if (!reply) {
     redisFree(redis);
     return false;
   }
 
-  const char* userJson = reply->str;
+  const char *userJson = reply->str;
   UserAuthInfo info;
   hosts_names_t hosts;
   if (parse_user_json(login, userJson, &info, &hosts)) {
     for (int j = 0; j < hosts.size(); ++j) {
-      if (hosts[j] == user.host.host && user.password == info.password) {
+      if (hosts[j] == user.host.GetHost() && user.password == info.password) {
         freeReplyObject(reply);
         redisFree(redis);
         return true;
@@ -137,41 +137,43 @@ bool RedisStorage::findUser(const UserAuthInfo& user) const {
   return false;
 }
 
-RedisSub::RedisSub(RedisSubHandler* handler) : stop_(false), handler_(handler) {}
+RedisSub::RedisSub(RedisSubHandler *handler)
+    : stop_(false), handler_(handler) {}
 
-void RedisSub::setConfig(const redis_sub_configuration_t& config) {
+void RedisSub::setConfig(const redis_sub_configuration_t &config) {
   config_ = config;
 }
 
 void RedisSub::listen() {
-  redisContext* redis_sub = redis_connect(config_);
+  redisContext *redis_sub = redis_connect(config_);
   if (!redis_sub) {
     return;
   }
 
-  const char* channel_str = config_.channel_in.c_str();
+  const char *channel_str = config_.channel_in.c_str();
 
-  void* reply = redisCommand(redis_sub, "SUBSCRIBE %s", channel_str);
+  void *reply = redisCommand(redis_sub, "SUBSCRIBE %s", channel_str);
   if (!reply) {
     redisFree(redis_sub);
     return;
   }
 
   while (!stop_) {
-    redisReply* lreply = NULL;
-    void** plreply = reinterpret_cast<void**>(&lreply);
+    redisReply *lreply = NULL;
+    void **plreply = reinterpret_cast<void **>(&lreply);
     if (redisGetReply(redis_sub, plreply) != REDIS_OK) {
       WARNING_LOG() << "REDIS PUB/SUB GET REPLY ERROR: " << redis_sub->errstr;
       break;
     }
 
-    bool is_error_reply = lreply->type != REDIS_REPLY_ARRAY || lreply->elements != 3 ||
+    bool is_error_reply = lreply->type != REDIS_REPLY_ARRAY ||
+                          lreply->elements != 3 ||
                           lreply->element[1]->type != REDIS_REPLY_STRING ||
                           lreply->element[2]->type != REDIS_REPLY_STRING;
 
-    char* chn = lreply->element[1]->str;
+    char *chn = lreply->element[1]->str;
     size_t chn_len = lreply->element[1]->len;
-    char* msg = lreply->element[2]->str;
+    char *msg = lreply->element[2]->str;
     size_t msg_len = lreply->element[2]->len;
 
     if (handler_) {
@@ -185,23 +187,25 @@ void RedisSub::listen() {
   redisFree(redis_sub);
 }
 
-void RedisSub::stop() {
-  stop_ = true;
-}
+void RedisSub::stop() { stop_ = true; }
 
-bool RedisSub::publish_clients_state(const std::string& msg) {
-  const char* channel = common::utils::c_strornull(config_.channel_clients_state);
+bool RedisSub::publish_clients_state(const std::string &msg) {
+  const char *channel = config_.channel_clients_state.empty()
+                            ? NULL
+                            : config_.channel_clients_state.c_str();
   size_t chn_len = config_.channel_clients_state.length();
   return publish(channel, chn_len, msg.c_str(), msg.length());
 }
 
-bool RedisSub::publish_command_out(const char* msg, size_t msg_len) {
-  const char* channel = common::utils::c_strornull(config_.channel_out);
+bool RedisSub::publish_command_out(const char *msg, size_t msg_len) {
+  const char *channel =
+      config_.channel_out.empty() ? NULL : config_.channel_out.c_str();
   size_t chn_len = config_.channel_out.length();
   return publish(channel, chn_len, msg, msg_len);
 }
 
-bool RedisSub::publish(const char* chn, size_t chn_len, const char* msg, size_t msg_len) {
+bool RedisSub::publish(const char *chn, size_t chn_len, const char *msg,
+                       size_t msg_len) {
   if (!chn || chn_len == 0) {
     return false;
   }
@@ -210,12 +214,12 @@ bool RedisSub::publish(const char* chn, size_t chn_len, const char* msg, size_t 
     return false;
   }
 
-  redisContext* redis_sub = redis_connect(config_);
+  redisContext *redis_sub = redis_connect(config_);
   if (!redis_sub) {
     return false;
   }
 
-  void* rreply = redisCommand(redis_sub, "PUBLISH %s %s", chn, msg);
+  void *rreply = redisCommand(redis_sub, "PUBLISH %s %s", chn, msg);
   if (!rreply) {
     redisFree(redis_sub);
     return false;
@@ -226,6 +230,6 @@ bool RedisSub::publish(const char* chn, size_t chn_len, const char* msg, size_t 
   return true;
 }
 
-}  // namespace server
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace server
+} // namespace siteonyourdevice
+} // namespace fasto

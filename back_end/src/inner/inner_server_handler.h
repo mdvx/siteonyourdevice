@@ -30,48 +30,44 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace inner {
 
-class InnerServerHandler : public InnerServerCommandSeqParser, public tcp::ITcpLoopObserver {
- public:
+class InnerServerHandler : public InnerServerCommandSeqParser,
+                           public tcp::ITcpLoopObserver {
+public:
   enum {
-    ping_timeout_server = 30  // sec
+    ping_timeout_server = 30 // sec
   };
 
-  explicit InnerServerHandler(const common::net::HostAndPort& innerHost, const HttpConfig& config);
+  explicit InnerServerHandler(const common::net::HostAndPort &innerHost,
+                              const HttpConfig &config);
   ~InnerServerHandler();
 
   UserAuthInfo authInfo() const;
-  void setConfig(const HttpConfig& config);
+  void setConfig(const HttpConfig &config);
 
-  virtual void preLooped(tcp::ITcpLoop* server) override;
-  virtual void accepted(tcp::TcpClient* client) override;
-  virtual void moved(tcp::TcpClient* client) override;
-  virtual void closed(tcp::TcpClient* client) override;
-  virtual void dataReceived(tcp::TcpClient* client) override;
-  virtual void dataReadyToWrite(tcp::TcpClient* client) override;
-  virtual void postLooped(tcp::ITcpLoop* server) override;
-  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_t id) override;
+  virtual void preLooped(tcp::ITcpLoop *server) override;
+  virtual void accepted(tcp::TcpClient *client) override;
+  virtual void moved(tcp::TcpClient *client) override;
+  virtual void closed(tcp::TcpClient *client) override;
+  virtual void dataReceived(tcp::TcpClient *client) override;
+  virtual void dataReadyToWrite(tcp::TcpClient *client) override;
+  virtual void postLooped(tcp::ITcpLoop *server) override;
+  virtual void timerEmited(tcp::ITcpLoop *server, timer_id_t id) override;
 
- private:
-  virtual void handleInnerRequestCommand(InnerClient* connection,
-                                         cmd_seq_t id,
-                                         int argc,
-                                         char* argv[]) override;
-  virtual void handleInnerResponceCommand(InnerClient* connection,
-                                          cmd_seq_t id,
-                                          int argc,
-                                          char* argv[]) override;
-  virtual void handleInnerApproveCommand(InnerClient* connection,
-                                         cmd_seq_t id,
-                                         int argc,
-                                         char* argv[]) override;
+private:
+  virtual void handleInnerRequestCommand(InnerClient *connection, cmd_seq_t id,
+                                         int argc, char *argv[]) override;
+  virtual void handleInnerResponceCommand(InnerClient *connection, cmd_seq_t id,
+                                          int argc, char *argv[]) override;
+  virtual void handleInnerApproveCommand(InnerClient *connection, cmd_seq_t id,
+                                         int argc, char *argv[]) override;
 
   HttpConfig config_;
-  InnerClient* inner_connection_;
+  InnerClient *inner_connection_;
   timer_id_t ping_server_id_timer_;
 
   const common::net::HostAndPort innerHost_;
 };
 
-}  // namespace inner
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace inner
+} // namespace siteonyourdevice
+} // namespace fasto

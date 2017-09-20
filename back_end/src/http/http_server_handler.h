@@ -18,15 +18,16 @@
 
 #pragma once
 
-#include <utility>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <common/http/http.h>
+#include <common/uri/url.h>
 
-#include "tcp/tcp_server.h"
 #include "http/callbacks/http_callbacks.h"
+#include "tcp/tcp_server.h"
 
 #include "infos.h"
 
@@ -37,56 +38,57 @@ namespace http {
 class Http2Client;
 
 class IHttpAuthObserver {
- public:
+public:
   IHttpAuthObserver();
-  virtual bool userCanAuth(const std::string& user, const std::string& password) = 0;
+  virtual bool userCanAuth(const std::string &user,
+                           const std::string &password) = 0;
   virtual ~IHttpAuthObserver();
 };
 
 class HttpServerHandler : public tcp::ITcpLoopObserver {
- public:
-  typedef common::shared_ptr<IHttpCallback> http_callback_t;
+public:
+  typedef std::shared_ptr<IHttpCallback> http_callback_t;
   typedef std::map<std::string, http_callback_t> http_callbacks_t;
 
-  typedef std::pair<common::uri::Uri, ILoopController*> socket_url_t;
+  typedef std::pair<common::uri::Url, ILoopController *> socket_url_t;
   typedef std::vector<socket_url_t> sockets_url_t;
 
-  HttpServerHandler(const HttpServerInfo& info, IHttpAuthObserver* observer);
-  virtual void preLooped(tcp::ITcpLoop* server) override;
-  virtual void accepted(tcp::TcpClient* client) override;
-  virtual void moved(tcp::TcpClient* client) override;
-  virtual void closed(tcp::TcpClient* client) override;
-  virtual void dataReceived(tcp::TcpClient* client) override;
-  virtual void dataReadyToWrite(tcp::TcpClient* client) override;
-  virtual void postLooped(tcp::ITcpLoop* server) override;
-  virtual void timerEmited(tcp::ITcpLoop* server, timer_id_t id) override;
+  HttpServerHandler(const HttpServerInfo &info, IHttpAuthObserver *observer);
+  virtual void preLooped(tcp::ITcpLoop *server) override;
+  virtual void accepted(tcp::TcpClient *client) override;
+  virtual void moved(tcp::TcpClient *client) override;
+  virtual void closed(tcp::TcpClient *client) override;
+  virtual void dataReceived(tcp::TcpClient *client) override;
+  virtual void dataReadyToWrite(tcp::TcpClient *client) override;
+  virtual void postLooped(tcp::ITcpLoop *server) override;
+  virtual void timerEmited(tcp::ITcpLoop *server, timer_id_t id) override;
 
   virtual ~HttpServerHandler();
 
-  void registerHttpCallback(const std::string& url, http_callback_t callback);
-  void registerSocketUrl(const common::uri::Uri& url);
+  void registerHttpCallback(const std::string &url, http_callback_t callback);
+  void registerSocketUrl(const common::uri::Url &url);
 
-  void setAuthChecker(IHttpAuthObserver* authChecker);
+  void setAuthChecker(IHttpAuthObserver *authChecker);
 
-  const HttpServerInfo& info() const;
+  const HttpServerInfo &info() const;
 
- protected:
-  virtual void processReceived(HttpClient* hclient, const char* request, size_t req_len);
-  virtual void handleRequest(HttpClient* hclient,
-                             const common::http::http_request& hrequest,
+protected:
+  virtual void processReceived(HttpClient *hclient, const char *request,
+                               size_t req_len);
+  virtual void handleRequest(HttpClient *hclient,
+                             const common::http::http_request &hrequest,
                              bool notClose);
 
- private:
-  bool tryToHandleAsRegisteredCallback(HttpClient* hclient,
-                                       const std::string& uri,
-                                       const common::http::http_request& request);
-  bool tryAuthenticateIfNeeded(HttpClient* hclient,
-                               const char* extra_header,
-                               const common::http::http_request& request);
+private:
+  bool
+  tryToHandleAsRegisteredCallback(HttpClient *hclient, const std::string &uri,
+                                  const common::http::http_request &request);
+  bool tryAuthenticateIfNeeded(HttpClient *hclient, const char *extra_header,
+                               const common::http::http_request &request);
 
   http_callbacks_t httpCallbacks_;
-  const common::shared_ptr<IHttpCallback> fshandler_;
-  IHttpAuthObserver* authChecker_;
+  const std::shared_ptr<IHttpCallback> fshandler_;
+  IHttpAuthObserver *authChecker_;
 
   sockets_url_t sockets_urls_;
 
@@ -94,16 +96,18 @@ class HttpServerHandler : public tcp::ITcpLoopObserver {
 };
 
 class Http2ServerHandler : public HttpServerHandler {
- public:
-  Http2ServerHandler(const HttpServerInfo& info, IHttpAuthObserver* observer);
+public:
+  Http2ServerHandler(const HttpServerInfo &info, IHttpAuthObserver *observer);
 
- protected:
-  virtual void processReceived(HttpClient* hclient, const char* request, size_t req_len) override;
+protected:
+  virtual void processReceived(HttpClient *hclient, const char *request,
+                               size_t req_len) override;
 
- private:
-  void handleHttp2Request(Http2Client* h2client, const char* request, uint32_t req_len);
+private:
+  void handleHttp2Request(Http2Client *h2client, const char *request,
+                          uint32_t req_len);
 };
 
-}  // namespace http
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace http
+} // namespace siteonyourdevice
+} // namespace fasto

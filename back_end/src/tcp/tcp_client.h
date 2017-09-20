@@ -20,8 +20,8 @@
 
 #include <string>
 
-#include <common/patterns/crtp_pattern.h>
 #include <common/net/socket_tcp.h>
+#include <common/patterns/crtp_pattern.h>
 
 #include "event_loop.h"
 
@@ -32,35 +32,38 @@ namespace tcp {
 class ITcpLoop;
 
 class TcpClient : common::IMetaClassInfo {
- public:
+public:
   typedef int flags_t;
   friend class ITcpLoop;
-  TcpClient(ITcpLoop* server, const common::net::socket_info& info, flags_t flags = EV_READ);
+  TcpClient(ITcpLoop *server, const common::net::socket_info &info,
+            flags_t flags = EV_READ);
   virtual ~TcpClient();
 
-  ITcpLoop* server() const;
+  ITcpLoop *server() const;
 
   common::net::socket_info info() const;
   int fd() const;
 
-  virtual common::Error write(const char* data, uint16_t size, ssize_t* nwrite) WARN_UNUSED_RESULT;
-  virtual common::Error read(char* out, uint16_t max_size, ssize_t* nread) WARN_UNUSED_RESULT;
+  virtual common::ErrnoError write(const char *data, uint16_t size,
+                                   size_t *nwrite) WARN_UNUSED_RESULT;
+  virtual common::ErrnoError read(char *out, uint16_t max_size,
+                                  size_t *nread) WARN_UNUSED_RESULT;
 
   void close();
 
-  void setName(const std::string& name);
+  void setName(const std::string &name);
   std::string name() const;
 
   flags_t flags() const;
   void setFlags(flags_t flags);
 
   common::patterns::id_counter<TcpClient>::type_t id() const;
-  virtual const char* ClassName() const override;
+  virtual const char *ClassName() const override;
   std::string formatedName() const;
 
- private:
-  ITcpLoop* server_;
-  ev_io* read_write_io_;
+private:
+  ITcpLoop *server_;
+  ev_io *read_write_io_;
   int flags_;
 
   common::net::SocketHolder sock_;
@@ -68,6 +71,6 @@ class TcpClient : common::IMetaClassInfo {
   const common::patterns::id_counter<TcpClient> id_;
 };
 
-}  // namespace tcp
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace tcp
+} // namespace siteonyourdevice
+} // namespace fasto

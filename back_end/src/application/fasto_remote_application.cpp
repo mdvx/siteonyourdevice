@@ -31,53 +31,66 @@ namespace fasto {
 namespace siteonyourdevice {
 namespace application {
 
-FastoRemoteApplication::FastoRemoteApplication(int argc, char* argv[])
-    : common::application::IApplicationImpl(argc, argv),
-      controller_(nullptr),
+FastoRemoteApplication::FastoRemoteApplication(int argc, char *argv[])
+    : common::application::IApplication(argc, argv), controller_(nullptr),
       network_handler_(nullptr),
       thread_(EVENT_BUS()->CreateEventThread<NetworkEventTypes>()) {}
 
-FastoRemoteApplication::~FastoRemoteApplication() {
-  EVENT_BUS()->Stop();
-}
+FastoRemoteApplication::~FastoRemoteApplication() { EVENT_BUS()->Stop(); }
 
-int FastoRemoteApplication::PreExec() {
-  controller_ = new network::NetworkController(fApp->Argc(), fApp->Argv());
+int FastoRemoteApplication::PreExecImpl() {
+  controller_ =
+      new network::NetworkController(fApp->GetArgc(), fApp->GetArgv());
   network_handler_ = new network::NetworkEventHandler(controller_);
   controller_->connect();
   return EXIT_SUCCESS;
 }
 
-int FastoRemoteApplication::Exec() {
+int FastoRemoteApplication::ExecImpl() {
   EVENT_BUS()->JoinEventThread(thread_);
   return EXIT_SUCCESS;
 }
 
-int FastoRemoteApplication::PostExec() {
+int FastoRemoteApplication::PostExecImpl() {
   delete network_handler_;
   delete controller_;
   return EXIT_SUCCESS;
 }
 
-void FastoRemoteApplication::PostEvent(event_t* event) {}
+void FastoRemoteApplication::PostEvent(event_t *event) {}
 
-void FastoRemoteApplication::SendEvent(event_t* event) {}
+void FastoRemoteApplication::SendEvent(event_t *event) {}
 
-void FastoRemoteApplication::Subscribe(listener_t* listener, common::events_size_t id) {}
+void FastoRemoteApplication::Subscribe(listener_t *listener,
+                                       common::events_size_t id) {}
 
-void FastoRemoteApplication::UnSubscribe(listener_t* listener, common::events_size_t id) {}
+void FastoRemoteApplication::UnSubscribe(listener_t *listener,
+                                         common::events_size_t id) {}
 
-void FastoRemoteApplication::UnSubscribe(listener_t* listener) {}
+void FastoRemoteApplication::UnSubscribe(listener_t *listener) {}
 
 void FastoRemoteApplication::ShowCursor() {}
 
 void FastoRemoteApplication::HideCursor() {}
 
-void FastoRemoteApplication::Exit(int result) {
+bool FastoRemoteApplication::IsCursorVisible() const { return false; }
+
+common::application::timer_id_t
+FastoRemoteApplication::AddTimer(uint32_t interval,
+                                 common::application::timer_callback_t cb,
+                                 void *user_data) {
+  return -1;
+}
+
+bool FastoRemoteApplication::RemoveTimer(common::application::timer_id_t id) {
+  return true;
+}
+
+void FastoRemoteApplication::ExitImpl(int result) {
   controller_->exit(result);
   EVENT_BUS()->StopEventThread(thread_);
 }
 
-}  // namespace application
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace application
+} // namespace siteonyourdevice
+} // namespace fasto

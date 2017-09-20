@@ -39,9 +39,11 @@ namespace server {
 
 const common::net::HostAndPort g_http_host(INNER_HOST_NAME, HOST_PORT);
 const common::net::HostAndPort g_inner_host(INNER_HOST_NAME, INNER_HOST_PORT);
-const common::net::HostAndPort g_websocket_host(INNER_HOST_NAME, WEBSOCKET_PORT);
-const common::net::HostAndPort g_relay_server_host(INNER_HOST_NAME, RANDOM_PORT);
+const common::net::HostAndPort g_websocket_host(INNER_HOST_NAME,
+                                                WEBSOCKET_PORT);
+const common::net::HostAndPort g_relay_server_host(INNER_HOST_NAME,
+                                                   RANDOM_PORT);
 
-}  // namespace server
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace server
+} // namespace siteonyourdevice
+} // namespace fasto

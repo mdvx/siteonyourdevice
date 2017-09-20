@@ -48,9 +48,7 @@ int ILoopController::exec() {
   return loop_->exec();
 }
 
-void ILoopController::start() {
-  started();
-}
+void ILoopController::start() { started(); }
 
 void ILoopController::stop() {
   if (loop_) {
@@ -65,23 +63,18 @@ ILoopController::~ILoopController() {
   delete handler_;
 }
 
-ILoopThreadController::ILoopThreadController() : ILoopController(), loop_thread_() {
+ILoopThreadController::ILoopThreadController()
+    : ILoopController(), loop_thread_() {
   loop_thread_ = THREAD_MANAGER()->CreateThread(&ILoopController::exec, this);
 }
 
 ILoopThreadController::~ILoopThreadController() {}
 
-int ILoopThreadController::join() {
-  return loop_thread_->JoinAndGet();
-}
+int ILoopThreadController::join() { return loop_thread_->JoinAndGet(); }
 
-void ILoopThreadController::started() {
-  loop_thread_->Start();
-}
+void ILoopThreadController::started() { loop_thread_->Start(); }
 
-void ILoopThreadController::stoped() {
-  join();
-}
+void ILoopThreadController::stoped() { join(); }
 
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace siteonyourdevice
+} // namespace fasto

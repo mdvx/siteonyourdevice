@@ -26,15 +26,16 @@ namespace fasto {
 namespace siteonyourdevice {
 
 class HttpFileSystemCallback : public HttpCallbackUrl {
- public:
+public:
   HttpFileSystemCallback();
-  virtual bool handleRequest(http::HttpClient* hclient,
-                             const char* extra_header,
-                             const common::http::http_request& request,
-                             const HttpServerInfo& info);
+  virtual bool handleRequest(http::HttpClient *hclient,
+                             const char *extra_header,
+                             const common::http::http_request &request,
+                             const HttpServerInfo &info);
 };
 
-common::shared_ptr<IHttpCallback> createFileSystemHttpCallback(const std::string& name);
+std::shared_ptr<IHttpCallback>
+createFileSystemHttpCallback(const std::string &name);
 
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace siteonyourdevice
+} // namespace fasto

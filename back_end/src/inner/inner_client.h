@@ -27,18 +27,21 @@ namespace siteonyourdevice {
 namespace inner {
 
 class InnerClient : public tcp::TcpClient {
- public:
-  InnerClient(tcp::ITcpLoop* server, const common::net::socket_info& info);
-  const char* ClassName() const override;
+public:
+  InnerClient(tcp::ITcpLoop *server, const common::net::socket_info &info);
+  const char *ClassName() const override;
 
-  common::Error write(const cmd_request_t& request, ssize_t* nwrite) WARN_UNUSED_RESULT;
-  common::Error write(const cmd_responce_t& responce, ssize_t* nwrite) WARN_UNUSED_RESULT;
-  common::Error write(const cmd_approve_t& approve, ssize_t* nwrite) WARN_UNUSED_RESULT;
+  common::ErrnoError write(const cmd_request_t &request,
+                           size_t *nwrite) WARN_UNUSED_RESULT;
+  common::ErrnoError write(const cmd_responce_t &responce,
+                           size_t *nwrite) WARN_UNUSED_RESULT;
+  common::ErrnoError write(const cmd_approve_t &approve,
+                           size_t *nwrite) WARN_UNUSED_RESULT;
 
- private:
+private:
   using tcp::TcpClient::write;
 };
 
-}  // namespace inner
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace inner
+} // namespace siteonyourdevice
+} // namespace fasto

@@ -20,15 +20,15 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#include <string>
 #include <iostream>
+#include <string>
 
 #include "inih/ini.h"
 
+#include <common/convert2string.h>
 #include <common/logger.h>
 #include <common/utils.h>
-#include <common/file_system.h>
-#include <common/convert2string.h>
+#include <common/file_system/file_system.h>
 
 #include "http_server_host.h"
 #include "server_config.h"
@@ -50,9 +50,7 @@ namespace {
 
 class SysLog : public std::basic_streambuf<char, std::char_traits<char> > {
  public:
-  explicit SysLog(std::string ident, int facility) : buffer_() {
-    openlog(ident.c_str(), LOG_PID, facility);
-  }
+  explicit SysLog(std::string ident, int facility) : buffer_() { openlog(ident.c_str(), LOG_PID, facility); }
 
   ~SysLog() { closelog(); }
 
@@ -79,7 +77,7 @@ class SysLog : public std::basic_streambuf<char, std::char_traits<char> > {
   std::string buffer_;
 };
 
-const common::net::HostAndPort redis_default_host = common::net::HostAndPort::createLocalHost(6379);
+const common::net::HostAndPort redis_default_host = common::net::HostAndPort::CreateLocalHost(6379);
 sig_atomic_t is_stop = 0;
 int total_clients = 0;
 const char* config_path = CONFIG_FILE_PATH;
@@ -95,7 +93,7 @@ int ini_handler_fasto(void* user, const char* section, const char* name, const c
 
 #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
   if (MATCH("http_server", "redis_server")) {
-    pconfig->redis_config_.redis_host = common::ConvertFromString<common::net::HostAndPort>(value);
+    common::ConvertFromString(value, &pconfig->redis_config_.redis_host);
     return 1;
   } else if (MATCH("http_server", "redis_unix_path")) {
     pconfig->redis_config_.redis_unix_socket = value;
@@ -120,7 +118,7 @@ fasto::siteonyourdevice::server::HttpServerHost* server = NULL;
 
 void signal_handler(int sig);
 void sync_config();
-void app_logger_hadler(common::logging::LEVEL_LOG level, const std::string& message);
+void app_logger_hadler(common::logging::LOG_LEVEL level, const std::string& message);
 
 int main(int argc, char* argv[]) {
   int opt;
@@ -151,9 +149,9 @@ int main(int argc, char* argv[]) {
   signal(SIGQUIT, signal_handler);
 
 #if defined(NDEBUG)
-  common::logging::LEVEL_LOG level = common::logging::L_INFO;
+  common::logging::LOG_LEVEL level = common::logging::LOG_LEVEL_INFO;
 #else
-  common::logging::LEVEL_LOG level = common::logging::L_DEBUG;
+  common::logging::LOG_LEVEL level = common::logging::LOG_LEVEL_DEBUG;
 #endif
 #if defined(LOG_TO_FILE)
   std::string log_path = common::file_system::prepare_path("~/" PROJECT_NAME_LOWERCASE ".log");
@@ -169,15 +167,15 @@ int main(int argc, char* argv[]) {
     common::logging::SET_LOGER_STREAM(&std::clog);
   }
 
-  server = new fasto::siteonyourdevice::server::HttpServerHost(
-      fasto::siteonyourdevice::server::g_http_host, fasto::siteonyourdevice::server::g_inner_host,
-      fasto::siteonyourdevice::server::g_websocket_host);
+  server = new fasto::siteonyourdevice::server::HttpServerHost(fasto::siteonyourdevice::server::g_http_host,
+                                                               fasto::siteonyourdevice::server::g_inner_host,
+                                                               fasto::siteonyourdevice::server::g_websocket_host);
 
   sync_config();
 
-  common::Error err = common::file_system::change_directory(HOST_PATH);
+  common::ErrnoError err = common::file_system::change_directory(HOST_PATH);
   int return_code = EXIT_FAILURE;
-  if (err && err->isError()) {
+  if (err) {
     goto exit;
   }
 
@@ -223,6 +221,6 @@ void sync_config() {
   server->setStorageConfig(config.redis_config_);
 }
 
-void app_logger_hadler(common::logging::LEVEL_LOG level, const std::string& message) {
-  syslog(level, "[%s] %s", common::logging::log_level_to_text(level), common::normalize(message));
+void app_logger_hadler(common::logging::LOG_LEVEL level, const std::string& message) {
+  syslog(level, "[%s] %s", common::logging::log_level_to_text(level), common::normalize_for_printf(message));
 }

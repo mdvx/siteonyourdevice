@@ -25,18 +25,17 @@ namespace siteonyourdevice {
 namespace websocket {
 
 class WebSocketServerHandler : public http::Http2ServerHandler {
- public:
-  explicit WebSocketServerHandler(const HttpServerInfo& info);
+public:
+  explicit WebSocketServerHandler(const HttpServerInfo &info);
 
- protected:
-  virtual void processReceived(http::HttpClient* hclient,
-                               const char* request,
+protected:
+  virtual void processReceived(http::HttpClient *hclient, const char *request,
                                size_t req_len) override;
-  virtual void handleRequest(http::HttpClient* hclient,
-                             const common::http::http_request& hrequest,
+  virtual void handleRequest(http::HttpClient *hclient,
+                             const common::http::http_request &hrequest,
                              bool notClose) override;
 };
 
-}  // namespace websocket
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace websocket
+} // namespace siteonyourdevice
+} // namespace fasto

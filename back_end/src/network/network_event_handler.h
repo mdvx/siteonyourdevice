@@ -27,20 +27,20 @@ namespace network {
 class NetworkController;
 
 class NetworkEventHandler {
- public:
-  explicit NetworkEventHandler(NetworkController* controller);
+public:
+  explicit NetworkEventHandler(NetworkController *controller);
   virtual ~NetworkEventHandler();
 
- protected:
-  virtual void handleEvent(NetworkEvent* event);
-  virtual void handleExceptionEvent(NetworkEvent* event, common::Error err);
+protected:
+  virtual void handleEvent(NetworkEvent *event);
+  virtual void handleExceptionEvent(NetworkEvent *event, common::Error err);
 
- private:
+private:
   class NetworkListener;
-  NetworkListener* network_listener_;
-  NetworkController* const controller_;
+  NetworkListener *network_listener_;
+  NetworkController *const controller_;
 };
 
-}  // namespace network
-}  // namespace siteonyourdevice
-}  // namespace fasto
+} // namespace network
+} // namespace siteonyourdevice
+} // namespace fasto

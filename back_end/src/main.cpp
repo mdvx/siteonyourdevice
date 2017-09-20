@@ -16,28 +16,20 @@
     along with SiteOnYourDevice.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <common/file_system.h>
+#include <common/file_system/types.h>
 #include <common/logger.h>
 
 #include <common/application/application.h>
 
 #include "application/fasto_remote_application.h"
 
-namespace common {
-namespace application {
-common::application::IApplicationImpl* CreateApplicationImpl(int argc, char* argv[]) {
-  return new fasto::siteonyourdevice::application::FastoRemoteApplication(argc, argv);
-}
-}
-}
-
 // [-c] config path [-d] run as daemon
 
 int main(int argc, char* argv[]) {
 #if defined(NDEBUG)
-  common::logging::LEVEL_LOG level = common::logging::L_INFO;
+  common::logging::LEVEL_LOG level = common::logging::LOG_LEVEL_INFO;
 #else
-  common::logging::LEVEL_LOG level = common::logging::L_DEBUG;
+  common::logging::LOG_LEVEL level = common::logging::LOG_LEVEL_DEBUG;
 #endif
 #if defined(LOG_TO_FILE)
   std::string log_path = common::file_system::prepare_path("~/" PROJECT_NAME_LOWERCASE ".log");
@@ -45,7 +37,7 @@ int main(int argc, char* argv[]) {
 #else
   INIT_LOGGER(PROJECT_NAME_TITLE, level);
 #endif
-  common::application::Application app(argc, argv);
+  fasto::siteonyourdevice::application::FastoRemoteApplication app(argc, argv);
   int res = app.Exec();
   return res;
 }
